@@ -1,0 +1,256 @@
+---
+title: "curate_metadata_tree"
+output: html_document
+date: "2025-03-03"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+```
+
+# Environment
+```{r}
+# Packages
+packages <- c("readxl","tidyverse","ape","phytools")
+lapply(packages,library,character.only=T)
+
+# Functions
+source("./scripts/dataset_curation/metadata_curation_functions.R")
+
+# Print environment
+Sys.info()
+sessionInfo()
+``` 
+
+# Clean the patient meadata
+Source: UPENN metadata file (459_patients_data_for_posting.xls)
+NFS Path: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/data/459_patients_data_for_posting.xls
+## Load and remove isolate with incomplete data
+```{r}
+# Load in the patient data
+metadata <- read_xls('../../data/459_patients_data_for_posting.xls') %>% as.data.frame
+metadata$isolate_no <-  paste0("PCMP_H",metadata$isolate_no)
+rownames(metadata) <- metadata$isolate_no 
+
+# Remove patient with mismatched SENSITIRE isolate number
+metadata <- metadata %>% subset(isolate_no != "PCMP_H473")
+```
+
+## Update spatiotemporal data
+```{r}
+metadata <- metadata %>% mutate(# Region
+                                          Region = ifelse(Region == "Northern CA", "Southern CA",ifelse(
+                                                          Region == "Houston","Texas", ifelse(
+                                                          Region == "Tampa","Florida",ifelse(
+                                                          Region == "Louisville","Kentucky","")))),
+                                          # Recode LTACH Variable (Alphabetical Coding)
+                                          LTACH_Recode = dplyr::recode(LTACH,
+                                                                # Southern CA
+                                                                EG =  "A", EH =  "B", EI =  "C", EJ =  "D", EL =  "E", GP =  "F",
+                                                                GQ =  "G", GR =  "H", GS =  "I", LM =  "J", OG =  "K", SG =  "L",
+                                                                # Houston
+                                                                DO = "M", DP = "N", DQ = "O", IL = "P", IS = "Q", TL = "R",
+                                                                # Tampa
+                                                                FB = "S", FD = "T",
+                                                                # Louisville
+                                                                EZ = "U"),  
+                                          LOSbeforeCx = dplyr::recode(LOSbeforeCx, '-202' = 202))
+
+```
+
+## Recode antibiotic exposure history data
+```{r}
+## Create new days of therapy (DOT) variables
+metadata$AG_day <- metadata %>% select(amikacin_day,gent_day,tobra_day) %>% rowSums()
+metadata$third_plus_ceph_day <- metadata %>% select(ceftazidime_day,ctx_day,ceftaroline_day,cefepime_day) %>% rowSums()
+metadata$FQ_day <- metadata %>% select(cipro_day,levo_day) %>% rowSums() 
+metadata$pseudoPCN_day <- metadata %>% select(zosyn_day,ceftazidime_day) %>% rowSums() 
+
+## Binarize antibiotic exposure history (1 day was chosen)
+DOT_vars <- colnames(metadata) %>% subset(grepl("day",.))
+for(i in DOT_vars){
+  metadata[,paste0(gsub("_day","",i),"_1d")] <-  binarize_abx_history(i,1,metadata)
+}
+
+## Binarized data
+metadata$any_antibiotic_1d <- ifelse(rowSums(metadata %>% select(any_of(DOT_vars)))>0,1,0)
+```
+
+# Antibiotic resistance metadata
+Source; Custom SENSITITRE broth microdilution assay
+NFS Paths: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Antibiotic_resistance/data/SENSITITRE MICs.xlsx
+## Load data
+```{r}
+SENSITITRE <- read_excel("../../Antibiotic_resistance/data/SENSITITRE MICs.xlsx", range = "B1:N460") %>% as.data.frame
+SENSITITRE <- SENSITITRE %>% mutate(isolate_no = paste0("PCMP_H",str_remove(gsub('CRKP_','',SENSITITRE$ISOLATES),"^0+"))) %>% `rownames<-`(.$isolate_no)
+
+# PCMP_H472 & PCMP_H473 were excluded due to data reporting issues
+SENSITITRE <- subset(SENSITITRE,!isolate_no %in% c("PCMP_H472","PCMP_H473"))
+```
+
+## Clean variables
+```{r}
+## Convert names
+SENSITITRE <-  dplyr::rename(SENSITITRE,MVB = "MEV",IR = "IMK", CST = "COL", AMK = "AMI", FOS = "FOS+",PT = "P/T4")
+
+## Fix MVB data due to miscoding (vaborbactom is a constant 8 µg/mL not 4 µg/mL)
+table(SENSITITRE$MVB)
+SENSITITRE <- SENSITITRE %>% mutate(MVB = dplyr::recode(MVB,"2/4" = "2/8"))
+
+## Create MIC Variable
+MIC_variables <- c("Ceftazidime-avibactam"="CZA","Meropenem-vaborbactam"="MVB","Imipenem-relebactam"="IR","Tigeycline"="TGC","Colistin"="CST","Amikacin"="AMK","Plazomicin"="PLZ","MERO","IMI")
+
+## Numerize MIC Data
+for(i in MIC_variables){
+  SENSITITRE[,paste0(i,"_num")] <- SENSITITRE[,paste0(i)]  %>% gsub("≤","",.) %>% gsub(">","",.) %>% gsub("/.","",.) %>% trimws(.,'both') %>% as.numeric
+}
+
+## Factorize Raw MIC Data
+for(i in MIC_variables){
+  SENSITITRE[,i] <- factorize_MIC(SENSITITRE,i)
+}
+
+## Log-2 Transform Data
+for(i in MIC_variables){
+  SENSITITRE[,paste0(i,"_log_2")] <- log2(SENSITITRE[,paste0(i,"_num")])
+}
+```
+
+## Convert Raw MIC data to phenotypic resistance categories
+Select references:
+1. https://academic.oup.com/cid/article/72/8/1484/5868454?login=true
+2. https://www.sciencedirect.com/science/article/pii/S0255085721041062
+```{r}
+SENSITITRE <- SENSITITRE %>% mutate(
+  ### Meropenem (MERO): ≤1/2/≥4
+  MERO_cat = ifelse(MERO_num <= 1,"S",ifelse(MERO_num >= 4,"R","I")),
+  ### Imipenem (IMI): ≤1/2/≥4
+  IMI_cat = ifelse(IMI_num <= 1,"S",ifelse(IMI_num >= 4,"R","I")),
+  ### Ceftazidime-avibactam: Susceptible (MIC≤8/4), Resistant (MIC≥16/4)  
+  CZA_cat = ifelse(CZA_num <= 8,"S",ifelse(CZA_num >= 16,"R","")),
+  ### Meropenem-vaborbactam (MVB): Susceptible (MIC≤4/8), Intermediate (MIC=8/8), Resistant (MIC≥16/8)  
+  MVB_cat = ifelse(MVB_num <= 4,"S",ifelse(MVB_num == 8,"I","R")),
+  ### Imipenem-relebactam (I-R): Susceptible (MIC≤1/4), Intermediate (MIC=2/4), Resistant (MIC≥4/4)  
+  IR_cat = ifelse(IR_num <= 1,"S",ifelse(IR_num == 2,"I","R")),
+  ### Tigecycline (TGC): Susceptible (MIC≤2), Intermediate (MIC=4), Resistant (MIC≥8)  
+  TGC_cat = ifelse(TGC_num <= 2,"S",ifelse(TGC_num == 4,"I","R")),
+  ### Colistin (CST): Intermediate (MIC≤2), Resistant (MIC≥4)
+  CST_cat = ifelse(CST_num <= 2,"I",ifelse(CST_num >= 4,"R","")),
+  ### Amikacin (AMK): Susceptible (MIC≤16), Intermediate (MIC=32), Resistant (MIC≥64)   
+  AMK_cat =  ifelse(AMK_num <= 16,"S",ifelse(AMK_num == 32,"I","R")),
+  ### Plazomicin (PLZ): Susceptible (MIC≤2), Intermediate (MIC=4), Resistant (MIC≥8) 
+  PLZ_cat = ifelse(PLZ_num <= 2,"S",ifelse(PLZ_num == 4,"I","R")))
+
+## Factorize Categorical Data
+MIC_variables_cat <- paste0(MIC_variables,"_cat") 
+for(i in MIC_variables_cat){
+  SENSITITRE[,i] <- factor(as.vector(SENSITITRE[,i]),
+                           levels = c("S","I","R"),
+                           labels = c("Susceptible","Intermediate","Resistant"))
+}
+
+## Create Binary Non-Susceptible Variable
+MIC_variables_no_CST <- c("MERO","IMI","MVB","IR","CZA","AMK","PLZ","TGC")
+for(i in MIC_variables_no_CST){
+  SENSITITRE[,paste0(i,"_dich")] <- binarize_MIC(SENSITITRE,paste0(i,"_cat"))
+}
+SENSITITRE$CST_dich <- ifelse(SENSITITRE$CST_cat == "Resistant","Non-Susceptible","Susceptible")
+
+## Factorize Dichotomous Data
+MIC_variables_dich <- paste0(MIC_variables,"_dich") 
+for(i in MIC_variables_dich){
+  SENSITITRE[,i] <- factor(as.vector(SENSITITRE[,i]),
+                           levels = c("Susceptible","Non-Susceptible"),
+                           labels = c("Susceptible","Non-Susceptible"))
+}
+
+## Numerical Dichotemous Variable for Resistance
+for(i in MIC_variables_dich){
+  SENSITITRE[,paste0(i,"_num")] <- ifelse(SENSITITRE[,i] == "Susceptible",0,1)
+}
+```
+
+## Create BL/BLI combination therapy outcome
+```{r}
+SENSITITRE$blbli_dich <- ifelse(SENSITITRE$MVB_dich=="Non-Susceptible"|SENSITITRE$IR_dich=="Non-Susceptible","Non-Susceptible","Susceptible")  %>% factor(.,levels = c("Susceptible","Non-Susceptible"),labels = c("Susceptible","Non-Susceptible"))
+SENSITITRE$blbli_dich_num <- ifelse(SENSITITRE$blbli_dich == "Non-Susceptible",1,0) 
+```
+
+# Kleborate data
+Source: Kleborate data
+NFS Path: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/kleborate/klebsiella_pneumo_complex_output.txt
+ENV: kleborate_v2_4_1.yml
+## Load kleborate
+```{r} 
+kleborate <- read.delim(file='./data/kleborate/klebsiella_pneumo_complex_output.txt',sep='\t')
+kleborate<- kleborate %>% mutate(isolate_no = gsub("_contigs_l1000","",strain)) %>% `rownames<-`(.$isolate_no) 
+```
+
+## Curate ST data
+```{r}
+# Clean ST Variable
+kleborate <- kleborate %>% mutate(ST = gsub("ST","",ST) %>% gsub("-1LV","*",.),
+                                  ST258 = ifelse(ST == "258",1,0))
+```
+
+# Create metadata dataframe
+```{r}
+# Merge metadata and sensititre data
+df <- left_join(metadata,SENSITITRE,by="isolate_no") 
+# Only keep ST258 isolates
+df <- df %>% left_join(.,kleborate %>% select(isolate_no,ST,ST258))
+df <- subset(df,ST258==1)
+# Keep rows corresponding to the tree and match ordering (important for future work)
+df <- df %>% `rownames<-`(df$isolate_no)    
+```
+
+# Phylogenetic tree data
+Source: SNPKIT V2.0 run using CP008827 (KPNIH1) reference genome w/ PCMP_H243 as root 
+
+## Load data
+```{r}
+tr <- read.tree(file="../../../Sequence_data/variant_calling/2025-02-17_snpkit_Penn_KPC_ST258/output_files/2025_02_23_21_11_49_core_results/phylokit/results/IQtree/Penn_KPC_ST258.treefile")  %>% 
+                    drop.tip(
+                    # Reference Sequence: https://www.ncbi.nlm.nih.gov/nuccore/CP008827
+                    c('gi|661922017|gb|CP008827.1|','PCMP_H243','PCMP_H473'))
+
+tr_midpoint = phytools::midpoint.root(tr) 
+ape::write.tree(tr_midpoint,paste0("./data/tree/tree.treefile"))
+```
+
+## Generate phylogenetic distance data
+```{r} 
+phylo_dist_midpoint <- ape::cophenetic.phylo(tr_midpoint)
+saveRDS(phylo_dist_midpoint,"./data/tree/phylo_dist.RDS") 
+```
+
+# Order dataframe
+```{r} 
+# Only keep ST258 isolates in tree
+df <- subset(df,isolate_no %in% tr$tip.label) 
+# Keep rows corresponding to the tree and match ordering (important for future work) 
+df <- df %>%.[match(as.vector(tr$tip.label), .$isolate_no),]
+```
+
+# Get clade data
+```{r}
+library(ggtree)
+root_number <-  tr_midpoint$edge[,1] %>% as.numeric %>% min
+clade_nodes <-  tr_midpoint$edge[tr_midpoint$edge[,1] == root_number,] %>% .[,2]  
+ 
+ggtree(tr_midpoint) + geom_point2(aes(subset=node==clade_nodes[1]), color='red', size=5)  + geom_point2(aes(subset=node==clade_nodes[2]), color='blue', size=5)
+ 
+clade_1_descendants = tr_midpoint$tip.label[ phangorn::Descendants(x = tr_midpoint,node = clade_nodes[[1]],type='tips') %>% unlist]
+clade_2_descendants = tr_midpoint$tip.label[ phangorn::Descendants(x = tr_midpoint,node = clade_nodes[[2]],type='tips') %>% unlist]
+
+df$clade_I <- ifelse(df$isolate_no %in% clade_1_descendants,"Clade I","Clade II")
+gheatmap(ggtree(tr_midpoint),df %>% select(clade_I))
+```
+
+# Write final dataframes
+```{r} 
+write.csv(df,file = "./data/dataset/df.csv")
+saveRDS(df,file = "./data/dataset/df.RDS")
+``` 
