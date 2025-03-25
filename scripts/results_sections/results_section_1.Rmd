@@ -1,0 +1,50 @@
+---
+title: "Non-susceptibility to β-lactam/β-lactamase inhibitor combinations was detected before their clinical deployment"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse","kableExtra","tableone")
+lapply(packages,library,character.only=T)
+
+# functions
+source("./lib/common_functions.R")  
+source("./lib/consistent_themes.R")  
+
+# Print environment
+Sys.info()
+sessionInfo()
+``` 
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+```
+
+# General statistics
+```{r}
+paste0("Number of isolates: ",nrow(df))
+paste0("Time distribution: ",paste0(min(df$Cx_date),"-",max(df$Cx_date)))
+paste0("Number of facilities: ",length(unique(df$LTACH_Recode)))
+paste0("Source distribution:")
+table(df$source)
+```
+
+# Distribution of MIC values in log 2 scale
+```{r}
+median_IQR("MVB_log_2",df)  
+median_IQR("IR_log_2",df)
+```
+
+# Phenotypic data
+```{r}
+convert_tableone_into_df(df,vars=c("blbli_dich_num","MVB_dich_num","MVB_cat","IR_dich_num","IR_cat"),factorVars = c("blbli_dich_num","MVB_dich_num","MVB_cat","IR_dich_num","IR_cat")) %>% favorite_kable
+```
