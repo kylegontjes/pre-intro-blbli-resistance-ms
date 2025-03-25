@@ -1,0 +1,33 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=TETyper
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1 
+#SBATCH --output=TETyper.out
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=9 --mem=45g --time=48:00:00
+
+# Results Directory
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/TETyper
+
+# Isolate List
+isolates=$(ls /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/illumina_fastq/clean_fastq_qc_pass_samples/*R1*.fastq.gz  | cut -d/ -f9 | cut -d_ -f1,2)
+
+TETyper.py  -h
+
+for isolate in `echo $isolates`
+do
+	# PRINT THE NAME OF THE FILE
+  echo $isolate;
+  # MAKE DIRECTORY
+  mkdir $isolate
+  # Go Into Directory
+  cd $isolate
+  # Build the amrfinder command
+  TETyper.py --ref /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/environments/TETyper/Tn4401b-1.fasta --fq1 /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/illumina_fastq/clean_fastq_qc_pass_samples/$isolate\_R1_trim_paired.fastq.gz --fq2 /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/illumina_fastq/clean_fastq_qc_pass_samples/$isolate\_R2_trim_paired.fastq.gz --outprefix $isolate --flank_len 25 --struct_profiles /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/environments/TETyper/struct_profiles.txt --snp_profiles /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/environments/TETyper/TETyper/snp_profiles.txt --show_region 7202-8083 --threads 8
+  cd ..
+done
+
