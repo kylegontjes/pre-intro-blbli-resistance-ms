@@ -1,0 +1,119 @@
+---
+title: "Differences in resistance prevalence and emergence events exist across clades of epidemic-lineage ST258  "
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse","kableExtra","tableone","cowplot","ape",'phyloAMR')
+lapply(packages,library,character.only=T)
+
+# functions
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")  
+
+# Print environment
+Sys.info()
+sessionInfo()
+```
+ 
+# Date
+```{r}
+df <- readRDS("./data/dataset/df.RDS") 
+tr <- read.tree("./data/tree/tree.treefile") 
+asr_obj <- readRDS("./data/asr_clustering/blbli_asr.RDS") 
+asr_clustering_obj <- readRDS("./data/asr_clustering/blbli_asr_clustering.RDS") 
+asr_clustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS") 
+
+df <- df %>% left_join(.,asr_clustering %>% select(isolate_no,blbli_asr_cluster_renamed ))
+rownames(df) <- df$isolate_no
+
+df$blbli_clustering_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible") 
+```
+
+```{r} 
+df_CI <- df %>% subset(clade_I == "Clade I")
+tr_CI <- keep.tip(tr,df_CI$isolate_no)
+df_CII <- df %>% subset(clade_I != "Clade I")
+tr_CII <- keep.tip(tr,df_CII$isolate_no)
+```
+
+# Clade frequency
+```{r}
+convert_tableone_into_df(df,vars = "clade_I") %>% favorite_kable
+```
+
+# Differences in prevalence and resistance across  clades
+## Continuous
+```{r}
+CI_MVB_MIC_dist <- median_IQR("MVB_log_2",df_CI)
+CII_MVB_MIC_dist <- median_IQR("MVB_log_2",df_CII)
+Clade_MVB_comps <- wilcox.test(MVB_num ~ clade_I,data=df) %>% .[["p.value"]] %>% round(.,digits=4)
+
+CI_IR_MIC_dist <- median_IQR("IR_log_2",df_CI)
+CII_IR_MIC_dist <- median_IQR("IR_log_2",df_CII)
+Clade_IR_comps <- wilcox.test(IR_num ~ clade_I,data=df) %>% .[["p.value"]] %>% round(.,digits=4)
+
+cbind(pheno="MVB",CI_MVB_MIC_dist,CII_MVB_MIC_dist,Clade_MVB_comps) %>% rbind(.,cbind(pheno="IR",CI_IR_MIC_dist,CII_IR_MIC_dist,Clade_IR_comps)) %>% `colnames<-`(c("Pheno","Clade I","Clade II","p-value")) %>% favorite_kable()
+``` 
+
+## Discrete
+```{r}  
+convert_tableone_into_df(df,vars = c("blbli_dich","MVB_dich","IR_dich"),strata="clade_I",outcome_names = c("Clade I","Clade II"))  %>% favorite_kable()
+```
+
+## Phylogenetic clustering
+### Overall count
+```{r} 
+table(df$blbli_asr_cluster_renamed,df$clade_I)
+```
+### Overall data
+```{r}
+phyloAMR::asr_cluster_analysis(asr_clustering_obj)
+```
+
+### Clustering data
+```{r} 
+clustering_categories <- subset(df$blbli_asr_cluster_renamed,grepl("No Feature",df$blbli_asr_cluster_renamed)==F) %>% sort %>%  unique
+count <- c()
+clade <- c()
+pt_count <- c()
+for(i in clustering_categories){
+    in_cluster <- subset(df,blbli_asr_cluster_renamed == i)
+    clade <- rbind(clade,in_cluster$clade_I %>% unique %>% sort %>% paste0(collapse="&"))
+    count <- rbind(count,nrow(in_cluster))
+    pt_count <- rbind(pt_count,in_cluster$Patient_ID %>% unique %>% length) 
+}
+clustering_data <- cbind.data.frame(clustering_categories = clustering_categories,clade,count,pt_count) %>% arrange(clade,-pt_count)
+clustering_data %>% favorite_kable 
+```
+
+# Data from modeling
+```{r}
+fitmultiMK <- readRDS("./data/fitmultiMk_rate_differences/fitmultiMk_rate_differences_table.RDS")
+fitmultiMK %>% subset(phenotype == 'blbli_dich_num') %>% favorite_kable()
+```
+
+# Tip level data
+```{r}
+ST258_phylo <- asr_cluster_analysis(asr_clustering_obj)   %>% mutate(population = "ST258")
+CI_phylo <- asr_cluster_analysis(asr_clustering_obj %>% subset(child_name %in% df_CI$isolate_no))  %>% mutate(population = "Clade I")
+CII_phylo <- asr_cluster_analysis(asr_clustering_obj %>% subset(child_name %in% df_CII$isolate_no)) %>% mutate(population = "Clade II")
+
+rbind(ST258_phylo,CI_phylo,CII_phylo) %>% favorite_kable()
+```
+# Statistical testing
+```{r}
+paste0("Phylo occurrence diffence")
+c(24,18,106,248) %>% matrix(ncol=2) %>% fisher.test()
+paste0("Clustering, no significant difference but still interesting")
+c(5,1,19,17) %>% matrix(ncol=2) %>% fisher.test()
+``` 
+ 

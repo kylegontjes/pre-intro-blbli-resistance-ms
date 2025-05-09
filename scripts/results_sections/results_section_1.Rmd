@@ -40,7 +40,14 @@ table(df$source)
 
 # Distribution of MIC values in log 2 scale
 ```{r}
-median_IQR("MVB_log_2",df)  
+# MVB
+paste0("MVB")
+median(df$MVB_num)
+median_IQR("MVB_log_2",df) 
+
+# IR
+paste0("IR")
+median(df$IR_num)
 median_IQR("IR_log_2",df)
 ```
 
