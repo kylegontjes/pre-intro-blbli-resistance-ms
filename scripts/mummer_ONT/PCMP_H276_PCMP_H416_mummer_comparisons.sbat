@@ -1,0 +1,29 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=PCMP_H276_PCMP_H416_nucmer
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/mummer_ONT/PCMP_H276_PCMP_H416.out
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=2g --time=00:15:00
+
+echo 'Running nucmer' 
+
+# Move to relevant directory
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/mummer_ONT
+
+# Note: Mummer is installed on our HPC, so we used mummer 4.0.0rc1 version here
+module load Bioinformatics
+module load mummer/4.0.0rc1
+
+# Nucmer
+nucmer -V
+nucmer -p PCMP_H276_PCMP_H416 /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/ONT/medaka/PCMP_H276/PCMP_H276_medaka.fasta /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/ONT/medaka/PCMP_H416/PCMP_H416_medaka.fasta 
+
+# show coords
+show-coords -r -c -l -T  PCMP_H276_PCMP_H416.delta > PCMP_H276_PCMP_H416.coords
+
+

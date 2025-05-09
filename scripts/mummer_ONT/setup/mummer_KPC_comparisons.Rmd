@@ -1,0 +1,69 @@
+---
+title: "Nucmer setup script"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/mummer_ONT')
+```
+
+# Create Model Bash Script
+```{bash} 
+
+echo "#!/bin/sh
+# Job name
+#SBATCH --job-name=title
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/mummer_ONT/prefix.out
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=2g --time=00:15:00
+
+echo 'Running nucmer' 
+
+# Move to relevant directory
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/mummer_ONT
+
+# Note: Mummer is installed on our HPC, so we used mummer 4.0.0rc1 version here
+module load Bioinformatics
+module load mummer/4.0.0rc1
+
+# Nucmer
+nucmer -V
+nucmer -p prefix /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/ONT/medaka/first/first_medaka.fasta /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/ONT/medaka/second/second_medaka.fasta 
+
+# show coords
+show-coords -r -c -l -T  prefix.delta > prefix.coords
+
+" > model_mummer4.sbat
+```
+ 
+
+```{r}
+library(tidyverse) 
+comparisons <- read.delim("./comparisons/comparisons.txt",sep = "")
+comparisons$prefix <- paste0(comparisons$first,"_",comparisons$second)  
+for(i in 1:nrow(comparisons)){
+  first <-  comparisons[i,"first"]
+  second <-  comparisons[i,"second"]
+  prefix <- comparisons[i,"prefix"]
+  
+  tx <- readLines("./model_mummer4.sbat")
+  tx_edit <-  gsub("title", paste0(prefix,"_nucmer"),tx) %>% 
+                gsub("slurm_output_file",paste0(prefix,"_mummer_slurm.out"),.) %>%
+                gsub("first", first,.) %>% 
+                gsub("second", second,.) %>% 
+                gsub("prefix", prefix,.) 
+  fileConn <- file(paste0(prefix,"_mummer_comparisons.sbat"))
+  writeLines(tx_edit,fileConn)
+  close(fileConn)
+}
+```
