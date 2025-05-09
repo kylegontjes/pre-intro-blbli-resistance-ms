@@ -1,0 +1,43 @@
+---
+title: "curate_TETyper"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+``` 
+
+```{r}
+library(tidyverse)
+source("./lib/common_functions.R")
+```
+
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+```
+
+# Load tn4401 TETyper data
+```{r}
+tn4401 <- read.delim("./data/TETyper/TETyper_results.txt") 
+tn4401_ST258 <- tn4401 %>% subset(isolate_no %in% df$isolate_no) %>% `rownames<-`(.$isolate_no) 
+
+tn4401_curated <- get_presence_absence_matrix('Structural_variant',tn4401_ST258)  %>% as.data.frame %>% mutate(isolate_no = rownames(.))
+tn4401_curated <- left_join(tn4401_ST258,tn4401_curated) 
+
+tn4401_curated <- tn4401_curated %>% mutate(Tn4401_del_6920_7126 = ifelse(unknown ==1 & Deletions == "6920-7126",1,0),
+                    Tn4401_del_1_554_7008_7075 = ifelse(unknown ==1 & Deletions == "1-554|7008-7075",1,0),
+                    Tn4401_del_1_3391_6920_7126 = ifelse(unknown ==1 & Deletions == "1-3391|6920-7126",1,0)) 
+
+tn4401_curated$tn4401_allele <- ifelse(tn4401_curated$Tn4401a == 1, "Tn4401a",
+                           ifelse(tn4401_curated$Tn4401b == 1,"Tn4401b",
+                                  ifelse(tn4401_curated$Tn4401d == 1,"Tn4401d",
+                                    ifelse(tn4401_curated$Tn4401_del_6920_7126==1,"Tn4401 del 6920-7126",
+                                           ifelse(tn4401_curated$Tn4401_del_1_554_7008_7075==1,"Tn4401 del 1-554 7008-7075",ifelse( tn4401_curated$Tn4401_del_1_3391_6920_7126==1,"Tn4401 del 1-3391 6920-7126","Other"))))))
+
+saveRDS(tn4401_curated,"./data/TETyper/TETyper_curated.RDS")
+```
