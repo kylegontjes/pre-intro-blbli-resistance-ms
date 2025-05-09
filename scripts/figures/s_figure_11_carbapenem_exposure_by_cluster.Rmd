@@ -149,9 +149,8 @@ FH <- ggplot(data=alluvium_plot_data,aes(x=ceph,fill=as.factor(genotype))) + fac
 ```
 
 # Plot
-
 ```{r,fig.width=15,fig.height=7.5}
-wo_legend <- cowplot::plot_grid(FA + theme(legend.position="none"),FB+ theme(legend.position="none"),FC+ theme(legend.position="none"),FD+ theme(legend.position="none"),FE+ theme(legend.position="none"),FF+ theme(legend.position="none"),FG+ theme(legend.position="none"),FH+ theme(legend.position="none"),ncol=4,labels =c("A.","B.","C.","D.","E.","F.","G.","H."), label_size = 18,rel_widths = c(1,1.25,1.25,1.4,1,1.25,1.25,1.4))
+wo_legend <- cowplot::plot_grid(FA + theme(legend.position="none"),FB+ theme(legend.position="none"),FC+ theme(legend.position="none"),FD+ theme(legend.position="none"),FE+ theme(legend.position="none"),FF+ theme(legend.position="none"),FG+ theme(legend.position="none"),FH+ theme(legend.position="none"),ncol=4,labels ="AUTO", label_size = 18,rel_widths = c(1,1.25,1.25,1.4,1,1.25,1.25,1.4))
 legend <- cowplot::plot_grid(get_legend(FA),get_legend(FC),ncol=2)
 s_figure_11 <- cowplot::plot_grid(wo_legend,legend,ncol=1,rel_heights = c(1,.075))
 s_figure_11

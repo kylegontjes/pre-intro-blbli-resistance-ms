@@ -43,13 +43,13 @@ df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))
 # Gain & Loss Figure
 ```{r}
 traits_of_interest <- c("blbli_dich_num",KPC_clusters)   
-trait_parent_child <- lapply(traits_of_interest,FUN=function(x){
+trait_parent_child <- pbmcapply::pbmclapply(traits_of_interest,FUN=function(x){
   asr(df,tr,tip_name_var = 'isolate_no',pheno=x,model='MF') %>% .$parent_child_df
-}) %>% `names<-`(traits_of_interest)
+},mc.cores=5) %>% `names<-`(traits_of_interest)
 
-synchronous_changes_w_AA552 <- lapply(traits_of_interest %>% subset(.!="AA552_KPC"),FUN=function(x){
+synchronous_changes_w_AA552 <- pbmcapply::pbmclapply(traits_of_interest %>% subset(.!="AA552_KPC"),FUN=function(x){
   phyloAMR::synchronous_detection(comparitor_parent_child_df = trait_parent_child[[x]],trait_parent_child_df = trait_parent_child[['AA552_KPC']],node_states = 'joint')
-}) %>% do.call(rbind,.) %>% mutate(comparitor = traits_of_interest %>% subset(.!="AA552_KPC"))
+},mc.cores=5) %>% do.call(rbind,.) %>% mutate(comparitor = traits_of_interest %>% subset(.!="AA552_KPC"))
 
 synchronous_changes_w_AA552 %>% subset(synchronous_transitions_num>0)
 
@@ -90,7 +90,10 @@ consistent_theme <- theme(plot.margin=grid::unit(c(-2,-3,0,-3), "cm"),legend.pos
   p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.2,offset =.000125) + Log2_scale + consistent_theme  
   # Add KPC data
   p8 <- p.7 +ggnewscale::new_scale_fill()
-  p9 <- gheatmap(p8,df %>% select(AA018_KPC,AA552_KPC,AA356_KPC,AA018_non_KPC,AA552_non_KPC) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 KPC plasmid","AA552 KPC plasmid","AA356 KPC plasmid","AA018 non-KPC plasmid","AA552 non-KPC plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.5,offset =.000175) + feature_scale_v  +  consistent_theme + ylim(NA,510) 
-  p9
+  s_figure_7 <- gheatmap(p8,df %>% select(AA018_KPC,AA552_KPC,AA356_KPC,AA018_non_KPC,AA552_non_KPC) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 KPC plasmid","AA552 KPC plasmid","AA356 KPC plasmid","AA018 non-KPC plasmid","AA552 non-KPC plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.5,offset =.000175) + feature_scale_v  +  consistent_theme + ylim(NA,510) 
+  s_figure_7
 ```
  
+```{r,message=F,echo=F,error=F,warning=F,fig.width=27.5,fig.height=15} 
+ggsave(plot = s_figure_7, filename = './figures/s_figure_7.png', width = 50, height = 57.5,limitsize=FALSE)
+```

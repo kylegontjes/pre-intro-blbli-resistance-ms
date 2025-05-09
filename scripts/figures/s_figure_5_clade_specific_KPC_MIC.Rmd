@@ -21,7 +21,7 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 
 #Scripts  
 source("./lib/common_functions.R")   
-source("./lib/table_figure_themes.R")
+source("./lib/consistent_themes.R")
 source("./scripts/figures/figure_4_functions.R")
 ```
 
@@ -90,10 +90,14 @@ MVB_CII <- KPC_CN_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="
 IR_CII <- KPC_CN_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC Copy Number") + ylim(-2.25,6)+ xlim(-2.75,5)
 ```
 
-```{r,fig.height=10,fig.width=15}
+```{r,fig.height=10.4,fig.width=13}
 legend <- cowplot::plot_grid(get_legend(MVB_CI) )
-s_fig_plots <- cowplot::plot_grid(MVB_CI + theme(legend.position = "none") ,IR_CI + theme(legend.position = "none"),MVB_CII+ theme(legend.position = "none"),IR_CII+ theme(legend.position = "none"),ncol=2,labels = c("A.","B.","C.","D."),label_size = 32)
-cowplot::plot_grid(s_fig_plots,legend,rel_heights = c(1,0.15),ncol=1)
+s_fig_plots <- cowplot::plot_grid(MVB_CI + theme(legend.position = "none") ,IR_CI + theme(legend.position = "none"),MVB_CII+ theme(legend.position = "none"),IR_CII+ theme(legend.position = "none"),ncol=2,labels = "AUTO",label_size = 32)
+s_figure_5 <- cowplot::plot_grid(s_fig_plots,legend,rel_heights = c(1,0.15),rel_widths=c(1,0.75),ncol=1)
+s_figure_5
 ```
  
+```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
+ggsave(plot = s_figure_5, filename = './figures/s_figure_5.png', width = 13, height = 10.4,limitsize=FALSE)
+```
  

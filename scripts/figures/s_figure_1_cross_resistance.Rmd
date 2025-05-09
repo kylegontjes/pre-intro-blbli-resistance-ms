@@ -75,5 +75,6 @@ s_figure_1 <-plot_grid(fig_heatmap_image,NULL,fig_legend_image,ncol=1,axis="l", 
 # Print & Save
 ```{r,message=F,error=F,warning=F,fig.width=16.25,fig.height=8.5}
 s_figure_1
+
 ggsave(plot = s_figure_1, filename = './figures/s_figure_1.png', width = 16.25, height = 8.5)
 ```

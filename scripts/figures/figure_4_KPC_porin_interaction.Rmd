@@ -1,0 +1,95 @@
+---
+title: "figure_4"
+output: html_document
+date: "2024-10-06"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","ggtree")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+source("./scripts/figures/figure_4_functions.R")
+```
+
+# Load in data
+## Depth Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+# Depth data
+KPC_plasmid_depth <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS")
+KPC_plasmid_depth$isolate_no <- rownames(KPC_plasmid_depth)
+                                         
+KPC_gene_depth <- KPC_plasmid_depth %>% select(isolate_no,KPNIH1_RS28775_chr_median_norm)
+
+df <- left_join(df,KPC_gene_depth)
+```
+## Genomic data
+```{r} 
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+
+df <- left_join(df,canonical)
+```
+
+# Create data variable
+```{r}
+# Simple ompK36 status
+df$OmpK36_mutations_simple <- ifelse(df$OmpK36_putative_function_altering==1 | df$OmpK36_truncation_kleborate==1 ,"Putative function-altering variant (PFAV)",
+                                     ifelse(df$OmpK36_L3_mutations==1, "Loop 3 insertion","No loop 3 insertion or PFAV"))
+
+df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("No loop 3 insertion or PFAV","Loop 3 insertion","Putative function-altering variant (PFAV)")))
+```
+
+# Generate figures
+```{r,fig.width=16,fig.height=14}
+fig4a <- create_MIC_histogram(df$MVB_log_2,df$OmpK36_mutations_simple,"Meropenem-Vaborbactam","") + scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
+        labels=c("≤0.25/8","0.5/8", "1/8","2/8","4/8","8/8","16/8","≥32/8")) + labs(fill="ompK36 Status") + theme_bw_me + ylim(NA,250) + figure_4_format + ompK36_scale
+  
+  
+fig4c <- create_MIC_histogram(df$IR_log_2,df$OmpK36_mutations_simple,"Imipenem-Relebactam","")+ scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
+        labels=c("≤0.25/4","0.5/4", "1/4","2/4","4/4","8/4","16/4","≥32/4"))  + labs(fill="ompK36 Status") +theme_bw_me  + theme_bw_me + ylim(NA,250) + figure_4_format + ompK36_scale
+
+# Proportion of non-susceptibility
+MVB_ompk36_prop <- df %>% group_by(MVB_cat,OmpK36_mutations_simple)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
+IR_ompk36_prop <- df %>% group_by(IR_cat,OmpK36_mutations_simple)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
+
+fig4b <- MIC_ompk36_prop_hist(MVB_ompk36_prop,"") + theme_bw_me  + ompK36_scale
+fig4d <- MIC_ompk36_prop_hist(IR_ompk36_prop,"") + theme_bw_me   + ompK36_scale
+
+# KPC Data 
+fig4e <- KPC_copy_number_ompk_hist(df,y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC Copy Number") 
+
+fig4f <- KPC_copy_number_ompk_hist(df,y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC Copy Number") 
+ 
+fig4.data <- plot_grid(fig4a + theme(legend.position = "none"),fig4b + theme(legend.position = "none"),fig4c + theme(legend.position = "none"),fig4d+ theme(legend.position = "none"), ncol=2,rel_widths = c(1,0.6,1,0.6),labels = "AUTO",label_size = 24)
+fig4.data.2 <- plot_grid(fig4e + theme(legend.position = "none"),fig4f+ theme(legend.position = "none"), ncol=2,labels = c("E","F"),label_size=24)
+fig4.data.all <- plot_grid(fig4.data,fig4.data.2, ncol=1,rel_heights = c(1,0.75))
+
+ompk36_legend <- gontjesr::get_legend(fig4b + theme(plot.margin = unit(c(t=-25, 5, b=0, 0), "cm")))
+figure_4_legends <- cowplot::plot_grid(ompk36_legend) + theme(plot.margin = unit(c(t=-1 , 5, b=0,0 ), "cm"))
+
+figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,ncol=1,rel_heights = c(1,.1)) + theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
+```
+
+
+```{r,fig.width=16,fig.height=16}
+figure_4
+```
+
+```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
+ggsave(plot = figure_4, filename = './figures/figure_4.png', width = 16, height = 16,limitsize=FALSE)
+```

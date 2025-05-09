@@ -124,20 +124,20 @@ BLBLI_panel$population <- factor(BLBLI_panel$population,levels = c("ST258","CI",
 ```
 
 ```{r}
-A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity (%)") + xlab("Population")  + ylim(0,105) +
-     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale
-B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity (%)") + xlab("Population") + ylim(0,105)+
-     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale
-C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive Predictive Value (%)") + xlab("Population") + ylim(0,105)+
-     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale
-D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative Predictive Value (%)") + xlab("Population") + ylim(0,105)+
-     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale
+A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity") + xlab("Population")  + ylim(0,105) +
+     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale+ sfig9_format
+B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity") + xlab("Population") + ylim(0,105)+
+     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale+ sfig9_format
+C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive Predictive Value") + xlab("Population") + ylim(0,105)+
+     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale + sfig9_format
+D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative Predictive Value") + xlab("Population") + ylim(0,105)+
+     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale + sfig9_format
 ```
 
 ```{r,fig.height=8,fig.width=12}
-plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A.","B.","C.","D."),ncol=2,label_size = 16,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
+plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A","B","C","D"),ncol=2,label_size = 16,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
 
-fig_legend <- get_legend(A) 
+fig_legend <- get_legend(A )
 
 s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.16))
 s_figure_9

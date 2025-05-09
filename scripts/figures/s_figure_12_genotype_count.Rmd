@@ -68,10 +68,10 @@ paste0("Number and percentage of variants under 1%: ")
 table(all_variants_annots$genotype_freq_under_1)
 grepl(pattern = "yes",all_variants_annots$genotype_freq_under_1) %>% sum / nrow(all_variants_annots) 
 
-s_figure_12_main <- variant_freq_histogram(all_variants_annots,bins=150)   + s_figure_12_format
+s_figure_12_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_12_format
 s_figure_12_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
 
-s_figure_12 <- s_figure_12_main +  annotation_custom(ggplotGrob(s_figure_12_inlet), xmin = 0.5, xmax = 1, ymin = 1250, ymax = 3250)
+s_figure_12 <- s_figure_12_main +  annotation_custom(ggplotGrob(s_figure_12_inlet), xmin = 0.4, xmax = 1, ymin = 1250, ymax = 4000)
 s_figure_12 
 ```
 

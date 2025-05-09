@@ -60,7 +60,7 @@ kpc_scale <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","No KPC"),values
 AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 KPC Plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Variant type
-variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","gray"), labels = c("SNP","INDEL","Insertion Sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","gray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Genotype scale
 genotype_scale <- scale_fill_manual(breaks=c("None","Carbapenem resistance-associated genotype","AA552 KPC plasmid"),values=c("gray","#00AFBB","brown"), name="Genotype Profile", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
@@ -138,6 +138,16 @@ sfig6_format <-  theme(legend.position = "bottom",
                        legend.title = element_text(size = 24,color="black"),
                        plot.title = element_text(size = 26,color="black"),
 )
+
+# S fig 9
+sfig9_format <-  theme(legend.position = "bottom",
+                       axis.text =   element_text(size=12,color="black"),
+                       axis.title = element_text(size = 14,color="black"),
+                       legend.text =   element_text(size=18,color="black"),
+                       legend.title = element_text(size = 20,color="black"),
+                       plot.title = element_text(size = 22,color="black"),
+)
+
 
 # S fig 12
 s_figure_12_format <-  theme(legend.position = "bottom",

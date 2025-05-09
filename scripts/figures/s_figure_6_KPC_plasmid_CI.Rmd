@@ -109,11 +109,11 @@ s_figure_6BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 2
 s_figure_6A <- cowplot::plot_grid(A)  
 ```
 
-```{r ,fig.height=15,fig.width=25}
+```{r ,fig.height=12.5,fig.width=25}
 s_figure_6 <- plot_grid(s_figure_6A,s_figure_6BC,labels=c("A",""),ncol=2,label_size = 28,rel_heights = c(1,1),rel_widths = c(1,0.6))  
 s_figure_6
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=27.5,fig.height=15} 
-ggsave(plot = s_figure_6, filename = './figures/s_figure_6.png', width = 25, height = 15,limitsize=FALSE)
+ggsave(plot = s_figure_6, filename = './figures/s_figure_6.png', width = 25, height = 12.5,limitsize=FALSE)
 ```

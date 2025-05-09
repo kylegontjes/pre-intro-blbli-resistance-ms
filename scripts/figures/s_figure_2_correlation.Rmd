@@ -53,6 +53,7 @@ s_figure_2 <-plot_grid(fig_heatmap_image,NULL,fig_legend_image,ncol=1,axis="l", 
 # Print & Save 
 ```{r,message=F,error=F,warning=F,fig.width=8,fig.height=5.33}
 s_figure_2
+
 ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 8, height = 5.33)
 ```
 
