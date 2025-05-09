@@ -1,0 +1,106 @@
+---
+title: "curate_nn_data"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Combination Therapy Manuscript
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot",'phyloAMR',"ggtree")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")  
+
+# Print environment
+Sys.info()
+sessionInfo()
+```
+
+# Data
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+# Matrices
+## Kleborate matrix
+kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
+## KPC Plasmids
+KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_mat.RDS") %>% as.data.frame  
+## Core genome burden models
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_model <- paste0(x,"_burden.RDS")
+  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
+} 
+## Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+# Join
+df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) 
+df <- left_join_matrix(model1_burden,df,"_1")
+df <- left_join_matrix(model1.2_burden,df,"_1.2")
+df <- left_join_matrix(model2_burden,df,"_2")
+df <- left_join_matrix(model2.2_burden,df,"_2.2")
+df <- left_join_matrix(model3_burden,df,"_3")
+df <- left_join_matrix(model3.2_burden,df,"_3.2")
+df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
+```
+
+# Get dataset for nn comps
+```{r}
+nn_df <- df %>% select(isolate_no,clade_I,blbli_dich_num,MVB_dich_num,MVB_dich,MVB_cat,MVB_num,MVB_log_2,IR_dich_num,IR_dich,IR_cat,IR_num,IR_log_2) %>% `rownames<-`(.$isolate_no)
+saveRDS(nn_df  ,"./data/nearest_neighbor_comparisons/nn_df.RDS") 
+```
+
+# Get hogwash hits
+# Hogwash Data manipulations
+```{r,echo=F,results=T,message=F,fig.height=10,fig.width=10,error=F}
+### LOAD HOGWASH DATA ###
+setwd("./data/GWAS/results/")
+hogwash_files <- list.files(pattern = "rda", recursive = TRUE) %>% subset(grepl("MVB_dich_num",.)==F & grepl("IR_dich_num",.)==F)
+hogwash_data  <-  lapply(hogwash_files,FUN = load_file)
+final_name <- hogwash_files %>% gsub(".rda","",.) %>% gsub("hogwash_","",.)  
+names(hogwash_data) <- final_name
+
+# Create summary dataset
+hogwash_sum_bin <- lapply(names(hogwash_data)[grep("dich",names(hogwash_data))] ,hogwash_sum_data,hogwash_data,test="binary") %>% do.call(rbind,.) %>% as.data.frame 
+hogwash_sum_cont <- lapply(names(hogwash_data)[grep("log",names(hogwash_data))] ,hogwash_sum_data,hogwash_data,test="continuous") %>% do.call(rbind,.) %>% as.data.frame 
+hogwash_sum <- bind_rows(hogwash_sum_bin,hogwash_sum_cont)  
+```
+
+```{r}
+sig_hits <- hogwash_sum$sig_hits %>% subset(is.na(.)==F) %>% str_split(.,",") %>% unlist %>% unique %>% sort()
+non_core <- subset(sig_hits,grepl("KPNIH1",sig_hits)==F)
+core <- subset(sig_hits,grepl("KPNIH1",sig_hits)==T)
+
+# Had to remove OmpK35-25% truncation from analysis because all isolates have this, making it impossible to find a nearest neighbor
+canonical <- colnames(canonical) %>% subset(!. %in%c("OmpK35-25%","isolate_no")) %>% sort
+
+get_possible_models <- function(x,df){
+  possible_models <- paste0(x,c("_1","_1.2","_2","_2.2","_3","_3.2"))
+  true_models <- subset(possible_models,possible_models %in% colnames(df))
+  return(true_models)
+}
+
+possible_core_models <- lapply(core,get_possible_models,df=df) %>% unlist 
+
+nn_dataset <- df %>% select(isolate_no,any_of(unique(c(non_core,possible_core_models,canonical))))
+rownames(nn_dataset) <- nn_dataset$isolate_no
+```
+
+```{r} 
+saveRDS(nn_dataset,"./data/nearest_neighbor_comparisons/nn_data.RDS") 
+```

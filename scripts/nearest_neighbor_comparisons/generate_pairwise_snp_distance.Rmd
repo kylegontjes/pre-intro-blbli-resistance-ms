@@ -1,0 +1,49 @@
+---
+title: "generate_pairwise_snp_distance"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse",'ape')   
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Source function
+source("./lib/variant_calling_cleaning_functions.R") 
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()
+``` 
+
+# Dataset
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+```
+
+# Pairwise SNP Distance Matrix  
+```{r}
+# Recombination filtered SNPs
+snps<- read.dna("~/Desktop/gl_mount/Sequence_data/variant_calling/2025-02-17_snpkit_Penn_KPC_ST258/output_files/2025_02_23_21_11_49_core_results/phylokit/results/gubbins_masked/Penn_KPC_ST258_gubbins_masked_var_sites.fa",
+                format = "fasta")
+
+# Create matrix
+matrix <- dna_matrix(snps,'gi|661922017|gb|CP008827.1|') %>% .[match(tr$tip.label,rownames(.)),match(tr$tip.label,rownames(.))]  
+dim(matrix)
+head(matrix)
+
+saveRDS(matrix,file="./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS")
+write_csv(matrix,file="./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.csv")
+```
