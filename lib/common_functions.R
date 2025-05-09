@@ -68,15 +68,15 @@ median_IQR <- function(pheno,df){
 easy_resistance_figures <- function(tr,df){
   rownames(df) <- df$isolate_no
   #Step #1: Clades
-  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 Clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1)   + clade_colors_scale_v
+  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1)   + clade_colors_scale_v
   
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill()
-  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI Clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1,offset =.000003) + cluster_scale + consistent_theme  
+  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1,offset =.000003) + cluster_scale + consistent_theme  
   
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich,MVB_dich,IR_dich) %>% `colnames<-`(c("BL/BLI Non-Susceptible","MVB Non-Susceptible","IR Non-Susceptible")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.3,offset =.000006) + NonSus_scale + consistent_theme  
+  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich,MVB_dich,IR_dich) %>% `colnames<-`(c("BL/BLI resistance","MVB resistance","IR resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.3,offset =.000006) + resistance_scale + consistent_theme  
   
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
