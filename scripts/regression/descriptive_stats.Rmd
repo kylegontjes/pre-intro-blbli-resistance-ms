@@ -1,0 +1,45 @@
+---
+title: "descriptive_stats"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(tableone)
+datasets <- readRDS("./data/regression/purposeful_regression_results.RDS") %>% .$datasets
+eligible_variables <- readLines("./data/regression/eligible_variables.txt") 
+source("./lib/common_functions.R")
+```
+
+```{r}
+descriptive_stats <- function(phenotype,datasets,variables,factor_vars,outcome_names){  
+  lr_non_s <- tryCatch(convert_tableone_into_df(strata = phenotype,dataset = datasets[['present']],vars = variables,factorVars = factor_vars,outcome_names=outcome_names), error = function(e) e)
+  lr_emerge <-  tryCatch(convert_tableone_into_df(strata = phenotype,dataset = datasets[['singleton']],vars = variables,factorVars = factor_vars,outcome_names=outcome_names), error = function(e) e)
+  lr_spread <- tryCatch(convert_tableone_into_df(strata = phenotype,dataset = datasets[['cluster']],vars = variables,factorVars = factor_vars,outcome_names=outcome_names), error = function(e) e)
+  lr_list <- list(lr_non_s,lr_emerge,lr_spread) %>% `names<-`(c("present","singleton","cluster"))
+  return(lr_list)
+}
+```
+
+
+```{r}
+descriptive_data <- descriptive_stats("blbli_dich_num",datasets = datasets,variables = eligible_variables,factor_vars = subset(eligible_variables,!eligible_variables %in% c("age","LOSbeforeCx")),outcome_names = c("Susceptible","Non-Susceptible"))
+descriptive_data$present$term <- eligible_variables
+descriptive_data$singleton$term <- eligible_variables
+descriptive_data$cluster$term <- eligible_variables
+```
+
+```{r}
+saveRDS(descriptive_data,"./data/regression/descriptive_stats.RDS")
+```
+
+
