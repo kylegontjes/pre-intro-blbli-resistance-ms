@@ -1,0 +1,10 @@
+name: mobsuite_v3_1_9
+channels:
+  - bioconda
+  - conda-forge
+  - default
+  - r
+dependencies:
+  - mob_suite 
+
+# conda env create -f mobsuite.yml 

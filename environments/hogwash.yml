@@ -1,0 +1,15 @@
+name: hogwash_v1_2_6_fixed
+channels:  
+  - conda-forge
+  - r
+  - bioconda
+  - defaults
+dependencies:  
+  - r-base   
+  - r-devtools
+  - r-ape=5.7-1
+  - r-pheatmap
+  - r-phytools 
+  - r-caper
+  - r-scales
+  - r-tidyverse
