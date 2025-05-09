@@ -1,0 +1,59 @@
+---
+title: "Curate KPC Plasmid matrix"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+library(tidyverse) 
+source("./scripts/mobsuite/mobsuite_functions.R")
+```
+
+# Dataframe
+```{r}
+df <- readRDS("./data/dataset/df.RDS") 
+```
+
+# Plasmid data
+```{r}
+mobtyper <- readRDS("./data/mobsuite/mobtyper.RDS")
+mobcontigs <- readRDS("./data/mobsuite/mobsuite_contigs.RDS")
+
+mobtyper_nn_mat <- readRDS("./data/mobsuite/plasmid_mash_nn_matrix.RDS")
+mobtyper_cluster_mat <- readRDS("./data/mobsuite/plasmid_cluster_matrix.RDS")
+```
+
+# KPC data
+```{r}
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC_3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC_5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC_2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC_10",""))))
+
+KPC_data$contig_id <- KPC_data$qseqid
+mobcontigs <- left_join(mobcontigs,KPC_data %>% select(qseqid,contig_id,KPC_allele))
+KPC_contigs <- subset(mobcontigs,is.na(KPC_allele) ==F) %>% select(isolate_no,primary_cluster_id,mash_nearest_neighbor)
+KPC_contigs$primary_cluster_id <- ifelse(KPC_contigs$primary_cluster_id=='-',"chromosome",KPC_contigs$primary_cluster_id)
+KPC_contigs$mash_nearest_neighbor <- ifelse(KPC_contigs$mash_nearest_neighbor=='-',"chromosome",KPC_contigs$mash_nearest_neighbor)
+```
+
+# Curate 
+```{r}
+KPC_containing_clusters_mat <- lapply(df$isolate_no,FUN=recode_matrix_by_kpc_content,type="primary_cluster_id",KPC_matrix=mobtyper_cluster_mat,KPC_location_data=KPC_contigs) %>% do.call(rbind,.)
+
+KPC_containing_plasmid_mat <- lapply(df$isolate_no,FUN=recode_matrix_by_kpc_content,type="mash_nearest_neighbor",KPC_matrix=mobtyper_nn_mat,KPC_location_data=KPC_contigs) %>% do.call(rbind,.)
+```
+
+# Save
+```{r}
+saveRDS(KPC_contigs,"./data/KPC_plasmid/KPC_contigs.RDS")
+saveRDS(KPC_containing_clusters_mat,"./data/KPC_plasmid/KPC_containing_clusters_mat.RDS")
+saveRDS(KPC_containing_plasmid_mat,"./data/KPC_plasmid/KPC_containing_plasmids_mat.RDS")
+```
