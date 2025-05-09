@@ -1,0 +1,90 @@
+---
+title: "curate_canonical_genotypes"
+output: html_document
+date: "2024-10-01"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r}
+library(tidyverse)
+source("./lib/common_functions.R")
+```
+
+# Data
+## Metadata
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+```
+## Kleborate
+```{r}
+kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS")
+df <- left_join(df,kleborate)
+```
+
+# Genotype matrices
+```{r}
+# load gwas models
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_model <- paste0(x,"_burden.RDS")
+  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/variant_matrices/grouped/",grouped_model)))
+}
+ 
+df <- left_join_genomic_matrix(model1_burden,df,"_1")
+df <- left_join_genomic_matrix(model1.2_burden,df,"_1.2")
+df <- left_join_genomic_matrix(model2_burden,df,"_2")
+df <- left_join_genomic_matrix(model2.2_burden,df,"_2.2")
+df <- left_join_genomic_matrix(model3_burden,df,"_3")
+df <- left_join_genomic_matrix(model3.2_burden,df,"_3.2")
+```
+
+# Insertion sequence data
+```{r}  
+is_mat <- readRDS("./data/variant_matrices/IS/ISFinder_mat.RDS")
+is_annots <- read.delim("./data/panISa/ISFinder_master.txt") %>% subset(Start_Position %in% c("3714105",'3714098','3714169') | Stop_Position %in% c("3714105",'3714098','3714169')) %>% select(Start_Position,Potential_IS) %>% distinct
+
+df <- left_join(df,is_mat %>% mutate(isolate_no=rownames(.)))
+```
+
+# Curate variables
+```{r}
+## OmpK36 mutations from kleborate
+### Loop 3 insertion
+df$OmpK36_L3_mutations <- ifelse(df$OmpK36GD==1 | df$OmpK36TD ==1,1,0)
+### Truncation - analyzing the composite outcome due to small event size
+df$OmpK36_truncation_kleborate <- ifelse(rowSums(df %>% select("OmpK36-0%","OmpK36-14%","OmpK36-22%","OmpK36-53%","OmpK36-74%"))>0,1,0)
+
+## Intergenic variants
+df <- left_join(df,is_mat %>% select("3714105_3714108|KPNIH1_RS18665-KPNIH1_RS18675|-.+",'3714098_3714106|KPNIH1_RS18665-KPNIH1_RS18675|-.+','3714169_3714168|KPNIH1_RS18665-KPNIH1_RS18675|-.+') %>% `colnames<-`(c("IsKpn26","Unk_IS_1","Unk_IS_2")) %>% mutate(isolate_no = rownames(is_mat))) %>% `rownames<-`(df$isolate_no)
+
+df <- df %>% mutate(OmpK36_promoter_IS = ifelse(IsKpn26 ==1 | Unk_IS_1 ==1 | Unk_IS_2 ==1,1,0))
+
+## Reclassify variant calling hits
+df <- df %>% mutate(RamA = KPNIH1_RS07240_3.2,
+                    RamR = KPNIH1_RS07230_3.2, 
+                    AcrAB_TolC_any = KPNIH1_RS06200_2.2,
+                    PBP2 = KPNIH1_RS07805_2.2,
+                    PBP4 = KPNIH1_RS24320_2.2,
+                    OmpK36_non_syn = KPNIH1_RS18665_2.2,
+                    OmpK36_intergenic = `KPNIH1_RS18665-KPNIH1_RS18675_1.2`,
+                    OmpK36_putative_function_altering = KPNIH1_RS18665_3.2)
+
+## Any PBP Modification
+df <- df %>% mutate(PBP_any = ifelse(PBP2 ==1 | PBP4 ==1 ,1,0))
+```
+
+# Curate and save
+```{r}
+canonical_hits <- df %>% select(isolate_no,RamA,RamR,AcrAB_TolC_any,PBP_any,PBP2,PBP4,OmpK36_non_syn,'OmpK35-25%',"OmpK36_c25t"  ,      OmpK36_truncation_kleborate,OmpK36_intergenic,OmpK36_putative_function_altering,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_promoter_IS)
+
+saveRDS(canonical_hits,"./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+write_csv(canonical_hits,"./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.csv")
+```
+ 
