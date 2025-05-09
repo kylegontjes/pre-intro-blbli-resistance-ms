@@ -1,0 +1,109 @@
+---
+title: "Supplemental Figure 3"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+# Combination Therapy Manuscript
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","phyloAMR","ggtree","gontjesr","ggnewscale",'gridExtra')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+```
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS") 
+# Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+df <- left_join(df,canonical)
+
+# tn4401 data
+tn4401 <- readRDS("./data/TETyper/TETyper_curated.RDS")  
+df <- left_join(df,tn4401)
+
+# load the kleborate
+kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame
+df <- left_join(df,kleborate)
+```
+
+```{r}
+tr <- read.tree("./data/tree/tree.treefile")  
+nn <- readRDS("./data/nearest_neighbor_comparisons/nn_comparisons.RDS") 
+blbli_asr <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+df <- df %>% left_join(.,blbli_asr)
+df$blbli_clustering_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible")
+```
+
+```{r}
+drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36GD','OmpK36TD','OmpK36_truncation_kleborate','OmpK36_non_syn','OmpK36_putative_function_altering','OmpK36_intergenic','OmpK36_promoter_IS')
+drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
+target_modification <- c('PBP_any','PBP2',"PBP4")
+
+carbapenem <- c(drug_entry,drug_exit,target_modification)
+```
+
+
+# FA - phylogeny 
+```{r ,fig.height=52.5,fig.width=60,echo=F,message=F,error=F,warning=F} 
+rownames(df) <- df$isolate_no
+p0 <- easy_resistance_figures(tr,df)
+# tn4401 allele
+p0.1 <- p0 + new_scale_fill()
+p1 <-  gheatmap(p0.1,df %>% select(tn4401_allele) %>% mutate_all(as.factor)  %>% `colnames<-`("tn4401 isoform"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1,offset =.000021)  + tn4401_scale + consistent_theme + ylim(NA,480)
+
+# KPC allele
+p1.1 <- p1 + new_scale_fill()
+p2 <-  gheatmap(p1.1,df %>% select(KPC_type) %>% mutate_all(as.factor)  %>% `colnames<-`("KPC allele"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1,offset =.000024)  +kpc_scale + consistent_theme + ylim(NA,480)
+
+# relevant alleles
+p2.1 <- p2 + new_scale_fill()
+FA <-  gheatmap(p2.1,df %>% select(any_of(carbapenem)) %>% mutate_all(as.factor) %>% `colnames<-`(recode(colnames(.,),'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T mutation in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.9,offset =.000027) +feature_scale  + consistent_theme + ylim(NA,575)
+```
+
+# FB - non freq s
+```{r,fig.height=15,fig.width=25}
+variables_to_use <- carbapenem %>% subset(.!='OmpK35-25%')
+
+gwas_nons_freq <- variants_freq(variables_to_use,df)   
+gwas_nons_freq$locus_tag<- factor(gwas_nons_freq$locus_tag, levels=rev(unique(variables_to_use)))
+                                  
+gwas_nons_freq$`Significant Hit` <- recode(gwas_nons_freq$locus_tag ,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T mutation in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD insertion in loop 3 of ompK36','OmpK36TD'='TD insertion insertion in loop 3 of ompK36','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations (PFAV)','OmpK36_intergenic'='Variant in intergenic region of ompK36','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4') 
+figure_3.C <- freq_plot(gwas_nons_freq) 
+
+FB <- freq_plot(gwas_nons_freq) 
+```
+
+# FC - nn data 
+```{r,fig.height=15,fig.width=25}
+# C. FC MIC (MVB * IR overlay) 
+nn_data_melt <- lapply(variables_to_use,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)
+nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(variables_to_use)))  
+nn_data_melt$locus_tag<- factor(nn_data_melt$locus_tag, levels=rev(unique(variables_to_use)))
+                                  
+nn_data_melt$locus_tag<- recode(nn_data_melt$locus_tag ,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T mutation in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD insertion in loop 3 of ompK36','OmpK36TD'='TD insertion insertion in loop 3 of ompK36','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations (PFAV)','OmpK36_intergenic'='Variant in intergenic region of ompK36','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4') 
+     
+FC <- nn_plot(nn_data_melt)  
+```
+
+```{r ,fig.height=55,fig.width=97}
+FBC <- plot_grid(FB,FC ,nrow = 2,labels = c("B.","C."),label_size = 62,align = "hv",label_x = -0.02)  + theme(plot.margin = unit(c(t=0,r=0,b=0,l=0.1), "cm")) 
+FABC <- plot_grid(FA,FBC,labels = c("A.",""),label_size = 62,ncol = 2,rel_heights = c(1,0.75),rel_widths = c(1,0.4)) + theme(plot.margin = unit(c(0,0,0,0), "cm")) 
+FABC
+```
+ 

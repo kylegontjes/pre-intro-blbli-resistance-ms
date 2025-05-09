@@ -1,0 +1,80 @@
+---
+title: "Supplemental Figure 12"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+
+# Combination Therapy Manuscript
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","gridExtra","gontjesr","tableone")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/consistent_themes.R")
+```
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+all_variants_mat <- readRDS("./data/variant_matrices/all_variants/all_variant_mat.RDS")
+all_variants_annots <- readRDS("./data/variant_matrices/all_variants/all_variant_annots.RDS")
+
+df <- left_join(df,all_variants_mat %>% mutate(isolate_no = rownames(.)))
+```
+
+# Get genotype count
+```{r}
+genotype_count <- function(dataframe,annots){
+  variants <- annots$raw_rownames
+  genotype_ct <- lapply(variants,FUN=function(x){
+    dataframe[,x] %>% sum()
+  }) %>% unlist
+  genotype_freq <- genotype_ct/nrow(dataframe)
+  genotype_freq_under_1 = {ifelse(genotype_freq<0.01,"yes","no")}
+  results_df <- cbind.data.frame(raw_rownames=variants,genotype_ct=genotype_ct,genotype_freq=genotype_freq,genotype_freq_under_1=genotype_freq_under_1)
+  return(results_df)
+  }
+  
+genotype_data <- genotype_count(df,all_variants_annots)
+all_variants_annots <- left_join(all_variants_annots,genotype_data)
+all_variants_annots$var_cat <- ifelse(all_variants_annots$label %in% c("Non-Coding SNP","Coding SNP"),"SNP",ifelse(all_variants_annots$label %in% c("Non-Coding Indel","Coding Indel"),"INDEL","Insertion"))
+```
+
+# Note for methods section about frequency of rare variants
+```{r}
+paste0("Proportion of variants that were with frequency under 1%: ")
+convert_tableone_into_df(genotype_data,vars="genotype_freq_under_1") 
+```
+
+# Supplemental figure 12
+```{r,fig.width=6,fig.height=5}
+# Overall
+variant_freq_histogram <- function(annots_df,bins=NULL){
+  figure <- ggplot(data=annots_df) + geom_histogram(aes(x=genotype_freq,fill=var_cat),bins=bins) + theme_bw_me + xlab("Proportion of isolates with variant") + ylab("Number of variants") + theme(legend.position = "bottom") + variant_type_scale
+  return(figure)
+}
+
+paste0("Number and percentage of variants under 1%: ")
+table(all_variants_annots$genotype_freq_under_1)
+grepl(pattern = "yes",all_variants_annots$genotype_freq_under_1) %>% sum / nrow(all_variants_annots) 
+
+s_figure_12_main <- variant_freq_histogram(all_variants_annots,bins=150)   + s_figure_12_format
+s_figure_12_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
+
+s_figure_12 <- s_figure_12_main +  annotation_custom(ggplotGrob(s_figure_12_inlet), xmin = 0.5, xmax = 1, ymin = 1250, ymax = 3250)
+s_figure_12 
+```
+
+```{r,message=F,echo=F,error=F,warning=F,fig.width=6,fig.height=5} 
+ggsave(plot = s_figure_12, filename = './figures/s_figure_12.png', width = 6, height = 5,limitsize=FALSE)
+```

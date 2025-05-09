@@ -1,0 +1,54 @@
+---
+title: "Figure 1 - Minimum inhibitory concentrations for meropenem-vaborbactam and imipenem-relebactam in 415 carbapenem-resistant Klebsiella pneumoniae ST258 isolates"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse","kableExtra","tableone","cowplot")
+lapply(packages,library,character.only=T)
+
+# functions
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R") 
+
+# Print environment
+Sys.info()
+sessionInfo()
+``` 
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+```
+
+## Figure Code
+```{r,message=F,error=F,warning=F,fig.width=15,fig.height=7.5}
+x_log_breaks <- c(-2,-1,0,1,2,3,4,5)
+
+# Figure
+figure1A <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-Vaborbactam","") + scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))  + ylim(NA,250) + figure_1_format + resistance_cat_scale
+  
+figure1B <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-Relebactam","")+ scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5","1","2","4","8","16","≥32"))   + ylim(NA,250) + figure_1_format + resistance_cat_scale
+
+# Legend
+MIC_legend <- get_legend(figure1A)
+MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=-0.25, 0, 0, b=0), "cm"))
+
+# Create cowplot Figure
+MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 24)
+figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.125)) 
+``` 
+
+## Figure
+```{r,message=F,error=F,warning=F,fig.width=15,fig.height=7.5}
+figure1
+ggsave(plot = figure1, filename = './figures/figure_1.png', width = 15, height = 7.5)
+```

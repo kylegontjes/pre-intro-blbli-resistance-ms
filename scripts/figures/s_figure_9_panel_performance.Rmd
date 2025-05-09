@@ -1,0 +1,148 @@
+---
+title: "s_figure_9: Panel performance"
+author: "Kyle Gontjes"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+source("./lib/common_functions.R")
+```
+
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+# GWAS table
+gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS")
+gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")
+# Genome features
+KPNIH1_features <- readRDS("./data/references/KPNIH1/KPNIH1_features.RDS")
+# Matrices
+## Kleborate matrix
+kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
+## KPC Plasmids
+KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_mat.RDS") %>% as.data.frame 
+## Core genome burden models
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_model <- paste0(x,"_burden.RDS")
+  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
+}
+## NN comps
+nn <- readRDS("./data/nearest_neighbor_comparisons/nn_comparisons.RDS")
+## BLBLI clustering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+blbli_asr <- readRDS("./data/asr_clustering/blbli_asr.RDS")
+## Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+# Join
+df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) 
+df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed))
+df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible" )
+   
+df <- left_join_matrix(model1_burden,df,"_1")
+df <- left_join_matrix(model1.2_burden,df,"_1.2")
+df <- left_join_matrix(model2_burden,df,"_2")
+df <- left_join_matrix(model2.2_burden,df,"_2.2")
+df <- left_join_matrix(model3_burden,df,"_3")
+df <- left_join_matrix(model3.2_burden,df,"_3.2")
+df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
+```
+
+
+# Get NN passing data list
+```{r}
+get_summary_statistics <- function(name,nn_list){
+  obj <- nn_list[[name]]
+  obj[["nn_comps_with_variant_sum"]]
+}
+
+get_nn_flag <- function(gwas_table){
+  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median >1)),"yes","no")  
+  return(gwas_table)  
+}
+```
+
+```{r}
+canonical_var <- canonical %>% select(-isolate_no,-`OmpK35-25%`) %>% colnames()
+nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) %>% mutate(variable = canonical_var)  
+nn_data <- get_nn_flag(nn_data)
+pass_nn_qc <- subset(nn_data,nn_qc=="yes")
+pass_nn_qc$variable %>% sort
+```
+
+# Panel
+```{r}
+known_hits <- c("OmpK36_putative_function_altering","OmpK36_promoter_IS",'OmpK36_truncation_kleborate',"PBP_any","RamA")  
+
+## Known Hits
+df$known <- get_pattern(known_hits,df) %>% .$presence
+novel_synchronous <-  gwas_table %>% subset(resistance_category != "Modulator" & nn_qc=="Yes") %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%")) %>% .$genotype %>% subset(!.%in%c('AA018'))
+df$novel_synchronous <- get_pattern(novel_synchronous,df) %>% .$presence
+df$AA552 <- get_pattern("AA552",df) %>% .$presence
+df$known_ST258_GWAS <- get_pattern(c(known_hits,novel_synchronous),df) %>% .$presence 
+df$blbli_dich_num <- as.numeric(df$blbli_dich_num)
+ 
+panels <- c("known","novel_synchronous","known_ST258_GWAS")
+
+## Overall
+BLBLI_exp_panel <- apply(df %>% select(panels),2,get_marginal_stats,outcome=df$blbli_dich_num) %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("ST258",3)),panels=panels) 
+
+## Clade I
+df_CI <- subset(df,clade_I=="Clade I")
+BLBLI_exp_panel_CI <-  apply(df_CI %>% select(panels),2,get_marginal_stats,outcome=df_CI$blbli_dich_num)  %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("CI",3)),panels=panels) 
+
+## Clade II
+df_CII <- subset(df,clade_I=="Clade II") 
+BLBLI_exp_panel_CII <-  apply(df_CII %>% select(panels),2,get_marginal_stats,outcome=df_CII$blbli_dich_num)  %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("CII",3)),panels=panels) 
+                                   
+BLBLI_panel <- rbind(BLBLI_exp_panel,BLBLI_exp_panel_CI,BLBLI_exp_panel_CII) %>% `rownames<-`(NULL) 
+BLBLI_panel$sens <- BLBLI_panel$sens *100
+BLBLI_panel$spec <- BLBLI_panel$spec *100
+BLBLI_panel$ppv <- BLBLI_panel$ppv *100
+BLBLI_panel$npv <- BLBLI_panel$npv *100
+BLBLI_panel$panels <- factor(BLBLI_panel$panels,levels = c("known","novel_synchronous","AA552","known_ST258_GWAS","known_ST258_GWAS_AA552"))
+BLBLI_panel$population <- factor(BLBLI_panel$population,levels = c("ST258","CI","CII"))  
+```
+
+```{r}
+A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity (%)") + xlab("Population")  + ylim(0,105) +
+     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale
+B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity (%)") + xlab("Population") + ylim(0,105)+
+     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale
+C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive Predictive Value (%)") + xlab("Population") + ylim(0,105)+
+     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale
+D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative Predictive Value (%)") + xlab("Population") + ylim(0,105)+
+     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale
+```
+
+```{r,fig.height=8,fig.width=12}
+plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A.","B.","C.","D."),ncol=2,label_size = 16,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
+
+fig_legend <- get_legend(A) 
+
+s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.16))
+s_figure_9
+```
+
+```{r}
+ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 12, height = 8,limitsize=FALSE)
+```

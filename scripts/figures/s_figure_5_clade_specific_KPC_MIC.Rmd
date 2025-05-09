@@ -1,0 +1,99 @@
+---
+title: "s_figure_5"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree","ggnewscale")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/table_figure_themes.R")
+source("./scripts/figures/figure_4_functions.R")
+```
+
+# Clade-specific trends
+
+## Load in data
+## Depth Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+# Depth data
+KPC_plasmid_depth <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS")
+KPC_plasmid_depth$isolate_no <- rownames(KPC_plasmid_depth)
+                                         
+KPC_gene_depth <- KPC_plasmid_depth %>% select(isolate_no,KPNIH1_RS28775_chr_median_norm)
+
+df <- left_join(df,KPC_gene_depth)
+```
+## Genomic data
+```{r} 
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+
+df <- left_join(df,canonical)
+``` 
+
+# Create data variable
+```{r}
+# Simple ompK36 status
+df$OmpK36_mutations_simple <- ifelse(df$OmpK36_putative_function_altering==1 | df$OmpK36_truncation_kleborate==1 ,"Putative function-altering variant (PFAV)",
+                                     ifelse(df$OmpK36_L3_mutations==1, "Loop 3 insertion","No loop 3 insertion or PFAV"))
+
+df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("No loop 3 insertion or PFAV","Loop 3 insertion","Putative function-altering variant (PFAV)")))
+```
+
+```{r}
+df_CI <-  df %>% subset(clade_I=="Clade I")
+df_CII <- df %>% subset(clade_I=="Clade II")
+```
+
+
+## Figures
+
+### Overall
+
+```{r}
+KPC_CN_hist <- function(dataset,y,x,color,title,colors){
+  data <- dataset %>% select(y,x,color) %>% `colnames<-`(c("y","x","color"))
+  colors_scale <- scale_color_manual(values=colors, name="ompK36 Status", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) 
+  figure <- ggplot(data= data) + geom_point(aes(y=y, x=log2(x),color=color) ) + theme(legend.position = "bottom")  + theme_bw_me  + theme(legend.position = "bottom",
+                                                                                                                                          axis.text =   element_text(size=20,color="black"),
+                                                                                                                                          axis.title = element_text(size = 24,color="black"),
+                                                                                                                                          legend.text =   element_text(size=22,color="black"),
+                                                                                                                                          legend.title = element_text(size = 24,color="black"),
+                                                                                                                                          plot.title = element_text(size = 26,color="black"),
+  )   + geom_smooth(method='lm',mapping = aes(x=log2(x),y=y,color=color)) + ggtitle(title) + colors_scale
+  return(figure)
+}
+
+```
+
+
+```{r,fig.height=8,fig.width=8}  
+MVB_CI <- KPC_CN_hist(df_CI %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC Copy Number") + ylim(-2.25,6) + xlim(-2.75,5)
+IR_CI <- KPC_CN_hist(df_CI %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC Copy Number") + ylim(-2.25,6)+ xlim(-2.75,5)
+
+MVB_CII <- KPC_CN_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC Copy Number") + ylim(-2.25,6)+ xlim(-2.75,5)
+IR_CII <- KPC_CN_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC Copy Number") + ylim(-2.25,6)+ xlim(-2.75,5)
+```
+
+```{r,fig.height=10,fig.width=15}
+legend <- cowplot::plot_grid(get_legend(MVB_CI) )
+s_fig_plots <- cowplot::plot_grid(MVB_CI + theme(legend.position = "none") ,IR_CI + theme(legend.position = "none"),MVB_CII+ theme(legend.position = "none"),IR_CII+ theme(legend.position = "none"),ncol=2,labels = c("A.","B.","C.","D."),label_size = 32)
+cowplot::plot_grid(s_fig_plots,legend,rel_heights = c(1,0.15),ncol=1)
+```
+ 
+ 

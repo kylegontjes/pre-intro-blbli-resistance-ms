@@ -1,0 +1,87 @@
+---
+title: "figure_2"
+output: html_document
+date: "2024-10-01"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse","kableExtra","tableone","cowplot")
+lapply(packages,library,character.only=T)
+
+# functions
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
+source("./scripts/figures/figure_2_functions.R")
+```
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS") 
+
+df <- df %>% left_join(.,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed) %>% `colnames<-`(c("isolate_no","blbli_asr_cluster_renamed"))) 
+
+rownames(df) <- df$isolate_no
+
+df$blbli_clustering_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible") 
+```
+
+# Part 1 - MIC Histogram
+```{r}
+fig2a <- create_MIC_histogram(df$MVB_log_2,df$clade_I,"Meropenem-Vaborbactam","A" )  + scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
+        labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))     + ylim(NA,250) +figure_2_format + clade_colors_scale_v
+   
+fig2c <- create_MIC_histogram(df$IR_log_2,df$clade_I,"Imipenem-Relebactam","C")+ scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
+        labels=c("≤0.25","0.5","1","2","4","8","16","≥32"))    + ylim(NA,250)   +figure_2_format + clade_colors_scale_v
+```
+
+# Part 2 - Resistance categories
+```{r}
+MVB_clade_prop <- df %>% group_by(clade_I,MVB_cat)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))
+IR_clade_prop <- df %>% group_by(clade_I,IR_cat)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))
+```
+
+```{r}
+fig2b <- MIC_prop_hist(MVB_clade_prop,"B",name="Resistance category") + resistance_cat_scale_v + figure_2_format 
+fig2d <- MIC_prop_hist(IR_clade_prop,"D",name="Resistance category") + resistance_cat_scale_v + figure_2_format 
+```
+
+# Part 3 - Phylogenetic clustering of resistance
+```{r}
+blbli_clade_phylo_prop <- df %>% subset(blbli_clustering_simple != "Susceptible") %>% group_by(clade_I,blbli_clustering_simple)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))  
+ 
+
+fig2e <- MIC_prop_hist_count(blbli_clade_phylo_prop,"E","Phylogenetic clustering") + cluster_scale + ylab("Number of Isolates") + figure_2_format  
+```
+
+# Figure Compilation
+```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5}
+fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),fig2b  + theme(legend.position = "none"),"",fig2c + theme(legend.position = "none"),fig2d + theme(legend.position = "none") , fig2e+ theme(legend.position = "none"), ncol=3,rel_widths = c(1,0.4,0.4,1,0.4,0.4))
+
+clade_legend <- get_legend(fig2a)
+resistance_legend <- get_legend(fig2b)
+clade_phylo_legend <- get_legend(fig2e)
+
+fig2.legends <- cowplot::plot_grid(clade_legend,"",resistance_legend,"",clade_phylo_legend,ncol=5,align = "hv",rel_widths = c(1,0.25,1,0.25,1)) + theme(plot.margin = unit(c(t=-2.5, 2, b=-1,0 ), "cm"))
+ 
+figure_2 <-  cowplot::plot_grid(fig2_data,fig2.legends,ncol=1,rel_heights = c(1,0.15),align = "h")
+```
+
+# Figure
+```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5}
+figure_2
+ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 15, height = 7.5)
+```

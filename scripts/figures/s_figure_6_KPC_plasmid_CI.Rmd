@@ -1,0 +1,119 @@
+---
+title: "s_figure_6"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+# Combination Therapy Manuscript
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","ggtree","ape","ggnewscale","tableone","kableExtra","cowplot")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
+```
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+
+KPC_plasmid_depth <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS")
+KPC_plasmid_depth$isolate_no <- rownames(KPC_plasmid_depth)
+                                         
+KPC_gene_depth <- KPC_plasmid_depth %>% select(isolate_no,KPNIH1_RS28775_chr_median_norm)
+
+
+KPC_containing_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame 
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+
+df <- left_join(df,KPC_gene_depth) %>% left_join(KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))     %>% left_join(pclustering) 
+```
+
+# Figure A  
+
+
+```{r,fig.height=10,fig.width=11}
+# Phylogeny of KPC-containing plasmid across Clade I
+df_CI <- df %>% subset(clade_I == "Clade I")
+rownames(df_CI) <- df_CI$isolate_no
+tr_CI <- keep.tip(tr, df_CI$isolate_no) 
+
+df_CI_plasmid_mat <- df_CI %>% select(colnames(KPC_containing_clusters)) %>% select_if(colSums(.)>0) %>% mutate(Other = ifelse(AA275 ==1 |AD548==1 | AA274==1 | AA356==1 ,1,0)) %>% select(-AA275,-AD548,-AA274,-AA356)
+ 
+rownames(df_CI) <- df_CI$isolate_no
+  #Step #1: Clades
+  p.1 <- gheatmap(ggtree(tr_CI),df_CI %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.1)   + clade_colors_scale_v
+  
+  #Step #3: BL/BLI Cluster
+  p.2 <- p.1 + new_scale_fill()
+  p.3 <-  gheatmap(p.2,df_CI %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.1,offset =.000025) + cluster_scale  
+  
+  #Step #4: MVB Binary
+  p.4 <- p.3 + new_scale_fill()
+  p.5 <-  gheatmap(p.4,df_CI %>% select(blbli_dich,MVB_dich,IR_dich) %>% `colnames<-`(c("BL/BLI resistance","MVB resistance","IR resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.3,offset =.00005) + resistance_scale 
+  
+  #Step #6: MVB MIC
+  p.6 <- p.5 + new_scale_fill()
+  p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.2,offset =.000125) + Log2_scale 
+   
+ p.8 <- p.7 + new_scale_fill() 
+A <-  gheatmap(p.8,df_CI_plasmid_mat %>% mutate_all(as.factor), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.3,offset =.000175) + feature_scale_v   + ylim(NA,205) + theme(legend.position = 'bottom') + consistent_theme
+A 
+```
+
+# B KPC copy number
+```{r}
+kpc_plasmid_simplified <- data.frame()
+for(i in 1:nrow(df_CI_plasmid_mat)){
+  isolate_row <- df_CI_plasmid_mat %>% .[i,]
+  kpc_plasmid_simplified[i,"KPC_plasmid_simplified"] <- ifelse(rowSums(isolate_row) == 0,"None",names(isolate_row)[which(isolate_row==1)]) 
+  kpc_plasmid_simplified[i,"isolate_no"] <- rownames(isolate_row)
+} 
+kpc_plasmid_simplified$KPC_plasmid_simplified <- factor(kpc_plasmid_simplified$KPC_plasmid_simplified,levels =c(table(kpc_plasmid_simplified$KPC_plasmid_simplified) %>% sort() %>% names %>% rev))
+
+df_CI <- left_join(df_CI,kpc_plasmid_simplified)
+
+B <- ggplot(data= df_CI) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.6))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("KPC Copy Number") + xlab("KPC Plasmid Cluster")+ theme_bw_me + sfig6_format + theme(legend.position='none')
+```
+
+# C membership in clusters
+```{r} 
+df_CI$AA552_like <- ifelse(df_CI$AA552==1,"Present","Absent")
+df_CI$blbli_cluster_simplified <- ifelse(grepl("Cluster",df_CI$blbli_asr_cluster_renamed),"Cluster",ifelse(grepl("Singleton",df_CI$blbli_asr_cluster_renamed),"Singleton","Susceptible") )
+
+blbli_plasmid_prop <- df_CI %>% group_by(blbli_cluster_simplified,AA552_like)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>% `colnames<-`(c("clustering_simple","AA552_like","n","freq")) %>% as.data.frame
+ 
+C <-  ggplot(data=blbli_plasmid_prop,aes(x=clustering_simple,fill=AA552_like,y=n))+geom_bar(position="stack",stat="identity",width = .75)  +ylab("No. isolates") +xlab("Phylogenetics of resistance")   + theme_bw_me + sfig6_format  +ylim(NA,115) + AA552_fill
+```
+
+```{r ,fig.height = 10, fig.width = 10,echo=F,message=F,error=F,warning=F}
+s_figure_6BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 28) 
+```
+
+```{r ,fig.height=10,fig.width=11}
+s_figure_6A <- cowplot::plot_grid(A)  
+```
+
+```{r ,fig.height=15,fig.width=25}
+s_figure_6 <- plot_grid(s_figure_6A,s_figure_6BC,labels=c("A",""),ncol=2,label_size = 28,rel_heights = c(1,1),rel_widths = c(1,0.6))  
+s_figure_6
+```
+ 
+```{r,message=F,echo=F,error=F,warning=F,fig.width=27.5,fig.height=15} 
+ggsave(plot = s_figure_6, filename = './figures/s_figure_6.png', width = 25, height = 15,limitsize=FALSE)
+```
