@@ -1,0 +1,76 @@
+- Parsing VCF files generated with SNPKIT
+- Path to config file: /nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/config
+- Note: Outgroup Sample Name not provided. Ignoring Outgroup steps.
+- Extracting Functional Class filter regions such as Phage (Phaster), Repeat (MUMmer), Custom Mask to Functional_class_filter_positions.txt
+- Number of Functional Class filter positions: 101301
+- Gathering Filtered SNP positions information.
+- Sorting unique variant positions.
+- The number of unique variant positions:87713
+- The number of unique indel positions:1712
+Processing /tmp/snpkit_temp/MERLIN_112_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_280_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_294_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_61_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_RE_8_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_6_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_22_filter2_final.vcf_no_proximate_snp.vcf
+Processing /tmp/snpkit_temp/MERLIN_19_filter2_final.vcf_no_proximate_snp.vcf
+- Time taken to complete the Core Step 1 method: 0:00:25.730628
+/nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/modules/variant_diagnostics/core_pipeline.py:766: DtypeWarning: Columns (1) have mixed types. Specify dtype option on import or set low_memory=False.
+  All_label_final_sorted_header = pd.read_csv("%s/All_label_final_sorted_header.txt" % args.filter2_only_snp_vcf_dir, sep='\t', header=0)
+- Parsing VCF files generated with SNPKIT
+- /tmp/snpkit_temp already exists and is non-empty.
+- Path to config file: /nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/config
+- Note: Outgroup Sample Name not provided. Ignoring Outgroup steps.
+- Extracting Functional Class filter regions such as Phage (Phaster), Repeat (MUMmer), Custom Mask to Functional_class_filter_positions.txt
+- Number of Functional Class filter positions: 101301
+- Generating data matrices.
+- Time taken to parse Indel VCFs: 0:00:01.876911
+- No. of core SNPs: 74861
+- Time taken to parse Single Variant VCFs: 0:00:42.977582
+- Adding snpEff annotations to SNP/Indel Matrix.
+- Extracting Locus Tag information from Genbank.
+- Reading annotations from Reference genome genbank file: /nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/references/cfreundii/MERLIN_280_reference.gbf
+- Merging Final Annotated VCF files into Final_vcf_no_proximate_snp.vcf using bcftools
+- Time taken to complete GATK combine variants method: 0:00:07.160571
+- Time taken to complete GATK combine variants method: 0:00:02.148451
+- Loading /scratch/esnitkin_root/esnitkin1/kgontjes/Project_MERLIN/Sequence_data/variant_calling/2025-03-13_SNPKIT_all/cfreundii/output_files//core_temp_dir//All_label_final_ordered_sorted.txt
+- Loading /scratch/esnitkin_root/esnitkin1/kgontjes/Project_MERLIN/Sequence_data/variant_calling/2025-03-13_SNPKIT_all/cfreundii/output_files//core_temp_dir//All_indel_label_final_ordered_sorted.txt
+Length of mask_fq_mq_positions:1073
+Length of mask_fq_mq_positions specific to outgroup:0
+- Time taken to complete the Generate SNP matrix method: 0:08:30.072782
+- Time taken to complete the Generate Indel matrix method: 0:00:06.347973
+- Generating Fasta from Variant Alleles.
+b'Traceback (most recent call last):'
+b'  File "/nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/modules/variant_diagnostics/extract_only_ref_variant_fasta_unique_positions.py", line 194, in <module>'
+b'    Generate_core_plus_noncore_alignment()'
+b'  File "/nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/modules/variant_diagnostics/extract_only_ref_variant_fasta_unique_positions.py", line 43, in Generate_core_plus_noncore_alignment'
+b'    get_reference = Fasta(args.reference)'
+b'  File "/nfs/turbo/umms-esnitkin/conda/snpkit/lib/python3.10/site-packages/pyfasta/fasta.py", line 71, in __init__'
+b'    self.index, self.prepared = self.record_class.prepare(self,'
+b'  File "/nfs/turbo/umms-esnitkin/conda/snpkit/lib/python3.10/site-packages/pyfasta/records.py", line 76, in prepare'
+b'    return idx, klass.modify_flat(f + klass.ext)'
+b'  File "/nfs/turbo/umms-esnitkin/conda/snpkit/lib/python3.10/site-packages/pyfasta/records.py", line 188, in modify_flat'
+b'    mm = np.memmap(flat_file, dtype="S1", mode="r")'
+b'  File "/nfs/turbo/umms-esnitkin/conda/snpkit/lib/python3.10/site-packages/numpy/core/memmap.py", line 267, in __new__'
+b'    mm = mmap.mmap(fid.fileno(), bytes, access=acc, offset=start)'
+b'ValueError: cannot mmap an empty file'
+- Time taken to parse and generate variant matrices: 0:10:00.202714
+rm: cannot remove '/tmp/snpkit_temp/*': No such file or directory
+- Parsing VCF files generated with SNPKIT
+- /tmp/snpkit_temp already exists and is non-empty.
+- Path to config file: /nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/config
+- Note: Outgroup Sample Name not provided. Ignoring Outgroup steps.
+- Extracting Functional Class filter regions such as Phage (Phaster), Repeat (MUMmer), Custom Mask to Functional_class_filter_positions.txt
+- Number of Functional Class filter positions: 101301
+- Note: Outgroup Sample Name not provided. Ignoring Outgroup steps.
+- Moving files to Results folder: /scratch/esnitkin_root/esnitkin1/kgontjes/Project_MERLIN/Sequence_data/variant_calling/2025-03-13_SNPKIT_all/cfreundii/output_files//2025_03_13_14_19_43_core_results/
+- Generating Gubbins MFA files
+- Submit Gubbins job: /scratch/esnitkin_root/esnitkin1/kgontjes/Project_MERLIN/Sequence_data/variant_calling/2025-03-13_SNPKIT_all/cfreundii/output_files//2025_03_13_14_19_43_core_results//gubbins/2025_03_13_14_19_43_MERLIN_280_reference_genome_aln_w_alt_allele_unmapped.sbat
+rm: cannot remove '/tmp/snpkit_temp/*': No such file or directory
+- Parsing VCF files generated with SNPKIT
+- /tmp/snpkit_temp already exists and is non-empty.
+- Path to config file: /nfs/turbo/umms-esnitkin/Project_MERLIN/Sequence_data/variant_calling/snpkit/config
+- Note: Outgroup Sample Name not provided. Ignoring Outgroup steps.
+- Extracting Functional Class filter regions such as Phage (Phaster), Repeat (MUMmer), Custom Mask to Functional_class_filter_positions.txt
+- Number of Functional Class filter positions: 101301
