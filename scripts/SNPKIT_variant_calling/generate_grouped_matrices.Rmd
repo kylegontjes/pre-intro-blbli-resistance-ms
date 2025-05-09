@@ -1,0 +1,114 @@
+---
+title: "Generate grouped matrices"
+output: html_document 
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r Generate Environment, results=FALSE,message=FALSE,warning=FALSE}
+#Base R Packages
+packages <- c("tidyverse","ape","phytools","data.table","prewas")
+# Function to Load Packages
+lapply(packages,library,character.only=T)
+
+# Functions
+source("./lib/variant_calling_cleaning_functions.R") 
+
+# Print environment
+Sys.info()
+sessionInfo()
+``` 
+
+# Dataframe & Tree 
+```{r}
+df <- readRDS(file="./data/dataset/df.RDS")
+tr <- read.tree(file="./data/tree/tree.treefile")
+``` 
+
+# Independent genomic data
+```{r}
+# SNP
+snp_mat <- readRDS("./data/variant_matrices/SNP/SNP_mat.RDS") 
+snp_annots <- readRDS("./data/variant_matrices/SNP/SNP_annots.RDS") %>% mutate(pos = as.numeric(pos))
+# Indel
+indel_mat <- readRDS("./data/variant_matrices/INDEL/INDEL_mat.RDS")
+indel_annots <- readRDS("./data/variant_matrices/INDEL/INDEL_annots.RDS") %>% mutate(pos = as.numeric(pos))
+# IS
+is_mat <- readRDS("./data/variant_matrices/IS/ISFinder_mat.RDS")
+is_annots <- readRDS("./data/variant_matrices/IS/ISFinder_annots.RDS")
+```
+
+# Generate genomic data subsets
+```{r}
+# SNPs
+## Non-Synonymous SNPs
+non_syn_snp_annots <-  snp_annots %>% subset(.,label == "Coding SNP" & variant_type != "synonymous_variant")
+non_syn_snp_mat <- snp_mat[,non_syn_snp_annots %>% select(raw_rownames) %>% unlist]
+## Deleterious Missense SNPs & Start/Stop SNPs
+non_syn_deleterious_high_risk_annots <- snp_annots %>% subset(.,label == "Coding SNP" & variant_type %in% c("start_lost","stop_gained","stop_lost","stop_lost&splice_region_variant") | variant_type == "missense_variant" & sift_prediction %in% c("DELETERIOUS", "DELETERIOUS (*WARNING! Low confidence)"))
+non_syn_deleterious_high_risk_mat <-  snp_mat[,non_syn_deleterious_high_risk_annots %>% select(raw_rownames) %>% unlist]
+
+# INDELs
+## Coding INDELs
+coding_indels_annots <- indel_annots %>% subset(.,label =="Coding Indel")
+coding_indels_mat <- indel_mat[,coding_indels_annots %>% select(raw_rownames) %>% unlist]
+## Frameshift & Disruptive INDELs
+high_risk_indels_annots <- indel_annots %>% subset(., variant_type %in% c("frameshift_variant","frameshift_variant&stop_gained","disruptive_inframe_deletion","disruptive_inframe_insertion","disruptive_inframe_deletion&splice_region_variant"))
+high_risk_indels_mat <-  indel_mat[,high_risk_indels_annots %>% select(raw_rownames) %>% unlist]
+
+# Insertion Sequences
+## Coding Insertion Sequences
+coding_is_annots <- is_annots %>% subset(.,intergenic ==F)
+coding_is_mat <- is_mat[,coding_is_annots %>% select(raw_rownames) %>% unlist]
+```
+
+# Generate grouped variant matrix
+```{r}
+# Model 1: All SNPs & Indels
+# Without All IS
+model1_mats <- c("snp_mat","indel_mat")
+model1_annots <- c("snp_annots","indel_annots")
+model1_burden <- return_grouped_matrix(model1_mats,model1_annots,tr)
+# With All IS
+model1.2_mats <- c(model1_mats,"is_mat") 
+model1.2_annots <- c(model1_annots,"is_annots") 
+model1.2_burden <- return_grouped_matrix(model1.2_mats,model1.2_annots,tr)
+
+# Model 2: All SNPs & Indels
+# Without Coding IS
+model2_mats <- c("non_syn_snp_mat","coding_indels_mat")
+model2_annots <- c("non_syn_snp_annots","coding_indels_annots")
+model2_burden <- return_grouped_matrix(model2_mats,model2_annots,tr)
+# With Coding IS
+model2.2_mats <- c(model2_mats,"coding_is_mat") 
+model2.2_annots <- c(model2_annots,"coding_is_annots") 
+model2.2_burden <- return_grouped_matrix(model2.2_mats,model2.2_annots,tr)
+
+# Model 3: 
+# Without Coding IS
+model3_mats <- c("non_syn_deleterious_high_risk_mat","high_risk_indels_mat")
+model3_annots <- c("non_syn_deleterious_high_risk_annots","high_risk_indels_annots")
+model3_burden <- return_grouped_matrix(model3_mats,model3_annots,tr)
+# With Coding IS
+model3.2_mats <- c(model3_mats,"coding_is_mat") 
+model3.2_annots <- c(model3_annots,"coding_is_annots") 
+model3.2_burden <- return_grouped_matrix(model3.2_mats,model3.2_annots,tr)
+```
+
+# Save matrices
+```{r}
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_files <- c(paste0(x,"_burden"),paste0(x,"_annots"))    
+  for(i in grouped_files){
+    saveRDS(get(i),file = paste0("./data/variant_matrices/grouped/",i,".RDS")) 
+  } 
+}
+``` 
