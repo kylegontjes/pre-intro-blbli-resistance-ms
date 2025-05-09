@@ -1,0 +1,1 @@
+cp /nfs/turbo/umms-esnitkin/data_sharing/reference/KPNIH1_plasmid_pKpQIL6e6/KPNIH1_plasmid_pKpQIL6e6.fasta /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1_plasmid_pKpQIL6e6

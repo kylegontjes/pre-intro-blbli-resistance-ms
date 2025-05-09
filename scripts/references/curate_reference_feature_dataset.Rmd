@@ -1,0 +1,42 @@
+---
+title: "curate_reference_feature_dataset"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+ 
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+ 
+```{r}
+library(genbankr)
+library(tidyverse)
+
+# Print
+Sys.info()
+sessionInfo() 
+```
+ 
+```{r}
+kpnih1 <- readGenBank(GBAccession("NZ_CP008827"),partial=TRUE)
+# Pull Features Using Locus Tag
+kpnih1_features <- cds(kpnih1) %>% as.data.frame
+  # Formatting Genome set
+  kpnih1_features_final <- kpnih1_features %>% dplyr::select(locus_tag,start,end,strand,gene,product,protein_id) %>% 
+    mutate(length = end - start,
+           locus_tag = make.unique(locus_tag)) 
+saveRDS(kpnih1_features_final,"./data/references/KPNIH1/KPNIH1_features.RDS")
+
+KPC_plasmid <- readGenBank(GBAccession("NZ_CP008830"),partial=TRUE) 
+# Pull Features Using Locus Tag
+KPC_plasmid_features <- cds(KPC_plasmid) %>% as.data.frame
+  # Formatting Genome set
+  KPC_plasmid_features_final <- KPC_plasmid_features %>% dplyr::select(locus_tag,start,end,strand,gene,product,protein_id) %>% 
+    mutate(length = end - start,
+           locus_tag = make.unique(locus_tag)) 
+   
+saveRDS(KPC_plasmid_features_final,"./data/references/KPNIH1_plasmid_pKpQIL6e6/KPNIH1_KPC_Plasmid_features.RDS")
