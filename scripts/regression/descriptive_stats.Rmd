@@ -32,7 +32,7 @@ descriptive_stats <- function(phenotype,datasets,variables,factor_vars,outcome_n
 
 
 ```{r}
-descriptive_data <- descriptive_stats("blbli_dich_num",datasets = datasets,variables = eligible_variables,factor_vars = subset(eligible_variables,!eligible_variables %in% c("age","LOSbeforeCx")),outcome_names = c("Susceptible","Non-Susceptible"))
+descriptive_data <- descriptive_stats("blbli_dich_num",datasets = datasets,variables = eligible_variables,factor_vars = subset(eligible_variables,!eligible_variables %in% c("age","LOSbeforeCx")),outcome_names = c("Susceptible","Resistant"))
 descriptive_data$present$term <- eligible_variables
 descriptive_data$singleton$term <- eligible_variables
 descriptive_data$cluster$term <- eligible_variables

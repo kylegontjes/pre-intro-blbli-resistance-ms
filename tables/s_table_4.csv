@@ -1,4 +1,4 @@
-term,Overall (n=303),Non-Susceptible (n=19),Susceptible (n=284),OR (95% CI),OR p-value,aOR (95% CI),aOR p-value
+term,Overall (n=303),Resistant (n=19),Susceptible (n=284),OR (95% CI),OR p-value,aOR (95% CI),aOR p-value
 age,70.40 (14.65),76.79 (8.06),69.98 (14.90),1.04 (1.00-1.08),0.0502,1.04 (1.01-1.09),0.0365
 LOSbeforeCx,41.41 (115.61),49.79 (101.48),40.85 (116.63),1.00 (0.99-1.00),0.7479,NA,NA
 sex.female,143 (47.2),11 (57.9),132 (46.5),1.58 (0.62-4.20),0.3380,NA,NA
