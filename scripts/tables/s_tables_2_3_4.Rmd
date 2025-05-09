@@ -1,0 +1,71 @@
+---
+title: "Supplemental Tables 2-4: Descriptive stats + regression modeling for presence, emergence, and spread "
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(tableone)
+library(kableExtra)
+source("./lib/consistent_themes.R")
+```
+
+```{r}
+descriptive_stats <- readRDS("./data/regression/descriptive_stats.RDS") 
+purposeful_results <- readRDS("./data/regression/purposeful_regression_results.RDS")
+```
+
+
+```{r}
+purposeful_results$univariable$present$term <- rownames(purposeful_results$univariable$present)
+purposeful_results$univariable$singleton$term <- rownames(purposeful_results$univariable$singleton)
+purposeful_results$univariable$cluster$term <- rownames(purposeful_results$univariable$cluster) 
+
+purposeful_results$multivariable$present$final_model_table$term <- rownames(purposeful_results$multivariable$present$final_model_table)
+purposeful_results$multivariable$singleton$final_model_table$term <- rownames(purposeful_results$multivariable$singleton$final_model_table)
+purposeful_results$multivariable$cluster$final_model_table$term <- rownames(purposeful_results$multivariable$cluster$final_model_table) 
+```
+
+```{r}
+table_curation <- function(stats,ulogr,mlogr){
+  stats <- stats[,c(6,2,4,3)] 
+  ulogr <- ulogr[,c(3,1,2)]  %>% `colnames<-`(c("term","OR (95% CI)","OR p-value"))
+  mlogr <- mlogr[,c(3,1,2)] %>% `colnames<-`(c("term","aOR (95% CI)","aOR p-value"))
+  results <- left_join(stats,ulogr) %>% left_join(mlogr)
+  return(results)
+}
+```
+
+```{r}
+s_table_2 <- table_curation(descriptive_stats$present,purposeful_results$univariable$present,purposeful_results$multivariable$present$final_model_table)
+s_table_3 <- table_curation(descriptive_stats$singleton,purposeful_results$univariable$singleton,purposeful_results$multivariable$singleton$final_model_table)
+s_table_4 <- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)
+```
+
+```{r}
+s_table_2 %>% favorite_kable()
+s_table_3 %>% favorite_kable()
+s_table_4 %>% favorite_kable()
+```
+
+
+```{r}
+write_csv(s_table_2,"./tables/s_table_2.csv")
+saveRDS(s_table_2,"./tables/s_table_2.RDS")
+
+write_csv(s_table_3,"./tables/s_table_3.csv")
+saveRDS(s_table_3,"./tables/s_table_3.RDS")
+
+write_csv(s_table_4,"./tables/s_table_4.csv")
+saveRDS(s_table_4,"./tables/s_table_4.RDS")
+```

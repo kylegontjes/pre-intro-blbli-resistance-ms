@@ -1,0 +1,77 @@
+---
+title: "Supplemental Table 1: Clade-specific trends in the prevalence of carbapenem resistance-associated genotypes"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+--- 
+# Combination Therapy Manuscript
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gontjesr","ggnewscale","tableone","kableExtra")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/common_functions.R")
+```
+
+# Data
+```{r}
+df <- readRDS("./data/dataset/df.RDS") 
+# Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+df <- left_join(df,canonical)
+
+# tn4401 data
+tn4401 <- readRDS("./data/TETyper/TETyper_curated.RDS")  
+df <- left_join(df,tn4401)
+
+# load the kleborate
+kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame
+df <- left_join(df,kleborate)
+```
+
+```{r}
+# B-lactamase genes  
+bla_variables <- c("Bla_acquired","Bla_ESBL_acquired","Bla_Carb_acquired","Bla_chr")
+rownames(kleborate) <- kleborate$isolate_no
+
+bla_mat<- lapply(bla_variables,FUN=function(x){get_presence_absence_matrix(x,kleborate)}) %>% do.call(cbind,.) %>% as.data.frame %>% mutate(isolate_no = rownames(.)) 
+
+## Edit similar b-lactamase gene calls
+bla_mat$`KPC-3` <- ifelse(bla_mat$`KPC-3`==1 | bla_mat$`KPC-3^`,1,0)
+bla_mat$`SHV-11` <- ifelse(bla_mat$`SHV-11`==1 | bla_mat$`SHV-11^`,1,0)
+bla_mat$`SHV-12` <- ifelse(bla_mat$`SHV-12`==1 ,1,0)
+bla_mat$`TEM-1D.v1` <- ifelse(bla_mat$`TEM-1D.v1^` ==1 | bla_mat$`TEM-1D.v1`==1,1,0)
+
+bla_genes <- colnames(bla_mat %>% select(-isolate_no)) %>% sort %>% subset(!.%in% c("KPC-3^","SHV-11^","SHV-12^","TEM-1D.v1^"))
+```
+
+```{r}
+canonical <- c('OmpK35-25%','OmpK36_L3_mutations',"OmpK36GD","OmpK36TD",'OmpK36_truncation_kleborate','OmpK36_putative_function_altering',"OmpK36_intergenic",'OmpK36_promoter_IS',"AcrAB_TolC_any","RamR","RamA","PBP_any","PBP2","PBP4")
+tn4401 <- c("Tn4401a","Tn4401b","Tn4401d","Tn4401_del_6920_7126","Tn4401_del_1_554_7008_7075","Tn4401_del_1_3391_6920_7126")
+```
+
+```{r} 
+exact <- c('OmpK36TD','OmpK36_truncation_kleborate','AcrAB_TolC_any','RamA','PBP_any','PBP2','PBP4','Tn4401_del_1_3391_6920_7126','CMY-2.v2','CTX-M-14','CTX-M-15',"KPC-5","LAP-2","OXA-1","TEM-1",'TEM-104?','TEM-104*?','TEM-150*?')
+
+s_table_1 <- convert_tableone_into_df(df,vars=c(canonical,bla_genes,tn4401),factorVars = c(canonical,bla_genes,tn4401),strata="clade_I",outcome_names = c("Clade I","Clade II"),exact=exact)
+s_table_1$Variable <-gsub(" = 1","",s_table_1$Variable) %>% gsub(" \\(|\\)|\\%","",.) 
+
+s_table_1 <- recode(s_table_1$Variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T mutation in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+s_table_1 <-  s_table_1 %>% as.data.frame
+favorite_kable(s_table_1)
+```
+
+```{r}
+write_csv(s_table_1,"./tables/s_table_1.csv")
+saveRDS(s_table_1,"./tables/s_table_1.RDS")
+```
