@@ -1,0 +1,36 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=copy_coverage_stats
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1 
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=30g --time=10:30:00
+
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/KPC_coverage/CoverageStats
+
+# Scripts
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/config .
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/bash_scripts .
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/*.s* .
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/coverage_runs.README .
+
+# Data
+## KPNIH1
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/KPC_coverage/KPNIH1
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/results/KPNIH1/*/gatk/*_summary .
+## KPC Plasmid 
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/KPC_coverage/KPNIH1_plasmid_pKpQIL6e6
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/results/KPNIH1_plasmid_pKpQIL6e6/*/gatk/*_summary .
+
+# Slurm
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/KPC_coverage/slurm
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/slurm_out/* .
+
+# Logs
+# KPNIH1
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/KPC_coverage/
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/logs/KPNIH1 .
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_coverage/CoverageStats/logs/KPNIH1_plasmid_pKpQIL6e6 .

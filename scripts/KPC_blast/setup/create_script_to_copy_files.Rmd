@@ -1,0 +1,33 @@
+---
+title: "create_script_to_copy_files"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Sequence_data/assembly/illumina/spades/') 
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/dataset/df.RDS")
+PCMP_isolates <- df$isolate_no %>% sort
+```
+
+
+```{r} 
+isolate_paths = paste0("/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/",PCMP_isolates,"/",PCMP_isolates,"_contigs_l1000.fasta")
+destination_paths = paste0("/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/KPC_blast/GeneScreener/assemblies/",PCMP_isolates,".fasta")
+
+shebang = "#!/bin/sh"
+cp_command = paste0("cp ",isolate_paths," ",destination_paths)
+
+write_lines(c(shebang,cp_command),"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/KPC_blast/setup/cp_assemblies.sh")
+```

@@ -1,0 +1,8 @@
+# Run this before
+srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=1 --time=12:00:00 --pty /bin/bash
+ 
+# KPNIH1
+snakemake -s CoverageStats_KPNIH1.smk --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/KPNIH1/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config_KPNIH1.yaml --latency-wait 30 --keep-going 
+
+# KPNIH1_KPC_plasmid
+snakemake -s CoverageStats_KPNIH1_KPC_plasmid.smk --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/KPNIH1_KPC_plasmid/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config_KPNIH1_KPC_plasmid.yaml --latency-wait 30 --keep-going 

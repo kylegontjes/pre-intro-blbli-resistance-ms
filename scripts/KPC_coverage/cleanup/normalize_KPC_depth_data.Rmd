@@ -1,0 +1,46 @@
+---
+title: "normalize_KPC_depth_data"
+output: html_document
+date: "2024-10-06"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+median_plasmid_gene_depth <- readRDS("./data/KPC_coverage/KPNIH1_plasmid_pKpQIL6e6/KPNIH1_KPC_plasmid_depth_by_feature_median.RDS")
+mean_plasmid_gene_depth <- readRDS("./data/KPC_coverage/KPNIH1_plasmid_pKpQIL6e6/KPNIH1_KPC_plasmid_depth_by_feature_mean.RDS")
+plasmid_depth <- readRDS("./data/KPC_coverage/KPNIH1_plasmid_pKpQIL6e6/KPNIH1_KPC_plasmid_depth_summary.RDS")
+kpnih1_depth <- readRDS("./data/KPC_coverage/KPNIH1/KPNIH1_depth_summary.RDS") 
+```
+
+# Normalize By gene data
+```{r}
+normalize_gene_data <- function(plasmid_gene,chromosome,suffix){
+  colnames(plasmid_gene) <- make.unique(colnames(plasmid_gene)) 
+  plasmid_gene <-  plasmid_gene %>% mutate_if(colnames(.) != "isolate_no",as.numeric)
+  depth_df <- plasmid_gene %>% left_join(.,chromosome) %>% `rownames<-`(.$isolate_no)
+  normalized_matrix <- depth_df %>% select(colnames(plasmid_gene) %>% subset(.!="isolate_no"))  / chromosome[,paste0("KPNIH1_",suffix,"_depth_non_zero")]
+    colnames(normalized_matrix) <- paste0(colnames(normalized_matrix),'_chr_',suffix,"_norm")
+  return(normalized_matrix) 
+}
+median_plasmid_gene_depth_chr_norm <- normalize_gene_data(median_plasmid_gene_depth,kpnih1_depth,"median")
+mean_plasmid_gene_depth_chr_norm <- normalize_gene_data(mean_plasmid_gene_depth,kpnih1_depth,"mean")
+
+
+median_plasmid_gene_depth_chr_norm$KPNIH1_RS28775_chr_median_norm  %>% hist
+mean_plasmid_gene_depth_chr_norm$KPNIH1_RS28775_chr_mean_norm %>% hist
+```
+
+```{r}
+saveRDS(median_plasmid_gene_depth_chr_norm,"./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS")
+saveRDS(mean_plasmid_gene_depth_chr_norm,"./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_mean_chromosome_normalized.RDS")
+```

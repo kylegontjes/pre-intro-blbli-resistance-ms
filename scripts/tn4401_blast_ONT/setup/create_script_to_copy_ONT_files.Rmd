@@ -1,0 +1,27 @@
+---
+title: "create_script_to_copy_files"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Sequence_data/assembly/ONT/medaka/') 
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r} 
+ONT_isolates = list.dirs(".") %>% gsub(".\\/","",.) %>% subset(.!='.')
+isolate_paths = paste0("/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/ONT/medaka/",ONT_isolates,"/",ONT_isolates,"_medaka.fasta")
+destination_paths = paste0("/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/tn4401_blast_ONT/GeneScreener/assemblies/",ONT_isolates,".fasta")
+
+shebang = "#!/bin/sh"
+cp_command = paste0("cp ",isolate_paths," ",destination_paths)
+
+write_lines(c(shebang,cp_command),"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/tn4401_blast_ONT/setup/cp_assemblies_ONT.sh")
+```

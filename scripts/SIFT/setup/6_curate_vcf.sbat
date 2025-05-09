@@ -1,0 +1,63 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=vcf_curate
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/SIFT/setup/vcf_curate.out
+# Number of cores, amount of memory, and walltime (250h and 40g by 8 cpus not enough memory, do high memory task)
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=2 --mem=10g --time=0:30:00
+
+module load Bioinformatics
+module load vcftools/0.1.15
+module load tabix/1.7-2
+module load bcftools/1.7
+module load samtools/1.9-3fj3o6c
+
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/SIFT/genomic_data
+
+mkdir snp
+mkdir indel
+mkdir final
+
+cd snp 
+cp /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/variant_calling/2025-02-17_snpkit_Penn_KPC_ST258/output_files/2025_02_23_21_11_49_core_results/data_matrix/snpEff_results/*filter2_final.vcf_no_proximate_snp.vcf_ANN.vcf.gz .
+
+## Unzip the vcf files
+ for i in *.vcf.gz;do gzip -d "$i"; done
+## Next, one must bgzip the vcf files
+ for i in *.vcf;do bgzip "$i"; done
+## Next, one must index the files
+ for i in *.gz;do bcftools index "$i"; done
+## Next, one can merge the bgziped files into one vcf file
+ bcftools merge *.gz -0 -Oz -o all_merged.vcf.gz
+## Next, gbzip the merged vcf files
+ bgzip -d all_merged.vcf.gz
+## Next, change the vcf file chromosome name to that found in your database (for me, CP008827.1)
+ var='gi\\|661922017\\|gb\\|CP008827.1\\|'; awk -F '\t' -v OFS='\t' -v var="$var" '{gsub(var,"CP008827.1",$1);print}' all_merged.vcf > all_merged_new_chr_snp.vcf
+
+cd ..
+
+cd indel
+cp /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/variant_calling/2025-02-17_snpkit_Penn_KPC_ST258/output_files/2025_02_23_21_11_49_core_results/data_matrix/snpEff_results/*_filter2_indel_final.vcf_ANN.vcf.gz .
+
+## Unzip the vcf files
+ for i in *.vcf.gz;do gzip -d "$i"; done
+## Next, one must bgzip the vcf files
+ for i in *.vcf;do bgzip "$i"; done
+## Next, one must index the files
+ for i in *.gz;do bcftools index "$i"; done
+## Next, one can merge the bgziped files into one vcf file
+ bcftools merge *.gz -0 -Oz -o all_merged.vcf.gz
+## Next, gbzip the merged vcf files
+ bgzip -d all_merged.vcf.gz
+## Next, change the vcf file chromosome name to that found in your database (for me, CP008827.1)
+ var='gi\\|661922017\\|gb\\|CP008827.1\\|'; awk -F '\t' -v OFS='\t' -v var="$var" '{gsub(var,"CP008827.1",$1);print}' all_merged.vcf > all_merged_new_chr_indel.vcf
+
+## Now, move the indel and snjp vcf files into the final directory
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/SIFT/genomic_data/final
+cp ../snp/all_merged_new_chr_snp.vcf all_snp.vcf
+cp ../indel/all_merged_new_chr_indel.vcf all_indel.vcf

@@ -1,0 +1,27 @@
+---
+title: "curate_kleborate_matrix"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+``` 
+
+```{r}
+library(ape)
+library(tidyverse)
+``` 
+
+```{r} 
+tr <- read.tree(file=paste0('./data/tree/tree.treefile'))
+kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame %>% `rownames<-`(.$isolate_no)  %>% .[match(tr$tip.label,rownames(.)),] %>% as.data.frame %>% select(-isolate_no,-species,-ST,-Omp_mutations,-Bla_acquired,-Bla_ESBL_acquired,-Bla_Carb_acquired,-Bla_chr,-KPC_type,-KPC_present,-`OmpK36-0%`,-`OmpK36-14%`,-`OmpK36-22%`,-`OmpK36-53%`,-`OmpK36-74%`) %>% select_if(.,colSums(.) > 1 & colSums(.) < nrow(.) - 2) %>% as.matrix
+```
+
+```{r}
+saveRDS(kleborate,"./data/GWAS/matrices/kleborate_mat.RDS")
+```

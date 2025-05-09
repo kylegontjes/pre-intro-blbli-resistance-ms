@@ -1,0 +1,136 @@
+---
+title: "hogwash_script_setup"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/GWAS')
+``` 
+
+# Model script
+```{bash}
+cd ./R
+echo "
+# Hogwash Run
+# Start Date: 04/21/25
+# Activate
+library(hogwash)
+library(tidyverse)
+library(ape)
+Sys.info()
+sessionInfo()
+
+setwd('/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+
+set.seed(45)
+
+#Load Dataset & Tree
+tr <- read.tree(file=paste0('/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/tree/tree.treefile'))
+df <-  readRDS(file=paste0('/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/dataset/df.RDS')) %>% .[match(tr\$tip.label,rownames(.)),] 
+rownames(df) <- df\$isolate_no
+
+#Phenotype
+phenotype <- df %>% select(outcome) %>% as.matrix
+
+#Genotypes
+geno <- readRDS(file=paste0('./data/GWAS/matrices/','genotypes','.RDS')) %>% subset(rownames(.) %in% rownames(df)) %>% .[match(tr\$tip.label,rownames(.)),] %>% as.data.frame %>% select_if(.,colSums(.) > 1 & colSums(.) < nrow(.) - 2) %>% as.matrix
+
+print('running hogwash for model: analysis')
+hogwash(
+  pheno = phenotype,
+  geno = geno,
+  tree = tr,
+  fdr = 0.10,
+  file_name = paste0('outcome','_','genotypes'),
+  dir = '/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/GWAS/results') " > model_hogwash.R
+```
+
+```{r}
+setwd("./R")
+library(tidyverse)
+
+# Loop list
+phenotypes = c("blbli_dich_num","MVB_log_2","IR_log_2")
+matrices <- c("model1_burden","model1.2_burden","model2_burden","model2.2_burden","model3_burden","model3.2_burden","kleborate_mat","KPC_containing_cluster_mat","KPC_containing_plasmids_mat") 
+loop_df <- cbind.data.frame(genotypes=rep(matrices,3))
+           
+for(pheno in phenotypes){
+for(i in 1:nrow(loop_df)){
+  outcome <- pheno
+  genotypes <- paste(loop_df[i,"genotypes"])
+  tx <- readLines("./model_hogwash.R")
+  tx_edit <- gsub("genotypes",genotypes,tx) %>% gsub("outcome",outcome,.)
+  fileConn <- file(paste0(outcome,"_",genotypes,".R"))
+  writeLines(tx_edit,fileConn)
+  close(fileConn)
+}
+}
+```
+
+# Create Model Bash Script
+```{bash}
+cd ./sh
+
+echo "#!/bin/sh
+# Job name
+#SBATCH --job-name=title
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/GWAS/slurm_out/slurm_output_file
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=5g --time=24:00:00
+echo 'Running hogwash'
+R CMD BATCH --no-restore --no-save --quiet /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/GWAS/R/R_script  /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/GWAS/R_console/R_console_output
+" > model_hogwash.sbat
+```
+
+
+# Change Model sh Script to Change Outcome and Genotype
+```{r}
+setwd("./sh")
+library(tidyverse)
+
+# Grouped and Burden
+phenotypes = c("blbli_dich_num","MVB_log_2","IR_log_2")
+matrices <- c("model1_burden","model1.2_burden","model2_burden","model2.2_burden","model3_burden","model3.2_burden","kleborate_mat","KPC_containing_cluster_mat","KPC_containing_plasmids_mat")
+loop_df <- cbind.data.frame(genotypes=rep(matrices,3))
+         
+for(pheno in phenotypes){
+for(i in 1:nrow(loop_df)){
+  outcome <- pheno 
+  genotypes <- paste(loop_df[i,"genotypes"])
+  tx <- readLines("./model_hogwash.sbat")
+  tx_edit <-  gsub("title", paste0(outcome,"_",genotypes),tx) %>% 
+                gsub("slurm_output_file",paste0(outcome,"_",genotypes,"_slurm.out"),.) %>%
+                gsub("R_script",paste0(outcome,"_",genotypes,".R"),.) %>% 
+                gsub("R_console_output",paste0(outcome,"_",genotypes,"_R_console.out"),.)
+  fileConn <- file(paste0(outcome,"_",genotypes,"_hogwash.sbat"))
+  writeLines(tx_edit,fileConn)
+  close(fileConn)
+}
+} 
+```
+
+# Create bash script to loop
+```{bash}
+cd ./sh
+
+echo "#!/bin/sh
+
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/GWAS/sh
+
+for script in \`ls *hogwash*.sbat | grep -v model_hogwash  \`
+  do
+  echo \$script
+  sbatch \$script
+done
+" > submit_hogwash_jobs.sh 
+```

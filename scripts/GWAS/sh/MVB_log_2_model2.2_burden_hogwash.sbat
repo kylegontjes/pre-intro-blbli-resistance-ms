@@ -1,0 +1,14 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=MVB_log_2_model2.2_burden
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/GWAS/slurm_out/MVB_log_2_model2.2_burden_slurm.out
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=5g --time=24:00:00
+echo 'Running hogwash'
+R CMD BATCH --no-restore --no-save --quiet /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/GWAS/R/MVB_log_2_model2.2_burden.R  /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/GWAS/R_console/MVB_log_2_model2.2_burden_R_console.out
+

@@ -1,0 +1,199 @@
+---
+title: "GWAS Table"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+# Combination Therapy Manuscript
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r}
+library(tidyverse) 
+library(ape)
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+
+# Print
+Sys.info()
+sessionInfo() 
+```
+
+# Edit this part of script!!!!!!!!!
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+# NN Data for hits
+nn <- readRDS("./data/nearest_neighbor_comparisons/nn_comparisons.RDS")  
+# Genome features
+KPNIH1_features <- readRDS("./data/references/KPNIH1/KPNIH1_features.RDS")
+# Matrices
+## Kleborate matrix
+kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
+## KPC Plasmids 
+KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_mat.RDS") %>% as.data.frame
+## Core genome burden models
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_model <- paste0(x,"_burden.RDS")
+  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
+}
+## BLBLI clustering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+
+# Join
+df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
+df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed))
+df <- left_join_matrix(model1_burden,df,"_1")
+df <- left_join_matrix(model1.2_burden,df,"_1.2")
+df <- left_join_matrix(model2_burden,df,"_2")
+df <- left_join_matrix(model2.2_burden,df,"_2.2")
+df <- left_join_matrix(model3_burden,df,"_3")
+df <- left_join_matrix(model3.2_burden,df,"_3.2")
+```
+
+# Load gwas data
+```{r}
+setwd("./data/GWAS/results")
+hogwash_files <- list.files(pattern = "rda", recursive = TRUE) %>% subset(grepl("MVB_dich_num",.)==F & grepl("IR_dich_num",.)==F)
+hogwash_data  <-  lapply(hogwash_files,FUN = load_file)
+final_name <- hogwash_files %>% gsub(".rda","",.) %>% gsub("hogwash_","",.)  
+names(hogwash_data) <- final_name
+
+# Create summary dataset
+hogwash_sum_bin <- lapply(names(hogwash_data)[grep("dich",names(hogwash_data))] ,hogwash_sum_data,hogwash_data,test="binary") %>% do.call(rbind,.) %>% as.data.frame 
+hogwash_sum_cont <- lapply(names(hogwash_data)[grep("log",names(hogwash_data))] ,hogwash_sum_data,hogwash_data,test="continuous") %>% do.call(rbind,.) %>% as.data.frame 
+hogwash_sum <- bind_rows(hogwash_sum_bin,hogwash_sum_cont)  
+```
+
+# Get general test data 
+```{r}
+test_data <- lapply(names(hogwash_data),FUN=get_metadata_from_filename) %>% do.call(bind_rows,.)
+hogwash_sum <- left_join(test_data,hogwash_sum) %>% select(-name)
+```
+
+# Core genome curation
+```{r}
+hogwash_sum_core <- subset(hogwash_sum,grepl("model",model)==T)
+                           
+sig_hits_grouped <- hogwash_sum_core %>% select(sig_hits) %>% unlist %>% str_split(.,",") %>% unlist %>% unique %>% subset(is.na(.)==F) %>% sort
+
+sig_hits_table_grouped <-  lapply(sig_hits_grouped,FUN=get_core_gene_hit_annotations,eggnog_gff_df = KPNIH1_features) %>% do.call(rbind,.) %>% as.data.frame 
+
+test_results <- lapply(sig_hits_table_grouped$locus_tag,FUN=get_pheno,sum_dataset= hogwash_sum_core) %>% do.call(bind_rows,.)
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,test_results)
+
+results_df <- lapply(sig_hits_table_grouped$locus_tag,FUN=get_pheno_sum,hogwash_sum_core) %>% do.call(bind_rows,.)
+
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,results_df) %>% `rownames<-`(.$locus_tag)
+```
+
+```{r}
+# get sig tests
+sig_hits_table_grouped_sig_tests <- lapply(sig_hits_table_grouped$test_name,get_sig_tests) %>% do.call(rbind,.) %>% mutate(locus_tag = sig_hits_table_grouped$locus_tag)
+
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,sig_hits_table_grouped_sig_tests)
+
+# Get sensitivity for all models
+sens_results <- lapply(sig_hits_table_grouped$locus_tag,FUN=get_sensitivity_ppv_core,df) %>% do.call(bind_rows,.) 
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,sens_results)
+
+# Get results for all models
+marginal_stats_data <- c()
+for(i in 1:nrow(sig_hits_table_grouped)){
+  models_available <- sig_hits_table_grouped[i,"sig_models"] %>% str_split(.,";") %>% unlist
+  marginal_stats_data[[i]] <- get_ppv_sens_datasets(sig_hits_table_grouped[i,]) %>% mutate(model_num = rownames(.),locus_tag = sig_hits_table_grouped$locus_tag[i]) %>% subset(model %in% models_available) 
+} %>% as.list 
+
+data_across <- marginal_stats_data %>% do.call(bind_rows,.)
+
+# Get max model
+marginal_stats_best_vals <- lapply(marginal_stats_data,get_max_model) %>% do.call(bind_rows,.) 
+
+marginal_stats_best_vals$best_model <- marginal_stats_best_vals$best_blbli_ppv
+
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,marginal_stats_best_vals)
+```
+
+```{r}
+# Get clustering info
+sig_hits_table_grouped$genotype <- paste0(sig_hits_table_grouped$locus_tag,"_",sig_hits_table_grouped$best_model)  
+
+variants_of_interest <- sig_hits_table_grouped$genotype
+
+clustering_info <- lapply(variants_of_interest,FUN=get_prop_in_res_isolates,df=df) %>% do.call(rbind,.)  %>% mutate(genotype = sig_hits_table_grouped$genotype)
+
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,clustering_info)
+
+# Add nn data
+nn_data_melt <- lapply(sig_hits_table_grouped$genotype,generate_nn_data_best_model,nn_data=nn) %>% do.call(rbind,.)
+sig_hits_table_grouped <- left_join(sig_hits_table_grouped,nn_data_melt)
+```
+
+# Add plasmid data
+```{r}
+sig_hits_plasmid <- subset(hogwash_sum %>% subset(grepl("KPC",model) & num_sig_hits >0))
+sig_plasmids <- sig_hits_plasmid$sig_hits %>% unlist %>% str_split(.,",") %>% unlist %>% unique %>% sort
+  
+plasmid_tests <- lapply(sig_plasmids,FUN=get_pheno,sum_dataset= hogwash_sum) %>% do.call(bind_rows,.)
+plasmids_pheno_sum <- lapply(sig_plasmids,FUN=get_pheno_sum,hogwash_sum) %>% do.call(bind_rows,.)
+plasmids_sens <- lapply(sig_plasmids,get_sensitivity_ppv_generic,df) %>% do.call(bind_rows,.) %>% mutate(locus_tag = sig_plasmids)
+plasmids_clustering <- lapply(sig_plasmids,FUN=get_prop_in_res_isolates,df=df) %>% do.call(rbind,.)  %>% mutate(genotype = sig_plasmids,locus_tag = sig_plasmids)
+plasmid_nn <- lapply(sig_plasmids,generate_nn_data_best_model,nn_data=nn) %>% do.call(rbind,.)
+
+sig_hits_table_plasmid <- left_join(plasmid_tests,plasmids_pheno_sum) %>% left_join(.,plasmids_sens) %>% left_join(.,plasmids_clustering) %>% left_join(.,plasmid_nn)
+```
+
+# Add kleborate data
+```{r}
+sig_hits_kleborate <- subset(hogwash_sum %>% subset(model=="kleborate" & num_sig_hits >0)) 
+
+sig_kleborate <- sig_hits_kleborate$sig_hits %>% unlist %>% str_split(.,",") %>% unlist %>% unique %>% sort
+  
+kleborate_tests <- lapply(sig_kleborate,FUN=get_pheno,sum_dataset= hogwash_sum) %>% do.call(bind_rows,.)
+kleborate_pheno_sum <- lapply(sig_kleborate,FUN=get_pheno_sum,hogwash_sum) %>% do.call(bind_rows,.)
+kleborate_sens <- lapply(sig_kleborate,get_sensitivity_ppv_generic,df) %>% do.call(bind_rows,.)  %>% mutate(locus_tag = sig_kleborate)
+kleborate_clustering <- lapply(sig_kleborate,FUN=get_prop_in_res_isolates,df=df) %>% do.call(rbind,.)   %>% mutate(genotype = sig_kleborate,locus_tag = sig_kleborate)
+kleborate_nn <- lapply(sig_kleborate,generate_nn_data_best_model,nn_data=nn) %>% do.call(rbind,.)
+
+sig_hits_table_kleborate <- left_join(kleborate_tests,kleborate_pheno_sum) %>% left_join(.,kleborate_sens) %>% left_join(.,kleborate_clustering) %>% left_join(.,kleborate_nn)
+```
+
+
+# Overall table
+```{r}
+gwas_table <- bind_rows(sig_hits_table_grouped,sig_hits_table_plasmid) %>% bind_rows(.,sig_hits_table_kleborate)
+```
+
+# Clean the data
+```{r}
+gwas_table <- gwas_table %>% get_resistance_category_data %>% get_significant_tests %>% get_significant_model %>% get_sig_phenotypes %>% get_nn_flag
+```
+
+# Add supplemental data
+```{r} 
+# Genotype freq by non-susceptibility status
+gwas_resistance_freq <- variants_freq(gwas_table$genotype,df)  
+gwas_table <- left_join(gwas_table,gwas_resistance_freq)
+gwas_table <- gwas_table %>% arrange(resistance_category,sig_models_simple)
+```
+
+# Save data
+## 1. GWAS hits matrix
+```{r}
+gwas_hits <- gwas_table$genotype
+gwas_mat <- df %>% select(any_of(gwas_hits),isolate_no) %>% `rownames<-`(.$isolate_no) %>% select(-isolate_no)
+saveRDS(gwas_mat,paste0("./data/GWAS/hits/gwas_mat.RDS"))
+```
+## 2. GWAS table
+```{r}
+gwas_table <- gwas_table %>% arrange(desc(resistance_category))
+saveRDS(gwas_table,paste0("./data/GWAS/hits/gwas_hits_table.RDS"))
+```

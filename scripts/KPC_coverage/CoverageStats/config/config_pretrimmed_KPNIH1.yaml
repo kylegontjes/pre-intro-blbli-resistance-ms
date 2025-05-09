@@ -1,0 +1,11 @@
+# General information
+samples: config/sample.tsv
+prefix: KPNIH1
+
+# Input fastq directory
+input_reads: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/illumina_fastq/clean_fastq_qc_pass_samples
+
+# Bwa parameters
+num_cores: 8
+## Reference genome
+reference_genome: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1.fasta

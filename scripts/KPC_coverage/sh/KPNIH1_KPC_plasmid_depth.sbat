@@ -1,0 +1,13 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=kpc_plasmid_depth
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/KPC_coverage/cleanup/KPNIH1_KPC_plasmid_depth.out
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=30g --time=0:30:00
+echo 'Running depth'
+R CMD BATCH --no-restore --no-save --quiet /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/KPC_coverage/R/KPNIH1_KPC_plasmid_depth.R  /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/KPC_coverage/cleanup/KPNIH1_KPC_plasmid_depth_R_console.out
