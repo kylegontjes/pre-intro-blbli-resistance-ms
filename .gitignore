@@ -1,0 +1,8 @@
+data
+._*
+slurm_out/
+scripts/SIFT/sift_annotation/
+environments/TETyper/
+environments/hogwash_1.2.6.tar.gz
+environments/hogwash_update.tar.gz
+environments/katiesaund-hogwash-c4d1cc4/
