@@ -1,0 +1,189 @@
+---
+title: "results_section_6"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts 
+source("./lib/consistent_themes.R") 
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+source("./lib/common_functions.R") 
+```
+
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+# GWAS table
+gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS") %>% subset(nn_qc=="Yes")
+gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")  
+# Matrices
+## Kleborate matrix
+kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
+## KPC Plasmids 
+KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_mat.RDS") %>% as.data.frame
+## Core genome burden models
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_model <- paste0(x,"_burden.RDS")
+  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
+}
+## BLBLI clustering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+blbli_asr <- readRDS("./data/asr_clustering/blbli_asr.RDS")
+## Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+# Join
+df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
+df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed,blbli_asr_cluster_collapsed))
+df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible" )
+   
+df <- left_join_matrix(model1_burden,df,"_1")
+df <- left_join_matrix(model1.2_burden,df,"_1.2")
+df <- left_join_matrix(model2_burden,df,"_2")
+df <- left_join_matrix(model2.2_burden,df,"_2.2")
+df <- left_join_matrix(model3_burden,df,"_3")
+df <- left_join_matrix(model3.2_burden,df,"_3.2")
+df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
+```
+```{r}
+known_hits <- c("OmpK36_putative_function_altering","OmpK36_promoter_IS","PBP_any","RamA")  
+
+## Known Hits
+df$known <- get_pattern(known_hits,df) %>% .$presence
+novel_synchronous <-  gwas_table %>% subset(resistance_category != "Modulator" & nn_qc=="Yes") %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805")) %>% .$genotype
+df$novel_synchronous <- get_pattern(novel_synchronous,df) %>% .$presence
+df$AA552 <- get_pattern("AA552",df) %>% .$presence
+df$known_ST258_GWAS <- get_pattern(c(known_hits,novel_synchronous),df) %>% .$presence
+df$known_ST258_GWAS_AA552 <- get_pattern(c(known_hits,novel_synchronous,"AA552"),df) %>% .$presence
+df$blbli_dich_num <- as.numeric(df$blbli_dich_num)
+df$blbli_asr_cluster_simplified <- ifelse(df$blbli_asr_cluster_renamed=="No feature","Susceptilbe",ifelse(df$blbli_asr_cluster_renamed=="Singleton","Singleton","Cluster"))
+df$clade_I <- as.factor(df$clade_I )
+df$clade_I <- relevel(df$clade_I, ref = "Clade II")
+df$genotype <- ifelse(df$AA552 == 1 ,"AA552",ifelse(df$known == 1,"Known","None"))
+df_CI <- df %>% subset(clade_I == "Clade I")
+df_CII <- df %>% subset(clade_I != "Clade I")
+```
+
+
+# Frequency in our categories
+## BL/BLI Numerical
+```{r}
+abx_vars <- c("carbapenem_1d","third_plus_ceph_1d","tigecycline_1d")
+overall_freq <- convert_tableone_into_df(df,vars =abx_vars,strata = "blbli_dich_num",outcome_names = c("S","NS" ),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CI_freq <- convert_tableone_into_df(df_CI,vars =abx_vars,strata = "blbli_dich_num",outcome_names = c("S","NS"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CII_freq <- convert_tableone_into_df(df_CII,vars =abx_vars,strata = "blbli_dich_num",outcome_names = c("S","NS"),factorVars = abx_vars,exact = abx_vars) %>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+## BL/BLI Clustering
+```{r}
+abx_vars <- c("carbapenem_1d","third_plus_ceph_1d","tigecycline_1d")
+overall_freq <- convert_tableone_into_df(df,vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Singleton","Susceptible"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CI_freq <- convert_tableone_into_df(df_CI,vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Singleton","Susceptible"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CII_freq <- convert_tableone_into_df(df_CII,vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Singleton","Susceptible"),factorVars = abx_vars,exact = abx_vars) %>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+
+## Cluster vs. suscetible
+```{r} 
+overall_freq <- convert_tableone_into_df(df %>% subset(blbli_asr_cluster_simplified!="Singleton"),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Suscetible"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CI_freq <- convert_tableone_into_df(df_CI %>% subset(blbli_asr_cluster_simplified!="Singleton"),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Suscetible"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CII_freq <- convert_tableone_into_df(df_CII %>% subset(blbli_asr_cluster_simplified!="Singleton"),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Suscetible"),factorVars = abx_vars,exact = abx_vars) %>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+## singleton vs. susceptible
+```{r} 
+overall_freq <- convert_tableone_into_df(df %>% subset(blbli_asr_cluster_simplified!="Cluster"),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Singleton","Suscetible"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CI_freq <- convert_tableone_into_df(df_CI %>% subset(blbli_asr_cluster_simplified!="Cluster"),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Singleton","Suscetible"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CII_freq <- convert_tableone_into_df(df_CII %>% subset(blbli_asr_cluster_simplified!="Cluster"),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Singleton","Suscetible"),factorVars = abx_vars,exact = abx_vars) %>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+
+## Cluster vs. singleton
+```{r} 
+overall_freq <- convert_tableone_into_df(df %>% subset(blbli_dich_num==1),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Singleton"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CI_freq <- convert_tableone_into_df(df_CI%>% subset(blbli_dich_num==1),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Singleton"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CII_freq <- convert_tableone_into_df(df_CII%>% subset(blbli_dich_num==1),vars =abx_vars,strata = "blbli_asr_cluster_simplified",outcome_names = c("Cluster","Singleton"),factorVars = abx_vars,exact = abx_vars) %>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+
+# Singleton vs singleton
+```{r}
+overall_freq <- convert_tableone_into_df(df ,vars =abx_vars,strata = "clade_I",outcome_names = c("CladeI","CladeII"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Overall", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)%>% `rownames<-`(NULL)
+  
+singleton_freq <- convert_tableone_into_df(df %>% subset(blbli_asr_cluster_collapsed=="Singleton"),vars =abx_vars,strata = "clade_I",outcome_names = c("CladeI","CladeII"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Singleton", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)%>% `rownames<-`(NULL)
+  
+cluster_freq <- convert_tableone_into_df(df %>% subset(blbli_asr_cluster_collapsed=="Cluster"),vars =abx_vars,strata = "clade_I",outcome_names = c("CladeI","CladeII"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Cluster", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist) %>% `rownames<-`(NULL)
+  
+data <- rbind(overall_freq,singleton_freq) %>% rbind(.,cluster_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+
+
+ # Genotype
+## Overall
+```{r}
+overall_freq <- convert_tableone_into_df(df,vars =abx_vars,strata = "genotype",outcome_names = c("AA552","Known","None"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)%>% `rownames<-`(NULL)
+
+
+CI_freq <- convert_tableone_into_df(df_CI,vars =abx_vars,strata = "genotype",outcome_names = c("AA552","Known","None"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)%>% `rownames<-`(NULL)
+
+
+CII_freq <- convert_tableone_into_df(df_CII,vars =abx_vars,strata = "genotype",outcome_names = c("AA552","Known","None"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist) %>% `rownames<-`(NULL)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+## AA552 vs. Known
+
+```{r}
+overall_freq <- convert_tableone_into_df(df %>% subset(genotype != "None"),vars =abx_vars,strata = "genotype",outcome_names = c("AA552","Known"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "ST258", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CI_freq <- convert_tableone_into_df(df_CI  %>% subset(genotype != "None"),vars =abx_vars,strata = "genotype",outcome_names = c("AA552","Known"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade I", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+CII_freq <- convert_tableone_into_df(df_CII  %>% subset(genotype != "None"),vars =abx_vars,strata = "genotype",outcome_names = c("AA552","Known"),factorVars = abx_vars,exact=abx_vars)%>% mutate(population = "Clade II", population_count = str_split(colnames(.)," ",simplify = T) %>% .[2,2] %>% unlist %>% gsub("\\(|n|=|\\)","",.)) %>% `colnames<-`(str_split(colnames(.)," ",simplify = T) %>% .[,1] %>% unlist)
+
+data <- rbind(overall_freq,CI_freq) %>% rbind(.,CII_freq) %>% arrange(Variable)
+favorite_kable(data)
+```
+
+ 
+
