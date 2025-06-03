@@ -1,0 +1,104 @@
+---
+title: "Results section 5"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+--- 
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+source("./lib/common_functions.R")
+```
+
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+# GWAS table
+gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS") %>% subset(nn_qc=="Yes")
+gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")  
+# Matrices
+## Kleborate matrix
+kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
+## KPC Plasmids 
+KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_mat.RDS") %>% as.data.frame
+## Core genome burden models
+models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+for(x in models){
+  grouped_model <- paste0(x,"_burden.RDS")
+  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
+}
+## BLBLI clustering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+blbli_asr <- readRDS("./data/asr_clustering/blbli_asr.RDS")
+## Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+# Join
+df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
+df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed,blbli_asr_cluster_collapsed))
+df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible" )
+   
+df <- left_join_matrix(model1_burden,df,"_1")
+df <- left_join_matrix(model1.2_burden,df,"_1.2")
+df <- left_join_matrix(model2_burden,df,"_2")
+df <- left_join_matrix(model2.2_burden,df,"_2.2")
+df <- left_join_matrix(model3_burden,df,"_3")
+df <- left_join_matrix(model3.2_burden,df,"_3.2")
+df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
+```
+
+# Task 1: Genotypes only in singletons
+```{r}
+singletons_only <- subset(gwas_table, `Singleton_prop` >0 & nn_qc=="Yes" & Cluster_prop ==0)  
+singletons_only %>% select(locus_tag,product,`No Feature_prop`,`Singleton_prop`,Cluster_prop,sig_phenotypes,sig_tests)
+```
+
+# Task 2: Genotypes in clusters
+```{r}
+cluster_prop <- gwas_table %>% subset(nn_qc=="Yes") %>% select_if(grepl("locus_tag|Cluster ",colnames(gwas_table))) %>% as.data.frame %>% `rownames<-`(NULL) %>% column_to_rownames(.,var="locus_tag")
+genotypes_in_clusters <- rowSums(cluster_prop == 1) %>% subset(.>0) %>% names
+ 
+gwas_table %>% subset(locus_tag %in% genotypes_in_clusters) %>% select(locus_tag,product,`No Feature_prop`,Cluster_prop,sig_phenotypes,sig_tests,sig_models)
+
+table(df$KPNIH1_RS18100_3.2,df$blbli_asr_cluster_renamed)
+table(df$AA552,df$blbli_asr_cluster_renamed)
+```
+
+## Penicillin/ompk36 analyses
+```{r}
+df$ompk36_lof_or_pbp <- ifelse(df$PBP_any ==1 | df$OmpK36_putative_function_altering == 1 ,1,0) 
+table(df$ompk36_lof_or_pbp,df$blbli_asr_cluster_renamed)
+nons <- subset(df,blbli_dich_num==1)
+table_comp <- table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed)
+table_comp
+prop.table(table_comp,margin = 2)
+table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed) %>% fisher.test()
+```
+
+# FJ plasmid analyses
+```{r} 
+table(df$AA552,df$blbli_asr_cluster_renamed)
+nons_CI <- subset(nons,clade_I == "Clade I")
+comps_table <- table(nons_CI$AA552,nons_CI$blbli_asr_cluster_collapsed) 
+comps_table
+prop.table(comps_table,margin=2)
+nons_CI$blbli_cluster_singleton <- ifelse(nons_CI$blbli_asr_cluster_renamed=="Singleton","Singleton","Cluster")
+table(nons_CI$AA552,nons_CI$blbli_cluster_singleton)
+table(nons_CI$AA552,nons_CI$blbli_cluster_singleton) %>% fisher.test()
+```
