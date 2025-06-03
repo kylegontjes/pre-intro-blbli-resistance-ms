@@ -54,7 +54,7 @@ depth <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_fea
 df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
 df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
 df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed))
-df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible" )
+df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No feature"="Susceptible" )
    
 df <- left_join_matrix(model1_burden,df,"_1")
 df <- left_join_matrix(model1.2_burden,df,"_1.2")
@@ -67,7 +67,7 @@ df <- left_join(df,depth %>% mutate(isolate_no = rownames(.)))
 ```
 
 ```{r}
-df$blbli_asr_cluster_simplified <- ifelse(df$blbli_asr_cluster_renamed=="No Feature","Susceptilbe",ifelse(df$blbli_asr_cluster_renamed=="Singleton","Singleton","Cluster"))
+df$blbli_asr_cluster_simplified <- ifelse(df$blbli_asr_cluster_renamed=="No feature","Susceptilbe",ifelse(df$blbli_asr_cluster_renamed=="Singleton","Singleton","Cluster"))
 df$clade_I <- as.factor(df$clade_I )
 df$clade_I <- relevel(df$clade_I, ref = "Clade II")
 df_CI <- df %>% subset(clade_I == "Clade I")
@@ -157,5 +157,5 @@ s_figure_11
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=27.5,fig.height=15} 
-ggsave(plot = s_figure_11, filename = './figures/s_figure_11.png', width = 15, height = 7.5,limitsize=FALSE)
+ggsave(plot = s_figure_11, filename = './figures/s_figure_11.png', width = 15, height = 7.5,limitsize=FALSE,bg='white')
 ```

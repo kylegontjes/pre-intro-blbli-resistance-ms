@@ -1,14 +1,16 @@
 Variable,Overall (n=412),Clade I (n=145),Clade II (n=267),p-value
 ompK35 porin truncation at 25%,412 (100.0),145 (100.0),267 (100.0),NA
+C25T mutation in ompK36,131 (31.8),129 (89.0),2 (0.7),<0.001
 Loop 3 insertion,124 (30.1),124 (85.5),0 (0.0),<0.001
 GD insertion,119 (28.9),119 (82.1),0 (0.0),<0.001
 TD insertion,5 (1.2),5 (3.4),0 (0.0),0.005
 ompK36 truncation,8 (1.9),1 (0.7),7 (2.6),0.270
-ompK36 putative function-altering mutations,20 (4.9),13 (9.0),7 (2.6),0.009
-ompK36 intergenic region,31 (7.5),5 (3.4),26 (9.7),0.034
-Insertion seqeunce at ompK36 promoter,24 (5.8),1 (0.7),23 (8.6),0.002
+ompK36 non-synonymous mutation,22 (5.3),13 (9.0),9 (3.4),0.029
+ompK36 putative function-altering mutations,20 (4.9),13 (9.0),7 (2.6),0.007
+ompK36 intergenic region,31 (7.5),5 (3.4),26 (9.7),0.020
+Insertion seqeunce at ompK36 promoter,24 (5.8),1 (0.7),23 (8.6),0.001
 acrAB-tolC efflux pump mutant,2 (0.5),0 (0.0),2 (0.7),0.543
-ramR efflux pump regulator PFAV,27 (6.6),11 (7.6),16 (6.0),0.678
+ramR efflux pump regulator PFAV,27 (6.6),11 (7.6),16 (6.0),0.537
 ramA efflux pump activator PFAV,10 (2.4),4 (2.8),6 (2.2),0.746
 Non-synonymous mutations in penicillin-binding-proteins,9 (2.2),3 (2.1),6 (2.2),1.000
 Penicillin-binding protein-2,8 (1.9),2 (1.4),6 (2.2),0.718
@@ -27,6 +29,7 @@ SHV-12,30 (7.3),2 (1.4),28 (10.5),0.001
 TEM-104?,6 (1.5),6 (4.1),0 (0.0),0.002
 TEM-104*?,7 (1.7),6 (4.1),1 (0.4),0.009
 TEM-150*?,6 (1.5),0 (0.0),6 (2.2),0.095
+TEM-1D.v1,177 (43.0),51 (35.2),126 (47.2),0.024
 Tn4401a,143 (35.0),138 (95.8),5 (1.9),<0.001
 Tn4401b,39 (9.5),5 (3.5),34 (12.8),0.004
 Tn4401d,137 (33.5),1 (0.7),136 (51.3),<0.001

@@ -35,25 +35,27 @@ MIC_correlation <-  cor(df %>% select("MERO_log_2","MVB_log_2","IMI_log_2","IR_l
  
 drugs <-  rownames(MIC_correlation) %>% gsub("_log_2","",.)
 
-corr_heatmap <- ComplexHeatmap::pheatmap(MIC_correlation %>% as.matrix,border_color = "black",name ="Spearman's Rank Correlation Coefficient",legend=F,fontsize = 14,
-    row_names_max_width = max_text_width(rownames(MIC_correlation), gp = gpar(fontsize = 16)),
-    column_names_max_height = max_text_width(rownames(MIC_correlation), gp = gpar(fontsize = 16)),
+corr_heatmap <- ComplexHeatmap::pheatmap(MIC_correlation %>% as.matrix,border_color = "black",name ="Spearman's rank correlation coefficient",legend=F,fontsize = 12,
+    row_names_max_width = max_text_width(rownames(MIC_correlation), gp = gpar(fontsize = 14)),
+    column_names_max_height = max_text_width(rownames(MIC_correlation), gp = gpar(fontsize = 14)),
     cluster_rows=T,cluster_cols = T,labels_row = drugs,labels_col=drugs,number_color = "black",breaks = c(-1,0,1),color=c("blue","white","red"),display_numbers = T)  
 
 ## Complex heatmap legend 
-fig_legend <- Legend(at = c(-1, -0.5, 0, 0.5, 1),labels = c("-1.00", "-0.50", "0.00", "0.50", "1.00"),title = "Spearman's Rank Correlation Coefficient",direction = "horizontal",col_fun = colorRamp2(breaks = c(-1,  0,  1),colors = c("blue","white","red")), title_gp = gpar(fontsize = 16),labels_gp=gpar(fontsize=16),legend_width = unit(14, "cm"))
+fig_legend <- Legend(at = c(-1, -0.5, 0, 0.5, 1),labels = c("-1.00", "-0.50", "0.00", "0.50", "1.00"),title = "Spearman's rank correlation coefficient",direction = "horizontal",col_fun = colorRamp2(breaks = c(-1,  0,  1),colors = c("blue","white","red")), title_gp = gpar(fontsize = 14),labels_gp=gpar(fontsize=12),legend_width = unit(10, "cm"), title_position = 'topcenter')
  
 # Print heatmap
 fig_heatmap_image <- grid.grabExpr(draw(corr_heatmap))
 fig_legend_image <- grid.grabExpr(draw(fig_legend))
 
-s_figure_2 <-plot_grid(fig_heatmap_image,NULL,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,-.08,.25))
+s_figure_2 <-plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.15))
 ```
 
 # Print & Save 
-```{r,message=F,error=F,warning=F,fig.width=8,fig.height=5.33}
+```{r,message=F,error=F,warning=F,fig.width=7.25,fig.height=5}
 s_figure_2
+```
 
-ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 8, height = 5.33)
+```{r}
+ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 7.25, height = 5)
 ```
 

@@ -227,7 +227,7 @@ phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_d
 
 # Main figure
 
-```{r,fig.width=13.5,fig.height=11.5}
+```{r,fig.width=15.5,fig.height=11.5}
 setwd("./data/mummer_ONT/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 tn4401_hopping

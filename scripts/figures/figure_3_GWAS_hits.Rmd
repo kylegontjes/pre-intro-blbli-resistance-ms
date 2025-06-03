@@ -63,17 +63,19 @@ rownames(df) <- df$isolate_no
 figure_3.df_mat <- get_gwas_hit_matrix(gwas_table,df) 
 sig_hits_name <- recode(colnames(figure_3.df_mat),"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 figure_3.phylo <- gwas_figures(df,tr,figure_3.df_mat,sig_hits_name = sig_hits_name %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.)) + ylim(NA,550)  
-figure_3.FB <- plot_grid(figure_3.phylo,labels = "B",label_size=62)  
+figure_3.FB <- plot_grid(figure_3.phylo,labels = "B",label_size=24)  
 figure_3.FB
 ```
 
 # Figure 3C - Resistance Frequency
 ```{r,fig.height=15,fig.width=25}
+figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",axis.text = element_text(size=20,colour = "black"),axis.title = element_text(size=22,colour = "black"),legend.title = element_text(size=22,colour = "black"),legend.text = element_text(size=20,colour = "black"),legend.title.align=0.5 ,legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
+
 gwas_nons_freq <- variants_freq(gwas_table$genotype,df)  
 gwas_nons_freq$locus_tag <- recode(gwas_nons_freq$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 gwas_nons_freq$`Significant Hit` <- gwas_nons_freq$locus_tag
 gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(figure_3.A_tb$locus_tag)))  
-figure_3.C <- freq_plot(gwas_nons_freq) 
+figure_3.C <- freq_plot(gwas_nons_freq)  + figure_3_descriptive_plot_theme
 ```
 
 # Figure 3D - Nearest neighbor Data
@@ -83,18 +85,18 @@ nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>%
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(figure_3.A_tb$locus_tag)))  
       
-figure_3.D <- nn_plot(nn_data_melt)  
+figure_3.D <- nn_plot(nn_data_melt)   + figure_3_descriptive_plot_theme
 ```
 
 # Merge figure
-```{r,fig.height=70,fig.width=80}
-figure_3.FCD <- plot_grid(figure_3.C,figure_3.D ,nrow = 2,labels = c("C","D"),label_size = 62,align = "hv",label_x = -0.02)  + theme(plot.margin = unit(c(t=0,r=0,b=0,l=0.1), "cm")) 
-figure_3.FCDB <- plot_grid(figure_3.FB,figure_3.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) + theme(plot.margin = unit(c(-40,0,0,0), "cm")) 
+```{r,fig.height=20,fig.width=25}
+figure_3.FCD <- plot_grid(figure_3.C,figure_3.D ,nrow = 2,labels = c("C","D"),label_size = 24,align = "hv",label_x = -0.02)
+figure_3.FCDB <- plot_grid(figure_3.FB,figure_3.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.65)) 
 ```
 
-```{r ,fig.height=50,fig.width=85.5}
-figure_3.FA <- plot_grid(figure_3.A,labels = "A.",label_size=62,align = "hv") + theme(plot.margin = unit(c(-40,0,0,0), "cm")) 
-figure_3 <- plot_grid(figure_3.FA,figure_3.FCDB,labels = c("A",""),nrow=2,label_size = 62) + theme(plot.margin = unit(c(0,0,0.25,0), "cm")) 
+```{r ,fig.height=17.5,fig.width=26}
+figure_3.FA <- plot_grid(figure_3.A,labels = "A",label_size=24,align = "hv")  
+figure_3 <- plot_grid(figure_3.FA,figure_3.FCDB,labels = c("",""),nrow=2,label_size = 24, rel_heights = c(0.25,1))   
 figure_3
 ```
 

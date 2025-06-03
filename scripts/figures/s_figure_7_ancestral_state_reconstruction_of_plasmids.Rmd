@@ -44,11 +44,11 @@ df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))
 ```{r}
 traits_of_interest <- c("blbli_dich_num",KPC_clusters)   
 trait_parent_child <- pbmcapply::pbmclapply(traits_of_interest,FUN=function(x){
-  asr(df,tr,tip_name_var = 'isolate_no',pheno=x,model='MF') %>% .$parent_child_df
+  asr(df,tr,tip_name_var = 'isolate_no',trait=x,model='MF') %>% .$parent_child_df
 },mc.cores=5) %>% `names<-`(traits_of_interest)
 
 synchronous_changes_w_AA552 <- pbmcapply::pbmclapply(traits_of_interest %>% subset(.!="AA552_KPC"),FUN=function(x){
-  phyloAMR::synchronous_detection(comparitor_parent_child_df = trait_parent_child[[x]],trait_parent_child_df = trait_parent_child[['AA552_KPC']],node_states = 'joint')
+  phyloAMR::synchronous_transitions(comparitor_parent_child_df = trait_parent_child[[x]],trait_parent_child_df = trait_parent_child[['AA552_KPC']],node_states = 'joint')
 },mc.cores=5) %>% do.call(rbind,.) %>% mutate(comparitor = traits_of_interest %>% subset(.!="AA552_KPC"))
 
 synchronous_changes_w_AA552 %>% subset(synchronous_transitions_num>0)
@@ -67,33 +67,33 @@ tree_obj <- st258   +
     geom_tippoint(aes(fill = "AA274 KPC plasmid loss",shape="AA274 KPC plasmid loss",subset=(node %in% AA274_loss),size="AA274 KPC plasmid loss",legend=F))  +
     geom_nodepoint(aes(fill = "AA018 KPC plasmid loss",shape="AA018 KPC plasmid loss",subset=(node %in% AA018_loss),size="AA018 KPC plasmid loss",legend=F)) +
     geom_tippoint(aes(fill = "AA018 KPC plasmid loss",shape="AA018 KPC plasmid loss",subset=(node %in% AA018_loss),size="AA018 KPC plasmid loss",legend=F))  + scale_fill_manual(name="Gain/Loss Events",values = c("AA552 KPC plasmid gain" ="#91796A","AA018 KPC plasmid loss"="#97C466","AA274 KPC plasmid loss"="blue"),guide = guide_legend(title.position = "top",label.position = "bottom",ncol=1,order=1)) + 
-    scale_shape_manual(name="Gain/Loss Events",values=c("AA552 KPC plasmid gain"=22,"AA018 KPC plasmid loss"=24,"AA274 KPC plasmid loss"=23),guide = guide_legend(title.position = "top",label.position = "bottom",ncol=1,order=1)) + scale_size_manual(name="Gain/Loss Events",values = c("AA552 KPC plasmid gain" =20,"AA018 KPC plasmid loss"= 16,"AA274 KPC plasmid loss"=16),guide = guide_legend(title.position = "top",label.position = "bottom",ncol=1,order=1))  
+    scale_shape_manual(name="Gain/Loss Events",values=c("AA552 KPC plasmid gain"=22,"AA018 KPC plasmid loss"=24,"AA274 KPC plasmid loss"=23),guide = guide_legend(title.position = "top",label.position = "bottom",ncol=1,order=1)) + scale_size_manual(name="Gain/Loss Events",values = c("AA552 KPC plasmid gain" =7,"AA018 KPC plasmid loss"= 4,"AA274 KPC plasmid loss"=4),guide = guide_legend(title.position = "top",label.position = "bottom",ncol=1,order=1))  
 ```
 
 # A. KPC Plasmid content
-```{r ,fig.height = 50, fig.width = 57.5,echo=F,message=F,error=F,warning=F}  
-consistent_theme <- theme(plot.margin=grid::unit(c(-2,-3,0,-3), "cm"),legend.position = 'bottom',legend.direction="vertical", legend.justification = "center",legend.box.spacing = unit(.0001, "cm"),legend.key.size = unit(1, "cm"),legend.key.width = unit(1, "cm") , legend.title = element_text(size=68),legend.text = element_text(size=64),legend.title.align=0.5,legend.text.align = 0, legend.margin=margin(t=-5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.75, "cm"))  
+```{r ,fig.height = 22.5, fig.width = 25,echo=F,message=F,error=F,warning=F}  
+consistent_theme <- theme(plot.margin=grid::unit(c(-2,-3,0,-3), "cm"),legend.position = 'bottom',legend.direction="vertical", legend.justification = "center",legend.box.spacing = unit(.0001, "cm"),legend.key.size = unit(0.4, "cm"),legend.key.width = unit(0.4, "cm") , legend.title = element_text(size=30),legend.text = element_text(size=28),legend.title.align=0.5,legend.text.align = 0, legend.margin=margin(t=-1,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(0.5, "cm"),legend.spacing.y=unit(1,"cm") ,legend.key = element_rect(colour = c('white')))  
   
  rownames(df) <- df$isolate_no
   #Step #1: Clades
-  p.1 <- gheatmap(tree_obj + ggnewscale::new_scale_fill(),df %>% select(clade_I) %>% `colnames<-`("ST258 Clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1)   + clade_colors_scale_v  +   consistent_theme
+  p.1 <- gheatmap(tree_obj + ggnewscale::new_scale_fill(),df %>% select(clade_I) %>% `colnames<-`("ST258 Clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.1)   + clade_colors_scale_v  +   consistent_theme
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill() 
-  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.1,offset =.000025) + cluster_scale + consistent_theme  
+  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.1,offset =.000025) + cluster_scale_4 + consistent_theme  
   
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich,MVB_dich,IR_dich) %>% `colnames<-`(c("BL/BLI resistant","MVB resistant","IR resistant")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.3,offset =.00005) + resistance_scale + consistent_theme  
+  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistant")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.1,offset =.00005) + resistance_scale + consistent_theme  
   
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
-  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.2,offset =.000125) + Log2_scale + consistent_theme  
+  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.2,offset =.000075) + Log2_scale + consistent_theme  
   # Add KPC data
   p8 <- p.7 +ggnewscale::new_scale_fill()
-  s_figure_7 <- gheatmap(p8,df %>% select(AA018_KPC,AA552_KPC,AA356_KPC,AA018_non_KPC,AA552_non_KPC) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 KPC plasmid","AA552 KPC plasmid","AA356 KPC plasmid","AA018 non-KPC plasmid","AA552 non-KPC plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 20, width = 0.5,offset =.000175) + feature_scale_v  +  consistent_theme + ylim(NA,510) 
+  s_figure_7 <- gheatmap(p8,df %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,AA356_KPC) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 KPC plasmid","AA018 non-KPC plasmid","AA552 KPC plasmid","AA552 non-KPC plasmid","AA356 KPC plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.5,offset =.000125) + feature_scale_v  +  consistent_theme + ylim(NA,520) 
   s_figure_7
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=27.5,fig.height=15} 
-ggsave(plot = s_figure_7, filename = './figures/s_figure_7.png', width = 50, height = 57.5,limitsize=FALSE)
+ggsave(plot = s_figure_7, filename = './figures/s_figure_7.png', width = 25, height = 22.5,limitsize=FALSE,bg="white")
 ```

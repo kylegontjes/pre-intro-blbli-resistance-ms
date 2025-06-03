@@ -81,127 +81,7 @@ paste0("How many passed QC:")
 table(gwas_table$nn_qc)
 ```
 
-# Synchronous
-```{r}
-synchronous <- gwas_table %>% subset(resistance_category != "Modulator")
-
-paste0("Number of synchronous hits")
-nrow(synchronous)
-
-paste0("Synchronous hits that passed QC")
-synchronous_pass <- subset(synchronous, nn_qc=="Yes")
-
-synchronous_pass %>% select(locus_tag,gene,product,blbli_res_freq,blbli_sus_freq,`Singleton_prop`,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,best_model,genotype)  %>% favorite_kable
-
-novel_synchronous <- synchronous_pass %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805")) %>% .$genotype
-```
-### AA552
-```{r}
-paste0("Nearest neigbor data")
-AA552_data <- synchronous_pass %>% subset(locus_tag == "AA552")
-AA552_data %>% select(blbli_sus_freq,blbli_sus_prop,blbli_res_freq,blbli_res_prop,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_diff_increase_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_diff_increase_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range)
-
-paste0("Frequency and enr")
-convert_tableone_into_df(df,vars = "AA552",strata='blbli_dich',outcome_names = c("Susceptible","Resistant"),factorVars='AA552')
-```
-
-# Log-2 KPC analyses
-```{r}
-
-```
-
-## AA018
-```{r}
-
-enrichment <- function(group,df){
-  group_df <- df %>% subset(get(group)==1)
-  wo_df <- df %>% subset(get(group)==0)
-  # MVB
-  ## Median IQR
-  MVB_median_with <-  median(group_df[,'MVB_log_2'])
-  MVB_IQR_with <-  IQR(group_df[,'MVB_log_2'])
-  MVB_median_IQR_with <-  paste0(MVB_median_with," (",MVB_IQR_with,")")  
-  MVB_median_wo <-  median(wo_df[,'MVB_log_2'])
-  MVB_IQR_wo <-  IQR(wo_df[,'MVB_log_2'])
-  MVB_median_IQR_wo <-  paste0(MVB_median_wo," (",MVB_IQR_wo,")") 
-  ## T test
-  MVB_t_test <- wilcox.test(df[,group], df[,"MVB_log_2"], conf.int=TRUE)    
-  MVB_t_test_p <- MVB_t_test$p.value
-  MVB_t_test_estimate <- wilcox_effsize(data = df,formula = as.formula(paste0("MVB_log_2","~",group)),paired = F) %>% .$effsize
-  
-  # IR
-  ## Median IQR
-  IR_median_with <-  median(group_df[,'IR_log_2'])
-  IR_IQR_with <-  IQR(group_df[,'IR_log_2'])
-  IR_median_IQR_with <-  paste0(IR_median_with," (",IR_IQR_with,")")  
-  IR_median_wo <-  median(wo_df[,'IR_log_2'])
-  IR_IQR_wo <-  IQR(wo_df[,'IR_log_2'])
-  IR_median_IQR_wo <-  paste0(IR_median_wo," (",IR_IQR_wo,")")  
-  ## T test
-  IR_t_test <- wilcox.test(df[,group], df[,"IR_log_2"], conf.int=TRUE) 
-  IR_t_test_p <- IR_t_test$p.value
-  IR_t_test_estimate <- wilcox_effsize(data = df,formula = as.formula(paste0("IR_log_2","~",group)),paired = F) %>% .$effsize
-  return(data.frame(genotype=group,MVB_median_IQR_with,MVB_median_IQR_wo,MVB_t_test_estimate,MVB_t_test_p,IR_median_IQR_with,IR_median_IQR_wo,IR_t_test_estimate,IR_t_test_p))
-}
-
-mean_rank <- function(group,df){
-  df$MVB_ranked <- df[,'MVB_log_2'] %>% rank
-  df$IR_ranked <- df[,'IR_log_2'] %>% rank
-  present_df <- df %>% subset(get(group)==1)
-  absent_df <- df %>% subset(get(group)==0)
-  # 
-  MVB_present <- paste0(mean(present_df[,'MVB_ranked'])," (",IQR(present_df[,'MVB_ranked']),")")
-  IR_present <- paste0(mean(present_df[,'IR_ranked'])," (",IQR(present_df[,'IR_ranked']),")")
-  # 
-  MVB_absent <- paste0(mean(absent_df[,'MVB_ranked'])," (",IQR(absent_df[,'MVB_ranked']),")")
-  IR_absent <- paste0(mean(absent_df[,'IR_ranked'])," (",IQR(absent_df[,'IR_ranked']),")")
-  return(data.frame(genotype=group,MVB_present,MVB_absent,IR_present,IR_absent))
-}
-```
-
-```{r}
-paste0("Nearest neigbor data")
-AA018_data <- synchronous_pass %>% subset(locus_tag == "AA018")
-AA018_data %>% select(blbli_sus_freq,blbli_sus_prop,blbli_res_freq,blbli_res_prop,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_diff_increase_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_diff_increase_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range)
-
-paste0("Frequency and enr")
-convert_tableone_into_df(df,vars = "AA018",strata='blbli_dich',outcome_names = c("Susceptible","Resistant"),factorVars='AA018')
-```
-## AA018 vs. AA552
-```{r}
-df_CI <- df %>% subset(clade_I=="Clade I")
-
-convert_tableone_into_df(df_CI,vars = c("AA552","AA018"),strata='blbli_dich_num',outcome_names = c("Susceptible","Resistant"),factorVars=c("AA552","AA018"))
-
-enrichment("AA552",df_CI) 
-
-wilcox.test(df_CI[,"AA552"],df_CI[,"KPC_log_2"],alternative='two.sided')
-
-paste0("Plasmid differences: ")
-
-convert_tableone_into_df(df_CI,vars = c("AA552_non_KPC"),strata='AA018_KPC',outcome_names = c("Absent","Present"),factorVars=c("AA552_non_KPC"))
-
-convert_tableone_into_df(df_CI,vars = c("AA018_non_KPC"),strata='AA552_KPC',outcome_names = c("Absent","Present"),factorVars=c("AA018_non_KPC"))
-```
-
-
-
-
-df$novel_hits_sig <- ifelse(rowSums(df %>% select(any_of(novel_synchronous))) >0,1,0)
-all_canonical <- c("OmpK36_Loss_of_function","OmpK36_promoter_IS","PBP_any","RamA")
-df$any_canonical <- ifelse(df %>% select(any_of(all_canonical)) %>% rowSums >0,1,0) 
-
-table(df$novel_hits_sig,df$any_canonical)
-table(df$KPNIH1_RS07465_3.2,df$any_canonical)
-table(df$KPNIH1_RS18830_2.2,df$any_canonical)
-table(df$KPNIH1_RS19680_3.2,df$any_canonical)
-table(df$KPNIH1_RS21500_3.2,df$any_canonical)
-table(df$KPNIH1_RS26035_2.2,df$any_canonical)
-```
-
-
-# Continuous
-## Overview
+# Four modulators
 ```{r}
 continuous <- gwas_table %>% subset(resistance_category == "Modulator")
 
@@ -212,8 +92,7 @@ paste0("Number of continuous hits passing qc: ")
 continuous_pass <- subset(continuous, nn_qc=="Yes")
 nrow(continuous_pass)
 
-paste0("Genotypes passing:")
-continuous_pass 
+paste0("Genotypes passing:") 
 library(rstatix)
 enrichment <- function(group,df){
   group_df <- df %>% subset(get(group)==1)
@@ -246,50 +125,79 @@ enrichment <- function(group,df){
   return(data.frame(genotype=group,MVB_median_IQR_with,MVB_median_IQR_wo,MVB_t_test_estimate,MVB_t_test_p,IR_median_IQR_with,IR_median_IQR_wo,IR_t_test_estimate,IR_t_test_p))
 }
 
-mean_rank <- function(group,df){
-  df$MVB_ranked <- df[,'MVB_log_2'] %>% rank
-  df$IR_ranked <- df[,'IR_log_2'] %>% rank
-  present_df <- df %>% subset(get(group)==1)
-  absent_df <- df %>% subset(get(group)==0)
-  # 
-  MVB_present <- paste0(mean(present_df[,'MVB_ranked'])," (",IQR(present_df[,'MVB_ranked']),")")
-  IR_present <- paste0(mean(present_df[,'IR_ranked'])," (",IQR(present_df[,'IR_ranked']),")")
-  # 
-  MVB_absent <- paste0(mean(absent_df[,'MVB_ranked'])," (",IQR(absent_df[,'MVB_ranked']),")")
-  IR_absent <- paste0(mean(absent_df[,'IR_ranked'])," (",IQR(absent_df[,'IR_ranked']),")")
-  return(data.frame(genotype=group,MVB_present,MVB_absent,IR_present,IR_absent))
-}
-
 lapply(continuous_pass$genotype,FUN=enrichment,df) %>% do.call(rbind,.) %>% favorite_kable
- 
-lapply(continuous_pass$genotype,FUN=mean_rank,df) %>% do.call(rbind,.) %>% favorite_kable
+  
 
 continuous_pass %>% select(locus_tag,product,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes)  %>% favorite_kable
 ```
 
+# AA552 plasmid
+```{r}
+gwas_table %>% subset(genotype %in% c("AA018","AA552")) %>% select(locus_tag,product,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes) %>% favorite_kable 
+
+plasmid_table <- table(df$AA552_KPC,df$blbli_dich_num) 
+plasmid_table
+prop.table(plasmid_table,margin=2)
+chisq.test( plasmid_table) 
+```
+
+# Log-2 KPC association
+
 ## OmpK36 GD insertion story
 ```{r} 
-convert_tableone_into_df(df,c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"),strata="clades",outcome_names = c("Clade I","Clade IIA","Clade IIB"),factorVars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"))
-
-# Simple ompK36 status
-df$OmpK36_mutations_simple <- ifelse(df$OmpK36_Loss_of_function==1,"Putative function altering variant (PFAV)",
-                                     ifelse(df$OmpK36_L3_mutations==1, "Insertion in loop 3","No insertion in loop 3 or PFAV"))
-
-df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("No insertion in loop 3 or PFAV","Insertion in loop 3","Putative function altering variant (PFAV)")))
+convert_tableone_into_df(df,c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"),strata="clade_I",outcome_names = c("Clade I","Clade II"),factorVars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"))
  
+# Simple ompK36 status
+df$OmpK36_mutations_simple <- ifelse(df$OmpK36_putative_function_altering==1 | df$OmpK36_truncation_kleborate==1 ,"Putative function-altering variant (PFAV)",
+                                     ifelse(df$OmpK36_L3_mutations==1, "Loop 3 insertion","No loop 3 insertion or PFAV"))
+
+df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("No loop 3 insertion or PFAV","Loop 3 insertion","Putative function-altering variant (PFAV)")))
 # Easy variable
 df$KPC_log_2 <- log2(df$KPNIH1_RS28775_chr_median_norm)
 ```
 
 ```{r}
-df_CI <- df %>% subset(clades == "clade I")
+df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
+df_w_KPC$OmpK36_mutations_simple <- relevel(df_w_KPC$OmpK36_mutations_simple,ref = "No loop 3 insertion or PFAV") 
+paste0("KPC w/ MVB or IR")
+lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
+lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
+lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary 
+
+
+paste0("IR w/ KPC")
+lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
+lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
+lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
+```
+### Investigation across clades
+```{r}
+df_w_KPC_CI <- df_w_KPC %>% subset(clade_I == "Clade I")
+df_w_KPC_CII <- df_w_KPC %>% subset(clade_I != "Clade I")
+# Clade I
+paste0("KPC w/ MVB or IR")
+lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
+lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
+lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary 
+
+
+paste0("IR w/ KPC")
+lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
+lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
+lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
+```
+
+
+
+
+
+
+```{r}
+df_CI <- df %>% subset(clade_I == "Clade I")
 convert_tableone_into_df(df_CI,vars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"),factorVars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"))
  
-
-df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
-df_w_KPC$OmpK36_mutations_simple <- relevel(df_w_KPC$OmpK36_mutations_simple,ref = "No insertion in loop 3 or PFAV") 
-df_w_KPC_CI <- df_w_KPC %>% subset(clades == "clade I")
-df_w_KPC_CII <- df_w_KPC %>% subset(clades != "clade I")
+df_w_KPC_CI <- df_w_KPC %>% subset(clade_I == "Clade I")
+df_w_KPC_CII <- df_w_KPC %>% subset(clade_I != "Clade I")
  
 paste0("MVB w/ KPC")
 lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
@@ -321,7 +229,7 @@ lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% summary
 # FJ223607 Story
 ## Validation of hits
 ```{r}
-continuous_pass %>% subset(genotype %in% c("AA018","AA552","FJ223607")) %>% select(locus_tag,product,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes) %>% favorite_kable 
+gwas_table %>% subset(genotype %in% c("AA018","AA552")) %>% select(locus_tag,product,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes) %>% favorite_kable 
 ```
 
 ```{r}
@@ -330,12 +238,59 @@ enrichment("AA552",df_CI)
 
 wilcox.test(df_CI[,"AA552"],df_CI[,"KPC_log_2"],alternative='two.sided')
 
-enrichment("FJ223607",df_CI)
+enrichment("AA552",df_CI)
 ```
+
 ```{r}
 table(df_CI$AA018_KPC,df_CI$AA552_non_KPC)
 convert_tableone_into_df(df_CI,"AA552_non_KPC",strata="AA018_KPC",factorVars = "AA552_non_KPC",outcome_names = c("Absent","Present"))
 convert_tableone_into_df(df_CI,"AA018_non_KPC",strata="AA552_KPC",factorVars = "AA018_non_KPC",outcome_names = c("Absent","Present"))
 ```
+# Synchronous
+```{r}
+synchronous <- gwas_table %>% subset(resistance_category != "Modulator")
 
+paste0("Number of synchronous hits")
+nrow(synchronous)
 
+paste0("Synchronous hits that passed QC")
+synchronous_pass <- subset(synchronous, nn_qc=="Yes")
+
+synchronous_pass %>% select(locus_tag,gene,product,blbli_res_freq,blbli_sus_freq,`Singleton_prop`,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,best_model,genotype)  %>% favorite_kable
+
+novel_synchronous <- synchronous_pass %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805")) %>% .$genotype
+```
+### AA552
+```{r}
+paste0("Nearest neigbor data")
+AA552_data <- synchronous_pass %>% subset(locus_tag == "AA552")
+AA552_data %>% select(blbli_sus_freq,blbli_sus_prop,blbli_res_freq,blbli_res_prop,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_diff_increase_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_diff_increase_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range)
+
+paste0("Frequency and enr")
+convert_tableone_into_df(df,vars = "AA552",strata='blbli_dich',outcome_names = c("Susceptible","Resistant"),factorVars='AA552')
+```
+
+```{r}
+paste0("Nearest neigbor data")
+AA018_data <- synchronous_pass %>% subset(locus_tag == "AA018")
+AA018_data %>% select(blbli_sus_freq,blbli_sus_prop,blbli_res_freq,blbli_res_prop,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_diff_increase_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_diff_increase_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range)
+
+paste0("Frequency and enr")
+convert_tableone_into_df(df,vars = "AA018",strata='blbli_dich',outcome_names = c("Susceptible","Resistant"),factorVars='AA018')
+```
+## AA018 vs. AA552
+```{r}
+df_CI <- df %>% subset(clade_I=="Clade I")
+
+convert_tableone_into_df(df_CI,vars = c("AA552","AA018"),strata='blbli_dich_num',outcome_names = c("Susceptible","Resistant"),factorVars=c("AA552","AA018"))
+
+enrichment("AA552",df_CI) 
+
+wilcox.test(df_CI[,"AA552"],df_CI[,"KPC_log_2"],alternative='two.sided')
+
+paste0("Plasmid differences: ")
+
+convert_tableone_into_df(df_CI,vars = c("AA552_non_KPC"),strata='AA018_KPC',outcome_names = c("Absent","Present"),factorVars=c("AA552_non_KPC"))
+
+convert_tableone_into_df(df_CI,vars = c("AA018_non_KPC"),strata='AA552_KPC',outcome_names = c("Absent","Present"),factorVars=c("AA018_non_KPC"))
+```

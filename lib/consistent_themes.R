@@ -11,6 +11,7 @@ theme_bw_me <- theme(panel.background = element_rect(fill = "white",colour = NA)
                      panel.grid.major = element_blank(),
                      panel.grid.minor = element_blank(),
                      axis.line = element_line(colour = "black"),legend.position = "bottom")
+
 # Resistance categories
 resistance_cat_colors <- c("Susceptible" = "#005AB5","Intermediate"="#FFC20A","Resistant" = "#DC3220")
 resistance_cat_scale <- scale_fill_manual(values=resistance_cat_colors, name="Resistance category", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
@@ -23,7 +24,7 @@ feature_scale_v <- scale_fill_manual(breaks = c(1,0), values = c('black','white'
 MVB_IR_scale <- scale_fill_manual(breaks = c("MVB_num_log_2_diff","IR_num_log_2_diff"),values=c(5,6),labels = c("Meropenem-vaborbactam"," Imipenem-relebactam"),name="Antibiotic",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 
 # Non-Susceptibility
-resistance_prop_scale <- scale_fill_manual(breaks = c("blbli_res_prop","blbli_sus_prop"),values=c("black","gray"),labels = c("Resistance"," Susceptible"),name="Resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
+resistance_prop_scale <- scale_fill_manual(breaks = c("blbli_res_prop","blbli_sus_prop"),values=c("black","gray"),labels = c("Resistance","Susceptible"),name="Resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 resistance_scale <- scale_fill_manual(breaks = c("Non-Susceptible","Susceptible"),values=c("black","white"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(order=3,title.position = "top", label.position = "right",nrow=2),drop = FALSE )
 NonSus_scale_c <- scale_color_manual(breaks = c("Non-Susceptible","Susceptible"),values=c("black","gray"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(order=3,title.position = "top", label.position = "right",nrow=1),drop = FALSE )
 
@@ -37,9 +38,10 @@ clade_colors_scale <- scale_fill_manual(values=clade_colors, name="Clade", guide
 clade_colors_scale_v <- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(order=1,ncol=1, title.position = "top", label.position = "right"))
 
 ### Clustering
-cluster_colors <- c("No Feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink')
+cluster_colors <- c("No feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink')
 cluster_labels <- names(cluster_colors) 
 cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels,name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
+cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels,name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
 
 # Potential scale
 potential_scale_general <- scale_fill_manual(breaks = c("Modulator","Mediator","None"),values=c("gray","#4d3227","white"),labels = c("Resistance Modulator","Resistance Mediator","None"),name="Genotype Category",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 5)) 
@@ -87,12 +89,32 @@ mytheme <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.01,
 
 # Figure 3 table
 mytheme_GWAS <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.05, 
-                                                       fontsize=58)),
-                          colhead = list(fg_params = list(hjust=0, x=0.05,fontsize=60, 
+                                                       fontsize=18)),
+                          colhead = list(fg_params = list(hjust=0, x=0.05,fontsize=20, 
                                                           fontface="bold")),
-                          padding=unit(c(35,5), "mm"))
+                          padding=unit(c(5,5), "mm"))
 # Figure 3 Tree
-consistent_theme_GWAS <- theme(plot.margin=grid::unit(c(-2,-3,0,-3), "cm"),legend.position = 'bottom',legend.direction="horizontal", legend.justification = "center", legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.0001, "cm"),legend.key.size = unit(1, "cm"),legend.key.width = unit(1, "cm") , legend.title = element_text(size=68),legend.text = element_text(size=64),legend.title.align=0.5,legend.text.align = 0, legend.margin=margin(t=-5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.75, "cm"))
+consistent_theme_sfigure_3 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
+                               legend.justification = "center", legend.key = element_rect(colour = c('black')),
+                               legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") ,
+                               legend.title = element_text(size=12),legend.text = element_text(size=10),
+                               legend.title.align=0.5,legend.text.align = 0,
+                               legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
+
+consistent_theme_sfigure_6 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
+                                    legend.justification = "center", legend.key = element_rect(colour = c('black')),
+                                    legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") ,
+                                    legend.title = element_text(size=22),legend.text = element_text(size=20),
+                                    legend.title.align=0.5,legend.text.align = 0,
+                                    legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
+
+
+consistent_theme_GWAS <- theme(legend.position = 'bottom',legend.direction="horizontal", 
+                                    legend.justification = "center", legend.key = element_rect(colour = c('black')),
+                                    legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") ,
+                                    legend.title = element_text(size=21),legend.text = element_text(size=19),
+                                    legend.title.align=0.5,legend.text.align = 0,
+                                    legend.margin=margin(t=-1,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
 # Favorite kable
 favorite_kable <- function (x){
@@ -103,22 +125,22 @@ favorite_kable <- function (x){
 
 # Figure 1 (Histogram)
 figure_1_format <-   theme(legend.position = "bottom",
-                           axis.ticks.length=unit(.25, "cm"),
-                           axis.text =   element_text(size=22,color="black"),
-                           axis.title = element_text(size = 24,color="black"),
-                           legend.text =   element_text(size=22,color="black"),
-                           legend.title = element_text(size = 24,color="black"),
-                           plot.title = element_text(size = 24,color="black")
+                           axis.ticks.length=unit(.2, "cm"),
+                           axis.text =   element_text(size=20,color="black"),
+                           axis.title = element_text(size = 22,color="black"),
+                           legend.text =   element_text(size=20,color="black"),
+                           legend.title = element_text(size = 22,color="black"),
+                           plot.title = element_text(size = 22,color="black")
 ) 
 
 
 ### Figure 2 (Histogram)
 figure_2_format <- theme(legend.position = "bottom",
-                         axis.text =   element_text(size=24,color="black"),
-                         axis.title = element_text(size = 28,color="black"),
-                         legend.text =   element_text(size=26,color="black"),
-                         legend.title = element_text(size = 28,color="black"),
-                         plot.title = element_text(size = 30,color="black")
+                         axis.text =   element_text(size=18,color="black"),
+                         axis.title = element_text(size = 20,color="black"),
+                         legend.text =   element_text(size=18,color="black"),
+                         legend.title = element_text(size = 20,color="black"),
+                         plot.title = element_text(size = 20,color="black")
 ) 
 
 # Figure 4 Format
@@ -141,11 +163,12 @@ sfig6_format <-  theme(legend.position = "bottom",
 
 # S fig 9
 sfig9_format <-  theme(legend.position = "bottom",
-                       axis.text =   element_text(size=12,color="black"),
-                       axis.title = element_text(size = 14,color="black"),
-                       legend.text =   element_text(size=18,color="black"),
-                       legend.title = element_text(size = 20,color="black"),
-                       plot.title = element_text(size = 22,color="black"),
+                       axis.text =   element_text(size=16,color="black"),
+                       axis.title = element_text(size = 18,color="black"),
+                       legend.text =   element_text(size=16,color="black"),
+                       legend.title = element_text(size = 18,color="black"),
+                       plot.title = element_text(size = 24,color="black"),
+                       legend.margin = margin(t=0,unit="cm")
 )
 
 

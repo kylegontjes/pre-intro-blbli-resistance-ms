@@ -1,5 +1,5 @@
 ---
-title: "generate_asr_clustering"
+title: "Generate ASR object"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -27,14 +27,12 @@ sessionInfo()
 # Patient Metadata & Phylogeny
 df <- readRDS("./data/dataset/df.RDS")
 tr <- read.tree("./data/tree/tree.treefile")   
-df<- df %>% .[match(tr$tip.label,.$isolate_no),] 
-# Best model call
-asr_model_choices <- readRDS("./data/asr_clustering/asr_model_choices.RDS") 
-asr_best_models <- asr_model_choices[["best_model"]]
+df <- df %>% .[match(tr$tip.label,.$isolate_no),]  
 ```
 
 # Run phylosuite
 ```{r}  
-asr_model <- phyloAMR::asr(df = df,tr = tr,tip_name_var = "isolate_no",pheno='blbli_dich_num',model = asr_best_models,node_states = "joint", upper_bound=1e100, lower_bound=1e-9, conf_threshold=NULL) 
+asr_model <- phyloAMR::asr(df = df, tr = tr, tip_name_variable = "isolate_no", trait = 'blbli_dich_num', model = 'MF', node_states = "joint", upper_bound = 1e50, lower_bound = 1e-9, confidence_threshold =  NULL) 
+
 saveRDS(asr_model,"./data/asr_clustering/blbli_asr.RDS")  
 ```

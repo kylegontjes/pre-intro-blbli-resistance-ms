@@ -44,7 +44,6 @@ df <- left_join(df,KPC_gene_depth) %>% left_join(KPC_containing_clusters %>% mut
 
 # Figure A  
 
-
 ```{r,fig.height=10,fig.width=11}
 # Phylogeny of KPC-containing plasmid across Clade I
 df_CI <- df %>% subset(clade_I == "Clade I")
@@ -55,22 +54,22 @@ df_CI_plasmid_mat <- df_CI %>% select(colnames(KPC_containing_clusters)) %>% sel
  
 rownames(df_CI) <- df_CI$isolate_no
   #Step #1: Clades
-  p.1 <- gheatmap(ggtree(tr_CI),df_CI %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.1)   + clade_colors_scale_v
+  p.1 <- gheatmap(ggtree(tr_CI),df_CI %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.075)   + clade_colors_scale_v
   
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill()
-  p.3 <-  gheatmap(p.2,df_CI %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.1,offset =.000025) + cluster_scale  
+  p.3 <-  gheatmap(p.2,df_CI %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.075,offset =.0000175) + cluster_scale_4  
   
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df_CI %>% select(blbli_dich,MVB_dich,IR_dich) %>% `colnames<-`(c("BL/BLI resistance","MVB resistance","IR resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.3,offset =.00005) + resistance_scale 
+  p.5 <-  gheatmap(p.4,df_CI %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.075,offset =.0000350) + resistance_scale 
   
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
-  p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.2,offset =.000125) + Log2_scale 
+  p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.15,offset =.0000525) + Log2_scale 
    
  p.8 <- p.7 + new_scale_fill() 
-A <-  gheatmap(p.8,df_CI_plasmid_mat %>% mutate_all(as.factor), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.3,offset =.000175) + feature_scale_v   + ylim(NA,205) + theme(legend.position = 'bottom') + consistent_theme
+A <-  gheatmap(p.8,df_CI_plasmid_mat %>% mutate_all(as.factor), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 9, width = 0.225,offset =.0000875) + feature_scale_v   + ylim(NA,195) + theme(legend.position = 'bottom') + consistent_theme_sfigure_6
 A 
 ```
 
@@ -102,18 +101,18 @@ C <-  ggplot(data=blbli_plasmid_prop,aes(x=clustering_simple,fill=AA552_like,y=n
 ```
 
 ```{r ,fig.height = 10, fig.width = 10,echo=F,message=F,error=F,warning=F}
-s_figure_6BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 28) 
+s_figure_6BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 24) 
 ```
 
-```{r ,fig.height=10,fig.width=11}
-s_figure_6A <- cowplot::plot_grid(A)  
+```{r ,fig.height=10,fig.width=11} 
+s_figure_6A <- cowplot::plot_grid(A,labels = c("A"),label_size=24)  
 ```
 
-```{r ,fig.height=12.5,fig.width=25}
-s_figure_6 <- plot_grid(s_figure_6A,s_figure_6BC,labels=c("A",""),ncol=2,label_size = 28,rel_heights = c(1,1),rel_widths = c(1,0.6))  
+```{r ,fig.height=12.5,fig.width=21}
+s_figure_6 <- plot_grid(s_figure_6A,s_figure_6BC,rel_heights = c(1,1),rel_widths = c(1,.425))  
 s_figure_6
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=27.5,fig.height=15} 
-ggsave(plot = s_figure_6, filename = './figures/s_figure_6.png', width = 25, height = 12.5,limitsize=FALSE)
+ggsave(plot = s_figure_6, filename = './figures/s_figure_6.png', width = 19, height = 10,limitsize=FALSE, bg='white')
 ```

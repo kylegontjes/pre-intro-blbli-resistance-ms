@@ -53,17 +53,25 @@ bla_mat$`SHV-12` <- ifelse(bla_mat$`SHV-12`==1 ,1,0)
 bla_mat$`TEM-1D.v1` <- ifelse(bla_mat$`TEM-1D.v1^` ==1 | bla_mat$`TEM-1D.v1`==1,1,0)
 
 bla_genes <- colnames(bla_mat %>% select(-isolate_no)) %>% sort %>% subset(!.%in% c("KPC-3^","SHV-11^","SHV-12^","TEM-1D.v1^"))
+df <- left_join(df,bla_mat)
 ```
 
 ```{r}
-canonical <- c('OmpK35-25%','OmpK36_L3_mutations',"OmpK36GD","OmpK36TD",'OmpK36_truncation_kleborate','OmpK36_putative_function_altering',"OmpK36_intergenic",'OmpK36_promoter_IS',"AcrAB_TolC_any","RamR","RamA","PBP_any","PBP2","PBP4")
+drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_truncation_kleborate','OmpK36_non_syn','OmpK36_putative_function_altering','OmpK36_intergenic','OmpK36_promoter_IS')
+drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
+target_modification <- c('PBP_any','PBP2',"PBP4")
+
+carbapenem <- c(drug_entry,drug_exit,target_modification)
+
 tn4401 <- c("Tn4401a","Tn4401b","Tn4401d","Tn4401_del_6920_7126","Tn4401_del_1_554_7008_7075","Tn4401_del_1_3391_6920_7126")
 ```
 
 ```{r} 
-exact <- c('OmpK36TD','OmpK36_truncation_kleborate','AcrAB_TolC_any','RamA','PBP_any','PBP2','PBP4','Tn4401_del_1_3391_6920_7126','CMY-2.v2','CTX-M-14','CTX-M-15',"KPC-5","LAP-2","OXA-1","TEM-1",'TEM-104?','TEM-104*?','TEM-150*?')
 
-s_table_1 <- convert_tableone_into_df(df,vars=c(canonical,bla_genes,tn4401),factorVars = c(canonical,bla_genes,tn4401),strata="clade_I",outcome_names = c("Clade I","Clade II"),exact=exact)
+
+exact <- c("OmpK36TD",'OmpK36_truncation_kleborate',"OmpK36_putative_function_altering","OmpK36_intergenic","OmpK36_promoter_IS","AcrAB_TolC_any","RamR","RamA","PBP_any","PBP2","PBP4",'Tn4401_del_1_3391_6920_7126','CMY-2.v2','CTX-M-14','CTX-M-15',"KPC-5","LAP-2","OXA-1","TEM-1",'TEM-104?','TEM-104*?','TEM-150*?')
+
+s_table_1 <- convert_tableone_into_df(dataset = df,vars=c(carbapenem,bla_genes,tn4401),factorVars = c(carbapenem,bla_genes,tn4401),strata="clade_I",outcome_names = c("Clade I","Clade II"),exact=exact)
 s_table_1$Variable <- gsub(" \\= 1","",s_table_1$Variable) %>% gsub(" \\(|\\)|\\%","",.) 
 
 s_table_1$Variable <- recode(s_table_1$Variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T mutation in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')

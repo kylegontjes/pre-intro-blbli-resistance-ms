@@ -55,3 +55,5 @@ median_IQR("IR_log_2",df)
 ```{r}
 convert_tableone_into_df(df,vars=c("blbli_dich_num","MVB_dich_num","MVB_cat","IR_dich_num","IR_cat"),factorVars = c("blbli_dich_num","MVB_dich_num","MVB_cat","IR_dich_num","IR_cat")) %>% favorite_kable
 ```
+
+# For data on cross-resistance, see supplemental figure 2

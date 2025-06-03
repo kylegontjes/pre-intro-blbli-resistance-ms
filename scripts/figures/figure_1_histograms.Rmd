@@ -32,11 +32,12 @@ df <- readRDS("./data/dataset/df.RDS")
 ## Figure Code
 ```{r,message=F,error=F,warning=F,fig.width=15,fig.height=7.5}
 x_log_breaks <- c(-2,-1,0,1,2,3,4,5)
+MIC_x_scale <- scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))
 
 # Figure
-figure1A <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-Vaborbactam","") + scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))  + ylim(NA,250) + figure_1_format + resistance_cat_scale
+figure1A <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-Vaborbactam") + MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
   
-figure1B <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-Relebactam","")+ scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5","1","2","4","8","16","≥32"))   + ylim(NA,250) + figure_1_format + resistance_cat_scale
+figure1B <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-Relebactam")+ MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
 
 # Legend
 MIC_legend <- get_legend(figure1A)
@@ -48,7 +49,10 @@ figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.
 ``` 
 
 ## Figure
-```{r,message=F,error=F,warning=F,fig.width=15,fig.height=7.5}
+```{r,message=F,error=F,warning=F,fig.width=12.5,fig.height=6.25}
 figure1
-ggsave(plot = figure1, filename = './figures/figure_1.png', width = 15, height = 7.5)
+```
+
+```{r}
+ggsave(plot = figure1, filename = './figures/figure_1.png', width = 12.5, height = 6.25, bg = "white")
 ```

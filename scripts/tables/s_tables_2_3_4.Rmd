@@ -27,20 +27,34 @@ purposeful_results <- readRDS("./data/regression/purposeful_regression_results.R
 
 
 ```{r}
-purposeful_results$univariable$present$term <- rownames(purposeful_results$univariable$present)
-purposeful_results$univariable$singleton$term <- rownames(purposeful_results$univariable$singleton)
-purposeful_results$univariable$cluster$term <- rownames(purposeful_results$univariable$cluster) 
+purposeful_results$univariable$present
+purposeful_results$univariable$singleton
+purposeful_results$univariable$cluster
 
-purposeful_results$multivariable$present$final_model_table$term <- rownames(purposeful_results$multivariable$present$final_model_table)
-purposeful_results$multivariable$singleton$final_model_table$term <- rownames(purposeful_results$multivariable$singleton$final_model_table)
-purposeful_results$multivariable$cluster$final_model_table$term <- rownames(purposeful_results$multivariable$cluster$final_model_table) 
+purposeful_results$multivariable$present$final_model_table
+purposeful_results$multivariable$singleton$final_model_table
+purposeful_results$multivariable$cluster$final_model_table
 ```
 
 ```{r}
 table_curation <- function(stats,ulogr,mlogr){
   stats <- stats[,c(6,2,4,3)] 
-  ulogr <- ulogr[,c(3,1,2)]  %>% `colnames<-`(c("term","OR (95% CI)","OR p-value"))
-  mlogr <- mlogr[,c(3,1,2)] %>% `colnames<-`(c("term","aOR (95% CI)","aOR p-value"))
+  # Format the tables
+  ## ulogr
+  ulogr$OR <- formatC(ulogr$OR, format = "f", digits = 2)
+  ulogr$`2.5%` <- formatC(ulogr$`2.5%`, format = "f", digits = 2)
+  ulogr$`97.5%` <-   formatC(ulogr$`97.5%`, format = "f", digits = 2)
+  ulogr$`OR (95% CI)` <- paste0(ulogr$OR," (",ulogr$`2.5%`,"-",ulogr$`97.5%`,")")
+  ## Mlogr
+  mlogr$OR <- formatC(mlogr$OR, format = "f", digits = 2)
+  mlogr$`2.5%` <- formatC(mlogr$`2.5%`, format = "f", digits = 2)
+  mlogr$`97.5%` <-   formatC(mlogr$`97.5%`, format = "f", digits = 2)
+  mlogr$`OR (95% CI)` <- paste0(mlogr$OR," (",mlogr$`2.5%`,"-",mlogr$`97.5%`,")")
+  
+  ulogr <- ulogr %>% select(variable, `OR (95% CI)`, p_value) %>% `colnames<-`(c("term","OR (95% CI)","OR p-value"))
+  ulogr$term <- as.character(ulogr$term)
+  mlogr <- mlogr %>% select(variable, `OR (95% CI)`, p_value) %>% `colnames<-`(c("term","aOR (95% CI)","aOR p-value"))
+  mlogr$term <- as.character(mlogr$term)
   results <- left_join(stats,ulogr) %>% left_join(mlogr)
   return(results)
 }

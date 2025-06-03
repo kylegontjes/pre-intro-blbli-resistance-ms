@@ -99,11 +99,12 @@ A <-plot_grid(fig_heatmap_image,NULL,fig_legend_image,ncol=1,axis="l", align="hv
 ```{r}
 traits_of_interest <- c("blbli_dich_num",rownames(prop_matrix))   
 trait_parent_child <- pbmcapply::pbmclapply(traits_of_interest,FUN=function(x){
-  asr(df,tr,tip_name_var = 'isolate_no',pheno=x,model='MF') %>% .$parent_child_df
-},mc.cores=5) %>% `names<-`(traits_of_interest)
+  phyloAMR::asr(df = df,tr = tr,tip_name_var = 'isolate_no',trait=x,model='MF') %>% .$parent_child_df
+},mc.cores=5)
+names(trait_parent_child) <- traits_of_interest
 
 synchronous_changes_w_blbli <- pbmcapply::pbmclapply(traits_of_interest %>% subset(.!="blbli_dich_num"),FUN=function(x){
-  phyloAMR::synchronous_detection(comparitor_parent_child_df = trait_parent_child[[x]],trait_parent_child_df = trait_parent_child[['blbli_dich_num']],node_states = 'joint')
+  phyloAMR::synchronous_transitions(comparitor_parent_child_df = trait_parent_child[[x]],trait_parent_child_df = trait_parent_child[['blbli_dich_num']],node_states = 'joint')
 },mc.cores=5) %>% do.call(rbind.data.frame,.) %>% mutate(comparitor = traits_of_interest %>% subset(.!="blbli_dich_num"))
 
 genotypes_w_transitions_in_parental_nodes <- apply(synchronous_changes_w_blbli,MARGIN = 1,FUN=function(x){
@@ -112,7 +113,7 @@ genotypes_w_transitions_in_parental_nodes <- apply(synchronous_changes_w_blbli,M
   ifelse(sum(transitions>(tr$Nnode+1))>0,T,F)
 })
 
-genotypes <- synchronous_changes_w_blbli[genotypes_w_transitions_in_parental_nodes,'comparitor'] 
+genotypes <- synchronous_changes_w_blbli[genotypes_w_transitions_in_parental_nodes,'comparitor'] %>% subset(is.na(.)==F)
 ```
 
 
@@ -122,7 +123,7 @@ st258 <- ggtree(tr)
 genotypes_and_blbli <- c('blbli_dich_num',genotypes)
 
 asr_traits_of_interest <-  pbmcapply::pbmclapply(genotypes_and_blbli,FUN=function(x){
-  asr_cluster_detection(df,tr,'isolate_no',patient_id='Patient_ID',pheno=x,parent_child_df = trait_parent_child[[x]],node_states = 'joint',faux_clusters = 'remove',remove_revertant = T,collapse_cluster = T,confidence = NULL)
+  asr_cluster_detection(df = df,tr = tr,'isolate_no',patient_id='Patient_ID',parent_child_df = trait_parent_child[[x]],node_states = 'joint',confidence = NULL,simplify_faux_clusters = T,simplify_revertant = T,collapse_cluster = T)
 },mc.cores=5)
 names(asr_traits_of_interest) <- genotypes_and_blbli
  
@@ -147,11 +148,11 @@ B <- st258 +
     geom_nodepoint(aes(fill = AA552_name,shape=AA552_name,subset=(node %in% gains$AA552),size=AA552_name,legend=F)) +
     geom_nodepoint(aes(fill = ompK36_name,shape=ompK36_name,subset=(node %in% gains$KPNIH1_RS18665_3.2),size=ompK36_name,legend=F)) +
     geom_nodepoint(aes(fill = PBP_name,shape=PBP_name,subset=(node %in% gains$PBP2),size=PBP_name,legend=F)) + scale_fill_manual(name="Synchronous clustering",values = setNames(
-    c("red", "#91796A", "#97C466", "#9451AD"),
+    c("#91796A", "red", "#97C466", "#9451AD"),
     c(blbli_name, AA552_name, ompK36_name, PBP_name)
   ),labels=c(blbli_name ,AA552_name,ompK36_name,PBP_name),guide = guide_legend(ncol=2,title.position = "top", label.position = "right")) + 
     scale_shape_manual(name="Synchronous clustering",values=setNames(
-    c(21,22,23,24),
+    c(22,21,23,24),
     c(blbli_name, AA552_name, ompK36_name, PBP_name)
   ),labels=c(blbli_name ,AA552_name,ompK36_name,PBP_name),guide = guide_legend(ncol=2,title.position = "top", label.position = "right")) + scale_size_manual(name="Synchronous clustering",values = setNames(
     c(4,3,3,2),
@@ -167,5 +168,5 @@ s_figure_10
 ``` 
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 14, height = 7.5,limitsize=FALSE)
+ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 14, height = 7.5,limitsize=FALSE,bg='white')
 ```

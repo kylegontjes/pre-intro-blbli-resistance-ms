@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-05-09" />
+<meta name="date" content="2025-06-02" />
 
 <title>s_figure_11_carbapenem_exposure</title>
 
@@ -350,7 +350,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">s_figure_11_carbapenem_exposure</h1>
-<h4 class="date">2025-05-09</h4>
+<h4 class="date">2025-06-02</h4>
 
 </div>
 
@@ -383,7 +383,7 @@ depth &lt;- readRDS(&quot;./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_dept
 df &lt;- left_join(df,kleborate %&gt;% mutate(isolate_no = rownames(.)))
 df &lt;- left_join(df,KPC_containing_clusters %&gt;% mutate(isolate_no = rownames(.)))  
 df &lt;- left_join(df,pclustering %&gt;% select(isolate_no,blbli_asr_cluster_renamed))
-df$blbli_asr_cluster_renamed_simple &lt;- recode(df$blbli_asr_cluster_renamed,&quot;No Feature&quot;=&quot;Susceptible&quot; )
+df$blbli_asr_cluster_renamed_simple &lt;- recode(df$blbli_asr_cluster_renamed,&quot;No feature&quot;=&quot;Susceptible&quot; )
    
 df &lt;- left_join_matrix(model1_burden,df,&quot;_1&quot;)
 df &lt;- left_join_matrix(model1.2_burden,df,&quot;_1.2&quot;)
@@ -393,7 +393,7 @@ df &lt;- left_join_matrix(model3_burden,df,&quot;_3&quot;)
 df &lt;- left_join_matrix(model3.2_burden,df,&quot;_3.2&quot;)
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) 
 df &lt;- left_join(df,depth %&gt;% mutate(isolate_no = rownames(.)))</code></pre>
-<pre class="r"><code>df$blbli_asr_cluster_simplified &lt;- ifelse(df$blbli_asr_cluster_renamed==&quot;No Feature&quot;,&quot;Susceptilbe&quot;,ifelse(df$blbli_asr_cluster_renamed==&quot;Singleton&quot;,&quot;Singleton&quot;,&quot;Cluster&quot;))
+<pre class="r"><code>df$blbli_asr_cluster_simplified &lt;- ifelse(df$blbli_asr_cluster_renamed==&quot;No feature&quot;,&quot;Susceptilbe&quot;,ifelse(df$blbli_asr_cluster_renamed==&quot;Singleton&quot;,&quot;Singleton&quot;,&quot;Cluster&quot;))
 df$clade_I &lt;- as.factor(df$clade_I )
 df$clade_I &lt;- relevel(df$clade_I, ref = &quot;Clade II&quot;)
 df_CI &lt;- df %&gt;% subset(clade_I == &quot;Clade I&quot;)

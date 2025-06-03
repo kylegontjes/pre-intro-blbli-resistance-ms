@@ -23,7 +23,7 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 
 #Scripts
 source("./lib/common_functions.R")
-source("./lib/table_figure_themes.R")
+source("./lib/consistent_themes.R")
 
 # Print
 Sys.info()
@@ -61,4 +61,3 @@ favorite_kable(table_1)
 write_csv(table_1,"./tables/table_1.csv")
 saveRDS(table_1,"./tables/table_1.RDS")
 ```
-

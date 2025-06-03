@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree")
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone")
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -27,8 +27,7 @@ source("./lib/common_functions.R")
 
 ```{r} 
 # Standard data
-df <- readRDS("./data/dataset/df.RDS")
-tr <- read.tree("./data/tree/tree.treefile")
+df <- readRDS("./data/dataset/df.RDS") 
 # GWAS table
 gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS")
 gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")
@@ -134,15 +133,15 @@ D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(st
      geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale + sfig9_format
 ```
 
-```{r,fig.height=8,fig.width=12}
+```{r,fig.height=10.625,fig.width=10.625}
 plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A","B","C","D"),ncol=2,label_size = 16,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
 
 fig_legend <- get_legend(A )
 
-s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.16))
+s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.05))
 s_figure_9
 ```
 
 ```{r}
-ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 12, height = 8,limitsize=FALSE)
+ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 10.625, height = 10.625,limitsize=FALSE,bg='white')
 ```

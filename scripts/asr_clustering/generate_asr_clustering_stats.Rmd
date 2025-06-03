@@ -35,7 +35,7 @@ blbli_asr_clustering <- readRDS('./data/asr_clustering/blbli_asr_clustering.RDS'
 
 # Clustering Analysis  
 ```{r}
-cluster_stats <- phyloAMR::asr_cluster_analysis(blbli_asr_clustering,remove_faux=TRUE) %>% mutate(pheno = 'BL/BLI')  %>% `rownames<-`(NULL)
+cluster_stats <- phyloAMR::asr_cluster_analysis(blbli_asr_clustering) %>% mutate(pheno = 'BL/BLI')  %>% `rownames<-`(NULL)
 
 # Print
 favorite_kable(cluster_stats)

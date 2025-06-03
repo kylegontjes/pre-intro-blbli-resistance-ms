@@ -57,46 +57,51 @@ s_figure_4.A <- s_figure_4.A_tbl %>% tableGrob(rows = NULL,theme=mytheme_GWAS)
 ```
 
 # S Figure 4B - Phylogeny 
-```{r,fig.height=55,fig.width=40}
+```{r ,fig.height=12.5,fig.width=12.5,echo=F,message=F,error=F,warning=F} 
 rownames(df) <- df$isolate_no
 s_figure_4.df_mat <- get_gwas_hit_matrix(gwas_table,df) 
 sig_hits_name <- recode(colnames(s_figure_4.df_mat),"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 s_figure_4.phylo <- gwas_figures(df,tr,s_figure_4.df_mat,sig_hits_name = sig_hits_name %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.)) + ylim(NA,545)  
-s_figure_4.FB <- plot_grid(s_figure_4.phylo,labels = "B",label_size=62)  
+s_figure_4.FB <- plot_grid(s_figure_4.phylo,labels = "B",label_size=24)  
 s_figure_4.FB
 ```
 
 # S Figure 4C - Resistance Frequency
-```{r,fig.height=15,fig.width=25}
+```{r,fig.height=7.5,fig.width=10}
 gwas_nons_freq <- variants_freq(gwas_table$genotype,df)  
 gwas_nons_freq$locus_tag <- recode(gwas_nons_freq$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 gwas_nons_freq$`Significant Hit` <- gwas_nons_freq$locus_tag
 gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(s_figure_4.A_tb$locus_tag)))  
-s_figure_4.C <- freq_plot(gwas_nons_freq) 
+
+s_figure_4_descriptive_plot_theme <-  theme(legend.position="bottom",axis.text = element_text(size=19,colour = "black"),axis.title = element_text(size=21,colour = "black"),legend.title = element_text(size=21,colour = "black"),legend.text = element_text(size=19,colour = "black"),legend.title.align=0.5 ,legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
+
+s_figure_4.C <- freq_plot(gwas_nons_freq)  +s_figure_4_descriptive_plot_theme
+s_figure_4.C
 ```
 
 # S Figure 4D - Nearest neighbor Data
-```{r,fig.height=15,fig.width=25}
+```{r,fig.height=7.5,fig.width=10}
 # D. FC MIC (MVB * IR overlay) 
 nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(s_figure_4.A_tb$locus_tag)))  
       
-s_figure_4.D <- nn_plot(nn_data_melt)  
+s_figure_4.D <- nn_plot(nn_data_melt)   + s_figure_4_descriptive_plot_theme
+s_figure_4.D
 ```
 
 # Merge figure
-```{r,fig.height=70,fig.width=80}
-s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","D"),label_size = 62,align = "hv",label_x = -0.02)  + theme(plot.margin = unit(c(t=0,r=0,b=0,l=0.1), "cm")) 
-s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) + theme(plot.margin = unit(c(-40,0,0,0), "cm")) 
+```{r,fig.height=20,fig.width=25}
+s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","D"),label_size = 24,align = "hv",label_x = -0.02)
+s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.675)) 
 ```
 
-```{r ,fig.height=52.5,fig.width=87.5}
-s_figure_4.FA <- plot_grid(s_figure_4.A,labels = "A",label_size=62,align = "hv") + theme(plot.margin = unit(c(-42.5,0,0,0), "cm")) 
-s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("A",""),nrow=2,label_size = 62) + theme(plot.margin = unit(c(0,0,0.25,0), "cm")) 
+```{r ,fig.height=17.25,fig.width=26}
+s_figure_4.FA <- plot_grid(s_figure_4.A,labels = "A",label_size=24,align = "hv")  
+s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,label_size = 24, rel_heights = c(0.325,1))   
 s_figure_4
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 87.5, height = 55,limitsize=FALSE)
+ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 26, height = 17.25,limitsize=FALSE)
 ```

@@ -92,7 +92,7 @@ IR_CII <- KPC_CN_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="I
 
 ```{r,fig.height=10.4,fig.width=13}
 legend <- cowplot::plot_grid(get_legend(MVB_CI) )
-s_fig_plots <- cowplot::plot_grid(MVB_CI + theme(legend.position = "none") ,IR_CI + theme(legend.position = "none"),MVB_CII+ theme(legend.position = "none"),IR_CII+ theme(legend.position = "none"),ncol=2,labels = "AUTO",label_size = 32)
+s_fig_plots <- cowplot::plot_grid(MVB_CI + theme(legend.position = "none") ,IR_CI + theme(legend.position = "none"),MVB_CII+ theme(legend.position = "none"),IR_CII+ theme(legend.position = "none"),ncol=2,labels = "AUTO",label_size = 24)
 s_figure_5 <- cowplot::plot_grid(s_fig_plots,legend,rel_heights = c(1,0.15),rel_widths=c(1,0.75),ncol=1)
 s_figure_5
 ```

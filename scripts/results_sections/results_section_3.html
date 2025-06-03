@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-05-02" />
+<meta name="date" content="2025-06-02" />
 
 <title>Known carbapenem resistance-associated genotypes moderately explain resistance in a clade-specific manner</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Known carbapenem resistance-associated
 genotypes moderately explain resistance in a clade-specific manner</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-05-02</h4>
+<h4 class="date">2025-06-02</h4>
 
 </div>
 
@@ -375,10 +375,10 @@ library(ggtree)</code></pre>
 ## 
 ## Please cite:
 ## 
-## Guangchuang Yu, Tommy Tsan-Yuk Lam, Huachen Zhu, Yi Guan. Two methods
-## for mapping and visualizing associated data on phylogeny using ggtree.
-## Molecular Biology and Evolution. 2018, 35(12):3041-3043.
-## doi:10.1093/molbev/msy194
+## Shuangbin Xu, Lin Li, Xiao Luo, Meijun Chen, Wenli Tang, Li Zhan, Zehan
+## Dai, Tommy T. Lam, Yi Guan, Guangchuang Yu. Ggtree: A serialized data
+## object for visualization of a phylogenetic tree and annotation data.
+## iMeta 2022, 1(4):e56. doi:10.1002/imt2.56
 ## 
 ## Attaching package: &#39;ggtree&#39;
 ## 
@@ -415,26 +415,26 @@ source(&quot;./lib/consistent_themes.R&quot;)  </code></pre>
 ## generated.</code></pre>
 <pre class="r"><code># Print environment
 Sys.info()</code></pre>
-<pre><code>##                                                                                              sysname 
-##                                                                                             &quot;Darwin&quot; 
-##                                                                                              release 
-##                                                                                             &quot;24.4.0&quot; 
-##                                                                                              version 
-## &quot;Darwin Kernel Version 24.4.0: Wed Mar 19 21:16:31 PDT 2025; root:xnu-11417.101.15~1/RELEASE_X86_64&quot; 
-##                                                                                             nodename 
-##                                                                                     &quot;msla0572.local&quot; 
-##                                                                                              machine 
-##                                                                                             &quot;x86_64&quot; 
-##                                                                                                login 
-##                                                                                               &quot;root&quot; 
-##                                                                                                 user 
-##                                                                                           &quot;kgontjes&quot; 
-##                                                                                       effective_user 
-##                                                                                           &quot;kgontjes&quot;</code></pre>
+<pre><code>##                                                                                             sysname 
+##                                                                                            &quot;Darwin&quot; 
+##                                                                                             release 
+##                                                                                            &quot;24.5.0&quot; 
+##                                                                                             version 
+## &quot;Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_X86_64&quot; 
+##                                                                                            nodename 
+##                                                                                    &quot;msla0572.local&quot; 
+##                                                                                             machine 
+##                                                                                            &quot;x86_64&quot; 
+##                                                                                               login 
+##                                                                                              &quot;root&quot; 
+##                                                                                                user 
+##                                                                                          &quot;kgontjes&quot; 
+##                                                                                      effective_user 
+##                                                                                          &quot;kgontjes&quot;</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.5.0 (2025-04-11)
 ## Platform: x86_64-apple-darwin20
-## Running under: macOS Sequoia 15.4
+## Running under: macOS Sequoia 15.5
 ## 
 ## Matrix products: default
 ## BLAS:   /Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib 
@@ -457,7 +457,7 @@ Sys.info()</code></pre>
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] gtable_0.3.6       xfun_0.52          bslib_0.9.0        lattice_0.22-7    
-##  [5] tzdb_0.5.0         vctrs_0.6.5        tools_4.5.0        generics_0.1.3    
+##  [5] tzdb_0.5.0         vctrs_0.6.5        tools_4.5.0        generics_0.1.4    
 ##  [9] yulab.utils_0.2.0  parallel_4.5.0     pkgconfig_2.0.3    Matrix_1.7-3      
 ## [13] ggplotify_0.1.2    RColorBrewer_1.1-3 lifecycle_1.0.4    compiler_4.5.0    
 ## [17] farver_2.1.2       treeio_1.32.0      mitools_2.4        survey_4.4-2      

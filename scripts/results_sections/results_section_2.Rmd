@@ -55,11 +55,11 @@ convert_tableone_into_df(df,vars = "clade_I") %>% favorite_kable
 ```{r}
 CI_MVB_MIC_dist <- median_IQR("MVB_log_2",df_CI)
 CII_MVB_MIC_dist <- median_IQR("MVB_log_2",df_CII)
-Clade_MVB_comps <- wilcox.test(MVB_num ~ clade_I,data=df) %>% .[["p.value"]] %>% round(.,digits=4)
+Clade_MVB_comps <- wilcox.test(MVB_log_2 ~ clade_I,data=df) %>% .[["p.value"]] %>% round(.,digits=4)
 
 CI_IR_MIC_dist <- median_IQR("IR_log_2",df_CI)
 CII_IR_MIC_dist <- median_IQR("IR_log_2",df_CII)
-Clade_IR_comps <- wilcox.test(IR_num ~ clade_I,data=df) %>% .[["p.value"]] %>% round(.,digits=4)
+Clade_IR_comps <- wilcox.test(IR_log_2 ~ clade_I,data=df) %>% .[["p.value"]] %>% round(.,digits=4)
 
 cbind(pheno="MVB",CI_MVB_MIC_dist,CII_MVB_MIC_dist,Clade_MVB_comps) %>% rbind(.,cbind(pheno="IR",CI_IR_MIC_dist,CII_IR_MIC_dist,Clade_IR_comps)) %>% `colnames<-`(c("Pheno","Clade I","Clade II","p-value")) %>% favorite_kable()
 ``` 
@@ -112,8 +112,7 @@ rbind(ST258_phylo,CI_phylo,CII_phylo) %>% favorite_kable()
 # Statistical testing
 ```{r}
 paste0("Phylo occurrence diffence")
-c(24,18,106,248) %>% matrix(ncol=2) %>% fisher.test()
+c(23,17,106,248) %>% matrix(ncol=2) %>% fisher.test()
 paste0("Clustering, no significant difference but still interesting")
-c(5,1,19,17) %>% matrix(ncol=2) %>% fisher.test()
+c(5,1,18,16) %>% matrix(ncol=2) %>% fisher.test()
 ``` 
- 

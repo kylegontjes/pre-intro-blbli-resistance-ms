@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-05-09" />
+<meta name="date" content="2025-06-02" />
 
 <title>Supplemental Table 1: Clade-specific trends in the prevalence of carbapenem resistance-associated genotypes</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Table 1: Clade-specific trends
 in the prevalence of carbapenem resistance-associated genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-05-09</h4>
+<h4 class="date">2025-06-02</h4>
 
 </div>
 
@@ -611,12 +611,18 @@ bla_mat$`SHV-11` &lt;- ifelse(bla_mat$`SHV-11`==1 | bla_mat$`SHV-11^`,1,0)
 bla_mat$`SHV-12` &lt;- ifelse(bla_mat$`SHV-12`==1 ,1,0)
 bla_mat$`TEM-1D.v1` &lt;- ifelse(bla_mat$`TEM-1D.v1^` ==1 | bla_mat$`TEM-1D.v1`==1,1,0)
 
-bla_genes &lt;- colnames(bla_mat %&gt;% select(-isolate_no)) %&gt;% sort %&gt;% subset(!.%in% c(&quot;KPC-3^&quot;,&quot;SHV-11^&quot;,&quot;SHV-12^&quot;,&quot;TEM-1D.v1^&quot;))</code></pre>
-<pre class="r"><code>canonical &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_L3_mutations&#39;,&quot;OmpK36GD&quot;,&quot;OmpK36TD&quot;,&#39;OmpK36_truncation_kleborate&#39;,&#39;OmpK36_putative_function_altering&#39;,&quot;OmpK36_intergenic&quot;,&#39;OmpK36_promoter_IS&#39;,&quot;AcrAB_TolC_any&quot;,&quot;RamR&quot;,&quot;RamA&quot;,&quot;PBP_any&quot;,&quot;PBP2&quot;,&quot;PBP4&quot;)
-tn4401 &lt;- c(&quot;Tn4401a&quot;,&quot;Tn4401b&quot;,&quot;Tn4401d&quot;,&quot;Tn4401_del_6920_7126&quot;,&quot;Tn4401_del_1_554_7008_7075&quot;,&quot;Tn4401_del_1_3391_6920_7126&quot;)</code></pre>
-<pre class="r"><code>exact &lt;- c(&#39;OmpK36TD&#39;,&#39;OmpK36_truncation_kleborate&#39;,&#39;AcrAB_TolC_any&#39;,&#39;RamA&#39;,&#39;PBP_any&#39;,&#39;PBP2&#39;,&#39;PBP4&#39;,&#39;Tn4401_del_1_3391_6920_7126&#39;,&#39;CMY-2.v2&#39;,&#39;CTX-M-14&#39;,&#39;CTX-M-15&#39;,&quot;KPC-5&quot;,&quot;LAP-2&quot;,&quot;OXA-1&quot;,&quot;TEM-1&quot;,&#39;TEM-104?&#39;,&#39;TEM-104*?&#39;,&#39;TEM-150*?&#39;)
+bla_genes &lt;- colnames(bla_mat %&gt;% select(-isolate_no)) %&gt;% sort %&gt;% subset(!.%in% c(&quot;KPC-3^&quot;,&quot;SHV-11^&quot;,&quot;SHV-12^&quot;,&quot;TEM-1D.v1^&quot;))
+df &lt;- left_join(df,bla_mat)</code></pre>
+<pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_truncation_kleborate&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
+drug_exit &lt;- c(&quot;AcrAB_TolC_any&quot;,&#39;RamR&#39;,&quot;RamA&quot;)
+target_modification &lt;- c(&#39;PBP_any&#39;,&#39;PBP2&#39;,&quot;PBP4&quot;)
 
-s_table_1 &lt;- convert_tableone_into_df(df,vars=c(canonical,bla_genes,tn4401),factorVars = c(canonical,bla_genes,tn4401),strata=&quot;clade_I&quot;,outcome_names = c(&quot;Clade I&quot;,&quot;Clade II&quot;),exact=exact)
+carbapenem &lt;- c(drug_entry,drug_exit,target_modification)
+
+tn4401 &lt;- c(&quot;Tn4401a&quot;,&quot;Tn4401b&quot;,&quot;Tn4401d&quot;,&quot;Tn4401_del_6920_7126&quot;,&quot;Tn4401_del_1_554_7008_7075&quot;,&quot;Tn4401_del_1_3391_6920_7126&quot;)</code></pre>
+<pre class="r"><code>exact &lt;- c(&quot;OmpK36TD&quot;,&#39;OmpK36_truncation_kleborate&#39;,&quot;OmpK36_putative_function_altering&quot;,&quot;OmpK36_intergenic&quot;,&quot;OmpK36_promoter_IS&quot;,&quot;AcrAB_TolC_any&quot;,&quot;RamR&quot;,&quot;RamA&quot;,&quot;PBP_any&quot;,&quot;PBP2&quot;,&quot;PBP4&quot;,&#39;Tn4401_del_1_3391_6920_7126&#39;,&#39;CMY-2.v2&#39;,&#39;CTX-M-14&#39;,&#39;CTX-M-15&#39;,&quot;KPC-5&quot;,&quot;LAP-2&quot;,&quot;OXA-1&quot;,&quot;TEM-1&quot;,&#39;TEM-104?&#39;,&#39;TEM-104*?&#39;,&#39;TEM-150*?&#39;)
+
+s_table_1 &lt;- convert_tableone_into_df(dataset = df,vars=c(carbapenem,bla_genes,tn4401),factorVars = c(carbapenem,bla_genes,tn4401),strata=&quot;clade_I&quot;,outcome_names = c(&quot;Clade I&quot;,&quot;Clade II&quot;),exact=exact)
 s_table_1$Variable &lt;- gsub(&quot; \\= 1&quot;,&quot;&quot;,s_table_1$Variable) %&gt;% gsub(&quot; \\(|\\)|\\%&quot;,&quot;&quot;,.) 
 
 s_table_1$Variable &lt;- recode(s_table_1$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T mutation in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
@@ -658,6 +664,23 @@ ompK35 porin truncation at 25%
 </td>
 <td style="text-align:left;">
 NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C25T mutation in ompK36
+</td>
+<td style="text-align:left;">
+131 (31.8)
+</td>
+<td style="text-align:left;">
+129 (89.0)
+</td>
+<td style="text-align:left;">
+2 (0.7)
+</td>
+<td style="text-align:left;">
+&lt;0.001
 </td>
 </tr>
 <tr>
@@ -730,6 +753,23 @@ ompK36 truncation
 </tr>
 <tr>
 <td style="text-align:left;">
+ompK36 non-synonymous mutation
+</td>
+<td style="text-align:left;">
+22 (5.3)
+</td>
+<td style="text-align:left;">
+13 (9.0)
+</td>
+<td style="text-align:left;">
+9 (3.4)
+</td>
+<td style="text-align:left;">
+0.029
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 ompK36 putative function-altering mutations
 </td>
 <td style="text-align:left;">
@@ -742,7 +782,7 @@ ompK36 putative function-altering mutations
 7 (2.6)
 </td>
 <td style="text-align:left;">
-0.009
+0.007
 </td>
 </tr>
 <tr>
@@ -759,7 +799,7 @@ ompK36 intergenic region
 26 (9.7)
 </td>
 <td style="text-align:left;">
-0.034
+0.020
 </td>
 </tr>
 <tr>
@@ -776,7 +816,7 @@ Insertion seqeunce at ompK36 promoter
 23 (8.6)
 </td>
 <td style="text-align:left;">
-0.002
+0.001
 </td>
 </tr>
 <tr>
@@ -810,7 +850,7 @@ ramR efflux pump regulator PFAV
 16 (6.0)
 </td>
 <td style="text-align:left;">
-0.678
+0.537
 </td>
 </tr>
 <tr>
@@ -1117,6 +1157,23 @@ TEM-150*?
 </td>
 <td style="text-align:left;">
 0.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TEM-1D.v1
+</td>
+<td style="text-align:left;">
+177 (43.0)
+</td>
+<td style="text-align:left;">
+51 (35.2)
+</td>
+<td style="text-align:left;">
+126 (47.2)
+</td>
+<td style="text-align:left;">
+0.024
 </td>
 </tr>
 <tr>
