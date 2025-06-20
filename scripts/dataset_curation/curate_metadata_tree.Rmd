@@ -218,6 +218,7 @@ tr <- read.tree(file="../../../Sequence_data/variant_calling/2025-02-17_snpkit_P
 
 tr_midpoint = phytools::midpoint.root(tr) 
 ape::write.tree(tr_midpoint,paste0("./data/tree/tree.treefile"))
+saveRDS(tr_midpoint,paste0("./data/tree/tree_midpoint.RDS"))
 ```
 
 ## Generate phylogenetic distance data
@@ -229,9 +230,11 @@ saveRDS(phylo_dist_midpoint,"./data/tree/phylo_dist.RDS")
 # Order dataframe
 ```{r} 
 # Only keep ST258 isolates in tree
-df <- subset(df,isolate_no %in% tr$tip.label) 
+df <- subset(df,isolate_no %in% tr_midpoint$tip.label) 
 # Keep rows corresponding to the tree and match ordering (important for future work) 
-df <- df %>%.[match(as.vector(tr$tip.label), .$isolate_no),]
+df <- df[match(as.vector(tr_midpoint$tip.label), df$isolate_no),]
+# Check ordering
+identical(tr_midpoint$tip.label, df$isolate_no)
 ```
 
 # Get clade data

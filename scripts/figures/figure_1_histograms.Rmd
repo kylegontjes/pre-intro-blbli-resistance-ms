@@ -27,6 +27,8 @@ sessionInfo()
 # Data
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
+tr <- ape::read.tree("./data/tree/tree.treefile")
+tr_obj <- readRDS("./data/tree/tree_midpoint.RDS")
 ```
 
 ## Figure Code
@@ -35,24 +37,24 @@ x_log_breaks <- c(-2,-1,0,1,2,3,4,5)
 MIC_x_scale <- scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))
 
 # Figure
-figure1A <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-Vaborbactam") + MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
-  
-figure1B <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-Relebactam")+ MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
+figure1A <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-Relebactam")+ MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
+
+figure1B <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-Vaborbactam") + MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
 
 # Legend
 MIC_legend <- get_legend(figure1A)
 MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=-0.25, 0, 0, b=0), "cm"))
 
 # Create cowplot Figure
-MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 24)
-figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.125)) 
+MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 20)
+figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.135)) 
 ``` 
 
 ## Figure
-```{r,message=F,error=F,warning=F,fig.width=12.5,fig.height=6.25}
+```{r,message=F,error=F,warning=F,fig.width=9.5,fig.height=5.5}
 figure1
 ```
 
 ```{r}
-ggsave(plot = figure1, filename = './figures/figure_1.png', width = 12.5, height = 6.25, bg = "white")
+ggsave(plot = figure1, filename = './figures/figure_1.png', width = 9.5, height = 5.5, bg = "white")
 ```

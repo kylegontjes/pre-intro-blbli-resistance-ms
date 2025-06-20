@@ -126,11 +126,10 @@ favorite_kable <- function (x){
 # Figure 1 (Histogram)
 figure_1_format <-   theme(legend.position = "bottom",
                            axis.ticks.length=unit(.2, "cm"),
-                           axis.text =   element_text(size=20,color="black"),
-                           axis.title = element_text(size = 22,color="black"),
-                           legend.text =   element_text(size=20,color="black"),
-                           legend.title = element_text(size = 22,color="black"),
-                           plot.title = element_text(size = 22,color="black")
+                           axis.text =   element_text(size=14,color="black"),
+                           axis.title = element_text(size = 16,color="black"),
+                           legend.text =   element_text(size=14,color="black"),
+                           legend.title = element_text(size = 16,color="black") 
 ) 
 
 

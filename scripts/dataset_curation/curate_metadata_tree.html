@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-03-24" />
+<meta name="date" content="2025-06-20" />
 
 <title>curate_metadata_tree</title>
 
@@ -350,7 +350,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">curate_metadata_tree</h1>
-<h4 class="date">2025-03-24</h4>
+<h4 class="date">2025-06-20</h4>
 
 </div>
 
@@ -363,7 +363,7 @@ lapply(packages,library,character.only=T)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+## ✔ ggplot2   3.5.2     ✔ tibble    3.2.1
 ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
 ## ✔ purrr     1.0.4     
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
@@ -414,30 +414,30 @@ source(&quot;./scripts/dataset_curation/metadata_curation_functions.R&quot;)
 
 # Print environment
 Sys.info()</code></pre>
-<pre><code>##                                                                                            sysname 
-##                                                                                           &quot;Darwin&quot; 
-##                                                                                            release 
-##                                                                                           &quot;24.3.0&quot; 
-##                                                                                            version 
-## &quot;Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:00 PST 2025; root:xnu-11215.81.4~3/RELEASE_X86_64&quot; 
-##                                                                                           nodename 
-##                                                                                   &quot;msla0572.local&quot; 
-##                                                                                            machine 
-##                                                                                           &quot;x86_64&quot; 
-##                                                                                              login 
-##                                                                                             &quot;root&quot; 
-##                                                                                               user 
-##                                                                                         &quot;kgontjes&quot; 
-##                                                                                     effective_user 
-##                                                                                         &quot;kgontjes&quot;</code></pre>
+<pre><code>##                                                                                             sysname 
+##                                                                                            &quot;Darwin&quot; 
+##                                                                                             release 
+##                                                                                            &quot;24.5.0&quot; 
+##                                                                                             version 
+## &quot;Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_X86_64&quot; 
+##                                                                                            nodename 
+##                                                                                    &quot;msla0572.local&quot; 
+##                                                                                             machine 
+##                                                                                            &quot;x86_64&quot; 
+##                                                                                               login 
+##                                                                                              &quot;root&quot; 
+##                                                                                                user 
+##                                                                                          &quot;kgontjes&quot; 
+##                                                                                      effective_user 
+##                                                                                          &quot;kgontjes&quot;</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>## R version 4.4.3 (2025-02-28)
+<pre><code>## R version 4.5.1 (2025-06-13)
 ## Platform: x86_64-apple-darwin20
-## Running under: macOS Sequoia 15.3.2
+## Running under: macOS Sequoia 15.5
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -449,32 +449,32 @@ Sys.info()</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] phytools_2.4-4  maps_3.4.2.1    ape_5.8-1       lubridate_1.9.4
+##  [1] phytools_2.4-4  maps_3.4.3      ape_5.8-1       lubridate_1.9.4
 ##  [5] forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4     purrr_1.0.4    
-##  [9] readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.1  
+##  [9] readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.2  
 ## [13] tidyverse_2.0.0 readxl_1.4.5    knitr_1.50     
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] fastmatch_1.1-6         gtable_0.3.6            xfun_0.51              
-##  [4] bslib_0.9.0             lattice_0.22-6          tzdb_0.5.0             
+##  [1] fastmatch_1.1-6         gtable_0.3.6            xfun_0.52              
+##  [4] bslib_0.9.0             lattice_0.22-7          tzdb_0.5.0             
 ##  [7] numDeriv_2016.8-1.1     quadprog_1.5-8          vctrs_0.6.5            
-## [10] tools_4.4.3             generics_0.1.3          parallel_4.4.3         
-## [13] pkgconfig_2.0.3         Matrix_1.7-3            scatterplot3d_0.3-44   
-## [16] lifecycle_1.0.4         compiler_4.4.3          munsell_0.5.1          
-## [19] mnormt_2.1.1            combinat_0.0-8          codetools_0.2-20       
-## [22] htmltools_0.5.8.1       sass_0.4.9              yaml_2.3.10            
-## [25] pillar_1.10.1           jquerylib_0.1.4         MASS_7.3-65            
-## [28] cachem_1.1.0            clusterGeneration_1.3.8 iterators_1.0.14       
-## [31] foreach_1.5.2           nlme_3.1-167            phangorn_2.12.1        
-## [34] tidyselect_1.2.1        digest_0.6.37           stringi_1.8.4          
-## [37] fastmap_1.2.0           grid_4.4.3              colorspace_2.1-1       
-## [40] expm_1.0-0              cli_3.6.4               magrittr_2.0.3         
-## [43] optimParallel_1.0-2     withr_3.0.2             scales_1.3.0           
+## [10] tools_4.5.1             generics_0.1.4          parallel_4.5.1         
+## [13] pkgconfig_2.0.3         Matrix_1.7-3            RColorBrewer_1.1-3     
+## [16] scatterplot3d_0.3-44    lifecycle_1.0.4         compiler_4.5.1         
+## [19] farver_2.1.2            mnormt_2.1.1            combinat_0.0-8         
+## [22] codetools_0.2-20        htmltools_0.5.8.1       sass_0.4.10            
+## [25] yaml_2.3.10             pillar_1.10.2           jquerylib_0.1.4        
+## [28] MASS_7.3-65             cachem_1.1.0            clusterGeneration_1.3.8
+## [31] iterators_1.0.14        foreach_1.5.2           nlme_3.1-168           
+## [34] phangorn_2.12.1         tidyselect_1.2.1        digest_0.6.37          
+## [37] stringi_1.8.7           fastmap_1.2.0           grid_4.5.1             
+## [40] expm_1.0-0              cli_3.6.5               magrittr_2.0.3         
+## [43] optimParallel_1.0-2     withr_3.0.2             scales_1.4.0           
 ## [46] DEoptim_2.2-8           timechange_0.3.0        rmarkdown_2.29         
 ## [49] igraph_2.1.4            cellranger_1.1.0        hms_1.1.3              
 ## [52] coda_0.19-4.1           evaluate_1.0.3          doParallel_1.0.17      
-## [55] rlang_1.1.5             Rcpp_1.0.14             glue_1.8.0             
-## [58] rstudioapi_0.17.1       jsonlite_1.9.1          R6_2.6.1</code></pre>
+## [55] rlang_1.1.6             Rcpp_1.0.14             glue_1.8.0             
+## [58] rstudioapi_0.17.1       jsonlite_2.0.0          R6_2.6.1</code></pre>
 </div>
 <div id="clean-the-patient-meadata" class="section level1">
 <h1>Clean the patient meadata</h1>
@@ -673,7 +673,8 @@ PCMP_H243 as root</p>
                     c(&#39;gi|661922017|gb|CP008827.1|&#39;,&#39;PCMP_H243&#39;,&#39;PCMP_H473&#39;))
 
 tr_midpoint = phytools::midpoint.root(tr) 
-ape::write.tree(tr_midpoint,paste0(&quot;./data/tree/tree.treefile&quot;))</code></pre>
+ape::write.tree(tr_midpoint,paste0(&quot;./data/tree/tree.treefile&quot;))
+saveRDS(tr_midpoint,paste0(&quot;./data/tree/tree_midpoint.RDS&quot;))</code></pre>
 </div>
 <div id="generate-phylogenetic-distance-data" class="section level2">
 <h2>Generate phylogenetic distance data</h2>
@@ -684,29 +685,24 @@ saveRDS(phylo_dist_midpoint,&quot;./data/tree/phylo_dist.RDS&quot;) </code></pre
 <div id="order-dataframe" class="section level1">
 <h1>Order dataframe</h1>
 <pre class="r"><code># Only keep ST258 isolates in tree
-df &lt;- subset(df,isolate_no %in% tr$tip.label) 
+df &lt;- subset(df,isolate_no %in% tr_midpoint$tip.label) 
 # Keep rows corresponding to the tree and match ordering (important for future work) 
-df &lt;- df %&gt;%.[match(as.vector(tr$tip.label), .$isolate_no),]</code></pre>
+df &lt;- df[match(as.vector(tr_midpoint$tip.label), df$isolate_no),]
+# Check ordering
+identical(tr_midpoint$tip.label, df$isolate_no)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="get-clade-data" class="section level1">
 <h1>Get clade data</h1>
 <pre class="r"><code>library(ggtree)</code></pre>
-<pre><code>## ggtree v3.12.0 For help: https://yulab-smu.top/treedata-book/
+<pre><code>## ggtree v3.16.0 Learn more at https://yulab-smu.top/contribution-tree-data/
 ## 
-## If you use the ggtree package suite in published research, please cite
-## the appropriate paper(s):
+## Please cite:
 ## 
-## Guangchuang Yu, David Smith, Huachen Zhu, Yi Guan, Tommy Tsan-Yuk Lam.
-## ggtree: an R package for visualization and annotation of phylogenetic
-## trees with their covariates and other associated data. Methods in
-## Ecology and Evolution. 2017, 8(1):28-36. doi:10.1111/2041-210X.12628
-## 
-## Guangchuang Yu.  Data Integration, Manipulation and Visualization of
-## Phylogenetic Trees (1st edition). Chapman and Hall/CRC. 2022,
-## doi:10.1201/9781003279242
-## 
-## Guangchuang Yu. Using ggtree to visualize data on tree-like structures.
-## Current Protocols in Bioinformatics. 2020, 69:e96. doi:10.1002/cpbi.96</code></pre>
+## Shuangbin Xu, Lin Li, Xiao Luo, Meijun Chen, Wenli Tang, Li Zhan, Zehan
+## Dai, Tommy T. Lam, Yi Guan, Guangchuang Yu. Ggtree: A serialized data
+## object for visualization of a phylogenetic tree and annotation data.
+## iMeta 2022, 1(4):e56. doi:10.1002/imt2.56</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;ggtree&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:ape&#39;:

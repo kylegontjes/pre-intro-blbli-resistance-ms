@@ -35,7 +35,7 @@ paste0("Number of isolates: ",nrow(df))
 paste0("Time distribution: ",paste0(min(df$Cx_date),"-",max(df$Cx_date)))
 paste0("Number of facilities: ",length(unique(df$LTACH_Recode)))
 paste0("Source distribution:")
-table(df$source)
+table(df$source) %>% sort
 ```
 
 # Distribution of MIC values in log 2 scale
