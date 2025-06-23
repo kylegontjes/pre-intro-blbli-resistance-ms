@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-05-05" />
+<meta name="date" content="2025-06-20" />
 
 <title>curate_TETyper</title>
 
@@ -352,12 +352,13 @@ display: none;
 
 <h1 class="title toc-ignore">curate_TETyper</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-05-05</h4>
+<h4 class="date">2025-06-20</h4>
 
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
+<pre class="r"><code>library(ape)
+library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -367,9 +368,11 @@ display: none;
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
+## ✖ dplyr::where()  masks ape::where()
 ## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 <pre class="r"><code>source(&quot;./lib/common_functions.R&quot;)</code></pre>
-<pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)</code></pre>
+<pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
+tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)</code></pre>
 <div id="load-tn4401-tetyper-data" class="section level1">
 <h1>Load tn4401 TETyper data</h1>
 <pre class="r"><code>tn4401 &lt;- read.delim(&quot;./data/TETyper/TETyper_results.txt&quot;) 

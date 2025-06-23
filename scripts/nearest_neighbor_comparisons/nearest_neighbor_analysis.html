@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-05-02" />
+<meta name="date" content="2025-06-20" />
 
 <title>nearest_neighbor_analysis</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">nearest_neighbor_analysis</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-05-02</h4>
+<h4 class="date">2025-06-20</h4>
 
 </div>
 
@@ -361,15 +361,18 @@ display: none;
 <h1>Combination Therapy Manuscript</h1>
 <pre class="r"><code>df &lt;- readRDS(&quot;./data/nearest_neighbor_comparisons/nn_df.RDS&quot;)
 nn_dataset &lt;- readRDS(&quot;./data/nearest_neighbor_comparisons/nn_data.RDS&quot;) 
-phylo_dist &lt;- readRDS(&quot;./data/tree/phylo_dist.RDS&quot;) %&gt;% as.data.frame %&gt;% subset(rownames(.) %in% df$isolate_no) %&gt;% select(any_of(df$isolate_no)) %&gt;% as.matrix
+
+phylogenetic_distance &lt;- readRDS(&quot;./data/tree/phylo_dist.RDS&quot;) %&gt;% as.data.frame %&gt;% subset(rownames(.) %in% df$isolate_no) %&gt;% select(any_of(df$isolate_no)) %&gt;% as.matrix
+
 metadata &lt;- left_join(nn_dataset,df) %&gt;% `rownames&lt;-`(df$isolate_no)
 
-variant_dist &lt;- readRDS(&quot;./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS&quot;) 
+variant_distance &lt;- readRDS(&quot;./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS&quot;) %&gt;% as.matrix
+
 variants &lt;- subset(colnames(nn_dataset),colnames(nn_dataset) != &quot;isolate_no&quot;) 
 
 nn_comps_all_vars_of_interest &lt;- lapply(variants,function(variable_name){
   isolates_w_variant &lt;- metadata[,c(&quot;isolate_no&quot;,variable_name)] %&gt;% subset(get(paste(variable_name))==1) %&gt;% select(isolate_no) %&gt;% unlist
-  variant_nn_data &lt;- lapply(isolates_w_variant,FUN=nearest_neighbor_algorithm,phylogenetic_distance = phylo_dist,variant_distance = variant_dist,annotate=T,metadata=metadata,variables_of_interest=c(&quot;blbli_dich_num&quot;,&quot;MVB_dich_num&quot;,&quot;MVB_num&quot;,&quot;IR_dich_num&quot;,&quot;IR_num&quot;), comparison=T,comparison_feature = variable_name) %&gt;% do.call(rbind,.)
+  variant_nn_data &lt;- lapply(isolates_w_variant,FUN=nearest_neighbor_algorithm,tip_name_variable = &#39;isolate_no&#39;,phylogenetic_distance = phylogenetic_distance,variant_distance = variant_distance,annotate=T,metadata=metadata,variables_of_interest=c(&quot;blbli_dich_num&quot;,&quot;MVB_dich_num&quot;,&quot;MVB_num&quot;,&quot;IR_dich_num&quot;,&quot;IR_num&quot;), comparison=T,comparison_feature = variable_name) %&gt;% do.call(rbind,.)
   nn_comps_with_variant &lt;- nearest_neighbor_analysis(variant_nn_data,binary_vars = c(&quot;blbli_dich_num&quot;,&quot;MVB_dich_num&quot;,&quot;IR_dich_num&quot;),continuous_vars = c(&quot;MVB_num&quot;,&quot;IR_num&quot;),log_2=T)%&gt;% as.data.frame
   nn_comps_with_variant_sum &lt;- nearest_neighbor_summary_statistics(nn_comps_with_variant,binary_vars = c(&quot;blbli_dich_num&quot;,&quot;MVB_dich_num&quot;,&quot;IR_dich_num&quot;),continuous_vars = c(&quot;MVB_num&quot;,&quot;IR_num&quot;),log_2=T)  
   print(paste0(&quot;Done w/ variant: &quot;,variable_name))

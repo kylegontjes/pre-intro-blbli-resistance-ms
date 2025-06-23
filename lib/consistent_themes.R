@@ -21,10 +21,10 @@ resistance_cat_scale_v <- scale_fill_manual(values=resistance_cat_colors, name="
 feature_colors <- c(`1` = "black",`0`="white")
 feature_scale <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Tip state", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 feature_scale_v <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Tip state", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
-MVB_IR_scale <- scale_fill_manual(breaks = c("MVB_num_log_2_diff","IR_num_log_2_diff"),values=c(5,6),labels = c("Meropenem-vaborbactam"," Imipenem-relebactam"),name="Antibiotic",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
+MVB_IR_scale <- scale_fill_manual(breaks = c("IR_num_log_2_diff","MVB_num_log_2_diff"),values=c(5,6),labels = c(" Imipenem-relebactam","Meropenem-vaborbactam"),name="Antibiotic", guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 
 # Non-Susceptibility
-resistance_prop_scale <- scale_fill_manual(breaks = c("blbli_res_prop","blbli_sus_prop"),values=c("black","gray"),labels = c("Resistance","Susceptible"),name="Resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
+resistance_prop_scale <- scale_fill_manual(breaks = c("blbli_res_prop","blbli_sus_prop"),values=c("black","gray"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 resistance_scale <- scale_fill_manual(breaks = c("Non-Susceptible","Susceptible"),values=c("black","white"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(order=3,title.position = "top", label.position = "right",nrow=2),drop = FALSE )
 NonSus_scale_c <- scale_color_manual(breaks = c("Non-Susceptible","Susceptible"),values=c("black","gray"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(order=3,title.position = "top", label.position = "right",nrow=1),drop = FALSE )
 
@@ -45,6 +45,7 @@ cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labe
 
 # Potential scale
 potential_scale_general <- scale_fill_manual(breaks = c("Modulator","Mediator","None"),values=c("gray","#4d3227","white"),labels = c("Resistance Modulator","Resistance Mediator","None"),name="Genotype Category",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 5)) 
+
 # Panels
 panel_scale <- scale_fill_manual(breaks = c("known","novel_synchronous","AA552","known_ST258_GWAS","known_ST258_GWAS_AA552"),values=hues::iwanthue(5),labels = c("Known genotypes","Novel GWAS hits","AA552 KPC plasmid","Known + Novel GWAS","Known + GWAS + AA552 KPC Plasmid"),name="Genotype Panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
 

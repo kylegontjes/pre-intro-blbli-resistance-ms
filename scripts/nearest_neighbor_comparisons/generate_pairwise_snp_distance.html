@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-03-27" />
+<meta name="date" content="2025-06-20" />
 
 <title>generate_pairwise_snp_distance</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">generate_pairwise_snp_distance</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-03-27</h4>
+<h4 class="date">2025-06-20</h4>
 
 </div>
 
@@ -364,6 +364,12 @@ display: none;
 <h1>Dataset</h1>
 <pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
 tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)</code></pre>
+<pre class="r"><code>dna_matrix &lt;- function(fa,reference){
+  ape::dist.dna(x = fa, # DNAbin object as read in above
+                as.matrix = TRUE, # return as matrix
+                model = &quot;N&quot;, # count pairwise distances
+                pairwise.deletion = TRUE # delete sites with missing data in a pairwise way
+  )%&gt;%  as.data.frame %&gt;% subset(rownames(.)!=paste0(reference)) %&gt;% select(-all_of(reference))}</code></pre>
 </div>
 <div id="pairwise-snp-distance-matrix" class="section level1">
 <h1>Pairwise SNP Distance Matrix</h1>
@@ -372,10 +378,11 @@ snps&lt;- read.dna(&quot;~/Desktop/gl_mount/Sequence_data/variant_calling/2025-0
                 format = &quot;fasta&quot;)
 
 # Create matrix
-matrix &lt;- dna_matrix(snps,&#39;gi|661922017|gb|CP008827.1|&#39;) %&gt;% .[match(tr$tip.label,rownames(.)),match(tr$tip.label,rownames(.))]  
-dim(matrix)</code></pre>
+dna_matrix &lt;- dna_matrix(snps,&#39;gi|661922017|gb|CP008827.1|&#39;) %&gt;% .[match(tr$tip.label,rownames(.)),match(tr$tip.label,rownames(.))]  
+dna_matrix &lt;- as.matrix(dna_matrix)
+dim(dna_matrix)</code></pre>
 <pre><code>## [1] 412 412</code></pre>
-<pre class="r"><code>head(matrix)</code></pre>
+<pre class="r"><code>head(dna_matrix)</code></pre>
 <pre><code>##           PCMP_H401 PCMP_H426 PCMP_H408 PCMP_H254 PCMP_H335 PCMP_H193 PCMP_H345
 ## PCMP_H401         0         4         1         9         9        11        12
 ## PCMP_H426         4         0         4        11        11        13        14
@@ -789,8 +796,8 @@ dim(matrix)</code></pre>
 ## PCMP_H254       209       210       203       203       205      62
 ## PCMP_H335       208       209       202       202       204      61
 ## PCMP_H193       206       207       200       200       202      59</code></pre>
-<pre class="r"><code>saveRDS(matrix,file=&quot;./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS&quot;)
-write_csv(matrix,file=&quot;./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.csv&quot;)</code></pre>
+<pre class="r"><code>saveRDS(dna_matrix,file=&quot;./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS&quot;)
+write_csv(as.data.frame(dna_matrix),file=&quot;./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.csv&quot;)</code></pre>
 </div>
 
 

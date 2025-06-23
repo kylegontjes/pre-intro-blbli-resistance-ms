@@ -34,6 +34,8 @@ sessionInfo()
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
 tr <- read.tree("./data/tree/tree.treefile") 
+df <- df %>% .[match(tr$tip.label,.$isolate_no),]  
+
 # Matrices
 ## Kleborate matrix
 kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 

@@ -18,9 +18,6 @@ packages <- c("tidyverse",'ape')
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
-#Source function
-source("./lib/variant_calling_cleaning_functions.R") 
-
 # Print environment
 set.seed(45) 
 Sys.info()
@@ -33,6 +30,16 @@ df <- readRDS("./data/dataset/df.RDS")
 tr <- read.tree("./data/tree/tree.treefile")
 ```
 
+```{r}
+dna_matrix <- function(fa,reference){
+  ape::dist.dna(x = fa, # DNAbin object as read in above
+                as.matrix = TRUE, # return as matrix
+                model = "N", # count pairwise distances
+                pairwise.deletion = TRUE # delete sites with missing data in a pairwise way
+  )%>%  as.data.frame %>% subset(rownames(.)!=paste0(reference)) %>% select(-all_of(reference))}
+```
+
+
 # Pairwise SNP Distance Matrix  
 ```{r}
 # Recombination filtered SNPs
@@ -40,10 +47,11 @@ snps<- read.dna("~/Desktop/gl_mount/Sequence_data/variant_calling/2025-02-17_snp
                 format = "fasta")
 
 # Create matrix
-matrix <- dna_matrix(snps,'gi|661922017|gb|CP008827.1|') %>% .[match(tr$tip.label,rownames(.)),match(tr$tip.label,rownames(.))]  
-dim(matrix)
-head(matrix)
+dna_matrix <- dna_matrix(snps,'gi|661922017|gb|CP008827.1|') %>% .[match(tr$tip.label,rownames(.)),match(tr$tip.label,rownames(.))]  
+dna_matrix <- as.matrix(dna_matrix)
+dim(dna_matrix)
+head(dna_matrix)
 
-saveRDS(matrix,file="./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS")
-write_csv(matrix,file="./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.csv")
+saveRDS(dna_matrix,file="./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS")
+write_csv(as.data.frame(dna_matrix),file="./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.csv")
 ```

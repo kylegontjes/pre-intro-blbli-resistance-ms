@@ -13,12 +13,14 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ``` 
 
 ```{r}
+library(ape)
 library(tidyverse)
 source("./lib/common_functions.R")
 ```
 
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
 ```
 
 # Load tn4401 TETyper data

@@ -19,8 +19,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 packages <- c("tidyverse","cowplot",'phyloAMR',"ggtree",'data.table')
 
 #Load Packages
-invisible(lapply(packages,library,character.only=T,quietly=T))
-source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+invisible(lapply(packages,library,character.only=T,quietly=T)) 
 
 source("./lib/common_functions.R")
 source("./lib/consistent_themes.R")  
@@ -33,15 +32,18 @@ sessionInfo()
 ```{r} 
 df <- readRDS("./data/nearest_neighbor_comparisons/nn_df.RDS")
 nn_dataset <- readRDS("./data/nearest_neighbor_comparisons/nn_data.RDS") 
-phylo_dist <- readRDS("./data/tree/phylo_dist.RDS") %>% as.data.frame %>% subset(rownames(.) %in% df$isolate_no) %>% select(any_of(df$isolate_no)) %>% as.matrix
+
+phylogenetic_distance <- readRDS("./data/tree/phylo_dist.RDS") %>% as.data.frame %>% subset(rownames(.) %in% df$isolate_no) %>% select(any_of(df$isolate_no)) %>% as.matrix
+
 metadata <- left_join(nn_dataset,df) %>% `rownames<-`(df$isolate_no)
 
-variant_dist <- readRDS("./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS") 
+variant_distance <- readRDS("./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS") %>% as.matrix
+
 variants <- subset(colnames(nn_dataset),colnames(nn_dataset) != "isolate_no") 
 
 nn_comps_all_vars_of_interest <- lapply(variants,function(variable_name){
   isolates_w_variant <- metadata[,c("isolate_no",variable_name)] %>% subset(get(paste(variable_name))==1) %>% select(isolate_no) %>% unlist
-  variant_nn_data <- lapply(isolates_w_variant,FUN=nearest_neighbor_algorithm,phylogenetic_distance = phylo_dist,variant_distance = variant_dist,annotate=T,metadata=metadata,variables_of_interest=c("blbli_dich_num","MVB_dich_num","MVB_num","IR_dich_num","IR_num"), comparison=T,comparison_feature = variable_name) %>% do.call(rbind,.)
+  variant_nn_data <- lapply(isolates_w_variant,FUN=nearest_neighbor_algorithm,tip_name_variable = 'isolate_no',phylogenetic_distance = phylogenetic_distance,variant_distance = variant_distance,annotate=T,metadata=metadata,variables_of_interest=c("blbli_dich_num","MVB_dich_num","MVB_num","IR_dich_num","IR_num"), comparison=T,comparison_feature = variable_name) %>% do.call(rbind,.)
   nn_comps_with_variant <- nearest_neighbor_analysis(variant_nn_data,binary_vars = c("blbli_dich_num","MVB_dich_num","IR_dich_num"),continuous_vars = c("MVB_num","IR_num"),log_2=T)%>% as.data.frame
   nn_comps_with_variant_sum <- nearest_neighbor_summary_statistics(nn_comps_with_variant,binary_vars = c("blbli_dich_num","MVB_dich_num","IR_dich_num"),continuous_vars = c("MVB_num","IR_num"),log_2=T)  
   print(paste0("Done w/ variant: ",variable_name))

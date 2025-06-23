@@ -1,6 +1,6 @@
 Variable,Overall (n=412),Clade I (n=145),Clade II (n=267),p-value
 ompK35 porin truncation at 25%,412 (100.0),145 (100.0),267 (100.0),NA
-C25T mutation in ompK36,131 (31.8),129 (89.0),2 (0.7),<0.001
+C25T transition in ompK36,131 (31.8),129 (89.0),2 (0.7),<0.001
 Loop 3 insertion,124 (30.1),124 (85.5),0 (0.0),<0.001
 GD insertion,119 (28.9),119 (82.1),0 (0.0),<0.001
 TD insertion,5 (1.2),5 (3.4),0 (0.0),0.005

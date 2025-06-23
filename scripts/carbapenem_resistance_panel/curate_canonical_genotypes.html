@@ -368,13 +368,21 @@ display: none;
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(ape)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ape&#39;
+## 
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     where</code></pre>
 <pre class="r"><code>source(&quot;./lib/common_functions.R&quot;)</code></pre>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
 <div id="metadata" class="section level2">
 <h2>Metadata</h2>
-<pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)</code></pre>
+<pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
+tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)</code></pre>
 </div>
 <div id="kleborate" class="section level2">
 <h2>Kleborate</h2>
@@ -442,6 +450,9 @@ df &lt;- df %&gt;% mutate(PBP_any = ifelse(PBP2 ==1 | PBP4 ==1 ,1,0))</code></pr
 <div id="curate-and-save" class="section level1">
 <h1>Curate and save</h1>
 <pre class="r"><code>canonical_hits &lt;- df %&gt;% select(isolate_no,RamA,RamR,AcrAB_TolC_any,PBP_any,PBP2,PBP4,OmpK36_non_syn,&#39;OmpK35-25%&#39;,&quot;OmpK36_c25t&quot;  ,      OmpK36_truncation_kleborate,OmpK36_intergenic,OmpK36_putative_function_altering,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_promoter_IS)
+
+rownames(canonical_hits) &lt;- canonical_hits$isolate_no
+canonical_hits &lt;- canonical_hits %&gt;%.[match(as.vector(tr$tip.label), .$isolate_no),]
 
 saveRDS(canonical_hits,&quot;./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS&quot;)
 write_csv(canonical_hits,&quot;./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.csv&quot;)</code></pre>

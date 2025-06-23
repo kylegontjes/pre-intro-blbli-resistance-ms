@@ -1,6 +1,6 @@
 Variable,Overall (n=412),BL/BLI Resistant (n=58),BL/BLI Susceptible (n=354),p-value
 ompK35 porin truncation at 25%,412 (100.0),58 (100.0),354 (100.0),NA
-C25T mutation in ompK36,131 (31.8),37 (63.8),94 (26.6),<0.001
+C25T transition in ompK36,131 (31.8),37 (63.8),94 (26.6),<0.001
 Loop 3 insertion,124 (30.1),37 (63.8),87 (24.6),<0.001
 GD insertion,119 (28.9),35 (60.3),84 (23.7),<0.001
 TD insertion,5 (1.2),2 (3.4),3 (0.8),0.147

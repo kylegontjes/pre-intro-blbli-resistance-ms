@@ -14,6 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 # Environment
 ```{r}
 library(tidyverse)
+library(ape)
 source("./lib/common_functions.R")
 ```
 
@@ -21,6 +22,7 @@ source("./lib/common_functions.R")
 ## Metadata
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
 ```
 ## Kleborate
 ```{r}
@@ -83,6 +85,9 @@ df <- df %>% mutate(PBP_any = ifelse(PBP2 ==1 | PBP4 ==1 ,1,0))
 # Curate and save
 ```{r}
 canonical_hits <- df %>% select(isolate_no,RamA,RamR,AcrAB_TolC_any,PBP_any,PBP2,PBP4,OmpK36_non_syn,'OmpK35-25%',"OmpK36_c25t"  ,      OmpK36_truncation_kleborate,OmpK36_intergenic,OmpK36_putative_function_altering,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_promoter_IS)
+
+rownames(canonical_hits) <- canonical_hits$isolate_no
+canonical_hits <- canonical_hits %>%.[match(as.vector(tr$tip.label), .$isolate_no),]
 
 saveRDS(canonical_hits,"./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
 write_csv(canonical_hits,"./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.csv")

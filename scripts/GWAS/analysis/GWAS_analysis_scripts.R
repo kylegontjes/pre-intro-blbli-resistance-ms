@@ -386,7 +386,7 @@ freq_plot <- function(hits_data){
 
 # NN Data
 generate_nn_melt_data <- function(variable,nn_data){
-  NN_data <- nn_data[[variable]][['nn_comps_with_variant']]   %>% mutate(locus_tag = rep(variable,nrow(.))) %>% select(locus_tag,MVB_num_log_2_diff,IR_num_log_2_diff)
+  NN_data <- nn_data[[variable]][['nn_comps_with_variant']]   %>% mutate(locus_tag = rep(variable,nrow(.))) %>% select(locus_tag,IR_num_log_2_diff,MVB_num_log_2_diff)
   nn_data_melt <- NN_data %>% reshape2::melt()
   nn_data_melt$locus_tag <-  gsub("_1|_2|_1.2|_2.2|_3|_3.2","",nn_data_melt$locus_tag)
   return(nn_data_melt)

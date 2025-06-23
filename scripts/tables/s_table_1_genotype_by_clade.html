@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-02" />
+<meta name="date" content="2025-06-23" />
 
 <title>Supplemental Table 1: Clade-specific trends in the prevalence of carbapenem resistance-associated genotypes</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Table 1: Clade-specific trends
 in the prevalence of carbapenem resistance-associated genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-02</h4>
+<h4 class="date">2025-06-23</h4>
 
 </div>
 
@@ -625,8 +625,10 @@ tn4401 &lt;- c(&quot;Tn4401a&quot;,&quot;Tn4401b&quot;,&quot;Tn4401d&quot;,&quot
 s_table_1 &lt;- convert_tableone_into_df(dataset = df,vars=c(carbapenem,bla_genes,tn4401),factorVars = c(carbapenem,bla_genes,tn4401),strata=&quot;clade_I&quot;,outcome_names = c(&quot;Clade I&quot;,&quot;Clade II&quot;),exact=exact)
 s_table_1$Variable &lt;- gsub(&quot; \\= 1&quot;,&quot;&quot;,s_table_1$Variable) %&gt;% gsub(&quot; \\(|\\)|\\%&quot;,&quot;&quot;,.) 
 
-s_table_1$Variable &lt;- recode(s_table_1$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T mutation in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
+s_table_1$Variable &lt;- recode(s_table_1$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T transition in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
+
 s_table_1 &lt;-  s_table_1 %&gt;% as.data.frame
+
 favorite_kable(s_table_1)</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
@@ -668,7 +670,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-C25T mutation in ompK36
+C25T transition in ompK36
 </td>
 <td style="text-align:left;">
 131 (31.8)

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-02" />
+<meta name="date" content="2025-06-23" />
 
 <title>table_1_carbapenem_resistance_genotypes</title>
 
@@ -576,7 +576,7 @@ display: none;
 
 <h1 class="title toc-ignore">table_1_carbapenem_resistance_genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-02</h4>
+<h4 class="date">2025-06-23</h4>
 
 </div>
 
@@ -614,7 +614,7 @@ Sys.info()</code></pre>
                                                                                      effective_user 
                                                                                          &quot;kgontjes&quot; </code></pre>
 <pre class="r"><code>sessionInfo() </code></pre>
-<pre><code>R version 4.5.0 (2025-04-11)
+<pre><code>R version 4.5.1 (2025-06-13)
 Platform: x86_64-apple-darwin20
 Running under: macOS Sequoia 15.5
 
@@ -640,17 +640,17 @@ other attached packages:
 loaded via a namespace (and not attached):
  [1] sass_0.4.10        generics_0.1.4     xml2_1.3.8         stringi_1.8.7     
  [5] lattice_0.22-7     hms_1.1.3          digest_0.6.37      magrittr_2.0.3    
- [9] evaluate_1.0.3     grid_4.5.0         timechange_0.3.0   RColorBrewer_1.1-3
+ [9] evaluate_1.0.3     grid_4.5.1         timechange_0.3.0   RColorBrewer_1.1-3
 [13] fastmap_1.2.0      jsonlite_2.0.0     Matrix_1.7-3       DBI_1.2.3         
 [17] survival_3.8-3     viridisLite_0.4.2  scales_1.4.0       jquerylib_0.1.4   
-[21] cli_3.6.5          mitools_2.4        rlang_1.1.6        splines_4.5.0     
-[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.10        tools_4.5.0       
+[21] cli_3.6.5          mitools_2.4        rlang_1.1.6        splines_4.5.1     
+[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.10        tools_4.5.1       
 [29] tzdb_0.5.0         hues_0.2.0         colorspace_2.1-1   vctrs_0.6.5       
 [33] R6_2.6.1           lifecycle_1.0.4    pkgconfig_2.0.3    pillar_1.10.2     
 [37] bslib_0.9.0        gtable_0.3.6       glue_1.8.0         Rcpp_1.0.14       
 [41] systemfonts_1.2.2  xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
 [45] farver_2.1.2       htmltools_0.5.8.1  survey_4.4-2       rmarkdown_2.29    
-[49] svglite_2.1.3      compiler_4.5.0    </code></pre>
+[49] svglite_2.1.3      compiler_4.5.1    </code></pre>
 <pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
 canonical &lt;- readRDS(&quot;./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS&quot;)
 
@@ -666,7 +666,7 @@ exact &lt;-  c(&quot;OmpK36TD&quot;,&#39;OmpK36_truncation_kleborate&#39;,&quot;
 table_1 &lt;- cbind(blbli_canonical[,c(1,2,4,3,5)]) %&gt;% `rownames&lt;-`(NULL) 
 table_1$Variable &lt;-gsub(&quot; = 1&quot;,&quot;&quot;,table_1$Variable) %&gt;% gsub(&quot; \\(|\\)|\\%&quot;,&quot;&quot;,.) 
 
-table_1$Variable &lt;- recode(table_1$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T mutation in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
+table_1$Variable &lt;- recode(table_1$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T transition in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
 
 favorite_kable(table_1)  </code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
@@ -709,7 +709,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-C25T mutation in ompK36
+C25T transition in ompK36
 </td>
 <td style="text-align:left;">
 131 (31.8)
