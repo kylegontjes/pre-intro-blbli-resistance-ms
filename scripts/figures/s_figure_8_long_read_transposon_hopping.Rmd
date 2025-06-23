@@ -72,15 +72,15 @@ df$KPC_plasmid <- relevel(df$KPC_plasmid,ref = "No KPC Plasmid")
 # Long read data
 
 ```{r}
-blast_lr <- read.delim("./data/KPC_blast_ONT/KPC_blast_master_ONT.txt",sep = ' ') #%>% subset
-blast_lr$contig <- blast_lr$qseqid %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,3:4]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
-blast_lr$element_symbol <- ifelse(grepl("KPC-2",blast_lr$sseqid),"KPC-2",ifelse(grepl("KPC-3",blast_lr$sseqid),"KPC-3",ifelse(grepl("KPC-5",blast_lr$sseqid),"KPC-5","Other")))
-blast_lr$gene <- blast_lr$element_symbol
+blast_lr <- read.delim("./data/tn4401_blast_hybrid/tn4401_blast_hybrid_master.txt",sep = ' ')
+blast_lr$contig <- blast_lr$qseqid %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,4:5]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+blast_lr$element_symbol <- blast_lr$sseqid 
+blast_lr$isolate_no <-  gsub("_flye_medaka_polypolish","",blast_lr$isolate_no)
 
-mobtyper_lr <- read.delim("./data/mobsuite_ONT/mobtyper_results_ONT.txt")  
-mobcontigs_lr <- read.delim("./data/mobsuite_ONT/mobsuite_contig_report_ONT.txt")
-mobcontigs_lr$contig <- mobcontigs_lr$contig_id%>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,3:4]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
-mobcontigs_lr$isolate_no <- gsub("_medaka","",mobcontigs_lr$sample_id)
+mobtyper_lr <- read.delim("./data/mobsuite_hybrid/mobtyper_results_hybrid.txt")  
+mobcontigs_lr <- read.delim("./data/mobsuite_hybrid/mobsuite_contig_report_hybrid.txt")
+mobcontigs_lr$contig <- mobcontigs_lr$contig_id%>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,4:5]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+mobcontigs_lr$isolate_no <- gsub("_flye_medaka_polypolish","",mobcontigs_lr$sample_id)
 
 KPC_data <- left_join(blast_lr,mobcontigs_lr)
 lr_KPC_cluster <-  distinct(KPC_data %>% select(isolate_no,element_symbol,primary_cluster_id,mash_nearest_neighbor)) %>% `colnames<-`(c("isolate_no","KPC gene","KPC_cluster_lr","KPC_plasmid_lr"))
@@ -91,19 +91,19 @@ lr_isolates <- left_join(lr_isolates,lr_KPC_cluster)
 # Read in data
 
 ```{r}
-kpc_contigs <- blast_lr %>% subset(gene  %in% c('KPC',"KPC-2","KPC-3","KPC-5")) %>% select(isolate_no,contig,gene) %>% distinct
+kpc_contigs <- blast_lr %>% subset(element_symbol  =='Tn4401b-1') %>% select(isolate_no,contig,element_symbol) %>% distinct
 
-contig_data <- mobcontigs_lr %>% select(isolate_no,contig,primary_cluster_id,mash_nearest_neighbor,size) %>% left_join(kpc_contigs)
+contig_data <- mobcontigs_lr %>% select(isolate_no,contig,primary_cluster_id,mash_nearest_neighbor,size) %>% left_join(kpc_contigs) 
 contig_data$primary_cluster_id <- ifelse(contig_data$primary_cluster_id == "-","Chromosome",contig_data$primary_cluster_id) 
-contig_data$contig_name <- paste0(contig_data$contig,"-",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor,"-",contig_data$gene,"-",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.)
+contig_data$contig_name <- paste0(contig_data$contig,"-",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor,"-",contig_data$element_symbol,"-",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.)
 ```
 
 # tn4401 data
 
 ```{r}
-tn4401_blast <- read.delim("./data/tn4401_blast_ONT/tn4401_blast_ONT_master.txt",sep = "")
-tn4401_blast$isolate_no <- gsub("_lr","",tn4401_blast$isolate_no )
-tn4401_blast$qseqid <- str_split(tn4401_blast$qseqid,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,3:4]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+tn4401_blast <- read.delim("./data/tn4401_blast_hybrid/tn4401_blast_hybrid_master.txt",sep = "")
+tn4401_blast$isolate_no <- gsub("_flye_medaka_polypolish","",tn4401_blast$isolate_no )
+tn4401_blast$qseqid <- str_split(tn4401_blast$qseqid,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,4:5]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
 ```
 
 # Create figures
@@ -122,15 +122,13 @@ library(ggplot2)
   return(blast_df)
  }
  
- 
-
 make_plots <- function(filename,contig_data,blast_data){
   coords <- read_delim(filename, 
                        delim = "\t", escape_double = FALSE, 
                        trim_ws = TRUE, skip = 3,col_names = T) %>% as.data.frame
   coords$`[TAGS]` <- gsub("\\t"," ",coords$`[TAGS]`)
-  coords$map1_chr <- str_split(coords$`[TAGS]`," ",simplify=T) %>% .[,1] %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,3:4]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
-  coords$map2_chr <- str_split(coords$`[TAGS]`," ",simplify=T) %>% .[,2] %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,3:4]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+  coords$map1_chr <- str_split(coords$`[TAGS]`," ",simplify=T) %>% .[,1] %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,4:5]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+  coords$map2_chr <- str_split(coords$`[TAGS]`," ",simplify=T) %>% .[,2] %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,4:5]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
   coords$map1_name <- gsub(".coords","",filename) %>% str_split(.,"_",simplify=T) %>% .[,1:2] %>% paste0(collapse="_")
   coords$map2_name <- gsub(".coords","",filename) %>% str_split(.,"_",simplify=T) %>% .[,3:4] %>% paste0(collapse="_")
   coords$map1_pos <- coords$`[S1]`
@@ -199,46 +197,35 @@ paste0("Plasmid profile")
 df$lr_isolates <- ifelse(df$isolate_no %in% lr_isolates,df$isolate_no,"Not sequenced")
 rownames(df) <- df$isolate_no
 
-
-
 po <- gheatmap(ggtree(tr %>% keep.tip(., df %>% subset(clade_I=='Clade I') %>% .$isolate_no)),df %>% select(blbli_dich_num,AA552_KPC,AA552_non_KPC,AA018_KPC),color=NULL,width = 0.8,colnames_position = 'top',colnames_angle = 90, colnames_offset_y = 0.25, hjust = 0,low='white',high='black')
 p0.1 <- po+ggnewscale::new_scale_fill()
 
 gheatmap(p0.1,df %>% select(lr_isolates),color=NULL,offset = 0.00025,width=0.2,colnames_position='top',colnames_angle = 90, colnames_offset_y = 0.25, hjust = 0) + ylim(NA,200) + scale_fill_manual(values = c("white",hues::iwanthue(7)))
-
-lapply(lr_isolates_CI,FUN=function(x){ 
-  contig_data_df <- contig_data %>% subset(isolate_no ==x)  
-  AA552 <- ifelse(sum(contig_data_df$primary_cluster_id %in% "AA552"),"Yes","No")
-  AA018 <- ifelse(sum(contig_data_df$primary_cluster_id %in% "AA018"),"Yes","No")
-  KPC_plasmid <- subset(contig_data_df,grepl("KPC",gene)) %>% .$primary_cluster_id
-  data.frame(isolate_no=x,AA018,AA552,KPC_plasmid)
-}) %>% do.call(rbind,.)
-
-
+ 
 phylo_dist <- readRDS("./data/tree/phylo_dist.RDS") %>% as.data.frame %>% subset(rownames(.) %in% df$isolate_no) %>% select(any_of(df$isolate_no)) %>% as.matrix 
 
 variant_dist <- readRDS("./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS")  
 
-phyloAMR::nearest_neighbor_algorithm("PCMP_H276",phylogenetic_distance = phylo_dist,variant_distance = variant_dist,metadata = df %>% subset(isolate_no %in% c(lr_isolates)),annotate = F,comparison = T,comparison_feature = 'AA018_KPC')
+phyloAMR::nearest_neighbor_algorithm("PCMP_H276",phylogenetic_distance = phylo_dist,tip_name_variable = 'isolate_no',variant_distance = variant_dist,metadata = df %>% subset(isolate_no %in% c(lr_isolates)),annotate = F,comparison = T,comparison_feature = 'AA018_KPC')
 
-phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_dist,variant_distance = variant_dist,metadata = df %>% subset(isolate_no %in% c(lr_isolates)),annotate = F,comparison = T,comparison_feature = 'AA018_KPC')
+phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_dist,tip_name_variable = 'isolate_no',variant_distance = variant_dist,metadata = df %>% subset(isolate_no %in% c(lr_isolates)),annotate = F,comparison = T,comparison_feature = 'AA018_KPC')
  
 ```
 
 # Main figure
 
-```{r,fig.width=15.5,fig.height=11.5}
-setwd("./data/mummer_ONT/")
+```{r,fig.width=17,fig.height=13}
+setwd("./data/mummer_hybrid/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 tn4401_hopping
 
-ggsave("../../figures/s_figure_8.png",plot=tn4401_hopping,width = 13.5,height = 11.5)
+ggsave("../../figures/s_figure_8.png",plot=tn4401_hopping,width = 17,height = 13)
 ```
 
 # Alternative
 
-```{r,fig.width=18.5,fig.height=18.5}
-setwd("./data/mummer_ONT/")
+```{r,fig.width=18,fig.height=20}
+setwd("./data/mummer_hybrid/")
 tn4401_hopping_2 <- make_plots(filename = 'PCMP_H148_PCMP_H307.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 tn4401_hopping_2
 ```

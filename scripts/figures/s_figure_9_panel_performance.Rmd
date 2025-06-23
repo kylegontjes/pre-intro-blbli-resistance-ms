@@ -88,19 +88,40 @@ pass_nn_qc <- subset(nn_data,nn_qc=="yes")
 pass_nn_qc$variable %>% sort
 ```
 
+
+# Implement another marginal statistics thresholding approach to identify discriminatory genotypes
+```{r}
+diagnostic_stats <- lapply(pass_nn_qc$variable , FUN=function(x){
+  get_marginal_stats(df[[x]],df$blbli_dich_num)
+}) %>% do.call(rbind.data.frame,.)  %>% mutate(comparitor = pass_nn_qc$variable )
+
+diagnostic_stats %>% favorite_kable()
+
+diagnostic_stats %>% subset(spec > 0.925 & accuracy >.80) %>% .$comparitor
+```
+
 # Panel
 ```{r}
-known_hits <- c("OmpK36_putative_function_altering","OmpK36_promoter_IS",'OmpK36_truncation_kleborate',"PBP_any","RamA")  
+known_hits <- diagnostic_stats %>% subset(spec > 0.925 & accuracy >.80) %>% .$comparitor %>% subset(.!='OmpK36_non_syn')
 
 ## Known Hits
 df$known <- get_pattern(known_hits,df) %>% .$presence
+novel_continuous <- gwas_table %>% subset(resistance_category == "Modulator" & nn_qc=="Yes" & c(IR_num_log_2_diff_median >1 | MVB_num_log_2_diff_median>1)) %>% .$genotype  %>% subset(!. %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%",'OmpK36_putative_function_altering','OmpK36GD','OmpK36_loop3_insertion'))
 novel_synchronous <-  gwas_table %>% subset(resistance_category != "Modulator" & nn_qc=="Yes") %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%")) %>% .$genotype %>% subset(!.%in%c('AA018'))
-df$novel_synchronous <- get_pattern(novel_synchronous,df) %>% .$presence
-df$AA552 <- get_pattern("AA552",df) %>% .$presence
+df$novel_continuous <- get_pattern(novel_continuous,df) %>% .$presence 
+df$novel_synchronous <- get_pattern(novel_synchronous,df) %>% .$presence 
+
+paste0("No contribution of novel continuous hits to explaining58 resistant strains: ") 
+df_res <- subset(df,blbli_dich_num==1)
+table(df_res$novel_continuous,df_res$known,dnn=c("Novel Continuous Hits","Known Hits"))
+
+
+df$novel_GWAS <- get_pattern(c(novel_synchronous,novel_continuous),df) %>% .$presence 
+df$AA552 <- get_pattern("AA552",df) %>% .$presence 
 df$known_ST258_GWAS <- get_pattern(c(known_hits,novel_synchronous),df) %>% .$presence 
 df$blbli_dich_num <- as.numeric(df$blbli_dich_num)
  
-panels <- c("known","novel_synchronous","known_ST258_GWAS")
+panels <- c("known","novel_GWAS","known_ST258_GWAS")
 
 ## Overall
 BLBLI_exp_panel <- apply(df %>% select(panels),2,get_marginal_stats,outcome=df$blbli_dich_num) %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("ST258",3)),panels=panels) 
@@ -118,7 +139,7 @@ BLBLI_panel$sens <- BLBLI_panel$sens *100
 BLBLI_panel$spec <- BLBLI_panel$spec *100
 BLBLI_panel$ppv <- BLBLI_panel$ppv *100
 BLBLI_panel$npv <- BLBLI_panel$npv *100
-BLBLI_panel$panels <- factor(BLBLI_panel$panels,levels = c("known","novel_synchronous","AA552","known_ST258_GWAS","known_ST258_GWAS_AA552"))
+BLBLI_panel$panels <- factor(BLBLI_panel$panels,levels = c("known","novel_GWAS","known_ST258_GWAS"))
 BLBLI_panel$population <- factor(BLBLI_panel$population,levels = c("ST258","CI","CII"))  
 ```
 
@@ -134,11 +155,11 @@ D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(st
 ```
 
 ```{r,fig.height=10.625,fig.width=10.625}
-plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A","B","C","D"),ncol=2,label_size = 16,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
+plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A","B","C","D"),ncol=2,label_size = 18,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
 
 fig_legend <- get_legend(A )
 
-s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.05))
+s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.075))
 s_figure_9
 ```
 

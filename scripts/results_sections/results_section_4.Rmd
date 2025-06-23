@@ -3,6 +3,7 @@ title: "Convergence-based genome-wide association study identified additional re
 output: html_document
 date: "`r Sys.Date()`"
 ---
+
 ```{r setup, include=FALSE}
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
@@ -68,6 +69,9 @@ df <- left_join_matrix(model3_burden,df,"_3")
 df <- left_join_matrix(model3.2_burden,df,"_3.2")
 df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
 df <- left_join(df,depth %>% mutate(isolate_no = rownames(.)))
+
+# Easy variable for blaKPC copy numebr
+df$KPC_log_2 <- log2(df$KPNIH1_RS28775_chr_median_norm)
 ```
 
 # Overview
@@ -131,122 +135,7 @@ lapply(continuous_pass$genotype,FUN=enrichment,df) %>% do.call(rbind,.) %>% favo
 continuous_pass %>% select(locus_tag,product,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes)  %>% favorite_kable
 ```
 
-# AA552 plasmid
-```{r}
-gwas_table %>% subset(genotype %in% c("AA018","AA552")) %>% select(locus_tag,product,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes) %>% favorite_kable 
-
-plasmid_table <- table(df$AA552_KPC,df$blbli_dich_num) 
-plasmid_table
-prop.table(plasmid_table,margin=2)
-chisq.test( plasmid_table) 
-```
-
-# Log-2 KPC association
-
-## OmpK36 GD insertion story
-```{r} 
-convert_tableone_into_df(df,c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"),strata="clade_I",outcome_names = c("Clade I","Clade II"),factorVars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"))
- 
-# Simple ompK36 status
-df$OmpK36_mutations_simple <- ifelse(df$OmpK36_putative_function_altering==1 | df$OmpK36_truncation_kleborate==1 ,"Putative function-altering variant (PFAV)",
-                                     ifelse(df$OmpK36_L3_mutations==1, "Loop 3 insertion","No loop 3 insertion or PFAV"))
-
-df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("No loop 3 insertion or PFAV","Loop 3 insertion","Putative function-altering variant (PFAV)")))
-# Easy variable
-df$KPC_log_2 <- log2(df$KPNIH1_RS28775_chr_median_norm)
-```
-
-```{r}
-df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
-df_w_KPC$OmpK36_mutations_simple <- relevel(df_w_KPC$OmpK36_mutations_simple,ref = "No loop 3 insertion or PFAV") 
-paste0("KPC w/ MVB or IR")
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary 
-
-
-paste0("IR w/ KPC")
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
-```
-### Investigation across clades
-```{r}
-df_w_KPC_CI <- df_w_KPC %>% subset(clade_I == "Clade I")
-df_w_KPC_CII <- df_w_KPC %>% subset(clade_I != "Clade I")
-# Clade I
-paste0("KPC w/ MVB or IR")
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary 
-
-
-paste0("IR w/ KPC")
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
-```
-
-
-
-
-
-
-```{r}
-df_CI <- df %>% subset(clade_I == "Clade I")
-convert_tableone_into_df(df_CI,vars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"),factorVars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"))
- 
-df_w_KPC_CI <- df_w_KPC %>% subset(clade_I == "Clade I")
-df_w_KPC_CII <- df_w_KPC %>% subset(clade_I != "Clade I")
- 
-paste0("MVB w/ KPC")
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CII) %>% summary 
-paste0("MVB w/ KPC controlling for ompk36 status")
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %>% summary 
-paste0("MVB w/ KPC modeling ompk36 status as an interaction term")
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% summary 
-
-paste0("IR w/ KPC")
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CII) %>% summary
-paste0("IR w/ KPC controlling for ompk36 status")
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %>% summary
-paste0("IR w/ KPC modeling ompk36 status as an interaction term")
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% summary
-```
-
-# FJ223607 Story
-## Validation of hits
-```{r}
-gwas_table %>% subset(genotype %in% c("AA018","AA552")) %>% select(locus_tag,product,MVB_num_log_2_diff_increase_prop,MVB_num_log_2_diff_decrease_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_log_2_diff_increase_prop,IR_num_log_2_diff_decrease_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range,genotype,sig_tests,sig_phenotypes) %>% favorite_kable 
-```
-
-```{r}
-convert_tableone_into_df(df_CI,vars=c("AA018","AA552"),factorVars = c("AA018","AA552"))
-enrichment("AA552",df_CI) 
-
-wilcox.test(df_CI[,"AA552"],df_CI[,"KPC_log_2"],alternative='two.sided')
-
-enrichment("AA552",df_CI)
-```
-
-```{r}
-table(df_CI$AA018_KPC,df_CI$AA552_non_KPC)
-convert_tableone_into_df(df_CI,"AA552_non_KPC",strata="AA018_KPC",factorVars = "AA552_non_KPC",outcome_names = c("Absent","Present"))
-convert_tableone_into_df(df_CI,"AA018_non_KPC",strata="AA552_KPC",factorVars = "AA018_non_KPC",outcome_names = c("Absent","Present"))
-```
-# Synchronous
+# Synchronous hits
 ```{r}
 synchronous <- gwas_table %>% subset(resistance_category != "Modulator")
 
@@ -260,37 +149,26 @@ synchronous_pass %>% select(locus_tag,gene,product,blbli_res_freq,blbli_sus_freq
 
 novel_synchronous <- synchronous_pass %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805")) %>% .$genotype
 ```
-### AA552
-```{r}
-paste0("Nearest neigbor data")
-AA552_data <- synchronous_pass %>% subset(locus_tag == "AA552")
-AA552_data %>% select(blbli_sus_freq,blbli_sus_prop,blbli_res_freq,blbli_res_prop,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_diff_increase_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_diff_increase_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range)
 
-paste0("Frequency and enr")
-convert_tableone_into_df(df,vars = "AA552",strata='blbli_dich',outcome_names = c("Susceptible","Resistant"),factorVars='AA552')
+# AA552 plasmid
+```{r} 
+plasmid_table <- table(df$AA552_KPC,df$blbli_dich_num) 
+plasmid_table
+prop.table(plasmid_table,margin=2)
+chisq.test( plasmid_table) 
 ```
 
 ```{r}
-paste0("Nearest neigbor data")
-AA018_data <- synchronous_pass %>% subset(locus_tag == "AA018")
-AA018_data %>% select(blbli_sus_freq,blbli_sus_prop,blbli_res_freq,blbli_res_prop,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,MVB_num_diff_increase_prop,MVB_num_log_2_diff_median,MVB_num_log_2_diff_range,IR_num_diff_increase_prop,IR_num_log_2_diff_median,IR_num_log_2_diff_range)
+df_CI <- subset(df,clade_I == 'Clade I')
+convert_tableone_into_df(df_CI,vars=c("AA018","AA552"),factorVars = c("AA018","AA552"))
 
-paste0("Frequency and enr")
-convert_tableone_into_df(df,vars = "AA018",strata='blbli_dich',outcome_names = c("Susceptible","Resistant"),factorVars='AA018')
-```
-## AA018 vs. AA552
-```{r}
-df_CI <- df %>% subset(clade_I=="Clade I")
-
-convert_tableone_into_df(df_CI,vars = c("AA552","AA018"),strata='blbli_dich_num',outcome_names = c("Susceptible","Resistant"),factorVars=c("AA552","AA018"))
-
-enrichment("AA552",df_CI) 
+enrichment("AA552",df_CI)
 
 wilcox.test(df_CI[,"AA552"],df_CI[,"KPC_log_2"],alternative='two.sided')
+```
 
-paste0("Plasmid differences: ")
-
-convert_tableone_into_df(df_CI,vars = c("AA552_non_KPC"),strata='AA018_KPC',outcome_names = c("Absent","Present"),factorVars=c("AA552_non_KPC"))
-
-convert_tableone_into_df(df_CI,vars = c("AA018_non_KPC"),strata='AA552_KPC',outcome_names = c("Absent","Present"),factorVars=c("AA018_non_KPC"))
+```{r}
+table(df_CI$AA018_KPC,df_CI$AA552_non_KPC)
+convert_tableone_into_df(df_CI,"AA552_non_KPC",strata="AA018_KPC",factorVars = "AA552_non_KPC",outcome_names = c("Absent","Present"))
+convert_tableone_into_df(df_CI,"AA018_non_KPC",strata="AA552_KPC",factorVars = "AA018_non_KPC",outcome_names = c("Absent","Present"))
 ```

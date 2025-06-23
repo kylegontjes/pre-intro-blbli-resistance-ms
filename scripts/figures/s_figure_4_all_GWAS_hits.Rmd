@@ -47,7 +47,7 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes)
 s_figure_4.A_tb$locus_tag <- recode(s_figure_4.A_tb$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 s_figure_4.A_tb$gene <- ifelse(grepl(pattern = 'ompK36',s_figure_4.A_tb$locus_tag) | s_figure_4.A_tb$locus_tag =='KPNIH1_RS18665',"ompK36",s_figure_4.A_tb$gene) %>% {ifelse(is.na(.),"",.)}
-s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "KPNIH1_RS18100","mdtA/muxA family multidrug efflux transporter periplasmic adaptor subunit",s_figure_4.A_tb$product)
+s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "KPNIH1_RS18100","MdtA/MuxA family multidrug efflux RND \ntransporter periplasmic adaptor subunit",s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$gene=='ompK36','porin OmpC',s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(grepl(pattern = 'KPC',s_figure_4.A_tb$locus_tag),"blaKPC-associated plasmid",s_figure_4.A_tb$product)
 
@@ -86,19 +86,19 @@ nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>%
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(s_figure_4.A_tb$locus_tag)))  
       
-s_figure_4.D <- nn_plot(nn_data_melt)   + s_figure_4_descriptive_plot_theme
+s_figure_4.D <- nn_plot(nn_data_melt) + s_figure_4_descriptive_plot_theme
 s_figure_4.D
 ```
 
 # Merge figure
 ```{r,fig.height=20,fig.width=25}
-s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","D"),label_size = 24,align = "hv",label_x = -0.02)
-s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.675)) 
+s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","D"),label_size = 28,align = "hv",label_x = -0.02)
+s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 
 ```
 
 ```{r ,fig.height=17.25,fig.width=26}
-s_figure_4.FA <- plot_grid(s_figure_4.A,labels = "A",label_size=24,align = "hv")  
-s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,label_size = 24, rel_heights = c(0.325,1))   
+s_figure_4.FA <- plot_grid(s_figure_4.A,labels = "A",label_size=28,align = "hv")  
+s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,label_size = 28, rel_heights = c(0.35,1))   
 s_figure_4
 ```
 

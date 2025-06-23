@@ -47,7 +47,7 @@ cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labe
 potential_scale_general <- scale_fill_manual(breaks = c("Modulator","Mediator","None"),values=c("gray","#4d3227","white"),labels = c("Resistance Modulator","Resistance Mediator","None"),name="Genotype Category",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 5)) 
 
 # Panels
-panel_scale <- scale_fill_manual(breaks = c("known","novel_synchronous","AA552","known_ST258_GWAS","known_ST258_GWAS_AA552"),values=hues::iwanthue(5),labels = c("Known genotypes","Novel GWAS hits","AA552 KPC plasmid","Known + Novel GWAS","Known + GWAS + AA552 KPC Plasmid"),name="Genotype Panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
+panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Known genotypes","Novel GWAS hits","Known + Novel GWAS"),name="Genotype Panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
 
 # OmpK36 scale
 ompK36_colors <- c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB")
@@ -103,9 +103,9 @@ consistent_theme_sfigure_3 <- theme(legend.position = 'bottom',legend.direction=
                                legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
 consistent_theme_sfigure_6 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
-                                    legend.justification = "center", legend.key = element_rect(colour = c('black')),
-                                    legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") ,
-                                    legend.title = element_text(size=22),legend.text = element_text(size=20),
+                                    legend.justification = "center", legend.key = element_rect(colour = c('white')),
+                                    legend.box.spacing = unit(.000005, "cm"),legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
+                                    legend.title = element_text(size=20),legend.text = element_text(size=18),
                                     legend.title.align=0.5,legend.text.align = 0,
                                     legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 

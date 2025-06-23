@@ -1,0 +1,20 @@
+# General information
+samples: config/sample_tn4401_hybrid.tsv
+prefix: tn4401_blast_hybrid
+
+# Input queries directory
+queries: /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/tn4401_blast_hybrid/GeneScreener/assemblies
+
+# Data directory
+database_directory: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/tn4401_blast_hybrid/database
+database_name: Tn4401b-1
+
+# Blast parameters
+dbversion: 5 
+dbtype: nucl
+outfmt: "\"6 qseqid sseqid slen length pident nident mismatch gapopen gaps qstart qend sstart send evalue\""
+evalue: 1e-10
+culling_limit: 1
+
+# R parameters
+directory: /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/tn4401_blast_hybrid/GeneScreener/

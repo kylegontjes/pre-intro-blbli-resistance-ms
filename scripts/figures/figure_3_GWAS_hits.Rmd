@@ -16,7 +16,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ggnewscale","ape","phytools","phyloAMR","gridExtra")
+packages <- c("tidyverse","cowplot","ggtree","ggnewscale","ape","phytools","phyloAMR","gridExtra",'ggtext')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -48,7 +48,7 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 figure_3.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes)
 figure_3.A_tb$locus_tag <- recode(figure_3.A_tb$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 figure_3.A_tb$gene <- ifelse(grepl(pattern = 'ompK36',figure_3.A_tb$locus_tag) | figure_3.A_tb$locus_tag =='KPNIH1_RS18665',"ompK36",figure_3.A_tb$gene) %>% {ifelse(is.na(.),"",.)}
-figure_3.A_tb$product <- ifelse(figure_3.A_tb$locus_tag == "KPNIH1_RS18100","mdtA/muxA family multidrug efflux transporter periplasmic adaptor subunit",figure_3.A_tb$product)
+figure_3.A_tb$product <- ifelse(figure_3.A_tb$locus_tag == "KPNIH1_RS18100","MdtA/MuxA family multidrug efflux RND \ntransporter periplasmic adaptor subunit",figure_3.A_tb$product)
 figure_3.A_tb$product <- ifelse(figure_3.A_tb$gene=='ompK36','porin OmpC',figure_3.A_tb$product)
 figure_3.A_tb$product <- ifelse(grepl(pattern = 'KPC',figure_3.A_tb$locus_tag),"blaKPC-associated plasmid",figure_3.A_tb$product)
 
@@ -90,16 +90,16 @@ figure_3.D <- nn_plot(nn_data_melt)   + figure_3_descriptive_plot_theme
 
 # Merge figure
 ```{r,fig.height=20,fig.width=25}
-figure_3.FCD <- plot_grid(figure_3.C,figure_3.D ,nrow = 2,labels = c("C","D"),label_size = 24,align = "hv",label_x = -0.02)
-figure_3.FCDB <- plot_grid(figure_3.FB,figure_3.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.65)) 
+figure_3.FCD <- plot_grid(figure_3.C,figure_3.D ,nrow = 2,labels = c("C","D"),label_size = 28,align = "hv",label_x = -0.02)
+figure_3.FCDB <- plot_grid(figure_3.FB,figure_3.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 
 ```
 
 ```{r ,fig.height=17.5,fig.width=26}
-figure_3.FA <- plot_grid(figure_3.A,labels = "A",label_size=24,align = "hv")  
-figure_3 <- plot_grid(figure_3.FA,figure_3.FCDB,labels = c("",""),nrow=2,label_size = 24, rel_heights = c(0.25,1))   
+figure_3.FA <- plot_grid(figure_3.A,labels = "A",label_size=28,align = "hv")  
+figure_3 <- plot_grid(figure_3.FA,figure_3.FCDB,labels = c("",""),nrow=2,label_size = 28, rel_heights = c(0.275,1))   
 figure_3
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = figure_3, filename = './figures/figure_3.png', width = 85.5, height = 50,limitsize=FALSE)
+ggsave(plot = figure_3, filename = './figures/figure_3.png', width = 26, height = 17.5,limitsize=FALSE, bg='white')
 ```

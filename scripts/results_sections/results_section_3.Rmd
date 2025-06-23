@@ -68,6 +68,18 @@ pass_nn_qc <- subset(nn_data,nn_qc=="yes")
 pass_nn_qc$variable %>% sort
 ```
 
+# Implement another marginal statistics thresholding approach to identify discriminatory genotypes
+```{r}
+diagnostic_stats <- lapply(pass_nn_qc$variable , FUN=function(x){
+  get_marginal_stats(df[[x]],df$blbli_dich_num)
+}) %>% do.call(rbind.data.frame,.)  %>% mutate(comparitor = pass_nn_qc$variable )
+
+diagnostic_stats %>% favorite_kable()
+
+diagnostic_stats %>% subset(spec > 0.925 & accuracy >.80) %>% .$comparitor
+```
+
+
 ```{r}
 convert_tableone_into_df(df,vars=c('OmpK36_c25t',"OmpK36_L3_mutations"),strata='clade_I',factorVars = c('OmpK36_c25t',"OmpK36_L3_mutations"),outcome_names = c("Clade I","Clade II")) %>% gontjesr::favorite_kable()
 ```
