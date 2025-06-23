@@ -38,7 +38,7 @@ clade_colors_scale <- scale_fill_manual(values=clade_colors, name="Clade", guide
 clade_colors_scale_v <- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(order=1,ncol=1, title.position = "top", label.position = "right"))
 
 ### Clustering
-cluster_colors <- c("No feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink')
+cluster_colors <- c("No feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink',"Cluster 7" = "#F0E442","Cluster 8" = '#00CED1')
 cluster_labels <- names(cluster_colors) 
 cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels,name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
 cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels,name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
@@ -135,11 +135,10 @@ figure_1_format <-   theme(legend.position = "bottom",
 
 ### Figure 2 (Histogram)
 figure_2_format <- theme(legend.position = "bottom",
-                         axis.text =   element_text(size=18,color="black"),
-                         axis.title = element_text(size = 20,color="black"),
-                         legend.text =   element_text(size=18,color="black"),
-                         legend.title = element_text(size = 20,color="black"),
-                         plot.title = element_text(size = 20,color="black")
+                         axis.text =   element_text(size=12,color="black"),
+                         axis.title = element_text(size = 14,color="black"),
+                         legend.text =   element_text(size=12,color="black"),
+                         legend.title = element_text(size = 14,color="black") 
 ) 
 
 # Figure 4 Format

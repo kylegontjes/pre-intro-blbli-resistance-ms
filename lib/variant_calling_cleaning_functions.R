@@ -48,13 +48,6 @@ clean_snpkit_output_INDEL <- function(code,allele,tr){
   return(Indel_parsed_post_processing)
 }
 
-dna_matrix <- function(fa,reference){
-  ape::dist.dna(x = fa, # DNAbin object as read in above
-                as.matrix = TRUE, # return as matrix
-                model = "N", # count pairwise distances
-                pairwise.deletion = TRUE # delete sites with missing data in a pairwise way
-  )%>%  as.data.frame %>% subset(rownames(.)!=paste0(reference)) %>% select(-all_of(reference))}
-
 # Functions to parse panISa output
 # panISa on GitHub: https://github.com/bvalot/panISa
 

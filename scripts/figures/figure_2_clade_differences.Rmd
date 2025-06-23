@@ -35,26 +35,43 @@ df$blbli_clustering_simple <- recode(df$blbli_asr_cluster_renamed,"No feature"="
 
 # Part 1 - MIC Histogram
 ```{r}
-fig2a <- create_MIC_histogram(df$MVB_log_2,df$clade_I,"Meropenem-Vaborbactam")  + scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
-        labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))     + ylim(NA,250) +figure_2_format + clade_colors_scale_v
+MIC_scale <-  scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
+        labels=c("≤0.25","0.5", "1","2","4","8","16","≥32")) 
+
+add_clade_median_values <- function(dataframe, variable, clade_variable) {
+  clade_I_median <- dataframe[dataframe[[clade_variable]] == "Clade I", variable] %>% median(na.rm = TRUE)
+  clade_II_median <- dataframe[dataframe[[clade_variable]] != "Clade I", variable] %>% median(na.rm = TRUE)
+  
+  list(
+    geom_vline(xintercept = clade_I_median, color = clade_colors[["Clade I"]], linetype = 3,size=1),
+    geom_vline(xintercept = clade_II_median, color = clade_colors[["Clade II"]], linetype = 3,size=1)
+  )
+}
+
+IR_intercepts <-  add_clade_median_values(df, "IR_log_2", "clade_I")
+
+fig2a <- create_MIC_histogram(df$IR_log_2,df$clade_I,"Imipenem-Relebactam") + ylim(NA,250)   +figure_2_format + clade_colors_scale_v   +MIC_scale + IR_intercepts[[1]] + IR_intercepts[[2]]
+
+MVB_intercepts <-  add_clade_median_values(df, "MVB_log_2", "clade_I")
+
+fig2c <- create_MIC_histogram(df$MVB_log_2,df$clade_I,"Meropenem-Vaborbactam")  + MIC_scale  + ylim(NA,250) +figure_2_format + clade_colors_scale_v + MVB_intercepts[[1]] + MVB_intercepts[[2]]
    
-fig2c <- create_MIC_histogram(df$IR_log_2,df$clade_I,"Imipenem-Relebactam")+ scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
-        labels=c("≤0.25","0.5","1","2","4","8","16","≥32"))    + ylim(NA,250)   +figure_2_format + clade_colors_scale_v
 ```
 
 # Part 2 - Resistance categories
 ```{r}
-MVB_clade_prop <- df %>% group_by(clade_I,MVB_cat)  %>%
-  dplyr::summarise(n = n()) %>%
-  mutate(freq = n / sum(n) *100) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))
 IR_clade_prop <- df %>% group_by(clade_I,IR_cat)  %>%
   dplyr::summarise(n = n()) %>%
   mutate(freq = n / sum(n)*100) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))
+
+MVB_clade_prop <- df %>% group_by(clade_I,MVB_cat)  %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n) *100) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))
 ```
 
 ```{r}
-fig2b <- MIC_prop_hist(MVB_clade_prop) + resistance_cat_scale_v + figure_2_format 
 fig2d <- MIC_prop_hist(IR_clade_prop) + resistance_cat_scale_v + figure_2_format 
+fig2b <- MIC_prop_hist(MVB_clade_prop) + resistance_cat_scale_v + figure_2_format 
 ```
 
 # Part 3 - Phylogenetic clustering of resistance
@@ -63,7 +80,7 @@ blbli_clade_phylo_prop <- df %>% subset(blbli_clustering_simple != "Susceptible"
   dplyr::summarise(n = n()) %>%
   mutate(freq = n / sum(n)) %>% `colnames<-`(c("clade_I","phenotype_cat","n","freq"))  
  
-blbli_clade_phylo_prop$phenotype_cat <- factor(blbli_clade_phylo_prop$phenotype_cat,levels = c("Singleton",paste0("Cluster ",1:6)))
+blbli_clade_phylo_prop$phenotype_cat <- factor(blbli_clade_phylo_prop$phenotype_cat,levels = c("Singleton",subset(blbli_clade_phylo_prop$phenotype_cat,blbli_clade_phylo_prop$phenotype_cat != "Singleton") %>% sort))
 
 
 fig2e <- MIC_prop_hist_count(blbli_clade_phylo_prop) + cluster_scale + figure_2_format  
@@ -71,7 +88,7 @@ fig2e <- MIC_prop_hist_count(blbli_clade_phylo_prop) + cluster_scale + figure_2_
 
 # Figure Compilation
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5}
-fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),fig2b  + theme(legend.position = "none"),"",fig2c + theme(legend.position = "none"),fig2d + theme(legend.position = "none") , fig2e+ theme(legend.position = "none"), ncol=3,rel_widths = c(1,0.45,0.45,1,0.45,0.45),labels = c("A","B","","C","D","E"),label_size = 22)
+fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),fig2b  + theme(legend.position = "none"),"",fig2c + theme(legend.position = "none"),fig2d + theme(legend.position = "none") , fig2e+ theme(legend.position = "none"), ncol=3,rel_widths = c(1,0.45,0.45,1,0.45,0.45),labels = c("A","B","","C","D","E"),label_size = 16)
 
 clade_legend <- get_legend(fig2a)
 resistance_legend <- get_legend(fig2b)
@@ -79,14 +96,14 @@ clade_phylo_legend <- get_legend(fig2e)
 
 fig2.legends <- cowplot::plot_grid(clade_legend,"",resistance_legend,"",clade_phylo_legend,ncol=5,align = "hv",rel_widths = c(1,0.25,1,0.25,1)) + theme(plot.margin = unit(c(t=-2.5, 2, b=-1,0 ), "cm"))
  
-figure_2 <-  cowplot::plot_grid(fig2_data,fig2.legends,ncol=1,rel_heights = c(1,0.15),align = "h")
+figure_2 <-  cowplot::plot_grid(fig2_data,fig2.legends,ncol=1,rel_heights = c(1,0.2),align = "h")
 ```
 
 # Figure
-```{r,message=F,echo=F,error=F,warning=F,fig.width=12.5,fig.height=9.25}
+```{r,message=F,echo=F,error=F,warning=F,fig.width=9,fig.height=7.2}
 figure_2
 ```
 
 ```{r}
-ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 12.5, height = 9.25)
+ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 9, height = 7.2)
 ```

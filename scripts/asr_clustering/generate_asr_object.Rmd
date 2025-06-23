@@ -30,9 +30,10 @@ tr <- read.tree("./data/tree/tree.treefile")
 df <- df %>% .[match(tr$tip.label,.$isolate_no),]  
 ```
 
-# Run phylosuite
+# Run phyloAMR
+## Chose to update to ER because it had better fit with the genotypic data
 ```{r}  
-asr_model <- phyloAMR::asr(df = df, tr = tr, tip_name_variable = "isolate_no", trait = 'blbli_dich_num', model = 'MF', node_states = "joint", upper_bound = 1e50, lower_bound = 1e-9, confidence_threshold =  NULL) 
+asr_model <- phyloAMR::asr(df = df, tr = tr, tip_name_variable = "isolate_no", trait = 'blbli_dich_num', model = 'ER', node_states = "joint", upper_bound = 1e50, lower_bound = 1e-9, confidence_threshold =  NULL) 
 
 saveRDS(asr_model,"./data/asr_clustering/blbli_asr.RDS")  
 ```

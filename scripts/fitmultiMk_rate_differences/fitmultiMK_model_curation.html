@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-04-10" />
+<meta name="date" content="2025-06-20" />
 
 <title>fitmultiMK_analyses</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">fitmultiMK_analyses</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-04-10</h4>
+<h4 class="date">2025-06-20</h4>
 
 </div>
 
@@ -383,10 +383,8 @@ library(phytools) </code></pre>
 
 Please cite:
 
-Guangchuang Yu, David Smith, Huachen Zhu, Yi Guan, Tommy Tsan-Yuk Lam.
-ggtree: an R package for visualization and annotation of phylogenetic
-trees with their covariates and other associated data. Methods in
-Ecology and Evolution. 2017, 8(1):28-36. doi:10.1111/2041-210X.12628
+Guangchuang Yu. Using ggtree to visualize data on tree-like structures.
+Current Protocols in Bioinformatics. 2020, 69:e96. doi:10.1002/cpbi.96
 
 Attaching package: &#39;ggtree&#39;
 
@@ -400,9 +398,9 @@ The following object is masked from &#39;package:ape&#39;:
 <pre class="r"><code>set.seed(45) 
 Sys.info()</code></pre>
 <pre><code>                              sysname                               release 
-                              &quot;Linux&quot;        &quot;4.18.0-477.81.1.el8_8.x86_64&quot; 
+                              &quot;Linux&quot;       &quot;4.18.0-553.50.1.el8_10.x86_64&quot; 
                               version                              nodename 
-&quot;#1 SMP Mon Nov 11 23:31:49 EST 2024&quot;             &quot;gl0002.arc-ts.umich.edu&quot; 
+&quot;#1 SMP Thu Apr 10 16:09:41 EDT 2025&quot;             &quot;gl0004.arc-ts.umich.edu&quot; 
                               machine                                 login 
                              &quot;x86_64&quot;                             &quot;unknown&quot; 
                                  user                        effective_user 
@@ -410,7 +408,7 @@ Sys.info()</code></pre>
 <pre class="r"><code>sessionInfo() </code></pre>
 <pre><code>R version 4.4.2 (2024-10-31)
 Platform: x86_64-conda-linux-gnu
-Running under: Red Hat Enterprise Linux 8.8 (Ootpa)
+Running under: Red Hat Enterprise Linux 8.10 (Ootpa)
 
 Matrix products: default
 BLAS/LAPACK: /home/kgontjes/.conda/envs/phytools_v2_4_4/lib/libopenblasp-r0.3.29.so;  LAPACK version 3.12.0
@@ -465,7 +463,14 @@ loaded via a namespace (and not attached):
 <h1>Load data</h1>
 <pre class="r"><code># Standard data
 df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
-tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)</code></pre>
+tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)
+
+# Keep rows corresponding to the tree and match orderin
+df &lt;- df[match(as.vector(tr$tip.label), df$isolate_no),]
+
+# Check ordering
+identical(tr$tip.label, df$isolate_no)</code></pre>
+<pre><code>[1] TRUE</code></pre>
 <pre class="r"><code>pheno &lt;- c(&quot;blbli&quot;,&quot;MVB&quot;,&quot;IR&quot;) %&gt;% paste0(.,&quot;_dich_num&quot;)</code></pre>
 </div>
 <div id="create-feature" class="section level1">

@@ -1,5 +1,5 @@
 ---
-title: "curate_kleborate_data_020625"
+title: "Curate kleborate data"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -74,6 +74,9 @@ bla_mat$KPC_present <-  ifelse(bla_mat$KPC_type != "No KPC",1,0)
 ```{r}
 kleborate_mat <- left_join(kleborate,porin_mutations_mat) %>% left_join(bla_mat)
 kleborate_mat_curated <- kleborate_mat %>% select(isolate_no,species,ST,Omp_mutations,all_of(colnames(porin_mutations_mat %>% select(-isolate_no))),bla_variables,all_of(colnames(bla_mat %>% select(-isolate_no))))
+
+rownames(kleborate_mat_curated) <- kleborate_mat_curated$isolate_no
+kleborate_mat_curated <- kleborate_mat_curated %>%.[match(as.vector(tr$tip.label), .$isolate_no),]
 
 saveRDS(kleborate_mat_curated,"./data/kleborate/kleborate_curated.RDS")
 ```

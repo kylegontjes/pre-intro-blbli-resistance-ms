@@ -112,7 +112,7 @@ rbind(ST258_phylo,CI_phylo,CII_phylo) %>% favorite_kable()
 # Statistical testing
 ```{r}
 paste0("Phylo occurrence diffence")
-c(23,17,106,248) %>% matrix(ncol=2) %>% fisher.test()
+c(20,15,106,248) %>% matrix(ncol=2) %>% fisher.test()
 paste0("Clustering, no significant difference but still interesting")
-c(5,1,18,16) %>% matrix(ncol=2) %>% fisher.test()
+c(5,2,15,14) %>% matrix(ncol=2) %>% fisher.test()
 ``` 

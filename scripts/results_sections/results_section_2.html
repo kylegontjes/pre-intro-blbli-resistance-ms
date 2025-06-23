@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-06-02" />
+<meta name="date" content="2025-06-20" />
 
 <title>Differences in resistance prevalence and emergence events exist across clades of epidemic-lineage ST258</title>
 
@@ -575,7 +575,7 @@ display: none;
 
 <h1 class="title toc-ignore">Differences in resistance prevalence and
 emergence events exist across clades of epidemic-lineage ST258</h1>
-<h4 class="date">2025-06-02</h4>
+<h4 class="date">2025-06-20</h4>
 
 </div>
 
@@ -696,7 +696,7 @@ Sys.info()</code></pre>
 ##                                                                                      effective_user 
 ##                                                                                          &quot;kgontjes&quot;</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>## R version 4.5.0 (2025-04-11)
+<pre><code>## R version 4.5.1 (2025-06-13)
 ## Platform: x86_64-apple-darwin20
 ## Running under: macOS Sequoia 15.5
 ## 
@@ -722,15 +722,15 @@ Sys.info()</code></pre>
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] gtable_0.3.6       xfun_0.52          bslib_0.9.0        lattice_0.22-7    
-##  [5] tzdb_0.5.0         vctrs_0.6.5        tools_4.5.0        generics_0.1.4    
-##  [9] yulab.utils_0.2.0  parallel_4.5.0     pkgconfig_2.0.3    Matrix_1.7-3      
-## [13] ggplotify_0.1.2    RColorBrewer_1.1-3 lifecycle_1.0.4    compiler_4.5.0    
+##  [5] tzdb_0.5.0         vctrs_0.6.5        tools_4.5.1        generics_0.1.4    
+##  [9] yulab.utils_0.2.0  parallel_4.5.1     pkgconfig_2.0.3    Matrix_1.7-3      
+## [13] ggplotify_0.1.2    RColorBrewer_1.1-3 lifecycle_1.0.4    compiler_4.5.1    
 ## [17] farver_2.1.2       treeio_1.32.0      mitools_2.4        survey_4.4-2      
 ## [21] ggtree_3.16.0      ggfun_0.1.8        htmltools_0.5.8.1  sass_0.4.10       
 ## [25] yaml_2.3.10        lazyeval_0.2.2     pillar_1.10.2      jquerylib_0.1.4   
 ## [29] cachem_1.1.0       nlme_3.1-168       tidyselect_1.2.1   aplot_0.2.5       
-## [33] digest_0.6.37      stringi_1.8.7      splines_4.5.0      fastmap_1.2.0     
-## [37] grid_4.5.0         colorspace_2.1-1   cli_3.6.5          magrittr_2.0.3    
+## [33] digest_0.6.37      stringi_1.8.7      splines_4.5.1      fastmap_1.2.0     
+## [37] grid_4.5.1         colorspace_2.1-1   cli_3.6.5          magrittr_2.0.3    
 ## [41] patchwork_1.3.0    survival_3.8-3     withr_3.0.2        scales_1.4.0      
 ## [45] timechange_0.3.0   rmarkdown_2.29     hms_1.1.3          evaluate_1.0.3    
 ## [49] viridisLite_0.4.2  gridGraphics_0.5-1 rlang_1.1.6        Rcpp_1.0.14       
@@ -930,27 +930,28 @@ IR_dich = Non-Susceptible (%)
 <pre><code>##             
 ##              Clade I Clade II
 ##   Cluster 1        0        2
-##   Cluster 2        2        0
-##   Cluster 3        2        0
+##   Cluster 2        0        2
+##   Cluster 3        3        0
 ##   Cluster 4        2        0
-##   Cluster 5       10        0
-##   Cluster 6        4        0
+##   Cluster 5        2        0
+##   Cluster 6       10        0
+##   Cluster 7        7        0
 ##   No feature     106      248
-##   Singleton       19       17</code></pre>
+##   Singleton       15       15</code></pre>
 </div>
 <div id="overall-data" class="section level3">
 <h3>Overall data</h3>
 <pre class="r"><code>phyloAMR::asr_cluster_analysis(asr_clustering_obj)</code></pre>
 <pre><code>##   present singletons singleton_isolates clusters cluster_isolates
-## 1      58         34                 36        6               22
+## 1      58         29                 30        7               28
 ##   cluster_size_median cluster_size_mean cluster_size_range no_feature
-## 1                   2              3.67               2-10        354
+## 1                   2                 4               2-10        354
 ##   revertant_isolates revertant_clusters revertant_cluster_size_median
-## 1                  1                  0                             0
+## 1                  3                  0                             0
 ##   revertant_cluster_size_mean revertant_cluster_size_range phylogenetic_events
-## 1                           0                            0                  40
+## 1                           0                            0                  36
 ##   feature_frequency phylogenetic_frequency clustering_frequency
-## 1             14.08                   9.22                   15</code></pre>
+## 1             14.08                   8.45                19.44</code></pre>
 </div>
 <div id="clustering-data" class="section level3">
 <h3>Clustering data</h3>
@@ -986,7 +987,7 @@ pt_count
 <tbody>
 <tr>
 <td style="text-align:left;">
-Cluster 5
+Cluster 6
 </td>
 <td style="text-align:left;">
 Clade I
@@ -1000,16 +1001,16 @@ Clade I
 </tr>
 <tr>
 <td style="text-align:left;">
-Cluster 2
+Cluster 7
 </td>
 <td style="text-align:left;">
 Clade I
 </td>
 <td style="text-align:right;">
-2
+7
 </td>
 <td style="text-align:right;">
-2
+4
 </td>
 </tr>
 <tr>
@@ -1020,10 +1021,10 @@ Cluster 3
 Clade I
 </td>
 <td style="text-align:right;">
-2
+3
 </td>
 <td style="text-align:right;">
-2
+3
 </td>
 </tr>
 <tr>
@@ -1042,13 +1043,13 @@ Clade I
 </tr>
 <tr>
 <td style="text-align:left;">
-Cluster 6
+Cluster 5
 </td>
 <td style="text-align:left;">
 Clade I
 </td>
 <td style="text-align:right;">
-4
+2
 </td>
 <td style="text-align:right;">
 2
@@ -1076,15 +1077,29 @@ Singleton
 Clade I&amp;Clade II
 </td>
 <td style="text-align:right;">
-36
+30
 </td>
 <td style="text-align:right;">
-33
+28
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Cluster 1
+</td>
+<td style="text-align:left;">
+Clade II
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cluster 2
 </td>
 <td style="text-align:left;">
 Clade II
@@ -1155,7 +1170,7 @@ LRT_pvalue
 <tbody>
 <tr>
 <td style="text-align:right;">
-6846.917
+6846.918
 </td>
 <td style="text-align:right;">
 NA
@@ -1217,28 +1232,28 @@ ARD
 blbli_dich_num
 </td>
 <td style="text-align:right;">
-50690.25
+51207.52
 </td>
 <td style="text-align:right;">
-158987.5
+161299.4
 </td>
 <td style="text-align:right;">
-8294.892
+8081.846
 </td>
 <td style="text-align:right;">
-89264.74
+86011.43
 </td>
 <td style="text-align:right;">
--149.1763
+-149.4415
 </td>
 <td style="text-align:right;">
-306.3525
+306.8830
 </td>
 <td style="text-align:right;">
-7.037362
+6.506932
 </td>
 <td style="text-align:right;">
-0.0296385
+0.0386400
 </td>
 </tr>
 </tbody>
@@ -1319,22 +1334,22 @@ population
 58
 </td>
 <td style="text-align:right;">
-34
+29
 </td>
 <td style="text-align:right;">
-36
+30
 </td>
 <td style="text-align:right;">
-6
+7
 </td>
 <td style="text-align:right;">
-22
+28
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-3.67
+4.0
 </td>
 <td style="text-align:left;">
 2-10
@@ -1343,7 +1358,7 @@ population
 354
 </td>
 <td style="text-align:right;">
-1
+3
 </td>
 <td style="text-align:right;">
 0
@@ -1358,16 +1373,16 @@ population
 0
 </td>
 <td style="text-align:right;">
-40
+36
 </td>
 <td style="text-align:right;">
 14.08
 </td>
 <td style="text-align:right;">
-9.22
+8.45
 </td>
 <td style="text-align:right;">
-15.00
+19.44
 </td>
 <td style="text-align:left;">
 ST258
@@ -1378,22 +1393,22 @@ ST258
 39
 </td>
 <td style="text-align:right;">
-18
+15
 </td>
 <td style="text-align:right;">
-19
+15
 </td>
 <td style="text-align:right;">
 5
 </td>
 <td style="text-align:right;">
-20
+24
 </td>
 <td style="text-align:right;">
-2
+3
 </td>
 <td style="text-align:right;">
-4.00
+4.8
 </td>
 <td style="text-align:left;">
 2-10
@@ -1402,7 +1417,7 @@ ST258
 106
 </td>
 <td style="text-align:right;">
-1
+2
 </td>
 <td style="text-align:right;">
 0
@@ -1417,16 +1432,16 @@ ST258
 0
 </td>
 <td style="text-align:right;">
-23
+20
 </td>
 <td style="text-align:right;">
 26.90
 </td>
 <td style="text-align:right;">
-15.13
+13.70
 </td>
 <td style="text-align:right;">
-21.74
+25.00
 </td>
 <td style="text-align:left;">
 Clade I
@@ -1437,22 +1452,22 @@ Clade I
 19
 </td>
 <td style="text-align:right;">
-16
+14
 </td>
 <td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-1
+15
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-2.00
+2.0
 </td>
 <td style="text-align:left;">
 2-2
@@ -1461,7 +1476,7 @@ Clade I
 248
 </td>
 <td style="text-align:right;">
-0
+1
 </td>
 <td style="text-align:right;">
 0
@@ -1473,19 +1488,19 @@ Clade I
 0
 </td>
 <td style="text-align:right;">
-NA
+0
 </td>
 <td style="text-align:right;">
-17
+16
 </td>
 <td style="text-align:right;">
 7.12
 </td>
 <td style="text-align:right;">
-6.42
+5.71
 </td>
 <td style="text-align:right;">
-5.88
+12.50
 </td>
 <td style="text-align:left;">
 Clade II
@@ -1498,32 +1513,32 @@ Clade II
 <h1>Statistical testing</h1>
 <pre class="r"><code>paste0(&quot;Phylo occurrence diffence&quot;)</code></pre>
 <pre><code>## [1] &quot;Phylo occurrence diffence&quot;</code></pre>
-<pre class="r"><code>c(23,17,106,248) %&gt;% matrix(ncol=2) %&gt;% fisher.test()</code></pre>
+<pre class="r"><code>c(20,15,106,248) %&gt;% matrix(ncol=2) %&gt;% fisher.test()</code></pre>
 <pre><code>## 
 ##  Fisher&#39;s Exact Test for Count Data
 ## 
 ## data:  .
-## p-value = 0.001088
+## p-value = 0.002002
 ## alternative hypothesis: true odds ratio is not equal to 1
 ## 95 percent confidence interval:
-##  1.542433 6.571054
+##  1.450588 6.802243
 ## sample estimates:
 ## odds ratio 
-##   3.155004</code></pre>
+##   3.109152</code></pre>
 <pre class="r"><code>paste0(&quot;Clustering, no significant difference but still interesting&quot;)</code></pre>
 <pre><code>## [1] &quot;Clustering, no significant difference but still interesting&quot;</code></pre>
-<pre class="r"><code>c(5,1,18,16) %&gt;% matrix(ncol=2) %&gt;% fisher.test()</code></pre>
+<pre class="r"><code>c(5,2,15,14) %&gt;% matrix(ncol=2) %&gt;% fisher.test()</code></pre>
 <pre><code>## 
 ##  Fisher&#39;s Exact Test for Count Data
 ## 
 ## data:  .
-## p-value = 0.2156
+## p-value = 0.4264
 ## alternative hypothesis: true odds ratio is not equal to 1
 ## 95 percent confidence interval:
-##    0.416102 222.828137
+##   0.3089578 27.6686581
 ## sample estimates:
 ## odds ratio 
-##   4.302249</code></pre>
+##   2.281063</code></pre>
 </div>
 
 

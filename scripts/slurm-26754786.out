@@ -1,0 +1,28 @@
+
+    Provides Bioinformatics software.
+    For more information please use:
+
+        $ module help Bioinformatics
+
+
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+ls: cannot access '/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/hybrid/polypolish/PCMP_H*/PMCP_H*/PMCP_H*_medaka_polypolish.fasta': No such file or directory
+ls: cannot access 'PCMP_H*/PCMP_H*/PCMP_H*_medaka_polypolish.fasta': No such file or directory

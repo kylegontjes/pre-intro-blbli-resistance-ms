@@ -29,6 +29,12 @@ sessionInfo()
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
 tr <- read.tree("./data/tree/tree.treefile")
+
+# Keep rows corresponding to the tree and match orderin
+df <- df[match(as.vector(tr$tip.label), df$isolate_no),]
+
+# Check ordering
+identical(tr$tip.label, df$isolate_no)
 ```
 
 ```{r}
