@@ -33,6 +33,7 @@ sessionInfo()
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
 canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+nn <- readRDS("./data/nearest_neighbor_comparisons/nn_comparisons.RDS")
 
 df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
 ```
@@ -56,6 +57,55 @@ table_1$Variable <- recode(table_1$Variable,'OmpK35-25'='ompK35 porin truncation
 
 favorite_kable(table_1)  
 ``` 
+
+# Get NN passing data list
+```{r}
+get_summary_statistics <- function(name,nn_list){
+  obj <- nn_list[[name]]
+  obj[["nn_comps_with_variant_sum"]]
+}
+
+get_nn_flag <- function(gwas_table){
+  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"yes","no")  
+  return(gwas_table)  
+}
+```
+
+```{r}
+canonical_var <- canonical %>% select(-isolate_no,-`OmpK35-25%`) %>% colnames()
+nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) %>% mutate(variable = canonical_var)  
+nn_data <- get_nn_flag(nn_data) 
+
+
+nn_data$Variable <-  recode(nn_data$variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+nn_data$`Nearest-neighbor criterion` <- nn_data$nn_qc 
+ 
+nn_data %>% favorite_kable()
+
+table_1 <- left_join(table_1,nn_data %>% select(Variable,`Nearest-neighbor criterion`))
+```
+
+# Implement another marginal statistics thresholding approach to identify discriminatory genotypes
+```{r}
+diagnostic_stats <- lapply(nn_data$variable , FUN=function(x){
+  get_marginal_stats(df[[x]],df$blbli_dich_num)
+}) %>% do.call(rbind.data.frame,.)  %>% mutate(Variable = nn_data$variable )
+
+diagnostic_stats$Discriminatory <- ifelse(diagnostic_stats$spec > 0.925 & diagnostic_stats$accuracy > 0.80,"Pass","Fail")
+
+
+diagnostic_stats$Variable <-  recode(diagnostic_stats$Variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+diagnostic_stats$`Discriminatory criterion` <- diagnostic_stats$Discriminatory 
+
+diagnostic_stats %>% favorite_kable()
+
+table_1 <- left_join(table_1,diagnostic_stats %>% select(Variable,`Discriminatory criterion`))
+```
+
+```{r}
+table_1 %>% favorite_kable()
+```
+
 
 ```{r}
 write_csv(table_1,"./tables/table_1.csv")

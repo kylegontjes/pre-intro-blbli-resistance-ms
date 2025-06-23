@@ -333,7 +333,7 @@ get_sig_phenotypes <- function(gwas_table){
 
 ## NN flag
 get_nn_flag <- function(gwas_table){
-  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"Yes","No")
+  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"Pass","Fail")
   return(gwas_table)
 }
 

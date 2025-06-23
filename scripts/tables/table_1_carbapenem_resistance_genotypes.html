@@ -653,6 +653,7 @@ loaded via a namespace (and not attached):
 [49] svglite_2.1.3      compiler_4.5.1    </code></pre>
 <pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
 canonical &lt;- readRDS(&quot;./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS&quot;)
+nn &lt;- readRDS(&quot;./data/nearest_neighbor_comparisons/nn_comparisons.RDS&quot;)
 
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) </code></pre>
 <pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_truncation_kleborate&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
@@ -960,6 +961,2822 @@ Penicillin-binding protein-4
 </td>
 <td style="text-align:left;">
 0.262
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="get-nn-passing-data-list" class="section level1">
+<h1>Get NN passing data list</h1>
+<pre class="r"><code>get_summary_statistics &lt;- function(name,nn_list){
+  obj &lt;- nn_list[[name]]
+  obj[[&quot;nn_comps_with_variant_sum&quot;]]
+}
+
+get_nn_flag &lt;- function(gwas_table){
+  gwas_table$nn_qc &lt;- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) &gt;1 | abs(gwas_table$IR_num_log_2_diff_median) &gt;1),&quot;yes&quot;,&quot;no&quot;)  
+  return(gwas_table)  
+}</code></pre>
+<pre class="r"><code>canonical_var &lt;- canonical %&gt;% select(-isolate_no,-`OmpK35-25%`) %&gt;% colnames()
+nn_data &lt;- lapply(canonical_var,get_summary_statistics,nn) %&gt;% do.call(rbind,.) %&gt;% mutate(variable = canonical_var)  
+nn_data &lt;- get_nn_flag(nn_data) 
+
+
+nn_data$Variable &lt;-  recode(nn_data$variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T transition in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
+nn_data$`Nearest-neighbor criterion` &lt;- nn_data$nn_qc 
+ 
+nn_data %&gt;% favorite_kable()</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:left;">
+comparison_feature
+</th>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+blbli_dich_num_binary_diff_gain_prop
+</th>
+<th style="text-align:right;">
+blbli_dich_num_binary_diff_loss_prop
+</th>
+<th style="text-align:right;">
+MVB_dich_num_binary_diff_gain_prop
+</th>
+<th style="text-align:right;">
+MVB_dich_num_binary_diff_loss_prop
+</th>
+<th style="text-align:right;">
+IR_dich_num_binary_diff_gain_prop
+</th>
+<th style="text-align:right;">
+IR_dich_num_binary_diff_loss_prop
+</th>
+<th style="text-align:right;">
+MVB_num_diff_median
+</th>
+<th style="text-align:right;">
+MVB_num_diff_mean
+</th>
+<th style="text-align:left;">
+MVB_num_diff_range
+</th>
+<th style="text-align:right;">
+MVB_num_diff_increase_prop
+</th>
+<th style="text-align:right;">
+MVB_num_diff_decrease_prop
+</th>
+<th style="text-align:right;">
+IR_num_diff_median
+</th>
+<th style="text-align:right;">
+IR_num_diff_mean
+</th>
+<th style="text-align:left;">
+IR_num_diff_range
+</th>
+<th style="text-align:right;">
+IR_num_diff_increase_prop
+</th>
+<th style="text-align:right;">
+IR_num_diff_decrease_prop
+</th>
+<th style="text-align:right;">
+MVB_num_log_2_diff_median
+</th>
+<th style="text-align:right;">
+MVB_num_log_2_diff_mean
+</th>
+<th style="text-align:left;">
+MVB_num_log_2_diff_range
+</th>
+<th style="text-align:right;">
+MVB_num_log_2_diff_increase_prop
+</th>
+<th style="text-align:right;">
+MVB_num_log_2_diff_decrease_prop
+</th>
+<th style="text-align:right;">
+IR_num_log_2_diff_median
+</th>
+<th style="text-align:right;">
+IR_num_log_2_diff_mean
+</th>
+<th style="text-align:left;">
+IR_num_log_2_diff_range
+</th>
+<th style="text-align:right;">
+IR_num_log_2_diff_increase_prop
+</th>
+<th style="text-align:right;">
+IR_num_log_2_diff_decrease_prop
+</th>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:left;">
+nn_qc
+</th>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Nearest-neighbor criterion
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+RamA
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.4000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+0.1000000
+</td>
+<td style="text-align:right;">
+1.875
+</td>
+<td style="text-align:right;">
+3.1750000
+</td>
+<td style="text-align:left;">
+-24-31.75
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:right;">
+1.6250000
+</td>
+<td style="text-align:left;">
+-3-15.75
+</td>
+<td style="text-align:right;">
+0.6000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+2.2000000
+</td>
+<td style="text-align:left;">
+-2-7
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.2000000
+</td>
+<td style="text-align:left;">
+-2-6
+</td>
+<td style="text-align:right;">
+0.6000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:left;">
+RamA
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+ramA efflux pump activator PFAV
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RamR
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+0.1851852
+</td>
+<td style="text-align:right;">
+0.1851852
+</td>
+<td style="text-align:right;">
+0.1851852
+</td>
+<td style="text-align:right;">
+0.1851852
+</td>
+<td style="text-align:right;">
+0.1111111
+</td>
+<td style="text-align:right;">
+0.1481481
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+-2.0277778
+</td>
+<td style="text-align:left;">
+-30-31.75
+</td>
+<td style="text-align:right;">
+0.2592593
+</td>
+<td style="text-align:right;">
+0.2592593
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.2500000
+</td>
+<td style="text-align:left;">
+-3.5-15.75
+</td>
+<td style="text-align:right;">
+0.3333333
+</td>
+<td style="text-align:right;">
+0.2962963
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.4074074
+</td>
+<td style="text-align:left;">
+-5-7
+</td>
+<td style="text-align:right;">
+0.2592593
+</td>
+<td style="text-align:right;">
+0.2592593
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.1481481
+</td>
+<td style="text-align:left;">
+-3-6
+</td>
+<td style="text-align:right;">
+0.3333333
+</td>
+<td style="text-align:right;">
+0.2962963
+</td>
+<td style="text-align:left;">
+RamR
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+ramR efflux pump regulator PFAV
+</td>
+<td style="text-align:left;">
+no
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AcrAB_TolC_any
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+0-0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.375
+</td>
+<td style="text-align:right;">
+0.3750000
+</td>
+<td style="text-align:left;">
+0-0.75
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+0-0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+0-2
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+AcrAB_TolC_any
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+acrAB-tolC efflux pump mutant
+</td>
+<td style="text-align:left;">
+no
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PBP_any
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0.5555556
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4444444
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5555556
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+4.3333333
+</td>
+<td style="text-align:left;">
+-16-28
+</td>
+<td style="text-align:right;">
+0.4444444
+</td>
+<td style="text-align:right;">
+0.2222222
+</td>
+<td style="text-align:right;">
+3.000
+</td>
+<td style="text-align:right;">
+3.5833333
+</td>
+<td style="text-align:left;">
+-2-15.5
+</td>
+<td style="text-align:right;">
+0.7777778
+</td>
+<td style="text-align:right;">
+0.1111111
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+1.4444444
+</td>
+<td style="text-align:left;">
+-1-6
+</td>
+<td style="text-align:right;">
+0.4444444
+</td>
+<td style="text-align:right;">
+0.2222222
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+2.2222222
+</td>
+<td style="text-align:left;">
+-1-5
+</td>
+<td style="text-align:right;">
+0.7777778
+</td>
+<td style="text-align:right;">
+0.1111111
+</td>
+<td style="text-align:left;">
+PBP_any
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Non-synonymous mutations in penicillin-binding-proteins
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PBP2
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.6250000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.6250000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.000
+</td>
+<td style="text-align:right;">
+4.8750000
+</td>
+<td style="text-align:left;">
+-16-28
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.2500000
+</td>
+<td style="text-align:right;">
+3.250
+</td>
+<td style="text-align:right;">
+3.9687500
+</td>
+<td style="text-align:left;">
+-2-15.5
+</td>
+<td style="text-align:right;">
+0.7500000
+</td>
+<td style="text-align:right;">
+0.1250000
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+1.6250000
+</td>
+<td style="text-align:left;">
+-1-6
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.2500000
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+2.3750000
+</td>
+<td style="text-align:left;">
+-1-5
+</td>
+<td style="text-align:right;">
+0.7500000
+</td>
+<td style="text-align:right;">
+0.1250000
+</td>
+<td style="text-align:left;">
+PBP2
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Penicillin-binding protein-2
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PBP4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+-0.250
+</td>
+<td style="text-align:right;">
+-0.2500000
+</td>
+<td style="text-align:left;">
+-0.5-0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+1.750
+</td>
+<td style="text-align:right;">
+1.7500000
+</td>
+<td style="text-align:left;">
+0.5-3
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+-0.5
+</td>
+<td style="text-align:right;">
+-0.5000000
+</td>
+<td style="text-align:left;">
+-1-0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+<td style="text-align:right;">
+1.5000000
+</td>
+<td style="text-align:left;">
+1-2
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+PBP4
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Penicillin-binding protein-4
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_non_syn
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+0.4090909
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2272727
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4090909
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.625
+</td>
+<td style="text-align:right;">
+6.5227273
+</td>
+<td style="text-align:left;">
+-0.25-31.75
+</td>
+<td style="text-align:right;">
+0.5909091
+</td>
+<td style="text-align:right;">
+0.0454545
+</td>
+<td style="text-align:right;">
+0.625
+</td>
+<td style="text-align:right;">
+3.2272727
+</td>
+<td style="text-align:left;">
+-4-31.5
+</td>
+<td style="text-align:right;">
+0.8636364
+</td>
+<td style="text-align:right;">
+0.0454545
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.7727273
+</td>
+<td style="text-align:left;">
+-1-7
+</td>
+<td style="text-align:right;">
+0.5909091
+</td>
+<td style="text-align:right;">
+0.0454545
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+<td style="text-align:right;">
+2.0909091
+</td>
+<td style="text-align:left;">
+-1-6
+</td>
+<td style="text-align:right;">
+0.8636364
+</td>
+<td style="text-align:right;">
+0.0454545
+</td>
+<td style="text-align:left;">
+OmpK36_non_syn
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+ompK36 non-synonymous mutation
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_c25t
+</td>
+<td style="text-align:right;">
+131
+</td>
+<td style="text-align:right;">
+0.2748092
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1832061
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1526718
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.500
+</td>
+<td style="text-align:right;">
+3.6469466
+</td>
+<td style="text-align:left;">
+-24-31.5
+</td>
+<td style="text-align:right;">
+0.8015267
+</td>
+<td style="text-align:right;">
+0.1221374
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.2690840
+</td>
+<td style="text-align:left;">
+-12-3.5
+</td>
+<td style="text-align:right;">
+0.4198473
+</td>
+<td style="text-align:right;">
+0.2061069
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+1.8396947
+</td>
+<td style="text-align:left;">
+-2-6
+</td>
+<td style="text-align:right;">
+0.8015267
+</td>
+<td style="text-align:right;">
+0.1221374
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.3893130
+</td>
+<td style="text-align:left;">
+-2-3
+</td>
+<td style="text-align:right;">
+0.4198473
+</td>
+<td style="text-align:right;">
+0.2061069
+</td>
+<td style="text-align:left;">
+OmpK36_c25t
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+C25T transition in ompK36
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_truncation_kleborate
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1250000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+3.750
+</td>
+<td style="text-align:right;">
+9.2500000
+</td>
+<td style="text-align:left;">
+0.25-31.75
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.750
+</td>
+<td style="text-align:right;">
+6.1562500
+</td>
+<td style="text-align:left;">
+-4-31.5
+</td>
+<td style="text-align:right;">
+0.7500000
+</td>
+<td style="text-align:right;">
+0.1250000
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:left;">
+1-7
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+2.3750000
+</td>
+<td style="text-align:left;">
+-1-6
+</td>
+<td style="text-align:right;">
+0.7500000
+</td>
+<td style="text-align:right;">
+0.1250000
+</td>
+<td style="text-align:left;">
+OmpK36_truncation_kleborate
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+ompK36 truncation
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_intergenic
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+0.1612903
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0967742
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1612903
+</td>
+<td style="text-align:right;">
+0.0645161
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:right;">
+-0.4274194
+</td>
+<td style="text-align:left;">
+-24-7.75
+</td>
+<td style="text-align:right;">
+0.5483871
+</td>
+<td style="text-align:right;">
+0.0967742
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:right;">
+0.5645161
+</td>
+<td style="text-align:left;">
+-3-4
+</td>
+<td style="text-align:right;">
+0.7096774
+</td>
+<td style="text-align:right;">
+0.0645161
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.2258065
+</td>
+<td style="text-align:left;">
+-2-5
+</td>
+<td style="text-align:right;">
+0.5483871
+</td>
+<td style="text-align:right;">
+0.0967742
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.0645161
+</td>
+<td style="text-align:left;">
+-2-4
+</td>
+<td style="text-align:right;">
+0.7096774
+</td>
+<td style="text-align:right;">
+0.0645161
+</td>
+<td style="text-align:left;">
+OmpK36_intergenic
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+ompK36 intergenic region
+</td>
+<td style="text-align:left;">
+no
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_putative_function_altering
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+0.4500000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2500000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4500000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.750
+</td>
+<td style="text-align:right;">
+7.1750000
+</td>
+<td style="text-align:left;">
+-0.25-31.75
+</td>
+<td style="text-align:right;">
+0.6500000
+</td>
+<td style="text-align:right;">
+0.0500000
+</td>
+<td style="text-align:right;">
+0.750
+</td>
+<td style="text-align:right;">
+3.5500000
+</td>
+<td style="text-align:left;">
+-4-31.5
+</td>
+<td style="text-align:right;">
+0.9500000
+</td>
+<td style="text-align:right;">
+0.0500000
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.9500000
+</td>
+<td style="text-align:left;">
+-1-7
+</td>
+<td style="text-align:right;">
+0.6500000
+</td>
+<td style="text-align:right;">
+0.0500000
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+2.3000000
+</td>
+<td style="text-align:left;">
+-1-6
+</td>
+<td style="text-align:right;">
+0.9500000
+</td>
+<td style="text-align:right;">
+0.0500000
+</td>
+<td style="text-align:left;">
+OmpK36_putative_function_altering
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+ompK36 putative function-altering mutations
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_L3_mutations
+</td>
+<td style="text-align:right;">
+124
+</td>
+<td style="text-align:right;">
+0.2983871
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2016129
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1693548
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.750
+</td>
+<td style="text-align:right;">
+4.5645161
+</td>
+<td style="text-align:left;">
+-0.25-31.75
+</td>
+<td style="text-align:right;">
+0.9354839
+</td>
+<td style="text-align:right;">
+0.0080645
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:right;">
+0.6935484
+</td>
+<td style="text-align:left;">
+0-3.75
+</td>
+<td style="text-align:right;">
+0.8629032
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+3.0483871
+</td>
+<td style="text-align:left;">
+-1-7
+</td>
+<td style="text-align:right;">
+0.9354839
+</td>
+<td style="text-align:right;">
+0.0080645
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.5080645
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+0.8629032
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+OmpK36_L3_mutations
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Loop 3 insertion
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36GD
+</td>
+<td style="text-align:right;">
+119
+</td>
+<td style="text-align:right;">
+0.2941176
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2016807
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1596639
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.750
+</td>
+<td style="text-align:right;">
+4.4852941
+</td>
+<td style="text-align:left;">
+0-31.75
+</td>
+<td style="text-align:right;">
+0.9495798
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:right;">
+0.6512605
+</td>
+<td style="text-align:left;">
+0-3.75
+</td>
+<td style="text-align:right;">
+0.8571429
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+3.1176471
+</td>
+<td style="text-align:left;">
+0-7
+</td>
+<td style="text-align:right;">
+0.9495798
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.4957983
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+0.8571429
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+OmpK36GD
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+GD insertion
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36TD
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0.4000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.500
+</td>
+<td style="text-align:right;">
+6.4500000
+</td>
+<td style="text-align:left;">
+-0.25-31.5
+</td>
+<td style="text-align:right;">
+0.6000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+0.500
+</td>
+<td style="text-align:right;">
+1.7000000
+</td>
+<td style="text-align:left;">
+0.5-3.5
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.4000000
+</td>
+<td style="text-align:left;">
+-1-6
+</td>
+<td style="text-align:right;">
+0.6000000
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.8000000
+</td>
+<td style="text-align:left;">
+1-3
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+OmpK36TD
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+TD insertion
+</td>
+<td style="text-align:left;">
+no
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OmpK36_promoter_IS
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+0.2083333
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.1250000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2083333
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.750
+</td>
+<td style="text-align:right;">
+1.1145833
+</td>
+<td style="text-align:left;">
+-8-7.75
+</td>
+<td style="text-align:right;">
+0.7083333
+</td>
+<td style="text-align:right;">
+0.0416667
+</td>
+<td style="text-align:right;">
+0.500
+</td>
+<td style="text-align:right;">
+0.9375000
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+0.7916667
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+1.7083333
+</td>
+<td style="text-align:left;">
+-1-5
+</td>
+<td style="text-align:right;">
+0.7083333
+</td>
+<td style="text-align:right;">
+0.0416667
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1.4166667
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+0.7916667
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+OmpK36_promoter_IS
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Insertion seqeunce at ompK36 promoter
+</td>
+<td style="text-align:left;">
+yes
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>table_1 &lt;- left_join(table_1,nn_data %&gt;% select(Variable,`Nearest-neighbor criterion`))</code></pre>
+</div>
+<div id="implement-another-marginal-statistics-thresholding-approach-to-identify-discriminatory-genotypes" class="section level1">
+<h1>Implement another marginal statistics thresholding approach to
+identify discriminatory genotypes</h1>
+<pre class="r"><code>diagnostic_stats &lt;- lapply(nn_data$variable , FUN=function(x){
+  get_marginal_stats(df[[x]],df$blbli_dich_num)
+}) %&gt;% do.call(rbind.data.frame,.)  %&gt;% mutate(Variable = nn_data$variable )
+
+diagnostic_stats$Discriminatory &lt;- ifelse(diagnostic_stats$spec &gt; 0.925 &amp; diagnostic_stats$accuracy &gt; 0.80,&quot;Pass&quot;,&quot;Fail&quot;)
+
+
+diagnostic_stats$Variable &lt;-  recode(diagnostic_stats$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T transition in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
+diagnostic_stats$`Discriminatory criterion` &lt;- diagnostic_stats$Discriminatory 
+
+diagnostic_stats %&gt;% favorite_kable()</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:right;">
+phenotype_count
+</th>
+<th style="text-align:right;">
+phenotype_freq
+</th>
+<th style="text-align:right;">
+feature_count
+</th>
+<th style="text-align:right;">
+feature_freq
+</th>
+<th style="text-align:right;">
+tp
+</th>
+<th style="text-align:right;">
+fp
+</th>
+<th style="text-align:right;">
+fn
+</th>
+<th style="text-align:right;">
+tn
+</th>
+<th style="text-align:right;">
+sens
+</th>
+<th style="text-align:right;">
+spec
+</th>
+<th style="text-align:right;">
+ppv
+</th>
+<th style="text-align:right;">
+npv
+</th>
+<th style="text-align:right;">
+accuracy
+</th>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Discriminatory
+</th>
+<th style="text-align:left;">
+Discriminatory criterion
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.0242718
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+0.103
+</td>
+<td style="text-align:right;">
+0.989
+</td>
+<td style="text-align:right;">
+0.600
+</td>
+<td style="text-align:right;">
+0.871
+</td>
+<td style="text-align:right;">
+0.864
+</td>
+<td style="text-align:left;">
+ramA efflux pump activator PFAV
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+0.0655340
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+334
+</td>
+<td style="text-align:right;">
+0.121
+</td>
+<td style="text-align:right;">
+0.944
+</td>
+<td style="text-align:right;">
+0.259
+</td>
+<td style="text-align:right;">
+0.868
+</td>
+<td style="text-align:right;">
+0.828
+</td>
+<td style="text-align:left;">
+ramR efflux pump regulator PFAV
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.0048544
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.994
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.859
+</td>
+<td style="text-align:right;">
+0.854
+</td>
+<td style="text-align:left;">
+acrAB-tolC efflux pump mutant
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0.0218447
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+351
+</td>
+<td style="text-align:right;">
+0.103
+</td>
+<td style="text-align:right;">
+0.992
+</td>
+<td style="text-align:right;">
+0.667
+</td>
+<td style="text-align:right;">
+0.871
+</td>
+<td style="text-align:right;">
+0.867
+</td>
+<td style="text-align:left;">
+Non-synonymous mutations in penicillin-binding-proteins
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.0194175
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+0.103
+</td>
+<td style="text-align:right;">
+0.994
+</td>
+<td style="text-align:right;">
+0.750
+</td>
+<td style="text-align:right;">
+0.871
+</td>
+<td style="text-align:right;">
+0.869
+</td>
+<td style="text-align:left;">
+Penicillin-binding protein-2
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0.0048544
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+353
+</td>
+<td style="text-align:right;">
+0.017
+</td>
+<td style="text-align:right;">
+0.997
+</td>
+<td style="text-align:right;">
+0.500
+</td>
+<td style="text-align:right;">
+0.861
+</td>
+<td style="text-align:right;">
+0.859
+</td>
+<td style="text-align:left;">
+Penicillin-binding protein-4
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+0.0533981
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+342
+</td>
+<td style="text-align:right;">
+0.172
+</td>
+<td style="text-align:right;">
+0.966
+</td>
+<td style="text-align:right;">
+0.455
+</td>
+<td style="text-align:right;">
+0.877
+</td>
+<td style="text-align:right;">
+0.854
+</td>
+<td style="text-align:left;">
+ompK36 non-synonymous mutation
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+131
+</td>
+<td style="text-align:right;">
+0.3179612
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+94
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+260
+</td>
+<td style="text-align:right;">
+0.638
+</td>
+<td style="text-align:right;">
+0.734
+</td>
+<td style="text-align:right;">
+0.282
+</td>
+<td style="text-align:right;">
+0.925
+</td>
+<td style="text-align:right;">
+0.721
+</td>
+<td style="text-align:left;">
+C25T transition in ompK36
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.0194175
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+0.103
+</td>
+<td style="text-align:right;">
+0.994
+</td>
+<td style="text-align:right;">
+0.750
+</td>
+<td style="text-align:right;">
+0.871
+</td>
+<td style="text-align:right;">
+0.869
+</td>
+<td style="text-align:left;">
+ompK36 truncation
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+0.0752427
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+331
+</td>
+<td style="text-align:right;">
+0.138
+</td>
+<td style="text-align:right;">
+0.935
+</td>
+<td style="text-align:right;">
+0.258
+</td>
+<td style="text-align:right;">
+0.869
+</td>
+<td style="text-align:right;">
+0.823
+</td>
+<td style="text-align:left;">
+ompK36 intergenic region
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+0.0485437
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+344
+</td>
+<td style="text-align:right;">
+0.172
+</td>
+<td style="text-align:right;">
+0.972
+</td>
+<td style="text-align:right;">
+0.500
+</td>
+<td style="text-align:right;">
+0.878
+</td>
+<td style="text-align:right;">
+0.859
+</td>
+<td style="text-align:left;">
+ompK36 putative function-altering mutations
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+124
+</td>
+<td style="text-align:right;">
+0.3009709
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+267
+</td>
+<td style="text-align:right;">
+0.638
+</td>
+<td style="text-align:right;">
+0.754
+</td>
+<td style="text-align:right;">
+0.298
+</td>
+<td style="text-align:right;">
+0.927
+</td>
+<td style="text-align:right;">
+0.738
+</td>
+<td style="text-align:left;">
+Loop 3 insertion
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+119
+</td>
+<td style="text-align:right;">
+0.2888350
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+270
+</td>
+<td style="text-align:right;">
+0.603
+</td>
+<td style="text-align:right;">
+0.763
+</td>
+<td style="text-align:right;">
+0.294
+</td>
+<td style="text-align:right;">
+0.922
+</td>
+<td style="text-align:right;">
+0.740
+</td>
+<td style="text-align:left;">
+GD insertion
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0.0121359
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+351
+</td>
+<td style="text-align:right;">
+0.034
+</td>
+<td style="text-align:right;">
+0.992
+</td>
+<td style="text-align:right;">
+0.400
+</td>
+<td style="text-align:right;">
+0.862
+</td>
+<td style="text-align:right;">
+0.857
+</td>
+<td style="text-align:left;">
+TD insertion
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+0.1407767
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+0.0582524
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+336
+</td>
+<td style="text-align:right;">
+0.103
+</td>
+<td style="text-align:right;">
+0.949
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:right;">
+0.866
+</td>
+<td style="text-align:right;">
+0.830
+</td>
+<td style="text-align:left;">
+Insertion seqeunce at ompK36 promoter
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>table_1 &lt;- left_join(table_1,diagnostic_stats %&gt;% select(Variable,`Discriminatory criterion`))</code></pre>
+<pre class="r"><code>table_1 %&gt;% favorite_kable()</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Overall (n=412)
+</th>
+<th style="text-align:left;">
+BL/BLI Resistant (n=58)
+</th>
+<th style="text-align:left;">
+BL/BLI Susceptible (n=354)
+</th>
+<th style="text-align:left;">
+p-value
+</th>
+<th style="text-align:left;">
+Nearest-neighbor criterion
+</th>
+<th style="text-align:left;">
+Discriminatory criterion
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ompK35 porin truncation at 25%
+</td>
+<td style="text-align:left;">
+412 (100.0)
+</td>
+<td style="text-align:left;">
+58 (100.0)
+</td>
+<td style="text-align:left;">
+354 (100.0)
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C25T transition in ompK36
+</td>
+<td style="text-align:left;">
+131 (31.8)
+</td>
+<td style="text-align:left;">
+37 (63.8)
+</td>
+<td style="text-align:left;">
+94 (26.6)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loop 3 insertion
+</td>
+<td style="text-align:left;">
+124 (30.1)
+</td>
+<td style="text-align:left;">
+37 (63.8)
+</td>
+<td style="text-align:left;">
+87 (24.6)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GD insertion
+</td>
+<td style="text-align:left;">
+119 (28.9)
+</td>
+<td style="text-align:left;">
+35 (60.3)
+</td>
+<td style="text-align:left;">
+84 (23.7)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Fail
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TD insertion
+</td>
+<td style="text-align:left;">
+5 (1.2)
+</td>
+<td style="text-align:left;">
+2 (3.4)
+</td>
+<td style="text-align:left;">
+3 (0.8)
+</td>
+<td style="text-align:left;">
+0.147
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 truncation
+</td>
+<td style="text-align:left;">
+8 (1.9)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+2 (0.6)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 non-synonymous mutation
+</td>
+<td style="text-align:left;">
+22 (5.3)
+</td>
+<td style="text-align:left;">
+10 (17.2)
+</td>
+<td style="text-align:left;">
+12 (3.4)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 putative function-altering mutations
+</td>
+<td style="text-align:left;">
+20 (4.9)
+</td>
+<td style="text-align:left;">
+10 (17.2)
+</td>
+<td style="text-align:left;">
+10 (2.8)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 intergenic region
+</td>
+<td style="text-align:left;">
+31 (7.5)
+</td>
+<td style="text-align:left;">
+8 (13.8)
+</td>
+<td style="text-align:left;">
+23 (6.5)
+</td>
+<td style="text-align:left;">
+0.061
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Insertion seqeunce at ompK36 promoter
+</td>
+<td style="text-align:left;">
+24 (5.8)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+18 (5.1)
+</td>
+<td style="text-align:left;">
+0.128
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+acrAB-tolC efflux pump mutant
+</td>
+<td style="text-align:left;">
+2 (0.5)
+</td>
+<td style="text-align:left;">
+0 (0.0)
+</td>
+<td style="text-align:left;">
+2 (0.6)
+</td>
+<td style="text-align:left;">
+1.000
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ramR efflux pump regulator PFAV
+</td>
+<td style="text-align:left;">
+27 (6.6)
+</td>
+<td style="text-align:left;">
+7 (12.1)
+</td>
+<td style="text-align:left;">
+20 (5.6)
+</td>
+<td style="text-align:left;">
+0.083
+</td>
+<td style="text-align:left;">
+no
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ramA efflux pump activator PFAV
+</td>
+<td style="text-align:left;">
+10 (2.4)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+4 (1.1)
+</td>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Non-synonymous mutations in penicillin-binding-proteins
+</td>
+<td style="text-align:left;">
+9 (2.2)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+3 (0.8)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Penicillin-binding protein-2
+</td>
+<td style="text-align:left;">
+8 (1.9)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+2 (0.6)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Penicillin-binding protein-4
+</td>
+<td style="text-align:left;">
+2 (0.5)
+</td>
+<td style="text-align:left;">
+1 (1.7)
+</td>
+<td style="text-align:left;">
+1 (0.3)
+</td>
+<td style="text-align:left;">
+0.262
+</td>
+<td style="text-align:left;">
+yes
+</td>
+<td style="text-align:left;">
+Pass
 </td>
 </tr>
 </tbody>
