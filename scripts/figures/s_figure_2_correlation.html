@@ -484,8 +484,8 @@ Sys.info()</code></pre>
 <h1>Data</h1>
 <pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)</code></pre>
 </div>
-<div id="supplemental-figure-correlation-matrix-of-mic" class="section level1">
-<h1>Supplemental figure: Correlation matrix of MIC</h1>
+<div id="supplemental-figure-correlation-matrix-of-mic-values" class="section level1">
+<h1>Supplemental figure: Correlation matrix of MIC values</h1>
 <pre class="r"><code>MIC_correlation &lt;-  cor(df %&gt;% select(&quot;MERO_log_2&quot;,&quot;MVB_log_2&quot;,&quot;IMI_log_2&quot;,&quot;IR_log_2&quot;,&quot;CZA_log_2&quot;,&quot;TGC_log_2&quot;,&quot;CST_log_2&quot;,&quot;AMK_log_2&quot;,&quot;PLZ_log_2&quot;) , method=&quot;spearman&quot;) %&gt;% round(.,2)
  
 drugs &lt;-  rownames(MIC_correlation) %&gt;% gsub(&quot;_log_2&quot;,&quot;&quot;,.)
@@ -502,7 +502,7 @@ fig_legend &lt;- Legend(at = c(-1, -0.5, 0, 0.5, 1),labels = c(&quot;-1.00&quot;
 fig_heatmap_image &lt;- grid.grabExpr(draw(corr_heatmap))
 fig_legend_image &lt;- grid.grabExpr(draw(fig_legend))
 
-s_figure_2 &lt;-plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis=&quot;l&quot;, align=&quot;hv&quot;,rel_heights = c(1,.15))</code></pre>
+s_figure_2 &lt;- plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis=&quot;l&quot;, align=&quot;hv&quot;,rel_heights = c(1,.15))</code></pre>
 </div>
 <div id="print-save" class="section level1">
 <h1>Print &amp; Save</h1>
