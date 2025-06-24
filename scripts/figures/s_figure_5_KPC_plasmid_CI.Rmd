@@ -140,5 +140,5 @@ s_figure_6
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=21.25,fig.height=15} 
-ggsave(plot = s_figure_6, filename = './figures/s_figure_6.png', width = 21.25, height = 12,limitsize=FALSE, bg='white')
+ggsave(plot = s_figure_6, filename = './figures/s_figure_5.png', width = 21.25, height = 12,limitsize=FALSE, bg='white')
 ```

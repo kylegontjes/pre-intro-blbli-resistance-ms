@@ -333,8 +333,14 @@ get_sig_phenotypes <- function(gwas_table){
 
 ## NN flag
 get_nn_flag <- function(gwas_table){
-  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"Pass","Fail")
+  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1), "Pass", "Fail")
   return(gwas_table)
+}
+
+## Diagnostic flag 
+
+get_diagnostic_flag <- function(gwas_table_specificity, gwas_table_accuracy, specificity_threshold = 0.90, accuracy_threshold = 0.80){
+  ifelse(gwas_table_specificity > specificity_threshold & gwas_table_accuracy > accuracy_threshold, "Pass", "Fail") 
 }
 
 # Get variant frequency in our phenotypes

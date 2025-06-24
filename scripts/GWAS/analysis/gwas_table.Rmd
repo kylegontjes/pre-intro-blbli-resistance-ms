@@ -166,7 +166,6 @@ kleborate_nn <- lapply(sig_kleborate,generate_nn_data_best_model,nn_data=nn) %>%
 sig_hits_table_kleborate <- left_join(kleborate_tests,kleborate_pheno_sum) %>% left_join(.,kleborate_sens) %>% left_join(.,kleborate_clustering) %>% left_join(.,kleborate_nn)
 ```
 
-
 # Overall table
 ```{r}
 gwas_table <- bind_rows(sig_hits_table_grouped,sig_hits_table_plasmid) %>% bind_rows(.,sig_hits_table_kleborate)
@@ -174,7 +173,15 @@ gwas_table <- bind_rows(sig_hits_table_grouped,sig_hits_table_plasmid) %>% bind_
 
 # Clean the data
 ```{r}
-gwas_table <- gwas_table %>% get_resistance_category_data %>% get_significant_tests %>% get_significant_model %>% get_sig_phenotypes %>% get_nn_flag
+gwas_table <- gwas_table %>% get_resistance_category_data %>% get_significant_tests %>% get_significant_model %>% get_sig_phenotypes %>% get_nn_flag 
+
+diagnostic_statistics <- lapply(gwas_table$genotype, FUN=function(geno){
+  marginal_stats <- get_marginal_stats(feature = df[[geno]],outcome = df[['blbli_dich_num']]) %>% mutate(genotype = geno)
+  marginal_stats$diagnostic_qc <- get_diagnostic_flag(marginal_stats$spec,marginal_stats$accuracy, specificity_threshold = 0.9, accuracy_threshold = 0.8)
+  return(marginal_stats)
+}) %>% do.call(rbind,.)
+
+gwas_table <- left_join(gwas_table,diagnostic_statistics)
 ```
 
 # Add supplemental data

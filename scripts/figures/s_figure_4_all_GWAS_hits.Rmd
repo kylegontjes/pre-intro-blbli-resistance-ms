@@ -1,5 +1,5 @@
 ---
-title: "Supplemental figure 4: All GWAS hits"
+title: "Supplemental figure 4: All significant genome-wide association study hits for β-lactam/β-lactamase inhibitor resistance"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -15,9 +15,8 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ggnewscale","ape","phytools","phyloAMR","gridExtra")
-
 #Load Packages
+packages <- c("tidyverse","cowplot","ggtree","ggnewscale","ape","phytools","phyloAMR","gridExtra")
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
 #Scripts
@@ -46,10 +45,15 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 ```{r}
 s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes)
 s_figure_4.A_tb$locus_tag <- recode(s_figure_4.A_tb$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
+s_figure_4.A_tb$locus_tag <- ifelse(s_figure_4.A_tb$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",s_figure_4.A_tb$locus_tag)
+
 s_figure_4.A_tb$gene <- ifelse(grepl(pattern = 'ompK36',s_figure_4.A_tb$locus_tag) | s_figure_4.A_tb$locus_tag =='KPNIH1_RS18665',"ompK36",s_figure_4.A_tb$gene) %>% {ifelse(is.na(.),"",.)}
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "KPNIH1_RS18100","MdtA/MuxA family multidrug efflux RND \ntransporter periplasmic adaptor subunit",s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$gene=='ompK36','porin OmpC',s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(grepl(pattern = 'KPC',s_figure_4.A_tb$locus_tag),"blaKPC-associated plasmid",s_figure_4.A_tb$product)
+s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "SHV-11","Broad-spectrum beta-lactamase",s_figure_4.A_tb$product)
+s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "TEM-1D.v1^","Broad-spectrum beta-lactamase",s_figure_4.A_tb$product)
+
 
 s_figure_4.A_tbl <- s_figure_4.A_tb %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes) %>% `colnames<-`(c('Significant Hit','Gene Hit', 'Product','Genotype Category', 'Significant Tests','Significant Models', 'Significant Phenotypes'))
 
@@ -60,23 +64,21 @@ s_figure_4.A <- s_figure_4.A_tbl %>% tableGrob(rows = NULL,theme=mytheme_GWAS)
 ```{r ,fig.height=12.5,fig.width=12.5,echo=F,message=F,error=F,warning=F} 
 rownames(df) <- df$isolate_no
 s_figure_4.df_mat <- get_gwas_hit_matrix(gwas_table,df) 
-sig_hits_name <- recode(colnames(s_figure_4.df_mat),"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
+sig_hits_name <- recode(colnames(s_figure_4.df_mat),"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665_3.2" = "ompK36 PFAV") 
 s_figure_4.phylo <- gwas_figures(df,tr,s_figure_4.df_mat,sig_hits_name = sig_hits_name %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.)) + ylim(NA,545)  
 s_figure_4.FB <- plot_grid(s_figure_4.phylo,labels = "B",label_size=24)  
-s_figure_4.FB
 ```
 
 # S Figure 4C - Resistance Frequency
 ```{r,fig.height=7.5,fig.width=10}
 gwas_nons_freq <- variants_freq(gwas_table$genotype,df)  
 gwas_nons_freq$locus_tag <- recode(gwas_nons_freq$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
-gwas_nons_freq$`Significant Hit` <- gwas_nons_freq$locus_tag
-gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(s_figure_4.A_tb$locus_tag)))  
+gwas_nons_freq$locus_tag <- ifelse(gwas_nons_freq$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",gwas_nons_freq$locus_tag)
+gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$locus_tag, levels=rev(unique(s_figure_4.A_tb$locus_tag)))  
 
 s_figure_4_descriptive_plot_theme <-  theme(legend.position="bottom",axis.text = element_text(size=19,colour = "black"),axis.title = element_text(size=21,colour = "black"),legend.title = element_text(size=21,colour = "black"),legend.text = element_text(size=19,colour = "black"),legend.title.align=0.5 ,legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
 
 s_figure_4.C <- freq_plot(gwas_nons_freq)  +s_figure_4_descriptive_plot_theme
-s_figure_4.C
 ```
 
 # S Figure 4D - Nearest neighbor Data
@@ -84,10 +86,10 @@ s_figure_4.C
 # D. FC MIC (MVB * IR overlay) 
 nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
+nn_data_melt$locus_tag <- ifelse(nn_data_melt$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",nn_data_melt$locus_tag)
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(s_figure_4.A_tb$locus_tag)))  
       
 s_figure_4.D <- nn_plot(nn_data_melt) + s_figure_4_descriptive_plot_theme
-s_figure_4.D
 ```
 
 # Merge figure

@@ -594,6 +594,7 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 #Scripts
 source(&quot;./lib/common_functions.R&quot;)
 source(&quot;./lib/consistent_themes.R&quot;)
+source(&quot;./scripts/GWAS/analysis/GWAS_analysis_scripts.R&quot;)
 
 # Print
 Sys.info()</code></pre>
@@ -2569,8 +2570,8 @@ identify discriminatory genotypes</h1>
   get_marginal_stats(df[[x]],df$blbli_dich_num)
 }) %&gt;% do.call(rbind.data.frame,.)  %&gt;% mutate(Variable = nn_data$variable )
 
-diagnostic_stats$Discriminatory &lt;- ifelse(diagnostic_stats$spec &gt; 0.90 &amp; diagnostic_stats$accuracy &gt; 0.80,&quot;Pass&quot;,&quot;Fail&quot;)
-
+diagnostic_stats$Discriminatory &lt;- get_diagnostic_flag(gwas_table_specificity = diagnostic_stats$spec, gwas_table_accuracy = diagnostic_stats$accuracy, specificity_threshold = 0.90,accuracy_threshold = 0.80)
+   
 diagnostic_stats$Variable &lt;-  recode(diagnostic_stats$Variable,&#39;OmpK35-25&#39;=&#39;ompK35 porin truncation at 25%&#39;,&#39;OmpK36_c25t&#39;=&#39;C25T transition in ompK36&#39;,&#39;OmpK36_L3_mutations&#39;=&#39;Loop 3 insertion&#39;,&#39;OmpK36GD&#39;=&#39;GD insertion&#39;,&#39;OmpK36TD&#39;=&#39;TD insertion&#39;,&#39;OmpK36_truncation_kleborate&#39;=&#39;ompK36 truncation&#39;, &#39;OmpK36_non_syn&#39;=&#39;ompK36 non-synonymous mutation&#39;,&#39;OmpK36_putative_function_altering&#39;=&#39;ompK36 putative function-altering mutations&#39;,&#39;OmpK36_intergenic&#39;=&#39;ompK36 intergenic region&#39;,&#39;OmpK36_promoter_IS&#39;=&#39;Insertion seqeunce at ompK36 promoter&#39;,&quot;AcrAB_TolC_any&quot; = &#39;acrAB-tolC efflux pump mutant&#39;,&#39;RamR&#39;=&#39;ramR efflux pump regulator PFAV&#39;,&quot;RamA&quot;=&#39;ramA efflux pump activator PFAV&#39;,&#39;PBP_any&#39;=&#39;Non-synonymous mutations in penicillin-binding-proteins&#39;,&#39;PBP2&#39;=&#39;Penicillin-binding protein-2&#39;,&quot;PBP4&quot;=&#39;Penicillin-binding protein-4&#39;)
 diagnostic_stats$`Discriminatory criterion` &lt;- diagnostic_stats$Discriminatory 
 

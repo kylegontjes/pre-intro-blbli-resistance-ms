@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2025-06-23" />
+<meta name="date" content="2025-06-24" />
 
-<title>Convergence-based genome-wide association study identified additional resistance-associated genotypes</title>
+<title>Convergence-based genome-wide association studies improved the explanation of BL/BLI resistance and illuminated distinct pathways to resistance across clades</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -574,8 +574,9 @@ display: none;
 
 
 <h1 class="title toc-ignore">Convergence-based genome-wide association
-study identified additional resistance-associated genotypes</h1>
-<h4 class="date">2025-06-23</h4>
+studies improved the explanation of BL/BLI resistance and illuminated
+distinct pathways to resistance across clades</h1>
+<h4 class="date">2025-06-24</h4>
 
 </div>
 
@@ -641,8 +642,8 @@ df$KPC_log_2 &lt;- log2(df$KPNIH1_RS28775_chr_median_norm)</code></pre>
 <pre><code>[1] &quot;How many passed QC:&quot;</code></pre>
 <pre class="r"><code>table(gwas_table$nn_qc)</code></pre>
 <pre><code>
- No Yes 
-  2   8 </code></pre>
+Fail Pass 
+   2    8 </code></pre>
 </div>
 <div id="four-modulators" class="section level1">
 <h1>Four modulators</h1>
@@ -656,7 +657,7 @@ paste0(&quot;Number of continuous hits: &quot;)</code></pre>
 <pre><code>[1] &quot;Number of continuous hits passing qc: &quot;</code></pre>
 <pre class="r"><code>continuous_pass &lt;- subset(continuous, nn_qc==&quot;Yes&quot;)
 nrow(continuous_pass)</code></pre>
-<pre><code>[1] 4</code></pre>
+<pre><code>[1] 0</code></pre>
 <pre class="r"><code>paste0(&quot;Genotypes passing:&quot;) </code></pre>
 <pre><code>[1] &quot;Genotypes passing:&quot;</code></pre>
 <pre class="r"><code>library(rstatix)
@@ -693,153 +694,8 @@ enrichment &lt;- function(group,df){
 
 lapply(continuous_pass$genotype,FUN=enrichment,df) %&gt;% do.call(rbind,.) %&gt;% favorite_kable</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
-<thead>
-<tr>
-<th style="text-align:left;">
-genotype
-</th>
-<th style="text-align:left;">
-MVB_median_IQR_with
-</th>
-<th style="text-align:left;">
-MVB_median_IQR_wo
-</th>
-<th style="text-align:right;">
-MVB_t_test_estimate
-</th>
-<th style="text-align:right;">
-MVB_t_test_p
-</th>
-<th style="text-align:left;">
-IR_median_IQR_with
-</th>
-<th style="text-align:left;">
-IR_median_IQR_wo
-</th>
-<th style="text-align:right;">
-IR_t_test_estimate
-</th>
-<th style="text-align:right;">
-IR_t_test_p
-</th>
-</tr>
-</thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-KPNIH1_RS02940_2.2
-</td>
-<td style="text-align:left;">
-2 (5)
-</td>
-<td style="text-align:left;">
--2 (2)
-</td>
-<td style="text-align:right;">
-0.0749583
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:left;">
-2 (4)
-</td>
-<td style="text-align:left;">
--1 (1)
-</td>
-<td style="text-align:right;">
-0.0788892
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-KPNIH1_RS18100_3
-</td>
-<td style="text-align:left;">
-0 (1)
-</td>
-<td style="text-align:left;">
--2 (2)
-</td>
-<td style="text-align:right;">
-0.1299490
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:left;">
--1 (1)
-</td>
-<td style="text-align:left;">
--2 (1)
-</td>
-<td style="text-align:right;">
-0.0281290
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OmpK36_loop3_insertion
-</td>
-<td style="text-align:left;">
-1 (2)
-</td>
-<td style="text-align:left;">
--2 (0)
-</td>
-<td style="text-align:right;">
-0.6809202
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:left;">
--1 (1)
-</td>
-<td style="text-align:left;">
--2 (1)
-</td>
-<td style="text-align:right;">
-0.4844326
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OmpK36GD
-</td>
-<td style="text-align:left;">
-1 (2)
-</td>
-<td style="text-align:left;">
--2 (0)
-</td>
-<td style="text-align:right;">
-0.6730222
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:left;">
--1 (1)
-</td>
-<td style="text-align:left;">
--2 (1)
-</td>
-<td style="text-align:right;">
-0.4506898
-</td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 </tbody>
 </table>
@@ -890,169 +746,6 @@ sig_phenotypes
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-KPNIH1_RS02940
-</td>
-<td style="text-align:left;">
-hypothetical protein
-</td>
-<td style="text-align:right;">
-0.6000000
-</td>
-<td style="text-align:right;">
-0.2000000
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
--1-7
-</td>
-<td style="text-align:right;">
-0.6000000
-</td>
-<td style="text-align:right;">
-0.200000
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
--1-6
-</td>
-<td style="text-align:left;">
-KPNIH1_RS02940_2.2
-</td>
-<td style="text-align:left;">
-Continuous
-</td>
-<td style="text-align:left;">
-MVB
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-KPNIH1_RS18100
-</td>
-<td style="text-align:left;">
-MdtA/MuxA family multidrug efflux RNDtransporter periplasmic adaptor
-subunit
-</td>
-<td style="text-align:right;">
-0.0370370
-</td>
-<td style="text-align:right;">
-0.9629630
-</td>
-<td style="text-align:right;">
--5
-</td>
-<td style="text-align:left;">
--7-7
-</td>
-<td style="text-align:right;">
-0.0370370
-</td>
-<td style="text-align:right;">
-0.962963
-</td>
-<td style="text-align:right;">
--3
-</td>
-<td style="text-align:left;">
--4-6
-</td>
-<td style="text-align:left;">
-KPNIH1_RS18100_3
-</td>
-<td style="text-align:left;">
-Continuous
-</td>
-<td style="text-align:left;">
-IR
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OmpK36_loop3_insertion
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-0.9354839
-</td>
-<td style="text-align:right;">
-0.0080645
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
--1-7
-</td>
-<td style="text-align:right;">
-0.8629032
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-0-4
-</td>
-<td style="text-align:left;">
-OmpK36_loop3_insertion
-</td>
-<td style="text-align:left;">
-Continuous
-</td>
-<td style="text-align:left;">
-MVB
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OmpK36GD
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-0.9495798
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-0-7
-</td>
-<td style="text-align:right;">
-0.8571429
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-0-4
-</td>
-<td style="text-align:left;">
-OmpK36GD
-</td>
-<td style="text-align:left;">
-Continuous
-</td>
-<td style="text-align:left;">
-MVB
-</td>
 </tr>
 </tbody>
 </table>
@@ -1107,132 +800,6 @@ genotype
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-KPNIH1_RS18665
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-porin OmpC
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-0.2222222
-</td>
-<td style="text-align:right;">
-0.4500000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-3.2
-</td>
-<td style="text-align:left;">
-KPNIH1_RS18665_3.2
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OmpK36_truncation_kleborate
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0.1388889
-</td>
-<td style="text-align:right;">
-0.5000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-OmpK36_truncation_kleborate
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-AA018
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-89
-</td>
-<td style="text-align:right;">
-0.3055556
-</td>
-<td style="text-align:right;">
-0.0294118
-</td>
-<td style="text-align:right;">
-0.5294118
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-AA018
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-AA552
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-0.1111111
-</td>
-<td style="text-align:right;">
-0.7692308
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-AA552
-</td>
 </tr>
 </tbody>
 </table>

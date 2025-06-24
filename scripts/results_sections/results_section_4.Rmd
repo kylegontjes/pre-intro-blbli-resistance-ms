@@ -1,5 +1,5 @@
 ---
-title: "Convergence-based genome-wide association study identified additional resistance-associated genotypes"
+title: "Convergence-based genome-wide association studies improved the explanation of BL/BLI resistance and illuminated distinct pathways to resistance across clades"
 output: html_document
 date: "`r Sys.Date()`"
 ---
