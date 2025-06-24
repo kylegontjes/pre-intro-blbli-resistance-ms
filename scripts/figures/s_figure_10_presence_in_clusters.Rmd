@@ -17,6 +17,7 @@ packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kable
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
 source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
 ```
 
@@ -63,12 +64,14 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 source("./scripts/figures/s_figure_10_functions.R")
 
 # Heatmap curation
+df$blbli_asr_cluster_renamed_simple <- ifelse(df$blbli_asr_cluster_renamed_simple=="Singleton" & df$clade_I == "Clade I","Singleton - Clade I",ifelse(df$blbli_asr_cluster_renamed_simple == "Singleton" & df$clade_I == "Clade II","Singleton - Clade II",ifelse(df$blbli_asr_cluster_renamed_simple=="No feature" & df$clade_I == "Clade I","Susceptible - Clade I", ifelse(df$blbli_asr_cluster_renamed_simple=="No feature" & df$clade_I == "Clade II","Susceptible - Clade II",df$blbli_asr_cluster_renamed_simple)))) 
+
 variables <- c(gwas_table$genotype,canonical %>% select(-isolate_no) %>% colnames(.) %>% sort) %>% unique %>% subset(!. %in% c("OmpK35-25%","OmpK36_loop3_insertion","OmpK36_L3_mutations","PBP_any","FJ223607","OmpK36_Loss_of_function","OmpK36_intergenic","OmpK36_non_syn","KPNIH1_RS07805_2.2",'OmpK36_putative_function_altering'))
 prop_data <- lapply(variables,numerical_data,df=df) %>% do.call(rbind,.) %>% `rownames<-`(variables) 
 prop_columns <- colnames(prop_data) %>% subset(. != "Cluster_prop" & grepl("_prop",.)) %>% sort
 ct_columns <- colnames(prop_data) %>% subset(. != "Cluster_ct" & grepl("_ct",.)) %>% sort
-df$blbli_asr_cluster_renamed <- factor(df$blbli_asr_cluster_renamed_simple,levels = c(prop_columns %>% gsub("_prop","",.)))
-total_ct <-  table(df %>% .$blbli_asr_cluster_renamed)  
+df$blbli_asr_cluster_renamed_simple <- factor(df$blbli_asr_cluster_renamed_simple,levels = c(prop_columns %>% gsub("_prop","",.)))
+total_ct <-  table(df %>% .$blbli_asr_cluster_renamed_simple)  
 total_genotype_ct <- prop_data %>% select(ct_columns) %>% `colnames<-`(gsub("_ct","",colnames(.))) %>% rowSums()
 column_names <- prop_columns %>% gsub("_prop","",.) %>% paste0(.," (n=",total_ct,")")
 ct_matrix <-  prop_data %>% select(ct_columns) %>% `colnames<-`(gsub("_ct","",colnames(.)))  %>% round(.,0)  %>% as.matrix %>% {ifelse(. ==0,"",.)}
@@ -83,23 +86,42 @@ for(i in 1:100){
 
 fig_legend <- Legend(at = c(0, 0.25, 0.50, 0.75, 1.00),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Proportion",direction = "horizontal",col_fun = colorRamp2(breaks = c(0, 1.00),colors = c("white","red")), title_gp = gpar(fontsize = 16),labels_gp=gpar(fontsize=14),legend_width = unit(12, "cm"))
 
+CI_groups <- table(df$clade_I,df$blbli_asr_cluster_renamed_simple) %>% .[1,] %>% subset(.>0) %>% names 
+
+column_names_nnotated <- lapply(colnames(prop_matrix),FUN=function(x){
+  if (x %in% CI_groups) {
+    y <- "Clade I"
+      names(y) <-x
+  } else {
+    y <- "Clade II"
+    names(y) <- x 
+  }
+  y
+   
+}) %>% unlist
+ 
+
+clade_labels <- columnAnnotation(Clade = column_names_nnotated,col=  list(Clade = clade_colors),show_legend=F)
+
+
 # Heatmap
-A_heatmap <- ComplexHeatmap::Heatmap(prop_matrix,show_heatmap_legend = F,show_row_names = T,col = c("white","red"),cluster_columns = F,cluster_rows=T,name = "Proportion",column_labels = column_names,row_labels = row_names,  cell_fun = function(j, i, x, y, width, height, fill) {
+A_heatmap <- ComplexHeatmap::Heatmap(prop_matrix,show_heatmap_legend = F,show_row_names = T,col = c("white","red"),cluster_columns = T,cluster_rows=T,name = "Proportion",column_labels = column_names,row_labels = row_names, cell_fun = function(j, i, x, y, width, height, fill) {
     grid.text(sprintf("%.3s", ct_matrix[i, j]), x, y, gp = gpar(fontsize = 8))
-},border_gp = gpar(col = "black", lty = 1), rect_gp = gpar(col = "white", lwd = 1)) 
+},border_gp = gpar(col = "black", lty = 1), rect_gp = gpar(col = "white", lwd = 1),bottom_annotation = clade_labels,row_names_gp =  gpar(fontsize = 11),column_names_gp =  gpar(fontsize = 11))
 
 
 fig_heatmap_image <- grid.grabExpr(draw(A_heatmap))
 fig_legend_image <- grid.grabExpr(draw(fig_legend))
 
-A <-plot_grid(fig_heatmap_image,NULL,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,-.085,.2))   
+A <- plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.2))   
 ```
 
 # B - Occurrence
 ```{r}
 traits_of_interest <- c("blbli_dich_num",rownames(prop_matrix))   
 trait_parent_child <- pbmcapply::pbmclapply(traits_of_interest,FUN=function(x){
-  phyloAMR::asr(df = df,tr = tr,tip_name_var = 'isolate_no',trait=x,model='MF') %>% .$parent_child_df
+  model <- ifelse(x == "blbli_dich_num","ER","MF")
+  phyloAMR::asr(df = df,tr = tr,tip_name_variable = 'isolate_no',trait=x,model=model) %>% .$parent_child_df
 },mc.cores=5)
 names(trait_parent_child) <- traits_of_interest
 
@@ -120,7 +142,7 @@ genotypes <- synchronous_changes_w_blbli[genotypes_w_transitions_in_parental_nod
 ## Data
 ```{r}
 st258 <- ggtree(tr)
-genotypes_and_blbli <- c('blbli_dich_num',genotypes)
+genotypes_and_blbli <- c('blbli_dich_num',genotypes,"RamA")
 
 asr_traits_of_interest <-  pbmcapply::pbmclapply(genotypes_and_blbli,FUN=function(x){
   asr_cluster_detection(df = df,tr = tr,'isolate_no',patient_id='Patient_ID',parent_child_df = trait_parent_child[[x]],node_states = 'joint',confidence = NULL,simplify_faux_clusters = T,simplify_revertant = T,collapse_cluster = T)
@@ -131,7 +153,7 @@ gains <- lapply(genotypes_and_blbli,FUN=function(y){
   asr_traits_of_interest[[y]][['asr_cluster']] %>% subset(grepl("cluster",.)) %>% str_split("_",simplify = T) %>% .[,2] %>% unlist %>% unique %>% as.numeric 
 }) %>% `names<-`(genotypes_and_blbli)
 
-tips <- hues::iwanthue(4,plot=T)
+tips <- hues::iwanthue(6,plot=T)
  
 tree_w_blbli <- st258 + geom_nodepoint(aes(subset=(node %in% gains$blbli_dich_num),fill="BL/BLI" ), shape=21, size= 4,show.legend = T) +  scale_fill_manual(name = "Phylogenetic occurrence", values ="red",breaks = "BL/BLI" )
 
@@ -141,32 +163,40 @@ genotypes <- gains %>% names %>% .[-1] %>% `names<-`(hues::iwanthue(3,hmin = 15,
 ```{r}
 blbli_name = "BL/BLI resistance"
 AA552_name = "AA552 KPC plasmid"
-ompK36_name = "ompK36 deleterious mutant"
+ompK36_name = "ompK36 PFAV mutant"
 PBP_name = "PBP-2 non-synonymous mutant"
+RamA_name = "ramA PFAV mutant" 
+genotype_ordering <- c(blbli_name ,AA552_name,ompK36_name,PBP_name,RamA_name)
+
 B <- st258 + 
     geom_nodepoint(aes(fill = blbli_name,shape=blbli_name,subset=(node %in% gains$blbli_dich_num),size=blbli_name,legend=F)) +
     geom_nodepoint(aes(fill = AA552_name,shape=AA552_name,subset=(node %in% gains$AA552),size=AA552_name,legend=F)) +
-    geom_nodepoint(aes(fill = ompK36_name,shape=ompK36_name,subset=(node %in% gains$KPNIH1_RS18665_3.2),size=ompK36_name,legend=F)) +
-    geom_nodepoint(aes(fill = PBP_name,shape=PBP_name,subset=(node %in% gains$PBP2),size=PBP_name,legend=F)) + scale_fill_manual(name="Synchronous clustering",values = setNames(
-    c("#91796A", "red", "#97C466", "#9451AD"),
-    c(blbli_name, AA552_name, ompK36_name, PBP_name)
-  ),labels=c(blbli_name ,AA552_name,ompK36_name,PBP_name),guide = guide_legend(ncol=2,title.position = "top", label.position = "right")) + 
+    geom_nodepoint(aes(fill = ompK36_name,shape=ompK36_name,subset=(node %in% gains$KPNIH1_RS18665_3.2),size=ompK36_name,legend=F)) +  
+  geom_nodepoint(aes(fill = RamA_name,shape=RamA_name,subset=(node %in% gains$RamA),size=RamA_name,legend=F))  +
+    geom_nodepoint(aes(fill = PBP_name,shape=PBP_name,subset=(node %in% gains$PBP2),size=PBP_name,legend=F)) + 
+  scale_fill_manual(name="Synchronous clustering",values = setNames(
+    c("red", "#91796A", "#97C466", "#9451AD","#B9964B"), genotype_ordering
+  ),breaks = genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) + 
     scale_shape_manual(name="Synchronous clustering",values=setNames(
-    c(22,21,23,24),
-    c(blbli_name, AA552_name, ompK36_name, PBP_name)
-  ),labels=c(blbli_name ,AA552_name,ompK36_name,PBP_name),guide = guide_legend(ncol=2,title.position = "top", label.position = "right")) + scale_size_manual(name="Synchronous clustering",values = setNames(
-    c(4,3,3,2),
-    c(blbli_name, AA552_name, ompK36_name, PBP_name)),labels=c(blbli_name ,AA552_name,ompK36_name,PBP_name),guide = guide_legend(ncol=2,title.position = "top", label.position = "right"))  + scale_alpha(guide = 'none') + theme(legend.position = 'bottom')
-B
+    c(22,21,23,24,25),genotype_ordering
+  ),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) + 
+  scale_size_manual(name="Synchronous clustering",values = setNames(
+    c(5,3.25,3,2,3),genotype_ordering),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + 
+  scale_alpha(guide = 'none') + theme(legend.position = 'bottom')
+rownames(df) <- df$isolate_no
+
+B_1 <- B + ggnewscale::new_scale_fill()
+
+B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI Clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0) + cluster_scale_2_col + ylim(NA,525) + theme(legend.position = 'bottom')
 ```
+
 # Cowplot supplemental figure
-```{r,fig.height=7.5,fig.width=14}
-A_grob <- ggplotify::as.ggplot(A) + theme(plot.margin = unit(c(0, 0.5, 0, 0.45), 
-                                "inches"))
-s_figure_10 <- cowplot::plot_grid(A_grob,B,labels = "AUTO",ncol=2,label_size = 20,rel_widths = c(1,.7))
+```{r, fig.height=7.5, fig.width=12}
+A_grob <- ggplotify::as.ggplot(A) + theme(plot.margin = unit(c(0, 0.5, 0, 0.45), "inches"))
+s_figure_10 <- cowplot::plot_grid(A_grob,B_w_tree,labels = "AUTO",ncol=2,label_size = 20,rel_widths = c(1,0.65))
 s_figure_10
 ``` 
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 14, height = 7.5,limitsize=FALSE,bg='white')
+ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 12, height = 7.5,limitsize=FALSE,bg='white')
 ```

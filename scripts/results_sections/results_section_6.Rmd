@@ -1,5 +1,5 @@
 ---
-title: "Results section 5"
+title: "Results section 6"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -91,7 +91,7 @@ prop.table(table_comp,margin = 2)
 table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed) %>% fisher.test()
 ```
 
-# FJ plasmid analyses
+# AA552 plasmid analyses
 ```{r} 
 table(df$AA552,df$blbli_asr_cluster_renamed)
 nons_CI <- subset(nons,clade_I == "Clade I")

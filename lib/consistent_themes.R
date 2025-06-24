@@ -40,8 +40,9 @@ clade_colors_scale_v <- scale_fill_manual(values=clade_colors, name="Clade", gui
 ### Clustering
 cluster_colors <- c("No feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink',"Cluster 7" = "#F0E442","Cluster 8" = '#00CED1')
 cluster_labels <- names(cluster_colors) 
-cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels,name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
-cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels,name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
+cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
+cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
+cluster_scale_2_col <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=2, title.position = "top", label.position = "right"))
 
 # Potential scale
 potential_scale_general <- scale_fill_manual(breaks = c("Modulator","Mediator","None"),values=c("gray","#4d3227","white"),labels = c("Resistance Modulator","Resistance Mediator","None"),name="Genotype Category",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 5)) 

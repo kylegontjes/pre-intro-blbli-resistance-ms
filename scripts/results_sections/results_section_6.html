@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-02" />
+<meta name="date" content="2025-06-24" />
 
-<title>Results section 5</title>
+<title>Results section 6</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,9 +350,9 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Results section 5</h1>
+<h1 class="title toc-ignore">Results section 6</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-02</h4>
+<h4 class="date">2025-06-24</h4>
 
 </div>
 
@@ -426,101 +426,101 @@ gwas_table %&gt;% subset(locus_tag %in% genotypes_in_clusters) %&gt;% select(loc
 10            BL/BLI PhyC &amp; Synchronous            &lt;NA&gt;</code></pre>
 <pre class="r"><code>table(df$KPNIH1_RS18100_3.2,df$blbli_asr_cluster_renamed)</code></pre>
 <pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 No feature
-  0         2         2         2         2        10         4        330
-  1         0         0         0         0         0         0         24
+    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
+  0         2         2         3         2         2        10         7
+  1         0         0         0         0         0         0         0
    
-    Singleton
-  0        33
-  1         3</code></pre>
+    No feature Singleton
+  0        330        27
+  1         24         3</code></pre>
 <pre class="r"><code>table(df$AA552,df$blbli_asr_cluster_renamed)</code></pre>
 <pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 No feature
-  0         2         0         0         2         0         0        350
-  1         0         2         2         0        10         4          4
+    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
+  0         2         2         1         0         2         0         0
+  1         0         0         2         2         0        10         7
    
-    Singleton
-  0        32
-  1         4</code></pre>
+    No feature Singleton
+  0        350        29
+  1          4         1</code></pre>
 <div id="penicillinompk36-analyses" class="section level2">
 <h2>Penicillin/ompk36 analyses</h2>
 <pre class="r"><code>df$ompk36_lof_or_pbp &lt;- ifelse(df$PBP_any ==1 | df$OmpK36_putative_function_altering == 1 ,1,0) 
 table(df$ompk36_lof_or_pbp,df$blbli_asr_cluster_renamed)</code></pre>
 <pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 No feature
-  0         0         2         2         2        10         4        342
-  1         2         0         0         0         0         0         12
+    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
+  0         2         0         3         2         2        10         7
+  1         0         2         0         0         0         0         0
    
-    Singleton
-  0        26
-  1        10</code></pre>
+    No feature Singleton
+  0        342        20
+  1         12        10</code></pre>
 <pre class="r"><code>nons &lt;- subset(df,blbli_dich_num==1)
 table_comp &lt;- table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed)
 table_comp</code></pre>
 <pre><code>   
     Cluster Singleton
-  0      20        26
+  0      26        20
   1       2        10</code></pre>
 <pre class="r"><code>prop.table(table_comp,margin = 2)</code></pre>
 <pre><code>   
        Cluster  Singleton
-  0 0.90909091 0.72222222
-  1 0.09090909 0.27777778</code></pre>
+  0 0.92857143 0.66666667
+  1 0.07142857 0.33333333</code></pre>
 <pre class="r"><code>table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed) %&gt;% fisher.test()</code></pre>
 <pre><code>
     Fisher&#39;s Exact Test for Count Data
 
 data:  .
-p-value = 0.1077
+p-value = 0.0217
 alternative hypothesis: true odds ratio is not equal to 1
 95 percent confidence interval:
-  0.6870704 39.1868444
+  1.154893 65.621301
 sample estimates:
 odds ratio 
-  3.767956 </code></pre>
+  6.304581 </code></pre>
 </div>
 </div>
-<div id="fj-plasmid-analyses" class="section level1">
-<h1>FJ plasmid analyses</h1>
+<div id="aa552-plasmid-analyses" class="section level1">
+<h1>AA552 plasmid analyses</h1>
 <pre class="r"><code>table(df$AA552,df$blbli_asr_cluster_renamed)</code></pre>
 <pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 No feature
-  0         2         0         0         2         0         0        350
-  1         0         2         2         0        10         4          4
+    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
+  0         2         2         1         0         2         0         0
+  1         0         0         2         2         0        10         7
    
-    Singleton
-  0        32
-  1         4</code></pre>
+    No feature Singleton
+  0        350        29
+  1          4         1</code></pre>
 <pre class="r"><code>nons_CI &lt;- subset(nons,clade_I == &quot;Clade I&quot;)
 comps_table &lt;- table(nons_CI$AA552,nons_CI$blbli_asr_cluster_collapsed) 
 comps_table</code></pre>
 <pre><code>   
     Cluster Singleton
-  0       2        15
-  1      18         4</code></pre>
+  0       3        14
+  1      21         1</code></pre>
 <pre class="r"><code>prop.table(comps_table,margin=2)</code></pre>
 <pre><code>   
-      Cluster Singleton
-  0 0.1000000 0.7894737
-  1 0.9000000 0.2105263</code></pre>
+       Cluster  Singleton
+  0 0.12500000 0.93333333
+  1 0.87500000 0.06666667</code></pre>
 <pre class="r"><code>nons_CI$blbli_cluster_singleton &lt;- ifelse(nons_CI$blbli_asr_cluster_renamed==&quot;Singleton&quot;,&quot;Singleton&quot;,&quot;Cluster&quot;)
 table(nons_CI$AA552,nons_CI$blbli_cluster_singleton)</code></pre>
 <pre><code>   
     Cluster Singleton
-  0       2        15
-  1      18         4</code></pre>
+  0       3        14
+  1      21         1</code></pre>
 <pre class="r"><code>table(nons_CI$AA552,nons_CI$blbli_cluster_singleton) %&gt;% fisher.test()</code></pre>
 <pre><code>
     Fisher&#39;s Exact Test for Count Data
 
 data:  .
-p-value = 1.664e-05
+p-value = 6.005e-07
 alternative hypothesis: true odds ratio is not equal to 1
 95 percent confidence interval:
- 0.002736971 0.225156657
+ 0.0002393201 0.1271177252
 sample estimates:
 odds ratio 
-0.03402261 </code></pre>
+0.01272795 </code></pre>
 </div>
 
 

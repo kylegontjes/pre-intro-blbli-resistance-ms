@@ -85,7 +85,7 @@ nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>%
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(figure_3.A_tb$locus_tag)))  
       
-figure_3.D <- nn_plot(nn_data_melt)   + figure_3_descriptive_plot_theme
+figure_3.D <- nn_plot(nn_data_melt) + figure_3_descriptive_plot_theme
 ```
 
 # Merge figure
