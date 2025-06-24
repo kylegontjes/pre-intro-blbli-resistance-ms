@@ -8,7 +8,7 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
 rm(list = ls())
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ``` 
 
 # Environment
@@ -26,7 +26,7 @@ sessionInfo()
 
 # Data
 ```{r}
-df <- readRDS("./data/metadata/df.RDS")
+df <- readRDS("./data/dataset/df.RDS")
 ```
 
 # Supplemental figure: Correlation matrix of MIC
