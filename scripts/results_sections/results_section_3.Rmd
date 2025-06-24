@@ -1,5 +1,5 @@
 ---
-title: "Known carbapenem resistance-associated genotypes moderately explain resistance in a clade-specific manner"
+title: "Non-carbapenemase mechanisms of carbapenem resistance explain BL/BLI resistance in a clade-specific manner"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -13,14 +13,13 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ``` 
 
 ```{r}
-library(tidyverse)
-library(tableone)
-library(ggtree)
-library(tableone)
-library(kableExtra)
+packages <- c("tidyverse","tableone","kableExtra")
 
-source("./lib/common_functions.R")
-source("./lib/consistent_themes.R")  
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Functions
+source("./lib/common_functions.R") 
 
 # Print environment
 Sys.info()
@@ -29,17 +28,10 @@ sessionInfo()
 
 # Data
 ```{r}
-df <- readRDS("./data/dataset/df.RDS")
-tr <- read.tree("./data/tree/tree.treefile")
-df <- df %>% .[match(tr$tip.label,.$isolate_no),]  
-canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
-df <- left_join(df,canonical)
+df <- readRDS("./data/dataset/df.RDS")  
 kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS")
-df <- left_join(df,kleborate %>% select(isolate_no,KPC_type))
-
-nn <- readRDS("./data/nearest_neighbor_comparisons/nn_comparisons.RDS")
+df <- left_join(df,kleborate %>% select(isolate_no,KPC_type)) 
 ```
-
 
 # KPC frequency
 ```{r}
@@ -47,44 +39,6 @@ table(df$KPC_type)
 convert_tableone_into_df(df,vars="KPC_type")
 ```
 
-# Get NN passing data list
-```{r}
-get_summary_statistics <- function(name,nn_list){
-  obj <- nn_list[[name]]
-  obj[["nn_comps_with_variant_sum"]]
-}
-
-get_nn_flag <- function(gwas_table){
-  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"yes","no")  
-  return(gwas_table)  
-}
-```
-
-```{r}
-canonical_var <- canonical %>% select(-isolate_no,-`OmpK35-25%`) %>% colnames()
-nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) %>% mutate(variable = canonical_var)  
-nn_data <- get_nn_flag(nn_data)
-pass_nn_qc <- subset(nn_data,nn_qc=="yes")
-pass_nn_qc$variable %>% sort
-```
-
-# Implement another marginal statistics thresholding approach to identify discriminatory genotypes
-```{r}
-diagnostic_stats <- lapply(pass_nn_qc$variable , FUN=function(x){
-  get_marginal_stats(df[[x]],df$blbli_dich_num)
-}) %>% do.call(rbind.data.frame,.)  %>% mutate(comparitor = pass_nn_qc$variable )
-
-diagnostic_stats %>% favorite_kable()
-
-diagnostic_stats %>% subset(spec > 0.925 & accuracy >.80) %>% .$comparitor
-```
-
-
-```{r}
-convert_tableone_into_df(df,vars=c('OmpK36_c25t',"OmpK36_L3_mutations"),strata='clade_I',factorVars = c('OmpK36_c25t',"OmpK36_L3_mutations"),outcome_names = c("Clade I","Clade II")) %>% gontjesr::favorite_kable()
-```
-
-
-# See frequency data in table 1 
+# See frequency data in table 1 for frequency and criterion
 # Frequency across clades found in supplemental table 1
-# Panel behavior found in overall supplemental panel figure
+# Diagnostic statistics for genotypic panel found in final supplemental panel  behavior found in overall supplemental panel figure

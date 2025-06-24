@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-23" />
+<meta name="date" content="2025-06-24" />
 
 <title>Supplemental Table 1: Clade-specific trends in the prevalence of carbapenem resistance-associated genotypes</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Table 1: Clade-specific trends
 in the prevalence of carbapenem resistance-associated genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-23</h4>
+<h4 class="date">2025-06-24</h4>
 
 </div>
 
@@ -613,7 +613,7 @@ bla_mat$`TEM-1D.v1` &lt;- ifelse(bla_mat$`TEM-1D.v1^` ==1 | bla_mat$`TEM-1D.v1`=
 
 bla_genes &lt;- colnames(bla_mat %&gt;% select(-isolate_no)) %&gt;% sort %&gt;% subset(!.%in% c(&quot;KPC-3^&quot;,&quot;SHV-11^&quot;,&quot;SHV-12^&quot;,&quot;TEM-1D.v1^&quot;))
 df &lt;- left_join(df,bla_mat)</code></pre>
-<pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_truncation_kleborate&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
+<pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&quot;OmpK36_truncation_kleborate&quot;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
 drug_exit &lt;- c(&quot;AcrAB_TolC_any&quot;,&#39;RamR&#39;,&quot;RamA&quot;)
 target_modification &lt;- c(&#39;PBP_any&#39;,&#39;PBP2&#39;,&quot;PBP4&quot;)
 
@@ -738,23 +738,6 @@ TD insertion
 </tr>
 <tr>
 <td style="text-align:left;">
-ompK36 truncation
-</td>
-<td style="text-align:left;">
-8 (1.9)
-</td>
-<td style="text-align:left;">
-1 (0.7)
-</td>
-<td style="text-align:left;">
-7 (2.6)
-</td>
-<td style="text-align:left;">
-0.270
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 ompK36 non-synonymous mutation
 </td>
 <td style="text-align:left;">
@@ -785,6 +768,23 @@ ompK36 putative function-altering mutations
 </td>
 <td style="text-align:left;">
 0.007
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 truncation
+</td>
+<td style="text-align:left;">
+8 (1.9)
+</td>
+<td style="text-align:left;">
+1 (0.7)
+</td>
+<td style="text-align:left;">
+7 (2.6)
+</td>
+<td style="text-align:left;">
+0.270
 </td>
 </tr>
 <tr>

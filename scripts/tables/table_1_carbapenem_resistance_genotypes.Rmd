@@ -39,7 +39,7 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 ```
 
 ```{r}
-drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_truncation_kleborate','OmpK36_non_syn','OmpK36_putative_function_altering','OmpK36_intergenic','OmpK36_promoter_IS')
+drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_non_syn','OmpK36_putative_function_altering',"OmpK36_truncation_kleborate",'OmpK36_intergenic','OmpK36_promoter_IS')
 drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
 target_modification <- c('PBP_any','PBP2',"PBP4")
 
@@ -66,7 +66,7 @@ get_summary_statistics <- function(name,nn_list){
 }
 
 get_nn_flag <- function(gwas_table){
-  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"yes","no")  
+  gwas_table$nn_qc <- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) >1 | abs(gwas_table$IR_num_log_2_diff_median) >1),"Pass","Fail")  
   return(gwas_table)  
 }
 ```

@@ -57,7 +57,7 @@ df <- left_join(df,bla_mat)
 ```
 
 ```{r}
-drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_truncation_kleborate','OmpK36_non_syn','OmpK36_putative_function_altering','OmpK36_intergenic','OmpK36_promoter_IS')
+drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_non_syn','OmpK36_putative_function_altering',"OmpK36_truncation_kleborate",'OmpK36_intergenic','OmpK36_promoter_IS')
 drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
 target_modification <- c('PBP_any','PBP2',"PBP4")
 
@@ -67,8 +67,6 @@ tn4401 <- c("Tn4401a","Tn4401b","Tn4401d","Tn4401_del_6920_7126","Tn4401_del_1_5
 ```
 
 ```{r} 
-
-
 exact <- c("OmpK36TD",'OmpK36_truncation_kleborate',"OmpK36_putative_function_altering","OmpK36_intergenic","OmpK36_promoter_IS","AcrAB_TolC_any","RamR","RamA","PBP_any","PBP2","PBP4",'Tn4401_del_1_3391_6920_7126','CMY-2.v2','CTX-M-14','CTX-M-15',"KPC-5","LAP-2","OXA-1","TEM-1",'TEM-104?','TEM-104*?','TEM-150*?')
 
 s_table_1 <- convert_tableone_into_df(dataset = df,vars=c(carbapenem,bla_genes,tn4401),factorVars = c(carbapenem,bla_genes,tn4401),strata="clade_I",outcome_names = c("Clade I","Clade II"),exact=exact)

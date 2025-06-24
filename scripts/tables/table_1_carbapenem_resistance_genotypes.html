@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-23" />
+<meta name="date" content="2025-06-24" />
 
 <title>table_1_carbapenem_resistance_genotypes</title>
 
@@ -576,7 +576,7 @@ display: none;
 
 <h1 class="title toc-ignore">table_1_carbapenem_resistance_genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-23</h4>
+<h4 class="date">2025-06-24</h4>
 
 </div>
 
@@ -604,7 +604,7 @@ Sys.info()</code></pre>
                                                                                             version 
 &quot;Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_X86_64&quot; 
                                                                                            nodename 
-                                                                                   &quot;msla0572.local&quot; 
+                                                                    &quot;macbookpro.wifi.med.umich.edu&quot; 
                                                                                             machine 
                                                                                            &quot;x86_64&quot; 
                                                                                               login 
@@ -656,7 +656,7 @@ canonical &lt;- readRDS(&quot;./data/carbapenem_resistance_panel/carbapenem_resi
 nn &lt;- readRDS(&quot;./data/nearest_neighbor_comparisons/nn_comparisons.RDS&quot;)
 
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) </code></pre>
-<pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_truncation_kleborate&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
+<pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&quot;OmpK36_truncation_kleborate&quot;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
 drug_exit &lt;- c(&quot;AcrAB_TolC_any&quot;,&#39;RamR&#39;,&quot;RamA&quot;)
 target_modification &lt;- c(&#39;PBP_any&#39;,&#39;PBP2&#39;,&quot;PBP4&quot;)
 
@@ -778,23 +778,6 @@ TD insertion
 </tr>
 <tr>
 <td style="text-align:left;">
-ompK36 truncation
-</td>
-<td style="text-align:left;">
-8 (1.9)
-</td>
-<td style="text-align:left;">
-6 (10.3)
-</td>
-<td style="text-align:left;">
-2 (0.6)
-</td>
-<td style="text-align:left;">
-&lt;0.001
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 ompK36 non-synonymous mutation
 </td>
 <td style="text-align:left;">
@@ -822,6 +805,23 @@ ompK36 putative function-altering mutations
 </td>
 <td style="text-align:left;">
 10 (2.8)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 truncation
+</td>
+<td style="text-align:left;">
+8 (1.9)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+2 (0.6)
 </td>
 <td style="text-align:left;">
 &lt;0.001
@@ -974,7 +974,7 @@ Penicillin-binding protein-4
 }
 
 get_nn_flag &lt;- function(gwas_table){
-  gwas_table$nn_qc &lt;- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) &gt;1 | abs(gwas_table$IR_num_log_2_diff_median) &gt;1),&quot;yes&quot;,&quot;no&quot;)  
+  gwas_table$nn_qc &lt;- ifelse(c(abs(gwas_table$MVB_num_log_2_diff_median) &gt;1 | abs(gwas_table$IR_num_log_2_diff_median) &gt;1),&quot;Pass&quot;,&quot;Fail&quot;)  
   return(gwas_table)  
 }</code></pre>
 <pre class="r"><code>canonical_var &lt;- canonical %&gt;% select(-isolate_no,-`OmpK35-25%`) %&gt;% colnames()
@@ -1177,13 +1177,13 @@ RamA
 RamA
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 ramA efflux pump activator PFAV
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -1275,13 +1275,13 @@ RamR
 RamR
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 ramR efflux pump regulator PFAV
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 </tr>
 <tr>
@@ -1373,13 +1373,13 @@ AcrAB_TolC_any
 AcrAB_TolC_any
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 acrAB-tolC efflux pump mutant
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 </tr>
 <tr>
@@ -1471,13 +1471,13 @@ PBP_any
 PBP_any
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Non-synonymous mutations in penicillin-binding-proteins
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -1569,13 +1569,13 @@ PBP2
 PBP2
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Penicillin-binding protein-2
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -1667,13 +1667,13 @@ PBP4
 PBP4
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Penicillin-binding protein-4
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -1765,13 +1765,13 @@ OmpK36_non_syn
 OmpK36_non_syn
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 ompK36 non-synonymous mutation
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -1863,13 +1863,13 @@ OmpK36_c25t
 OmpK36_c25t
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 C25T transition in ompK36
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -1961,13 +1961,13 @@ OmpK36_truncation_kleborate
 OmpK36_truncation_kleborate
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 ompK36 truncation
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -2059,13 +2059,13 @@ OmpK36_intergenic
 OmpK36_intergenic
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 ompK36 intergenic region
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 </tr>
 <tr>
@@ -2157,13 +2157,13 @@ OmpK36_putative_function_altering
 OmpK36_putative_function_altering
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 ompK36 putative function-altering mutations
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -2255,13 +2255,13 @@ OmpK36_L3_mutations
 OmpK36_L3_mutations
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Loop 3 insertion
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -2353,13 +2353,13 @@ OmpK36GD
 OmpK36GD
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 GD insertion
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 <tr>
@@ -2451,13 +2451,13 @@ OmpK36TD
 OmpK36TD
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 TD insertion
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 </tr>
 <tr>
@@ -2549,13 +2549,13 @@ OmpK36_promoter_IS
 OmpK36_promoter_IS
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Insertion seqeunce at ompK36 promoter
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 </tr>
 </tbody>
@@ -3450,7 +3450,7 @@ C25T transition in ompK36
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Fail
@@ -3473,7 +3473,7 @@ Loop 3 insertion
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Fail
@@ -3496,7 +3496,7 @@ GD insertion
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Fail
@@ -3519,30 +3519,7 @@ TD insertion
 0.147
 </td>
 <td style="text-align:left;">
-no
-</td>
-<td style="text-align:left;">
-Pass
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-ompK36 truncation
-</td>
-<td style="text-align:left;">
-8 (1.9)
-</td>
-<td style="text-align:left;">
-6 (10.3)
-</td>
-<td style="text-align:left;">
-2 (0.6)
-</td>
-<td style="text-align:left;">
-&lt;0.001
-</td>
-<td style="text-align:left;">
-yes
+Fail
 </td>
 <td style="text-align:left;">
 Pass
@@ -3565,7 +3542,7 @@ ompK36 non-synonymous mutation
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Pass
@@ -3588,7 +3565,30 @@ ompK36 putative function-altering mutations
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
+</td>
+<td style="text-align:left;">
+Pass
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ompK36 truncation
+</td>
+<td style="text-align:left;">
+8 (1.9)
+</td>
+<td style="text-align:left;">
+6 (10.3)
+</td>
+<td style="text-align:left;">
+2 (0.6)
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+Pass
 </td>
 <td style="text-align:left;">
 Pass
@@ -3611,7 +3611,7 @@ ompK36 intergenic region
 0.061
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 Pass
@@ -3634,7 +3634,7 @@ Insertion seqeunce at ompK36 promoter
 0.128
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Pass
@@ -3657,7 +3657,7 @@ acrAB-tolC efflux pump mutant
 1.000
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 Pass
@@ -3680,7 +3680,7 @@ ramR efflux pump regulator PFAV
 0.083
 </td>
 <td style="text-align:left;">
-no
+Fail
 </td>
 <td style="text-align:left;">
 Pass
@@ -3703,7 +3703,7 @@ ramA efflux pump activator PFAV
 0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Pass
@@ -3726,7 +3726,7 @@ Non-synonymous mutations in penicillin-binding-proteins
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Pass
@@ -3749,7 +3749,7 @@ Penicillin-binding protein-2
 &lt;0.001
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Pass
@@ -3772,7 +3772,7 @@ Penicillin-binding protein-4
 0.262
 </td>
 <td style="text-align:left;">
-yes
+Pass
 </td>
 <td style="text-align:left;">
 Pass
