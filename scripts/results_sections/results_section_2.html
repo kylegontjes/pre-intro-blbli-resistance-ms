@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2025-06-20" />
+<meta name="date" content="2025-06-24" />
 
-<title>Differences in resistance prevalence and emergence events exist across clades of epidemic-lineage ST258</title>
+<title>Differences in resistance emergence and spread exist across clades of epidemic-lineage ST258</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -573,9 +573,9 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Differences in resistance prevalence and
-emergence events exist across clades of epidemic-lineage ST258</h1>
-<h4 class="date">2025-06-20</h4>
+<h1 class="title toc-ignore">Differences in resistance emergence and
+spread exist across clades of epidemic-lineage ST258</h1>
+<h4 class="date">2025-06-24</h4>
 
 </div>
 
@@ -686,7 +686,7 @@ Sys.info()</code></pre>
 ##                                                                                             version 
 ## &quot;Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_X86_64&quot; 
 ##                                                                                            nodename 
-##                                                                                    &quot;msla0572.local&quot; 
+##                                                                     &quot;macbookpro.wifi.med.umich.edu&quot; 
 ##                                                                                             machine 
 ##                                                                                            &quot;x86_64&quot; 
 ##                                                                                               login 
@@ -1116,149 +1116,6 @@ Clade II
 </div>
 </div>
 </div>
-<div id="data-from-modeling" class="section level1">
-<h1>Data from modeling</h1>
-<pre class="r"><code>fitmultiMK &lt;- readRDS(&quot;./data/fitmultiMk_rate_differences/fitmultiMk_rate_differences_table.RDS&quot;)
-fitmultiMK %&gt;% subset(phenotype == &#39;blbli_dich_num&#39;) %&gt;% favorite_kable()</code></pre>
-<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
-<thead>
-<tr>
-<th style="text-align:right;">
-R1
-</th>
-<th style="text-align:right;">
-R2
-</th>
-<th style="text-align:right;">
-log_likelihood
-</th>
-<th style="text-align:right;">
-AIC
-</th>
-<th style="text-align:left;">
-model
-</th>
-<th style="text-align:left;">
-phenotype
-</th>
-<th style="text-align:right;">
-CI_R1
-</th>
-<th style="text-align:right;">
-CI_R2
-</th>
-<th style="text-align:right;">
-CII_R1
-</th>
-<th style="text-align:right;">
-CII_R2
-</th>
-<th style="text-align:right;">
-multi_regime_log_likelihood
-</th>
-<th style="text-align:right;">
-multi_regime_AIC
-</th>
-<th style="text-align:right;">
-LRT_chisq
-</th>
-<th style="text-align:right;">
-LRT_pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right;">
-6846.918
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
--177.0104
-</td>
-<td style="text-align:right;">
-356.0209
-</td>
-<td style="text-align:left;">
-ER
-</td>
-<td style="text-align:left;">
-blbli_dich_num
-</td>
-<td style="text-align:right;">
-20965.15
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-3881.492
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
--168.5682
-</td>
-<td style="text-align:right;">
-341.1364
-</td>
-<td style="text-align:right;">
-16.884493
-</td>
-<td style="text-align:right;">
-0.0000397
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-12811.143
-</td>
-<td style="text-align:right;">
-80293.47
-</td>
-<td style="text-align:right;">
--152.6949
-</td>
-<td style="text-align:right;">
-309.3899
-</td>
-<td style="text-align:left;">
-ARD
-</td>
-<td style="text-align:left;">
-blbli_dich_num
-</td>
-<td style="text-align:right;">
-51207.52
-</td>
-<td style="text-align:right;">
-161299.4
-</td>
-<td style="text-align:right;">
-8081.846
-</td>
-<td style="text-align:right;">
-86011.43
-</td>
-<td style="text-align:right;">
--149.4415
-</td>
-<td style="text-align:right;">
-306.8830
-</td>
-<td style="text-align:right;">
-6.506932
-</td>
-<td style="text-align:right;">
-0.0386400
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <div id="tip-level-data" class="section level1">
 <h1>Tip level data</h1>
 <pre class="r"><code>ST258_phylo &lt;- asr_cluster_analysis(asr_clustering_obj)   %&gt;% mutate(population = &quot;ST258&quot;)
@@ -1504,6 +1361,149 @@ Clade I
 </td>
 <td style="text-align:left;">
 Clade II
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="data-from-fitmultimk-modeling" class="section level1">
+<h1>Data from fitmultiMK modeling</h1>
+<pre class="r"><code>fitmultiMK &lt;- readRDS(&quot;./data/fitmultiMk_rate_differences/fitmultiMk_rate_differences_table.RDS&quot;)
+fitmultiMK %&gt;% subset(phenotype == &#39;blbli_dich_num&#39;) %&gt;% favorite_kable()</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:right;">
+R1
+</th>
+<th style="text-align:right;">
+R2
+</th>
+<th style="text-align:right;">
+log_likelihood
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:left;">
+model
+</th>
+<th style="text-align:left;">
+phenotype
+</th>
+<th style="text-align:right;">
+CI_R1
+</th>
+<th style="text-align:right;">
+CI_R2
+</th>
+<th style="text-align:right;">
+CII_R1
+</th>
+<th style="text-align:right;">
+CII_R2
+</th>
+<th style="text-align:right;">
+multi_regime_log_likelihood
+</th>
+<th style="text-align:right;">
+multi_regime_AIC
+</th>
+<th style="text-align:right;">
+LRT_chisq
+</th>
+<th style="text-align:right;">
+LRT_pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+6846.918
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+-177.0104
+</td>
+<td style="text-align:right;">
+356.0209
+</td>
+<td style="text-align:left;">
+ER
+</td>
+<td style="text-align:left;">
+blbli_dich_num
+</td>
+<td style="text-align:right;">
+20965.15
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+3881.492
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+-168.5682
+</td>
+<td style="text-align:right;">
+341.1364
+</td>
+<td style="text-align:right;">
+16.884493
+</td>
+<td style="text-align:right;">
+0.0000397
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+12811.143
+</td>
+<td style="text-align:right;">
+80293.47
+</td>
+<td style="text-align:right;">
+-152.6949
+</td>
+<td style="text-align:right;">
+309.3899
+</td>
+<td style="text-align:left;">
+ARD
+</td>
+<td style="text-align:left;">
+blbli_dich_num
+</td>
+<td style="text-align:right;">
+51207.52
+</td>
+<td style="text-align:right;">
+161299.4
+</td>
+<td style="text-align:right;">
+8081.846
+</td>
+<td style="text-align:right;">
+86011.43
+</td>
+<td style="text-align:right;">
+-149.4415
+</td>
+<td style="text-align:right;">
+306.8830
+</td>
+<td style="text-align:right;">
+6.506932
+</td>
+<td style="text-align:right;">
+0.0386400
 </td>
 </tr>
 </tbody>

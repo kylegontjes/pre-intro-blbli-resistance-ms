@@ -1,5 +1,5 @@
 ---
-title: "Differences in resistance prevalence and emergence events exist across clades of epidemic-lineage ST258  "
+title: "Differences in resistance emergence and spread exist across clades of epidemic-lineage ST258"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -95,12 +95,6 @@ clustering_data <- cbind.data.frame(clustering_categories = clustering_categorie
 clustering_data %>% favorite_kable 
 ```
 
-# Data from modeling
-```{r}
-fitmultiMK <- readRDS("./data/fitmultiMk_rate_differences/fitmultiMk_rate_differences_table.RDS")
-fitmultiMK %>% subset(phenotype == 'blbli_dich_num') %>% favorite_kable()
-```
-
 # Tip level data
 ```{r}
 ST258_phylo <- asr_cluster_analysis(asr_clustering_obj)   %>% mutate(population = "ST258")
@@ -109,6 +103,13 @@ CII_phylo <- asr_cluster_analysis(asr_clustering_obj %>% subset(child_name %in% 
 
 rbind(ST258_phylo,CI_phylo,CII_phylo) %>% favorite_kable()
 ```
+
+# Data from fitmultiMK modeling
+```{r}
+fitmultiMK <- readRDS("./data/fitmultiMk_rate_differences/fitmultiMk_rate_differences_table.RDS")
+fitmultiMK %>% subset(phenotype == 'blbli_dich_num') %>% favorite_kable()
+```
+
 # Statistical testing
 ```{r}
 paste0("Phylo occurrence diffence")

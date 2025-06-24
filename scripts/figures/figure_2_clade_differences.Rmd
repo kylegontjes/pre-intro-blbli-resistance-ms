@@ -1,7 +1,7 @@
 ---
-title: "figure_2"
+title: "Figure 2: Differences in β-lactam/β-lactamase inhibitor combination resistance across clades of epidemic lineage sequence type 258"
 output: html_document
-date: "2024-10-01"
+date: "`r Sys.Date()`"
 ---
 
 ```{r setup, include=FALSE}
