@@ -20,47 +20,19 @@ packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree")
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
 #Scripts
-source("./lib/consistent_themes.R")
-source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+source("./lib/consistent_themes.R") 
 source("./lib/common_functions.R")
 ```
 
 ```{r} 
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
-tr <- read.tree("./data/tree/tree.treefile")
-# GWAS table
-gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS")
-gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")
-# Genome features
-KPNIH1_features <- readRDS("./data/references/KPNIH1/KPNIH1_features.RDS")
-# Matrices
-## Kleborate matrix
-kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
-## KPC Plasmids 
-KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
-KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
-KPC_clusters <- colnames(KPC_containing_clusters)
-Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
-df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))
-## Core genome burden models
-models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
-for(x in models){
-  grouped_model <- paste0(x,"_burden.RDS")
-  assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
-}
-## BLBLI clustering
-pclustering <- readRDS('./data/asr_clustering/blbli_asr_clustering_df.RDS')
-blbli_asr <- readRDS('./data/asr_clustering/blbli_asr.RDS')
+tr <- read.tree("./data/tree/tree.treefile") 
 ## Canonical
 canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
 ## Depth
 depth <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS")
-# Join
-df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
-df <- left_join(df,gwas_mat %>% mutate(isolate_no = rownames(.))) 
-df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed))
-df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible" )
+# Join 
 df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
 df <- left_join(df,depth %>% mutate(isolate_no = rownames(.)))
 ```

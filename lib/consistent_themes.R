@@ -144,11 +144,11 @@ figure_2_format <- theme(legend.position = "bottom",
 
 # Figure 4 Format
 figure_4_format <-   theme(legend.position = "bottom",
-                           axis.text =   element_text(size=20,color="black"),
-                           axis.title = element_text(size = 24,color="black"),
-                           legend.text =   element_text(size=22,color="black"),
-                           legend.title = element_text(size = 24,color="black"),
-                           plot.title = element_text(size = 26,color="black")
+                           axis.text =   element_text(size=12,color="black"),
+                           axis.title = element_text(size = 14,color="black"),
+                           legend.text =   element_text(size=12,color="black"),
+                           legend.title = element_text(size = 14,color="black"),
+                           plot.title = element_text(size = 16,color="black")
 ) 
 
 # S fig 6
