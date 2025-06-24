@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 1 - Cross-resistance profile of 412 carbapenem-resistant Klebsiella pneumoniae ST258 isolates"
+title: "Supplemental Figure 1 - Cross-resistance profile of carbapenem-resistant Klebsiella pneumoniae ST258 isolates"
 output: html_document
 date: "`r Sys.Date()`"
 ---

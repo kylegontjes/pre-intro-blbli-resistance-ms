@@ -1,5 +1,5 @@
 ---
-title: "Non-susceptibility to β-lactam/β-lactamase inhibitor combinations was detected before their clinical deployment"
+title: "Results section 1: Detection of resistance to β-lactam/β-lactamase inhibitor combinations before their clinical deployment"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -56,4 +56,4 @@ median_IQR("IR_log_2",df)
 convert_tableone_into_df(df,vars=c("blbli_dich_num","MVB_dich_num","MVB_cat","IR_dich_num","IR_cat"),factorVars = c("blbli_dich_num","MVB_dich_num","MVB_cat","IR_dich_num","IR_cat")) %>% favorite_kable
 ```
 
-# For data on cross-resistance, see supplemental figure 2
+# For data on cross-resistance and correlations between MICs, see supplemental figures 1-2

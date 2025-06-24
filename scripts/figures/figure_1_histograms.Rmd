@@ -1,5 +1,5 @@
 ---
-title: "Figure 1 - Minimum inhibitory concentrations for meropenem-vaborbactam and imipenem-relebactam in 415 carbapenem-resistant Klebsiella pneumoniae ST258 isolates"
+title: "Figure 1 - Minimum inhibitory concentrations for imipenem-relebactam and meropenem-vaborbactam in carbapenem-resistant Klebsiella pneumoniae ST258 isolates"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -47,7 +47,7 @@ MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=-0.25, 0
 
 # Create cowplot Figure
 MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 20)
-figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.135)) 
+figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.14)) 
 ``` 
 
 ## Figure
