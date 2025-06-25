@@ -111,7 +111,7 @@ A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,A
 # B KPC copy number
 ```{r} 
 df_CI$KPC_plasmid_simplified <- ifelse(df_CI$AA018_KPC == 1, "AA018",ifelse(df_CI$AA552_KPC == 1,"AA552","Other"))
-B <- ggplot(data= df_CI) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.6))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("KPC Copy Number") + xlab("KPC Plasmid Cluster")+ theme_bw_me + sfig6_format + theme(legend.position='none') + ylim(NA,10.01)
+B <- ggplot(data= df_CI) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.6))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("KPC copy number") + xlab("KPC plasmid cluster")+ theme_bw_me + sfig6_format + theme(legend.position='none') + ylim(NA,10.01)
 ```
 
 # C membership in clusters
@@ -139,6 +139,6 @@ s_figure_6 <- plot_grid(s_figure_6A,s_figure_6BC,rel_heights = c(1,1),rel_widths
 s_figure_6
 ```
  
-```{r,message=F,echo=F,error=F,warning=F,fig.width=21.25,fig.height=15} 
-ggsave(plot = s_figure_6, filename = './figures/s_figure_5.png', width = 21.25, height = 12,limitsize=FALSE, bg='white')
+```{r,message=F,echo=F,error=F,warning=F,fig.width=21.5,fig.height=15} 
+ggsave(plot = s_figure_6, filename = './figures/s_figure_5.png', width = 21.5, height = 12,limitsize=FALSE, bg='white')
 ```
