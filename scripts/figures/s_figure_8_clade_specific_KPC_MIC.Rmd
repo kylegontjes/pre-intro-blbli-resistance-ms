@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 8: "
+title: "Supplemental Figure 8: Associations between blaKPC copy number and minimum-inhibitory concentration stratified by clade"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -89,6 +89,6 @@ s_figure_5
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_5, filename = './figures/s_figure_5.png', width =7.4, height = 7.4,limitsize=FALSE)
+ggsave(plot = s_figure_5, filename = './figures/s_figure_8.png', width =7.4, height = 7.4,limitsize=FALSE)
 ```
  
