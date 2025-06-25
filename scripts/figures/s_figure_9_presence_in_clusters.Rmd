@@ -177,7 +177,7 @@ B <- st258 +
     c(21,22,23,24,25),genotype_ordering
   ),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) + 
   scale_size_manual(name="Synchronous clustering",values = setNames(
-    c(5,3.25,3,2,3),genotype_ordering),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + 
+    c(4,2.25,2.5,1.75,2.25),genotype_ordering),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + 
   scale_alpha(guide = 'none') + theme(legend.position = 'bottom')
 rownames(df) <- df$isolate_no
 
