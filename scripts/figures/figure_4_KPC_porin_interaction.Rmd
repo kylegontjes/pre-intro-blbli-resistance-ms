@@ -1,5 +1,5 @@
 ---
-title: "figure_4"
+title: "Figure 4. Interaction of loop 3 insertions in ompK36 porin with blaKPC copy number "
 output: html_document
 date: "2024-10-06"
 ---
@@ -68,7 +68,6 @@ IR_intercepts <-  add_group_median_values(df, "IR_log_2", "OmpK36_mutations_simp
 
 fig4a <- create_MIC_histogram(df$IR_log_2,df$OmpK36_mutations_simple,"Imipenem-relebactam")+ scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
         labels=c("≤0.25/4","0.5/4", "1/4","2/4","4/4","8/4","16/4","≥32/4"))  + labs(fill="ompK36 Status")  + theme_bw_me + ylim(NA,250) + figure_4_format + ompK36_scale  + IR_intercepts[[1]] + IR_intercepts[[2]] + IR_intercepts[[3]] 
-
 MVB_intercepts <-  add_group_median_values(df, "MVB_log_2", "OmpK36_mutations_simple")
 
 fig4c <- create_MIC_histogram(df$MVB_log_2,df$OmpK36_mutations_simple,"Meropenem-vaborbactam") + scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
@@ -99,7 +98,6 @@ figure_4_legends <- cowplot::plot_grid(ompk36_legend) + theme(plot.margin = unit
 
 figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,rel_heights = c(1,0.125),rel_widths=c(1,0.75),ncol=1 )+ theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
 ```
-
 
 ```{r,fig.width=9,fig.height=9}
 figure_4

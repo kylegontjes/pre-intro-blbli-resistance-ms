@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-23" />
+<meta name="date" content="2025-06-25" />
 
-<title>results_section_5</title>
+<title>Interaction between carbapenemase copy number and loop 3 insertions in ompK36</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,9 +350,10 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">results_section_5</h1>
+<h1 class="title toc-ignore">Interaction between carbapenemase copy
+number and loop 3 insertions in ompK36</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-23</h4>
+<h4 class="date">2025-06-25</h4>
 
 </div>
 
@@ -367,10 +368,8 @@ depth &lt;- readRDS(&quot;./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_dept
 # Join 
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) 
 df &lt;- left_join(df,depth %&gt;% mutate(isolate_no = rownames(.)))</code></pre>
-<div id="log-2-kpc-association" class="section level1">
-<h1>Log-2 KPC association</h1>
-<div id="ompk36-gd-insertion-story" class="section level2">
-<h2>OmpK36 GD insertion story</h2>
+<div id="log-2-kpc-association-with-mics" class="section level1">
+<h1>Log-2 KPC association with MICs</h1>
 <pre class="r"><code>convert_tableone_into_df(df,c(&quot;OmpK36_L3_mutations&quot;,&quot;OmpK36GD&quot;,&quot;OmpK36TD&quot;),strata=&quot;clade_I&quot;,outcome_names = c(&quot;Clade I&quot;,&quot;Clade II&quot;),factorVars = c(&quot;OmpK36_L3_mutations&quot;,&quot;OmpK36GD&quot;,&quot;OmpK36TD&quot;))</code></pre>
 <pre><code>                     Variable Overall (n=412) Clade I (n=145) Clade II (n=267)
 2 OmpK36_L3_mutations = 1 (%)      124 (30.1)      124 (85.5)          0 (0.0)
@@ -391,224 +390,596 @@ df$KPC_log_2 &lt;- log2(df$KPNIH1_RS28775_chr_median_norm)</code></pre>
 df_w_KPC$OmpK36_mutations_simple &lt;- relevel(df_w_KPC$OmpK36_mutations_simple,ref = &quot;No loop 3 insertion or PFAV&quot;) 
 paste0(&quot;KPC w/ MVB or IR&quot;)</code></pre>
 <pre><code>[1] &quot;KPC w/ MVB or IR&quot;</code></pre>
-<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %&gt;% summary </code></pre>
-<pre><code>
-Call:
-lm(formula = MVB_log_2 ~ KPC_log_2, data = df_w_KPC)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--1.609 -1.355 -1.223  0.783  5.896 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -0.64019    0.09543  -6.708 6.62e-11 ***
-KPC_log_2   -0.12339    0.08963  -1.377    0.169    
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.913 on 407 degrees of freedom
-Multiple R-squared:  0.004635,  Adjusted R-squared:  0.002189 
-F-statistic: 1.895 on 1 and 407 DF,  p-value: 0.1694</code></pre>
-<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %&gt;% summary  </code></pre>
-<pre><code>
-Call:
-lm(formula = MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple, 
-    data = df_w_KPC)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.3058 -0.5955 -0.3072  0.0726  5.5518 
-
-Coefficients:
-                                                                 Estimate
-(Intercept)                                                      -1.68216
-KPC_log_2                                                         0.29810
-OmpK36_mutations_simplePutative function-altering variant (PFAV)  2.40093
-OmpK36_mutations_simpleLoop 3 insertion                           2.95659
-                                                                 Std. Error
-(Intercept)                                                         0.09012
-KPC_log_2                                                           0.07057
-OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.31289
-OmpK36_mutations_simpleLoop 3 insertion                             0.16614
-                                                                 t value
-(Intercept)                                                      -18.666
-KPC_log_2                                                          4.224
-OmpK36_mutations_simplePutative function-altering variant (PFAV)   7.673
-OmpK36_mutations_simpleLoop 3 insertion                           17.796
-                                                                 Pr(&gt;|t|)    
-(Intercept)                                                       &lt; 2e-16 ***
-KPC_log_2                                                        2.96e-05 ***
-OmpK36_mutations_simplePutative function-altering variant (PFAV) 1.26e-13 ***
-OmpK36_mutations_simpleLoop 3 insertion                           &lt; 2e-16 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.411 on 405 degrees of freedom
-Multiple R-squared:  0.4611,    Adjusted R-squared:  0.4571 
-F-statistic: 115.5 on 3 and 405 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %&gt;% summary </code></pre>
-<pre><code>
-Call:
-lm(formula = MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple, 
-    data = df_w_KPC)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.6853 -0.4743 -0.3879  0.2174  5.5628 
-
-Coefficients:
-                                                                           Estimate
-(Intercept)                                                                -1.60844
-KPC_log_2                                                                   0.10428
-OmpK36_mutations_simplePutative function-altering variant (PFAV)            2.35451
-OmpK36_mutations_simpleLoop 3 insertion                                     3.18870
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)  0.11194
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                           0.89315
-                                                                           Std. Error
-(Intercept)                                                                   0.08915
-KPC_log_2                                                                     0.08219
-OmpK36_mutations_simplePutative function-altering variant (PFAV)              0.31356
-OmpK36_mutations_simpleLoop 3 insertion                                       0.16801
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.23027
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                             0.17237
-                                                                           t value
-(Intercept)                                                                -18.042
-KPC_log_2                                                                    1.269
-OmpK36_mutations_simplePutative function-altering variant (PFAV)             7.509
-OmpK36_mutations_simpleLoop 3 insertion                                     18.979
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)   0.486
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                            5.182
-                                                                           Pr(&gt;|t|)
-(Intercept)                                                                 &lt; 2e-16
-KPC_log_2                                                                     0.205
-OmpK36_mutations_simplePutative function-altering variant (PFAV)           3.87e-13
-OmpK36_mutations_simpleLoop 3 insertion                                     &lt; 2e-16
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.627
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                          3.49e-07
-                                                                              
-(Intercept)                                                                ***
-KPC_log_2                                                                     
-OmpK36_mutations_simplePutative function-altering variant (PFAV)           ***
-OmpK36_mutations_simpleLoop 3 insertion                                    ***
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                          ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.369 on 403 degrees of freedom
-Multiple R-squared:  0.4949,    Adjusted R-squared:  0.4887 
-F-statistic: 78.98 on 5 and 403 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %&gt;% tab_model() </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.64
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.83 – -0.45
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.12
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.30 – 0.05
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.169
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.005 / 0.002
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.68
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.86 – -1.51
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.30
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.16 – 0.44
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.40
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.79 – 3.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.96
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.63 – 3.28
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.461 / 0.457
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %&gt;% tab_model() </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.61
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.78 – -1.43
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.06 – 0.27
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.205
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.35
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.74 – 2.97
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.19
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.86 – 3.52
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.11
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.34 – 0.56
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.627
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple [Loop 3<br>insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.89
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.55 – 1.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.495 / 0.489
+</td>
+</tr>
+</table>
 <pre class="r"><code>paste0(&quot;IR w/ KPC&quot;)</code></pre>
 <pre><code>[1] &quot;IR w/ KPC&quot;</code></pre>
-<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %&gt;% summary </code></pre>
-<pre><code>
-Call:
-lm(formula = IR_log_2 ~ KPC_log_2, data = df_w_KPC)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--0.9766 -0.8805  0.0305  0.1510  6.1156 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -1.12047    0.05716 -19.604   &lt;2e-16 ***
-KPC_log_2    0.02193    0.05368   0.409    0.683    
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.146 on 407 degrees of freedom
-Multiple R-squared:  0.00041,   Adjusted R-squared:  -0.002046 
-F-statistic: 0.167 on 1 and 407 DF,  p-value: 0.683</code></pre>
-<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %&gt;% summary  </code></pre>
-<pre><code>
-Call:
-lm(formula = IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple, 
-    data = df_w_KPC)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.0827 -0.4701 -0.3304  0.5226  4.6166 
-
-Coefficients:
-                                                                 Estimate
-(Intercept)                                                      -1.63033
-KPC_log_2                                                         0.18138
-OmpK36_mutations_simplePutative function-altering variant (PFAV)  2.52439
-OmpK36_mutations_simpleLoop 3 insertion                           1.21813
-                                                                 Std. Error
-(Intercept)                                                         0.05744
-KPC_log_2                                                           0.04498
-OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.19943
-OmpK36_mutations_simpleLoop 3 insertion                             0.10589
-                                                                 t value
-(Intercept)                                                      -28.384
-KPC_log_2                                                          4.033
-OmpK36_mutations_simplePutative function-altering variant (PFAV)  12.658
-OmpK36_mutations_simpleLoop 3 insertion                           11.504
-                                                                 Pr(&gt;|t|)    
-(Intercept)                                                       &lt; 2e-16 ***
-KPC_log_2                                                        6.59e-05 ***
-OmpK36_mutations_simplePutative function-altering variant (PFAV)  &lt; 2e-16 ***
-OmpK36_mutations_simpleLoop 3 insertion                           &lt; 2e-16 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 0.8993 on 405 degrees of freedom
-Multiple R-squared:  0.3871,    Adjusted R-squared:  0.3825 
-F-statistic: 85.25 on 3 and 405 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %&gt;% summary  </code></pre>
-<pre><code>
-Call:
-lm(formula = IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple, 
-    data = df_w_KPC)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.0452 -0.4520 -0.3362  0.5359  4.5980 
-
-Coefficients:
-                                                                           Estimate
-(Intercept)                                                                -1.60716
-KPC_log_2                                                                   0.12046
-OmpK36_mutations_simplePutative function-altering variant (PFAV)            2.51893
-OmpK36_mutations_simpleLoop 3 insertion                                     1.29703
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)  0.00779
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                           0.29434
-                                                                           Std. Error
-(Intercept)                                                                   0.05819
-KPC_log_2                                                                     0.05365
-OmpK36_mutations_simplePutative function-altering variant (PFAV)              0.20467
-OmpK36_mutations_simpleLoop 3 insertion                                       0.10967
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.15030
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                             0.11251
-                                                                           t value
-(Intercept)                                                                -27.619
-KPC_log_2                                                                    2.245
-OmpK36_mutations_simplePutative function-altering variant (PFAV)            12.307
-OmpK36_mutations_simpleLoop 3 insertion                                     11.827
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)   0.052
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                            2.616
-                                                                           Pr(&gt;|t|)
-(Intercept)                                                                 &lt; 2e-16
-KPC_log_2                                                                   0.02528
-OmpK36_mutations_simplePutative function-altering variant (PFAV)            &lt; 2e-16
-OmpK36_mutations_simpleLoop 3 insertion                                     &lt; 2e-16
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)  0.95869
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                           0.00923
-                                                                              
-(Intercept)                                                                ***
-KPC_log_2                                                                  *  
-OmpK36_mutations_simplePutative function-altering variant (PFAV)           ***
-OmpK36_mutations_simpleLoop 3 insertion                                    ***
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                          ** 
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 0.8938 on 403 degrees of freedom
-Multiple R-squared:  0.3975,    Adjusted R-squared:  0.3901 
-F-statistic: 53.18 on 5 and 403 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %&gt;%  tab_model() </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.12
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.23 – -1.01
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.08 – 0.13
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.683
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.000 / -0.002
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC)  %&gt;% tab_model()</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.63
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.74 – -1.52
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.18
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.09 – 0.27
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.52
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.13 – 2.92
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.22
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.01 – 1.43
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.387 / 0.383
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.61
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.72 – -1.49
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.12
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.01 – 0.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.025</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.52
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.12 – 2.92
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.30
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.08 – 1.51
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.01
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.29 – 0.30
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.959
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple [Loop 3<br>insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.29
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.07 – 0.52
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.009</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.398 / 0.390
+</td>
+</tr>
+</table>
 <div id="investigation-across-clades" class="section level3">
 <h3>Investigation across clades</h3>
 <pre class="r"><code>df_w_KPC_CI &lt;- df_w_KPC %&gt;% subset(clade_I == &quot;Clade I&quot;)
@@ -616,225 +987,1105 @@ df_w_KPC_CII &lt;- df_w_KPC %&gt;% subset(clade_I != &quot;Clade I&quot;)
 # Clade I
 paste0(&quot;KPC w/ MVB or IR&quot;)</code></pre>
 <pre><code>[1] &quot;KPC w/ MVB or IR&quot;</code></pre>
-<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %&gt;% summary </code></pre>
-<pre><code>
-Call:
-lm(formula = MVB_log_2 ~ KPC_log_2, data = df_w_KPC_CI)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--4.0193 -0.9445 -0.0153  1.0068  4.0809 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)   0.9454     0.1626   5.814 3.86e-08 ***
-KPC_log_2     0.6026     0.1592   3.784 0.000227 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.818 on 142 degrees of freedom
-Multiple R-squared:  0.0916,    Adjusted R-squared:  0.0852 
-F-statistic: 14.32 on 1 and 142 DF,  p-value: 0.0002268</code></pre>
-<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% summary  </code></pre>
-<pre><code>
-Call:
-lm(formula = MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple, 
-    data = df_w_KPC_CI)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.5394 -0.9580 -0.0717  0.7332  4.1394 
-
-Coefficients:
-                                                                 Estimate
-(Intercept)                                                       -1.6386
-KPC_log_2                                                          0.7285
-OmpK36_mutations_simplePutative function-altering variant (PFAV)   0.9899
-OmpK36_mutations_simpleLoop 3 insertion                            3.1013
-                                                                 Std. Error
-(Intercept)                                                          0.4230
-KPC_log_2                                                            0.1355
-OmpK36_mutations_simplePutative function-altering variant (PFAV)     0.5999
-OmpK36_mutations_simpleLoop 3 insertion                              0.4422
-                                                                 t value
-(Intercept)                                                       -3.874
-KPC_log_2                                                          5.377
-OmpK36_mutations_simplePutative function-altering variant (PFAV)   1.650
-OmpK36_mutations_simpleLoop 3 insertion                            7.013
-                                                                 Pr(&gt;|t|)    
-(Intercept)                                                      0.000164 ***
-KPC_log_2                                                        3.09e-07 ***
-OmpK36_mutations_simplePutative function-altering variant (PFAV) 0.101173    
-OmpK36_mutations_simpleLoop 3 insertion                          9.11e-11 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.513 on 140 degrees of freedom
-Multiple R-squared:  0.3799,    Adjusted R-squared:  0.3666 
-F-statistic: 28.59 on 3 and 140 DF,  p-value: 1.751e-14</code></pre>
-<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% summary </code></pre>
-<pre><code>
-Call:
-lm(formula = MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple, 
-    data = df_w_KPC_CI)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.6853 -0.9572 -0.0783  0.7871  4.9971 
-
-Coefficients:
-                                                                           Estimate
-(Intercept)                                                                -1.91435
-KPC_log_2                                                                   0.02235
-OmpK36_mutations_simplePutative function-altering variant (PFAV)            1.38705
-OmpK36_mutations_simpleLoop 3 insertion                                     3.49461
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)  0.23357
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                           0.97508
-                                                                           Std. Error
-(Intercept)                                                                   0.46612
-KPC_log_2                                                                     0.56297
-OmpK36_mutations_simplePutative function-altering variant (PFAV)              0.62468
-OmpK36_mutations_simpleLoop 3 insertion                                       0.49094
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.61459
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                             0.58637
-                                                                           t value
-(Intercept)                                                                 -4.107
-KPC_log_2                                                                    0.040
-OmpK36_mutations_simplePutative function-altering variant (PFAV)             2.220
-OmpK36_mutations_simpleLoop 3 insertion                                      7.118
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)   0.380
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                            1.663
-                                                                           Pr(&gt;|t|)
-(Intercept)                                                                6.83e-05
-KPC_log_2                                                                    0.9684
-OmpK36_mutations_simplePutative function-altering variant (PFAV)             0.0280
-OmpK36_mutations_simpleLoop 3 insertion                                    5.46e-11
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)   0.7045
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                            0.0986
-                                                                              
-(Intercept)                                                                ***
-KPC_log_2                                                                     
-OmpK36_mutations_simplePutative function-altering variant (PFAV)           *  
-OmpK36_mutations_simpleLoop 3 insertion                                    ***
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                          .  
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.482 on 138 degrees of freedom
-Multiple R-squared:  0.4136,    Adjusted R-squared:  0.3924 
-F-statistic: 19.47 on 5 and 138 DF,  p-value: 1.223e-14</code></pre>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.95
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.62 – 1.27
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.60
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.29 – 0.92
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.092 / 0.085
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.64
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.47 – -0.80
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.73
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.46 – 1.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.99
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.20 – 2.18
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.101
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.23 – 3.98
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.380 / 0.367
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.91
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.84 – -0.99
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.09 – 1.14
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.968
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.39
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.15 – 2.62
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.028</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.49
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.52 – 4.47
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.98 – 1.45
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.704
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple [Loop 3<br>insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.98
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.18 – 2.13
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.099
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.414 / 0.392
+</td>
+</tr>
+</table>
 <pre class="r"><code>paste0(&quot;IR w/ KPC&quot;)</code></pre>
 <pre><code>[1] &quot;IR w/ KPC&quot;</code></pre>
-<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %&gt;% summary </code></pre>
-<pre><code>
-Call:
-lm(formula = IR_log_2 ~ KPC_log_2, data = df_w_KPC_CI)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8815 -0.6405 -0.1401  0.6180  3.0666 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -0.41277    0.09133  -4.519 1.30e-05 ***
-KPC_log_2    0.36673    0.08944   4.100 6.92e-05 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.021 on 142 degrees of freedom
-Multiple R-squared:  0.1059,    Adjusted R-squared:  0.09956 
-F-statistic: 16.81 on 1 and 142 DF,  p-value: 6.918e-05</code></pre>
-<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% summary  </code></pre>
-<pre><code>
-Call:
-lm(formula = IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple, 
-    data = df_w_KPC_CI)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.6304 -0.5361 -0.1702  0.5423  2.3616 
-
-Coefficients:
-                                                                 Estimate
-(Intercept)                                                      -1.79496
-KPC_log_2                                                         0.32809
-OmpK36_mutations_simplePutative function-altering variant (PFAV)  2.01835
-OmpK36_mutations_simpleLoop 3 insertion                           1.44692
-                                                                 Std. Error
-(Intercept)                                                         0.25638
-KPC_log_2                                                           0.08212
-OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.36363
-OmpK36_mutations_simpleLoop 3 insertion                             0.26804
-                                                                 t value
-(Intercept)                                                       -7.001
-KPC_log_2                                                          3.996
-OmpK36_mutations_simplePutative function-altering variant (PFAV)   5.551
-OmpK36_mutations_simpleLoop 3 insertion                            5.398
-                                                                 Pr(&gt;|t|)    
-(Intercept)                                                      9.70e-11 ***
-KPC_log_2                                                        0.000104 ***
-OmpK36_mutations_simplePutative function-altering variant (PFAV) 1.38e-07 ***
-OmpK36_mutations_simpleLoop 3 insertion                          2.81e-07 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 0.9171 on 140 degrees of freedom
-Multiple R-squared:  0.2892,    Adjusted R-squared:  0.2739 
-F-statistic: 18.98 on 3 and 140 DF,  p-value: 2.182e-10</code></pre>
-<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% summary  </code></pre>
-<pre><code>
-Call:
-lm(formula = IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple, 
-    data = df_w_KPC_CI)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.6626 -0.5434 -0.1157  0.5557  2.2806 
-
-Coefficients:
-                                                                           Estimate
-(Intercept)                                                                -1.90942
-KPC_log_2                                                                   0.03498
-OmpK36_mutations_simplePutative function-altering variant (PFAV)            2.16872
-OmpK36_mutations_simpleLoop 3 insertion                                     1.59929
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)  0.15334
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                           0.37982
-                                                                           Std. Error
-(Intercept)                                                                   0.28817
-KPC_log_2                                                                     0.34805
-OmpK36_mutations_simplePutative function-altering variant (PFAV)              0.38620
-OmpK36_mutations_simpleLoop 3 insertion                                       0.30351
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.37996
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                             0.36251
-                                                                           t value
-(Intercept)                                                                 -6.626
-KPC_log_2                                                                    0.100
-OmpK36_mutations_simplePutative function-altering variant (PFAV)             5.616
-OmpK36_mutations_simpleLoop 3 insertion                                      5.269
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)   0.404
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                            1.048
-                                                                           Pr(&gt;|t|)
-(Intercept)                                                                7.13e-10
-KPC_log_2                                                                     0.920
-OmpK36_mutations_simplePutative function-altering variant (PFAV)           1.04e-07
-OmpK36_mutations_simpleLoop 3 insertion                                    5.15e-07
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    0.687
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                             0.297
-                                                                              
-(Intercept)                                                                ***
-KPC_log_2                                                                     
-OmpK36_mutations_simplePutative function-altering variant (PFAV)           ***
-OmpK36_mutations_simpleLoop 3 insertion                                    ***
-KPC_log_2:OmpK36_mutations_simplePutative function-altering variant (PFAV)    
-KPC_log_2:OmpK36_mutations_simpleLoop 3 insertion                             
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 0.9162 on 138 degrees of freedom
-Multiple R-squared:  0.3007,    Adjusted R-squared:  0.2754 
-F-statistic: 11.87 on 5 and 138 DF,  p-value: 1.464e-09</code></pre>
-</div>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.41
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.59 – -0.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.37
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.19 – 0.54
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.106 / 0.100
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.79
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.30 – -1.29
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.33
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.17 – 0.49
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.30 – 2.74
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.45
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.92 – 1.98
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.289 / 0.274
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.91
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.48 – -1.34
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.03
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.65 – 0.72
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.920
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.17
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.41 – 2.93
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Loop 3 insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.60
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.00 – 2.20
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.15
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.60 – 0.90
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.687
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple [Loop 3<br>insertion]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.38
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.34 – 1.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.297
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.301 / 0.275
+</td>
+</tr>
+</table>
+<pre class="r"><code># Clade II
+paste0(&quot;KPC w/ MVB or IR&quot;)</code></pre>
+<pre><code>[1] &quot;KPC w/ MVB or IR&quot;</code></pre>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CII) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.44
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.63 – -1.25
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.08
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.09 – 0.26
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.346
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+265
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.003 / -0.000
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.58
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.75 – -1.42
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.08
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.07 – 0.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.288
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+4.22
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.39 – 5.04
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+265
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.281 / 0.276
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+MVB log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.59
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.75 – -1.43
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.05 – 0.25
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.210
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+4.64
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.66 – 5.62
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.95
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.14 – 0.24
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.117
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+265
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.288 / 0.280
+</td>
+</tr>
+</table>
+<pre class="r"><code>paste0(&quot;IR w/ KPC&quot;)</code></pre>
+<pre><code>[1] &quot;IR w/ KPC&quot;</code></pre>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %&gt;% tab_model()  </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.41
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.59 – -0.23
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.37
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.19 – 0.54
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+144
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.106 / 0.100
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.58
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.70 – -1.47
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.10
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.00 – 0.20
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.062
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.43
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.86 – 4.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+265
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.354 / 0.349
+</td>
+</tr>
+</table>
+<pre class="r"><code>lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %&gt;% tab_model()   </code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+IR log 2
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.59
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.70 – -1.48
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.11
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.01 – 0.22
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.034</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+OmpK36 mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.81
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.14 – 4.49
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+KPC log 2 × OmpK36<br>mutations simple<br>[Putative<br>function-altering
+variant<br>(PFAV)]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.87
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.69 – -0.05
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.039</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+265
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.364 / 0.357
+</td>
+</tr>
+</table>
 </div>
 </div>
 

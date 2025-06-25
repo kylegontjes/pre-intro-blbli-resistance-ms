@@ -1,5 +1,5 @@
 ---
-title: "s_figure_9: Panel performance"
+title: "Supplemental Figure 7: Panel performance"
 author: "Kyle Gontjes"
 output: html_document
 date: "`r Sys.Date()`"

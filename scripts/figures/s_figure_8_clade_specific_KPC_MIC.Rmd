@@ -1,9 +1,8 @@
 ---
-title: "s_figure_5"
+title: "Supplemental Figure 8: "
 output: html_document
 date: "`r Sys.Date()`"
 ---
-
 
 ```{r setup, include=FALSE}
 require(knitr)
@@ -77,11 +76,11 @@ IR_CII <- KPC_copy_number_ompk_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median
 legend <- cowplot::plot_grid(get_legend(MVB_CI) )
 
 # Clade I
-CI_label <- cowplot::plot_grid(ggdraw()  +   draw_label("Clade I", fontface = 'bold', size=18,x = 0.5, hjust = 0.5) )
+CI_label <- cowplot::plot_grid(ggdraw() + draw_label("Clade I", fontface = 'bold', size=18,x = 0.5, hjust = 0.5))
 s_fig_plots_CI <- cowplot::plot_grid(CI_label,cowplot::plot_grid(IR_CI + theme(legend.position = "none"),MVB_CI + theme(legend.position = "none") ,nrow=2,labels = c("A","C"),label_size=18),ncol=1,rel_heights = c(0.027,1))
 
 # Clade II
-CII_label <- cowplot::plot_grid(ggdraw()  +   draw_label("Clade II", fontface = 'bold', size=18,x = 0.5, hjust = 0.5) )
+CII_label <- cowplot::plot_grid(ggdraw() + draw_label("Clade II", fontface = 'bold', size=18,x = 0.5, hjust = 0.5))
 s_fig_plots_CII <- cowplot::plot_grid(CII_label,cowplot::plot_grid(IR_CII + theme(legend.position = "none"),MVB_CII + theme(legend.position = "none") ,nrow=2,labels = c("B","D"),label_size=18),ncol=1,rel_heights = c(0.027,1))
 
 s_fig_plots <- cowplot::plot_grid(s_fig_plots_CI,s_fig_plots_CII,ncol=2)

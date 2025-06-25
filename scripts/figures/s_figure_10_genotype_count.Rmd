@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 12"
+title: "Supplemental Figure 10. Proportion of isolates with a core genome variant"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -76,5 +76,5 @@ s_figure_12
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=6,fig.height=5} 
-ggsave(plot = s_figure_12, filename = './figures/s_figure_12.png', width = 6, height = 5,limitsize=FALSE)
+ggsave(plot = s_figure_12, filename = './figures/s_figure_10.png', width = 6, height = 5,limitsize=FALSE)
 ```

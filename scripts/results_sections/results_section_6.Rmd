@@ -1,5 +1,5 @@
 ---
-title: "Results section 6"
+title: "Results section 6: Resistance-associated genotypes showed different propensities for spread"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document

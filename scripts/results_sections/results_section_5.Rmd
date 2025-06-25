@@ -1,10 +1,10 @@
 ---
-title: "results_section_5"
+title: "Interaction between carbapenemase copy number and loop 3 insertions in ompK36"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
 ---
-
+ 
 ```{r setup, include=FALSE}
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree")
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree",'sjPlot')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -37,9 +37,8 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 df <- left_join(df,depth %>% mutate(isolate_no = rownames(.)))
 ```
 
-# Log-2 KPC association
-
-## OmpK36 GD insertion story
+# Log-2 KPC association with MICs
+ 
 ```{r} 
 convert_tableone_into_df(df,c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"),strata="clade_I",outcome_names = c("Clade I","Clade II"),factorVars = c("OmpK36_L3_mutations","OmpK36GD","OmpK36TD"))
  
@@ -56,14 +55,14 @@ df$KPC_log_2 <- log2(df$KPNIH1_RS28775_chr_median_norm)
 df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
 df_w_KPC$OmpK36_mutations_simple <- relevel(df_w_KPC$OmpK36_mutations_simple,ref = "No loop 3 insertion or PFAV") 
 paste0("KPC w/ MVB or IR")
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary 
+lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% tab_model() 
+lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% tab_model()  
+lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% tab_model() 
 
 paste0("IR w/ KPC")
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>% summary 
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% summary  
+lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC) %>%  tab_model() 
+lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC)  %>% tab_model()
+lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC) %>% tab_model()   
 ```
 ### Investigation across clades
 ```{r}
@@ -71,13 +70,24 @@ df_w_KPC_CI <- df_w_KPC %>% subset(clade_I == "Clade I")
 df_w_KPC_CII <- df_w_KPC %>% subset(clade_I != "Clade I")
 # Clade I
 paste0("KPC w/ MVB or IR")
-lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
-lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
-lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary 
+lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% tab_model()  
+lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% tab_model()   
+lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% tab_model()  
+
+paste0("IR w/ KPC")
+lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% tab_model()  
+lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% tab_model()   
+lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% tab_model()   
+
+# Clade II
+paste0("KPC w/ MVB or IR")
+lm(MVB_log_2 ~ KPC_log_2 ,data=df_w_KPC_CII) %>% tab_model()  
+lm(MVB_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_model()   
+lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_model()  
 
 
 paste0("IR w/ KPC")
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% summary 
-lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
-lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CI) %>% summary  
+lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% tab_model()  
+lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_model()   
+lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_model()   
 ```

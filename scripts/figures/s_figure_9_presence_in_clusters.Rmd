@@ -1,5 +1,5 @@
 ---
-title: "s_figure_10"
+title: "Supplemental Figure 9 Differential potential for emergence and spread of β-lactam/β-lactamase inhibitor resistance-associated genotypes "
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -26,7 +26,7 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 df <- readRDS("./data/dataset/df.RDS")
 tr <- read.tree("./data/tree/tree.treefile")
 # GWAS table
-gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS") %>% subset(nn_qc=="Yes")
+gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS") %>% subset(nn_qc=="Pass")
 gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")  
 # Matrices
 ## Kleborate matrix
@@ -61,7 +61,7 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 
 # A - Heatmap for presence by resistance category
 ```{r,fig.height=7.5,fig.width=8.75}
-source("./scripts/figures/s_figure_10_functions.R")
+source("./scripts/figures/s_figure_9_functions.R")
 
 # Heatmap curation
 df$blbli_asr_cluster_renamed_simple <- ifelse(df$blbli_asr_cluster_renamed_simple=="Singleton" & df$clade_I == "Clade I","Singleton - Clade I",ifelse(df$blbli_asr_cluster_renamed_simple == "Singleton" & df$clade_I == "Clade II","Singleton - Clade II",ifelse(df$blbli_asr_cluster_renamed_simple=="No feature" & df$clade_I == "Clade I","Susceptible - Clade I", ifelse(df$blbli_asr_cluster_renamed_simple=="No feature" & df$clade_I == "Clade II","Susceptible - Clade II",df$blbli_asr_cluster_renamed_simple)))) 
@@ -99,10 +99,8 @@ column_names_nnotated <- lapply(colnames(prop_matrix),FUN=function(x){
   y
    
 }) %>% unlist
- 
 
 clade_labels <- columnAnnotation(Clade = column_names_nnotated,col=  list(Clade = clade_colors),show_legend=F)
-
 
 # Heatmap
 A_heatmap <- ComplexHeatmap::Heatmap(prop_matrix,show_heatmap_legend = F,show_row_names = T,col = c("white","red"),cluster_columns = T,cluster_rows=T,name = "Proportion",column_labels = column_names,row_labels = row_names, cell_fun = function(j, i, x, y, width, height, fill) {
@@ -156,8 +154,6 @@ gains <- lapply(genotypes_and_blbli,FUN=function(y){
 tips <- hues::iwanthue(6,plot=T)
  
 tree_w_blbli <- st258 + geom_nodepoint(aes(subset=(node %in% gains$blbli_dich_num),fill="BL/BLI" ), shape=21, size= 4,show.legend = T) +  scale_fill_manual(name = "Phylogenetic occurrence", values ="red",breaks = "BL/BLI" )
-
-genotypes <- gains %>% names %>% .[-1] %>% `names<-`(hues::iwanthue(3,hmin = 15,hmax=360,lmin = 10,plot = T,random = F)  )
 ```
 ## Create figure
 ```{r}
@@ -198,5 +194,5 @@ s_figure_10
 ``` 
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 12, height = 7.5,limitsize=FALSE,bg='white')
+ggsave(plot = s_figure_10, filename = './figures/s_figure_9.png', width = 12, height = 7.5,limitsize=FALSE,bg='white')
 ```
