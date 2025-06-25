@@ -177,11 +177,14 @@ gwas_table <- gwas_table %>% get_resistance_category_data %>% get_significant_te
 
 diagnostic_statistics <- lapply(gwas_table$genotype, FUN=function(geno){
   marginal_stats <- get_marginal_stats(feature = df[[geno]],outcome = df[['blbli_dich_num']]) %>% mutate(genotype = geno)
-  marginal_stats$diagnostic_qc <- get_diagnostic_flag(marginal_stats$spec,marginal_stats$accuracy, specificity_threshold = 0.9, accuracy_threshold = 0.8)
+  marginal_stats$diagnostic_qc <- get_diagnostic_flag(marginal_stats$spec,marginal_stats$accuracy, specificity_threshold = 0.925, accuracy_threshold = 0.8)
   return(marginal_stats)
 }) %>% do.call(rbind,.)
 
 gwas_table <- left_join(gwas_table,diagnostic_statistics)
+
+# Add explanatory criterion
+gwas_table$explanatory_qc <- ifelse(gwas_table$diagnostic_qc == "Pass" & c(gwas_table$IR_num_log_2_diff_median > 1 | gwas_table$MVB_num_log_2_diff_median > 1),"Yes", "No")
 ```
 
 # Add supplemental data

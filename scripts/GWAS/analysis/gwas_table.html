@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-24" />
+<meta name="date" content="2025-06-25" />
 
 <title>GWAS Table</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">GWAS Table</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-24</h4>
+<h4 class="date">2025-06-25</h4>
 
 </div>
 
@@ -559,11 +559,14 @@ sig_hits_table_kleborate &lt;- left_join(kleborate_tests,kleborate_pheno_sum) %&
 
 diagnostic_statistics &lt;- lapply(gwas_table$genotype, FUN=function(geno){
   marginal_stats &lt;- get_marginal_stats(feature = df[[geno]],outcome = df[[&#39;blbli_dich_num&#39;]]) %&gt;% mutate(genotype = geno)
-  marginal_stats$diagnostic_qc &lt;- get_diagnostic_flag(marginal_stats$spec,marginal_stats$accuracy, specificity_threshold = 0.9, accuracy_threshold = 0.8)
+  marginal_stats$diagnostic_qc &lt;- get_diagnostic_flag(marginal_stats$spec,marginal_stats$accuracy, specificity_threshold = 0.925, accuracy_threshold = 0.8)
   return(marginal_stats)
 }) %&gt;% do.call(rbind,.)
 
-gwas_table &lt;- left_join(gwas_table,diagnostic_statistics)</code></pre>
+gwas_table &lt;- left_join(gwas_table,diagnostic_statistics)
+
+# Add explanatory criterion
+gwas_table$explanatory_qc &lt;- ifelse(gwas_table$diagnostic_qc == &quot;Pass&quot; &amp; c(gwas_table$IR_num_log_2_diff_median &gt; 1 | gwas_table$MVB_num_log_2_diff_median &gt; 1),&quot;Yes&quot;, &quot;No&quot;)</code></pre>
 </div>
 <div id="add-supplemental-data" class="section level1">
 <h1>Add supplemental data</h1>

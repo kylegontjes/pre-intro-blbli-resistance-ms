@@ -45,7 +45,7 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 
 # Figure 3A - Table
 ```{r}
-figure_3.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,diagnostic_qc)
+figure_3.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc)
 figure_3.A_tb$locus_tag <- recode(figure_3.A_tb$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665" = "ompK36 PFAV")
 figure_3.A_tb$locus_tag <- ifelse(figure_3.A_tb$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",figure_3.A_tb$locus_tag)
 figure_3.A_tb$gene <- ifelse(grepl(pattern = 'ompK36',figure_3.A_tb$locus_tag) | figure_3.A_tb$locus_tag =='KPNIH1_RS18665',"ompK36",figure_3.A_tb$gene) %>% {ifelse(is.na(.),"",.)}
@@ -53,7 +53,7 @@ figure_3.A_tb$product <- ifelse(figure_3.A_tb$locus_tag == "KPNIH1_RS18100","Mdt
 figure_3.A_tb$product <- ifelse(figure_3.A_tb$gene=='ompK36','porin OmpC',figure_3.A_tb$product)
 figure_3.A_tb$product <- ifelse(grepl(pattern = 'KPC',figure_3.A_tb$locus_tag),"blaKPC-associated plasmid",figure_3.A_tb$product)
 
-figure_3.A_tbl <- figure_3.A_tb %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,diagnostic_qc) %>% `colnames<-`(c('Significant Hit','Gene Hit', 'Product','Genotype Category', 'Significant Tests','Significant Models', 'Significant Phenotypes',"Diagnostic Criterion"))
+figure_3.A_tbl <- figure_3.A_tb %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc) %>% `colnames<-`(c('Significant Hit','Gene Hit', 'Product','Genotype Category', 'Significant Tests','Significant Models', 'Significant Phenotypes',"Explanatory Genotype"))
 
 figure_3.A <- figure_3.A_tbl %>% tableGrob(rows = NULL,theme=mytheme_GWAS)  
 ```
@@ -65,7 +65,6 @@ figure_3.df_mat <- get_gwas_hit_matrix(gwas_table,df)
 sig_hits_name <- recode(colnames(figure_3.df_mat),"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665" = "ompK36 PFAV")
 figure_3.phylo <- gwas_figures(df,tr,figure_3.df_mat,sig_hits_name = sig_hits_name %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.)) + ylim(NA,550)  
 figure_3.FB <- plot_grid(figure_3.phylo,labels = "B",label_size=24)  
-figure_3.FB
 ```
 
 # Figure 3C - Resistance Frequency

@@ -80,17 +80,16 @@ get_nn_flag <- function(gwas_table){
 }
 ```
 
+# Get genotype data for canonical genotypes
 ```{r}
+# Nearest neighbor
 canonical_var <- canonical %>% select(-isolate_no,-`OmpK35-25%`) %>% colnames()
 nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) %>% mutate(variable = canonical_var)  
 nn_data <- get_nn_flag(nn_data)
 pass_nn_qc <- subset(nn_data,nn_qc=="yes")
 pass_nn_qc$variable %>% sort
-```
 
-
-# Implement another marginal statistics thresholding approach to identify discriminatory genotypes
-```{r}
+# Diagnostic statistics 
 diagnostic_stats <- lapply(pass_nn_qc$variable , FUN=function(x){
   get_marginal_stats(df[[x]],df$blbli_dich_num)
 }) %>% do.call(rbind.data.frame,.)  %>% mutate(comparitor = pass_nn_qc$variable )
@@ -106,15 +105,20 @@ known_hits <- diagnostic_stats %>% subset(spec > 0.925 & accuracy >.80) %>% .$co
 
 ## Known Hits
 df$known <- get_pattern(known_hits,df) %>% .$presence
-novel_continuous <- gwas_table %>% subset(resistance_category == "Modulator" & nn_qc=="Yes" & c(IR_num_log_2_diff_median >1 | MVB_num_log_2_diff_median>1)) %>% .$genotype  %>% subset(!. %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%",'OmpK36_putative_function_altering','OmpK36GD','OmpK36_loop3_insertion'))
-novel_synchronous <-  gwas_table %>% subset(resistance_category != "Modulator" & nn_qc=="Yes") %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%")) %>% .$genotype %>% subset(!.%in%c('AA018'))
+paste0("Novel continuous")
+novel_continuous <- gwas_table %>% subset(resistance_category == "Modulator"  & explanatory_qc=="Yes") %>% .$genotype  %>% subset(!. %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%",'OmpK36_putative_function_altering','OmpK36GD','OmpK36_loop3_insertion'))
+novel_continuous
+
+paste0("Novel synchronous")
+novel_synchronous <-  gwas_table %>% subset(resistance_category != "Modulator" & explanatory_qc=="Yes") %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805",known_hits,"OmpK36-0%")) %>% .$genotype %>% subset(!.%in%c('AA018'))
+novel_synchronous
+
 df$novel_continuous <- get_pattern(novel_continuous,df) %>% .$presence 
 df$novel_synchronous <- get_pattern(novel_synchronous,df) %>% .$presence 
 
 paste0("No contribution of novel continuous hits to explaining58 resistant strains: ") 
 df_res <- subset(df,blbli_dich_num==1)
 table(df_res$novel_continuous,df_res$known,dnn=c("Novel Continuous Hits","Known Hits"))
-
 
 df$novel_GWAS <- get_pattern(c(novel_synchronous,novel_continuous),df) %>% .$presence 
 df$AA552 <- get_pattern("AA552",df) %>% .$presence 
@@ -128,41 +132,42 @@ BLBLI_exp_panel <- apply(df %>% select(panels),2,get_marginal_stats,outcome=df$b
 
 ## Clade I
 df_CI <- subset(df,clade_I=="Clade I")
-BLBLI_exp_panel_CI <-  apply(df_CI %>% select(panels),2,get_marginal_stats,outcome=df_CI$blbli_dich_num)  %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("CI",3)),panels=panels) 
+BLBLI_exp_panel_CI <-  apply(df_CI %>% select(panels),2,get_marginal_stats,outcome=df_CI$blbli_dich_num)  %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("Clade I",3)),panels=panels) 
 
 ## Clade II
 df_CII <- subset(df,clade_I=="Clade II") 
-BLBLI_exp_panel_CII <-  apply(df_CII %>% select(panels),2,get_marginal_stats,outcome=df_CII$blbli_dich_num)  %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("CII",3)),panels=panels) 
+BLBLI_exp_panel_CII <-  apply(df_CII %>% select(panels),2,get_marginal_stats,outcome=df_CII$blbli_dich_num)  %>% do.call(rbind,.) %>% as.data.frame%>% mutate(phenotype = c(rep("BLBLI",3)),population = c(rep("Clade II",3)),panels=panels) 
                                    
 BLBLI_panel <- rbind(BLBLI_exp_panel,BLBLI_exp_panel_CI,BLBLI_exp_panel_CII) %>% `rownames<-`(NULL) 
 BLBLI_panel$sens <- BLBLI_panel$sens *100
 BLBLI_panel$spec <- BLBLI_panel$spec *100
 BLBLI_panel$ppv <- BLBLI_panel$ppv *100
-BLBLI_panel$npv <- BLBLI_panel$npv *100
+BLBLI_panel$npv <- BLBLI_panel$npv *100 
+BLBLI_panel$accuracy <- BLBLI_panel$accuracy *100
 BLBLI_panel$panels <- factor(BLBLI_panel$panels,levels = c("known","novel_GWAS","known_ST258_GWAS"))
-BLBLI_panel$population <- factor(BLBLI_panel$population,levels = c("ST258","CI","CII"))  
+BLBLI_panel$population <- factor(BLBLI_panel$population,levels = c("ST258","Clade I","Clade II"))  
 ```
 
 ```{r}
-A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity") + xlab("Population")  + ylim(0,105) +
-     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale+ sfig9_format
-B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity") + xlab("Population") + ylim(0,105)+
-     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale+ sfig9_format
-C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive Predictive Value") + xlab("Population") + ylim(0,105)+
-     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale + sfig9_format
-D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative Predictive Value") + xlab("Population") + ylim(0,105)+
-     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale + sfig9_format
+A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity") + xlab("")  + ylim(0,105) +
+     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale_v+ sfig9_format
+B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity") + xlab("") + ylim(0,105)+
+     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v+ sfig9_format
+C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive predictive value") + xlab("") + ylim(0,105)+
+     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + sfig9_format
+D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative predictive value") + xlab("") + ylim(0,105)+
+     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + sfig9_format
+E <- ggplot(data=BLBLI_panel,aes(fill=panels,y=accuracy,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Accuracy") + xlab("") + ylim(0,105)+
+     geom_text(aes(label=signif(accuracy,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + sfig9_format  
 ```
 
-```{r,fig.height=10.625,fig.width=10.625}
-plots <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),labels = c("A","B","C","D"),ncol=2,label_size = 18,rel_widths = c(1,1,1,1),label_y = 1,label_x = -0.009)
-
-fig_legend <- get_legend(A )
-
-s_figure_9 <- cowplot::plot_grid(plots,fig_legend,ncol=1,rel_heights=c(1,0.075))
+```{r,fig.height=12,fig.width=10.5}
+fig_legend <- get_legend(A)
+s_figure_9 <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),E+ theme(legend.position = "none"),fig_legend,labels = c("A","B","C","D","E",""),ncol=2,label_size = 18,rel_widths = c(1,1,1,1,1,1),label_y = 1,label_x = -0.009)
+ 
 s_figure_9
 ```
 
 ```{r}
-ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 10.625, height = 10.625,limitsize=FALSE,bg='white')
+ggsave(plot = s_figure_9, filename = './figures/s_figure_7.png', width = 12, height = 10.5,limitsize=FALSE,bg='white')
 ```

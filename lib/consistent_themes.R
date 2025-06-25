@@ -47,7 +47,8 @@ cluster_scale_2_col <- scale_fill_manual(values=cluster_colors,breaks = cluster_
 potential_scale_general <- scale_fill_manual(breaks = c("Modulator","Mediator","None"),values=c("gray","#4d3227","white"),labels = c("Resistance Modulator","Resistance Mediator","None"),name="Genotype Category",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 5)) 
 
 # Panels
-panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Known genotypes","Novel GWAS hits","Known + Novel GWAS"),name="Genotype Panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
+panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + Novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
+panel_scale_v <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + Novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 1)) 
 
 # OmpK36 scale
 ompK36_colors <- c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB")
@@ -164,8 +165,8 @@ sfig6_format <-  theme(legend.position = "bottom",
 sfig9_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=16,color="black"),
                        axis.title = element_text(size = 18,color="black"),
-                       legend.text =   element_text(size=16,color="black"),
-                       legend.title = element_text(size = 18,color="black"),
+                       legend.text =   element_text(size=20,color="black"),
+                       legend.title = element_text(size = 22,color="black"),
                        plot.title = element_text(size = 24,color="black"),
                        legend.margin = margin(t=0,unit="cm")
 )

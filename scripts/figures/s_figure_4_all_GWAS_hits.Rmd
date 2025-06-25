@@ -43,7 +43,7 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 
 # S Figure 4A - Table
 ```{r}
-s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes)
+s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,nn_qc)
 s_figure_4.A_tb$locus_tag <- recode(s_figure_4.A_tb$locus_tag,"AA018"="AA018 KPC plasmid cluster","AA552"="AA552 KPC plasmid cluster","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36')
 s_figure_4.A_tb$locus_tag <- ifelse(s_figure_4.A_tb$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",s_figure_4.A_tb$locus_tag)
 
@@ -55,7 +55,7 @@ s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "SHV-11","Broad-s
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "TEM-1D.v1^","Broad-spectrum beta-lactamase",s_figure_4.A_tb$product)
 
 
-s_figure_4.A_tbl <- s_figure_4.A_tb %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes) %>% `colnames<-`(c('Significant Hit','Gene Hit', 'Product','Genotype Category', 'Significant Tests','Significant Models', 'Significant Phenotypes'))
+s_figure_4.A_tbl <- s_figure_4.A_tb %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,nn_qc) %>% `colnames<-`(c('Significant Hit','Gene Hit', 'Product','Genotype Category', 'Significant Tests','Significant Models', 'Significant Phenotypes','Nearest neighbor\ncriterion'))
 
 s_figure_4.A <- s_figure_4.A_tbl %>% tableGrob(rows = NULL,theme=mytheme_GWAS)  
 ```
@@ -98,12 +98,12 @@ s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","
 s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 
 ```
 
-```{r ,fig.height=17.25,fig.width=26}
+```{r ,fig.height=18.5,fig.width=26.25}
 s_figure_4.FA <- plot_grid(s_figure_4.A,labels = "A",label_size=28,align = "hv")  
 s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,label_size = 28, rel_heights = c(0.35,1))   
 s_figure_4
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 26, height = 17.25,limitsize=FALSE)
+ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 26.25, height = 18.5,limitsize=FALSE)
 ```
