@@ -52,7 +52,8 @@ panel_scale_v <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_
 
 # OmpK36 scale
 ompK36_colors <- c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB")
-ompK36_scale <- scale_fill_manual(values=ompK36_colors,name="ompK36 porin status", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+ompK36_scale <- scale_fill_manual(values=ompK36_colors,name="Status of ompK36 porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+ompK36_color_scale <- scale_color_manual(values=ompK36_colors,name="Status of ompK36 porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Tn4401 allele
 tn4401_scale <- scale_fill_manual(breaks=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),values = c(8,9,10,11,12,13),labels=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),name = "Tn4401 isoform",guide = guide_legend(order=5,title.position = "top", label.position = "right",ncol=1))
@@ -65,10 +66,7 @@ AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown"
 
 # Variant type
 variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","gray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
-
-# Genotype scale
-genotype_scale <- scale_fill_manual(breaks=c("None","Carbapenem resistance-associated genotype","AA552 KPC plasmid"),values=c("gray","#00AFBB","brown"), name="Genotype Profile", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
-
+ 
 # Sfigure2 format
 format <-   theme(legend.position = "bottom",
                   axis.text =   element_text(size=18,color="black"),

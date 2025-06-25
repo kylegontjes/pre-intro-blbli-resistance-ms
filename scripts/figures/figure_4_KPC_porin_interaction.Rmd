@@ -81,13 +81,13 @@ IR_ompk36_prop <- df %>% group_by(IR_cat,OmpK36_mutations_simple)  %>%
   dplyr::summarise(n = n()) %>%
   mutate(freq = n / sum(n)) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
 
-fig4b <- MIC_ompk36_prop_hist(IR_ompk36_prop,"") + theme_bw_me   + ompK36_scale + xlab("Resistance category")+ ylab("Proportion (%)") +figure_4_format
-fig4d <- MIC_ompk36_prop_hist(MVB_ompk36_prop,"") + theme_bw_me  + ompK36_scale + xlab("Resistance category") + ylab("Proportion (%)") +figure_4_format
+fig4b <- MIC_ompk36_prop_hist(IR_ompk36_prop,"") + theme_bw_me   + ompK36_scale + xlab("Resistance category")+ ylab("Proportion (%)") +figure_4_format + ompK36_scale
+fig4d <- MIC_ompk36_prop_hist(MVB_ompk36_prop,"") + theme_bw_me  + ompK36_scale + xlab("Resistance category") + ylab("Proportion (%)") +figure_4_format + ompK36_scale
 
 # KPC Data 
-fig4e <- KPC_copy_number_ompk_hist(df,y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC copy number")   + figure_4_format
+fig4e <- KPC_copy_number_ompk_hist(df,y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC copy number")   + figure_4_format + ompK36_color_scale
 
-fig4f <- KPC_copy_number_ompk_hist(df,y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC copy number")   + figure_4_format
+fig4f <- KPC_copy_number_ompk_hist(df,y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC copy number")   + figure_4_format + ompK36_color_scale
  
 fig4.data <- plot_grid(fig4a + theme(legend.position = "none"),fig4b + theme(legend.position = "none"),fig4c + theme(legend.position = "none"),fig4d+ theme(legend.position = "none"), ncol=2,rel_widths = c(1,.75,1,.75),labels = "AUTO",label_size = 18)
 fig4.data.2 <- plot_grid(fig4e + theme(legend.position = "none"),fig4f+ theme(legend.position = "none"), ncol=2,labels = c("E","F"),label_size=18)
