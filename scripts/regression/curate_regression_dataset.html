@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-24" />
+<meta name="date" content="2025-06-25" />
 
 <title>Curate dataset for phylogenetically-aware regression</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Curate dataset for phylogenetically-aware
 regression</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-24</h4>
+<h4 class="date">2025-06-25</h4>
 
 </div>
 
@@ -383,7 +383,7 @@ Sys.info()</code></pre>
                                                                                             version 
 &quot;Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_X86_64&quot; 
                                                                                            nodename 
-                                                                    &quot;macbookpro.wifi.med.umich.edu&quot; 
+                                                                                   &quot;msla0572.local&quot; 
                                                                                             machine 
                                                                                            &quot;x86_64&quot; 
                                                                                               login 
@@ -523,8 +523,17 @@ variables &lt;- c(other_vars,abx_vars_of_interest)
 
 df_final &lt;- df_fin %&gt;% select(variables,isolate_no,source,clade_I,Patient_ID,Cx_date,pheno,&#39;multimorbid&#39;,&#39;any_antibiotic_1d&#39;,&#39;any_device&#39;,&#39;device_ct&#39;,&#39;comorb_ct&#39;,&#39;AG_1d&#39;)</code></pre>
 </div>
-<div id="reclassify-asr-clustering" class="section level1">
-<h1>Reclassify ASR clustering</h1>
+<div id="reclassify-asr-clustering-for-use-in-phyloamrs-phyloaware_regression" class="section level1">
+<h1>Reclassify ASR clustering for use in phyloAMR’s
+phyloaware_regression</h1>
+<div id="clusters-aa552-resistant" class="section level2">
+<h2>Clusters = AA552 + resistant</h2>
+</div>
+<div id="singletons-other-strains" class="section level2">
+<h2>Singletons = other strains</h2>
+</div>
+<div id="no-featureu-not-resistant" class="section level2">
+<h2>No featureu = not resistant</h2>
 <pre class="r"><code>blbli_asr_clustering &lt;- readRDS(&quot;./data/asr_clustering/blbli_asr_clustering.RDS&quot;) 
 blbli_regression_df &lt;-  df_final %&gt;% left_join(.,blbli_asr_clustering %&gt;% mutate(isolate_no = child_name)) 
 
@@ -532,6 +541,7 @@ blbli_regression_df &lt;-  df_final %&gt;% left_join(.,blbli_asr_clustering %&gt
 KPC_containing_clusters &lt;- readRDS(&quot;./data/GWAS/matrices/KPC_containing_cluster_mat.RDS&quot;) %&gt;% as.data.frame
 blbli_regression_df &lt;-  blbli_regression_df %&gt;% left_join(.,KPC_containing_clusters %&gt;% mutate(isolate_no = rownames(.)))
 blbli_regression_df$asr_cluster &lt;- ifelse(blbli_regression_df$AA552==1 &amp; blbli_regression_df$blbli_dich_num==1 , &#39;cluster&#39;, ifelse(blbli_regression_df$blbli_dich_num==1,&quot;singleton&quot;,&quot;no feature&quot;)) </code></pre>
+</div>
 </div>
 <div id="save" class="section level1">
 <h1>Save</h1>

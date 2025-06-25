@@ -122,7 +122,10 @@ variables <- c(other_vars,abx_vars_of_interest)
 df_final <- df_fin %>% select(variables,isolate_no,source,clade_I,Patient_ID,Cx_date,pheno,'multimorbid','any_antibiotic_1d','any_device','device_ct','comorb_ct','AG_1d')
 ```
 
-# Reclassify ASR clustering
+# Reclassify ASR clustering for use in phyloAMR's phyloaware_regression
+## Clusters = AA552 + resistant
+## Singletons = other strains
+## No featureu = not resistant
 ```{r}
 blbli_asr_clustering <- readRDS("./data/asr_clustering/blbli_asr_clustering.RDS") 
 blbli_regression_df <-  df_final %>% left_join(.,blbli_asr_clustering %>% mutate(isolate_no = child_name)) 
@@ -132,7 +135,6 @@ KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_
 blbli_regression_df <-  blbli_regression_df %>% left_join(.,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))
 blbli_regression_df$asr_cluster <- ifelse(blbli_regression_df$AA552==1 & blbli_regression_df$blbli_dich_num==1 , 'cluster', ifelse(blbli_regression_df$blbli_dich_num==1,"singleton","no feature")) 
 ```
-
 
 # Save
 ```{r} 

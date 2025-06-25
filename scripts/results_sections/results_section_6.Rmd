@@ -66,7 +66,7 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 # Task 1: Genotypes only in singletons
 ```{r}
 singletons_only <- subset(gwas_table, `Singleton_prop` >0 & nn_qc=="Yes" & Cluster_prop ==0)  
-singletons_only %>% select(locus_tag,product,`No Feature_prop`,`Singleton_prop`,Cluster_prop,sig_phenotypes,sig_tests)
+singletons_only %>% select(locus_tag,product,`No feature_prop`,`Singleton_prop`,Cluster_prop,sig_phenotypes,sig_tests)
 ```
 
 # Task 2: Genotypes in clusters
@@ -74,7 +74,7 @@ singletons_only %>% select(locus_tag,product,`No Feature_prop`,`Singleton_prop`,
 cluster_prop <- gwas_table %>% subset(nn_qc=="Yes") %>% select_if(grepl("locus_tag|Cluster ",colnames(gwas_table))) %>% as.data.frame %>% `rownames<-`(NULL) %>% column_to_rownames(.,var="locus_tag")
 genotypes_in_clusters <- rowSums(cluster_prop == 1) %>% subset(.>0) %>% names
  
-gwas_table %>% subset(locus_tag %in% genotypes_in_clusters) %>% select(locus_tag,product,`No Feature_prop`,Cluster_prop,sig_phenotypes,sig_tests,sig_models)
+gwas_table %>% subset(locus_tag %in% genotypes_in_clusters) %>% select(locus_tag,product,`No feature_prop`,Cluster_prop,sig_phenotypes,sig_tests,sig_models)
 
 table(df$KPNIH1_RS18100_3.2,df$blbli_asr_cluster_renamed)
 table(df$AA552,df$blbli_asr_cluster_renamed)
