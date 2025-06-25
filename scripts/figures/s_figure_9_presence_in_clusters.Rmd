@@ -139,7 +139,7 @@ genotypes <- synchronous_changes_w_blbli[genotypes_w_transitions_in_parental_nod
 
 ## Data
 ```{r}
-st258 <- ggtree(tr)
+st258 <- ggtree(tr, size=0.25)
 genotypes_and_blbli <- c('blbli_dich_num',genotypes,"RamA")
 
 asr_traits_of_interest <-  pbmcapply::pbmclapply(genotypes_and_blbli,FUN=function(x){
@@ -151,7 +151,7 @@ gains <- lapply(genotypes_and_blbli,FUN=function(y){
   asr_traits_of_interest[[y]][['asr_cluster']] %>% subset(grepl("cluster",.)) %>% str_split("_",simplify = T) %>% .[,2] %>% unlist %>% unique %>% as.numeric 
 }) %>% `names<-`(genotypes_and_blbli)
 
-tips <- hues::iwanthue(6,plot=T)
+tips <- hues::iwanthue(5,plot=T)
  
 tree_w_blbli <- st258 + geom_nodepoint(aes(subset=(node %in% gains$blbli_dich_num),fill="BL/BLI" ), shape=21, size= 4,show.legend = T) +  scale_fill_manual(name = "Phylogenetic occurrence", values ="red",breaks = "BL/BLI" )
 ```
@@ -171,10 +171,10 @@ B <- st258 +
   geom_nodepoint(aes(fill = RamA_name,shape=RamA_name,subset=(node %in% gains$RamA),size=RamA_name,legend=F))  +
     geom_nodepoint(aes(fill = PBP_name,shape=PBP_name,subset=(node %in% gains$PBP2),size=PBP_name,legend=F)) + 
   scale_fill_manual(name="Synchronous clustering",values = setNames(
-    c("red", "#91796A", "#97C466", "#9451AD","#B9964B"), genotype_ordering
+    c("red", "#91796A", "#97C466", "#9451AD","#97B2B7"), genotype_ordering
   ),breaks = genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) + 
     scale_shape_manual(name="Synchronous clustering",values=setNames(
-    c(22,21,23,24,25),genotype_ordering
+    c(21,22,23,24,25),genotype_ordering
   ),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) + 
   scale_size_manual(name="Synchronous clustering",values = setNames(
     c(5,3.25,3,2,3),genotype_ordering),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + 

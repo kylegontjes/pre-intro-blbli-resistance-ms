@@ -171,7 +171,7 @@ sfig9_format <-  theme(legend.position = "bottom",
 
 
 # S fig 12
-s_figure_12_format <-  theme(legend.position = "bottom",
+s_figure_10_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=12,color="black"),
                        axis.title = element_text(size = 14,color="black"),
                        legend.text =   element_text(size=14,color="black"),
