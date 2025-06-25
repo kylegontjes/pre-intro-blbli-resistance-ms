@@ -61,8 +61,11 @@ df_CII <- df %>% subset(clade_I=="Clade II")
 
 
 ## Figures
-
-### Overall 
+```{r}
+fig_w_fill <- create_MIC_histogram(df$IR_log_2,df$OmpK36_mutations_simple,"Imipenem-relebactam")+ scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
+        labels=c("≤0.25/4","0.5/4", "1/4","2/4","4/4","8/4","16/4","≥32/4"))  + labs(fill="ompK36 Status")  + theme_bw_me + ylim(NA,250) + figure_4_format + ompK36_scale  
+```
+ 
 
 ```{r,fig.height=8,fig.width=8}  
 MVB_CI <- KPC_copy_number_ompk_hist(df_CI %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC copy number") + ylim(-2.25,6) + xlim(-2.75,5) + figure_4_format + ompK36_color_scale
@@ -72,23 +75,20 @@ MVB_CII <- KPC_copy_number_ompk_hist(df_CII %>% subset( KPNIH1_RS28775_chr_media
 IR_CII <- KPC_copy_number_ompk_hist(df_CII %>% subset( KPNIH1_RS28775_chr_median_norm!=0),y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title = "",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC copy number") + ylim(-2.25,6)+ xlim(-2.75,5) + figure_4_format + ompK36_color_scale
 ```
 
-```{r,fig.height=8,fig.width=8}
-legend <- cowplot::plot_grid(get_legend(MVB_CI) )
+```{r,fig.height=7.5,fig.width=7.5}
+legend <- cowplot::plot_grid(get_legend(fig_w_fill))
 
-# Clade I
-CI_label <- cowplot::plot_grid(ggdraw() + draw_label("Clade I", fontface = 'bold', size=18,x = 0.5, hjust = 0.5))
-s_fig_plots_CI <- cowplot::plot_grid(CI_label,cowplot::plot_grid(IR_CI + theme(legend.position = "none"),MVB_CI + theme(legend.position = "none") ,nrow=2,labels = c("A","C"),label_size=18),ncol=1,rel_heights = c(0.05,1))
+# Clade I 
+s_fig_plots_CI <- cowplot::plot_grid(cowplot::plot_grid(IR_CI + theme(legend.position = "none"),MVB_CI + theme(legend.position = "none") ,nrow=2,labels = c("A","C"),label_size=18) + draw_label("Clade I", fontface = 'bold', size=18,x = 0.5, hjust = 0.5,y = 0.975)) 
+# Clade II 
+s_fig_plots_CII <- cowplot::plot_grid(cowplot::plot_grid(IR_CII + theme(legend.position = "none"),MVB_CII + theme(legend.position = "none") ,nrow=2,labels = c("B","D"),label_size=18)  + draw_label("Clade II", fontface = 'bold', size=18,x = 0.5, hjust = 0.5,y = 0.975)) 
 
-# Clade II
-CII_label <- cowplot::plot_grid(ggdraw() + draw_label("Clade II", fontface = 'bold', size=18,x = 0.5, hjust = 0.5))
-s_fig_plots_CII <- cowplot::plot_grid(CII_label,cowplot::plot_grid(IR_CII + theme(legend.position = "none"),MVB_CII + theme(legend.position = "none") ,nrow=2,labels = c("B","D"),label_size=18),ncol=1,rel_heights = c(0.05,1))
-
-s_fig_plots <- cowplot::plot_grid(s_fig_plots_CI,s_fig_plots_CII,ncol=2)
+s_fig_plots <- cowplot::plot_grid(s_fig_plots_CI,s_fig_plots_CII)
 s_figure_5 <- cowplot::plot_grid(s_fig_plots,legend,rel_heights = c(1,0.075),rel_widths=c(1,0.75),ncol=1)
 s_figure_5
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_5, filename = './figures/s_figure_8.png', width =8, height = 8,limitsize=FALSE,bg='white')
+ggsave(plot = s_figure_5, filename = './figures/s_figure_8.png', width =7.5, height = 7.5,limitsize=FALSE,bg='white')
 ```
  
