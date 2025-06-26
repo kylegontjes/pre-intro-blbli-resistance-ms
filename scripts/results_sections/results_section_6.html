@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-06-25" />
+<meta name="date" content="2025-06-26" />
 
 <title>Results section 6: Resistance-associated genotypes showed different propensities for spread</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Results section 6: Resistance-associated
 genotypes showed different propensities for spread</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-06-25</h4>
+<h4 class="date">2025-06-26</h4>
 
 </div>
 
@@ -393,41 +393,6 @@ df &lt;- left_join_matrix(model2.2_burden,df,&quot;_2.2&quot;)
 df &lt;- left_join_matrix(model3_burden,df,&quot;_3&quot;)
 df &lt;- left_join_matrix(model3.2_burden,df,&quot;_3.2&quot;)
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) </code></pre>
-<div id="task-1-genotypes-only-in-singletons" class="section level1">
-<h1>Task 1: Genotypes only in singletons</h1>
-<pre class="r"><code>singletons_only &lt;- subset(gwas_table, `Singleton_prop` &gt;0 &amp; nn_qc==&quot;Yes&quot; &amp; Cluster_prop ==0)  
-singletons_only %&gt;% select(locus_tag,product,`No feature_prop`,`Singleton_prop`,Cluster_prop,sig_phenotypes,sig_tests)</code></pre>
-<pre><code>[1] locus_tag       product         No feature_prop Singleton_prop 
-[5] Cluster_prop    sig_phenotypes  sig_tests      
-&lt;0 rows&gt; (or 0-length row.names)</code></pre>
-</div>
-<div id="task-2-genotypes-in-clusters" class="section level1">
-<h1>Task 2: Genotypes in clusters</h1>
-<pre class="r"><code>cluster_prop &lt;- gwas_table %&gt;% subset(nn_qc==&quot;Yes&quot;) %&gt;% select_if(grepl(&quot;locus_tag|Cluster &quot;,colnames(gwas_table))) %&gt;% as.data.frame %&gt;% `rownames&lt;-`(NULL) %&gt;% column_to_rownames(.,var=&quot;locus_tag&quot;)
-genotypes_in_clusters &lt;- rowSums(cluster_prop == 1) %&gt;% subset(.&gt;0) %&gt;% names
- 
-gwas_table %&gt;% subset(locus_tag %in% genotypes_in_clusters) %&gt;% select(locus_tag,product,`No feature_prop`,Cluster_prop,sig_phenotypes,sig_tests,sig_models)</code></pre>
-<pre><code>[1] locus_tag       product         No feature_prop Cluster_prop   
-[5] sig_phenotypes  sig_tests       sig_models     
-&lt;0 rows&gt; (or 0-length row.names)</code></pre>
-<pre class="r"><code>table(df$KPNIH1_RS18100_3.2,df$blbli_asr_cluster_renamed)</code></pre>
-<pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
-  0         2         2         3         2         2        10         7
-  1         0         0         0         0         0         0         0
-   
-    No feature Singleton
-  0        330        27
-  1         24         3</code></pre>
-<pre class="r"><code>table(df$AA552,df$blbli_asr_cluster_renamed)</code></pre>
-<pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
-  0         2         2         1         0         2         0         0
-  1         0         0         2         2         0        10         7
-   
-    No feature Singleton
-  0        350        29
-  1          4         1</code></pre>
 <div id="penicillinompk36-analyses" class="section level2">
 <h2>Penicillin/ompk36 analyses</h2>
 <pre class="r"><code>df$ompk36_lof_or_pbp &lt;- ifelse(df$PBP_any ==1 | df$OmpK36_putative_function_altering == 1 ,1,0) 
@@ -464,7 +429,6 @@ alternative hypothesis: true odds ratio is not equal to 1
 sample estimates:
 odds ratio 
   6.304581 </code></pre>
-</div>
 </div>
 <div id="aa552-plasmid-analyses" class="section level1">
 <h1>AA552 plasmid analyses</h1>
