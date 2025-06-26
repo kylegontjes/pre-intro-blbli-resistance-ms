@@ -393,46 +393,11 @@ df &lt;- left_join_matrix(model2.2_burden,df,&quot;_2.2&quot;)
 df &lt;- left_join_matrix(model3_burden,df,&quot;_3&quot;)
 df &lt;- left_join_matrix(model3.2_burden,df,&quot;_3.2&quot;)
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) </code></pre>
-<div id="penicillinompk36-analyses" class="section level2">
-<h2>Penicillin/ompk36 analyses</h2>
-<pre class="r"><code>df$ompk36_lof_or_pbp &lt;- ifelse(df$PBP_any ==1 | df$OmpK36_putative_function_altering == 1 ,1,0) 
-table(df$ompk36_lof_or_pbp,df$blbli_asr_cluster_renamed)</code></pre>
-<pre><code>   
-    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
-  0         2         0         3         2         2        10         7
-  1         0         2         0         0         0         0         0
-   
-    No feature Singleton
-  0        342        20
-  1         12        10</code></pre>
-<pre class="r"><code>nons &lt;- subset(df,blbli_dich_num==1)
-table_comp &lt;- table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed)
-table_comp</code></pre>
-<pre><code>   
-    Cluster Singleton
-  0      26        20
-  1       2        10</code></pre>
-<pre class="r"><code>prop.table(table_comp,margin = 2)</code></pre>
-<pre><code>   
-       Cluster  Singleton
-  0 0.92857143 0.66666667
-  1 0.07142857 0.33333333</code></pre>
-<pre class="r"><code>table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed) %&gt;% fisher.test()</code></pre>
-<pre><code>
-    Fisher&#39;s Exact Test for Count Data
-
-data:  .
-p-value = 0.0217
-alternative hypothesis: true odds ratio is not equal to 1
-95 percent confidence interval:
-  1.154893 65.621301
-sample estimates:
-odds ratio 
-  6.304581 </code></pre>
-</div>
 <div id="aa552-plasmid-analyses" class="section level1">
 <h1>AA552 plasmid analyses</h1>
-<pre class="r"><code>table(df$AA552,df$blbli_asr_cluster_renamed)</code></pre>
+<pre class="r"><code>df$ompk36_lof_or_pbp &lt;- ifelse(df$PBP_any ==1 | df$OmpK36_putative_function_altering == 1 ,1,0) 
+nons &lt;- subset(df,blbli_dich_num==1)
+table(df$AA552,df$blbli_asr_cluster_renamed)</code></pre>
 <pre><code>   
     Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
   0         2         2         1         0         2         0         0
@@ -471,6 +436,41 @@ alternative hypothesis: true odds ratio is not equal to 1
 sample estimates:
 odds ratio 
 0.01272795 </code></pre>
+<div id="penicillinompk36-analyses" class="section level2">
+<h2>Penicillin/ompk36 analyses</h2>
+<pre class="r"><code>table(df$ompk36_lof_or_pbp,df$blbli_asr_cluster_renamed)</code></pre>
+<pre><code>   
+    Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Cluster 6 Cluster 7
+  0         2         0         3         2         2        10         7
+  1         0         2         0         0         0         0         0
+   
+    No feature Singleton
+  0        342        20
+  1         12        10</code></pre>
+<pre class="r"><code>table_comp &lt;- table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed)
+table_comp</code></pre>
+<pre><code>   
+    Cluster Singleton
+  0      26        20
+  1       2        10</code></pre>
+<pre class="r"><code>prop.table(table_comp,margin = 2)</code></pre>
+<pre><code>   
+       Cluster  Singleton
+  0 0.92857143 0.66666667
+  1 0.07142857 0.33333333</code></pre>
+<pre class="r"><code>table(nons$ompk36_lof_or_pbp,nons$blbli_asr_cluster_collapsed) %&gt;% fisher.test()</code></pre>
+<pre><code>
+    Fisher&#39;s Exact Test for Count Data
+
+data:  .
+p-value = 0.0217
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+  1.154893 65.621301
+sample estimates:
+odds ratio 
+  6.304581 </code></pre>
+</div>
 </div>
 
 
