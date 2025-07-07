@@ -56,5 +56,5 @@ s_figure_2
 ```
 
 ```{r}
-ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 7.25, height = 5)
+ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 7.25, height = 5,bg='white')
 ```
