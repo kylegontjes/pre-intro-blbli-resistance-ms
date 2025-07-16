@@ -35,6 +35,7 @@ Log2_scale <-scale_fill_manual(breaks = c(-2,-1,0,1,2,3,4,5),values = colfunc(8)
 clade_colors <- c("Clade I" = "red","Clade II"="blue")
 clade_colors_scale <- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 clade_colors_scale_v <- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(order=1,ncol=1, title.position = "top", label.position = "right"))
+clade_colors_scale_3_col<- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(order=1,nrow=3, title.position = "top", label.position = "right"))
 
 ### Clustering
 cluster_colors <- c("No feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink',"Cluster 7" = "#F0E442","Cluster 8" = '#00CED1')
@@ -138,7 +139,7 @@ figure_2_format <- theme(legend.position = "bottom",
                          axis.text =   element_text(size=12,color="black"),
                          axis.title = element_text(size = 14,color="black"),
                          legend.text =   element_text(size=12,color="black"),
-                         legend.title = element_text(size = 14,color="black") 
+                         legend.title = element_text(size = 14,color="black")
 ) 
 
 # Figure 4 Format
