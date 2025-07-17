@@ -2,6 +2,7 @@
 
 ## Packages
 library(gridExtra)
+library(ggtext)
 library(kableExtra)
 library(knitr)
 
@@ -54,9 +55,9 @@ panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GW
 panel_scale_v <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + Novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 1)) 
 
 # OmpK36 scale
-ompK36_colors <- c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB")
-ompK36_scale <- scale_fill_manual(values=ompK36_colors,name="Status of ompK36 porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
-ompK36_color_scale <- scale_color_manual(values=ompK36_colors,name="Status of ompK36 porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+ompK36_colors <- rev(c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB"))
+ompK36_scale <- scale_fill_manual(values=ompK36_colors,name="Status of <i>ompK36</i> porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+ompK36_color_scale <- scale_color_manual(values=ompK36_colors,name = "Status of <i>ompK36</i> porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Tn4401 allele
 tn4401_scale <- scale_fill_manual(breaks=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),values = c(8,9,10,11,12,13),labels=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),name = "Tn4401 isoform",guide = guide_legend(order=5,title.position = "top", label.position = "right",ncol=1))
@@ -135,7 +136,6 @@ figure_1_format <-   theme(legend.position = "bottom",
                            legend.title = element_text(size = 16,color="black") 
 ) 
 
-
 ### Figure 2 (Histogram)
 figure_2_format <- theme(legend.position = "bottom",
                          axis.text =   element_text(size=12,color="black"),
@@ -147,11 +147,17 @@ figure_2_format <- theme(legend.position = "bottom",
 # Figure 4 Format
 figure_4_format <-   theme(legend.position = "bottom",
                            axis.text =   element_text(size=12,color="black"),
+                           axis.title = element_markdown(size = 14,color="black"),
+                           legend.text =   element_text(size=12,color="black"),
+                           legend.title = element_markdown(size = 14,color="black"),
+                           plot.title = element_text(size = 16,color="black"))
+                           
+figure_4_format_wo_element_markdown <-   theme(legend.position = "bottom",
+                           axis.text =   element_text(size=12,color="black"),
                            axis.title = element_text(size = 14,color="black"),
                            legend.text =   element_text(size=12,color="black"),
                            legend.title = element_text(size = 14,color="black"),
-                           plot.title = element_text(size = 16,color="black")
-) 
+                           plot.title = element_text(size = 16,color="black")) 
 
 # S fig 6
 sfig6_format <-  theme(legend.position = "bottom",

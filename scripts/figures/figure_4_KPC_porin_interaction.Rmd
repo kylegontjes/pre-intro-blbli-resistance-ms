@@ -13,7 +13,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","cowplot","ggtree","cowplot")
+packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext")
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -47,7 +47,10 @@ df <- left_join(df,canonical)
 df$OmpK36_mutations_simple <- ifelse(df$OmpK36_putative_function_altering==1 | df$OmpK36_truncation_kleborate==1 ,"Putative function-altering variant (PFAV)",
                                      ifelse(df$OmpK36_L3_mutations==1, "Loop 3 insertion","No loop 3 insertion or PFAV"))
 
-df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("No loop 3 insertion or PFAV","Loop 3 insertion","Putative function-altering variant (PFAV)")))
+df$OmpK36_mutations_simple <- factor(
+  df$OmpK36_mutations_simple,
+  levels = rev(c("No loop 3 insertion or PFAV", "Loop 3 insertion", "Putative function-altering variant (PFAV)"))
+)
 ```
 
 # Generate figures
@@ -67,29 +70,32 @@ add_group_median_values <- function(dataframe, variable, group_variable) {
 IR_intercepts <-  add_group_median_values(df, "IR_log_2", "OmpK36_mutations_simple")
 
 fig4a <- create_MIC_histogram(df$IR_log_2,df$OmpK36_mutations_simple,"Imipenem-relebactam")+ scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
-        labels=c("≤0.25/4","0.5/4", "1/4","2/4","4/4","8/4","16/4","≥32/4"))  + labs(fill="ompK36 Status")  + theme_bw_me + ylim(NA,250) + figure_4_format + ompK36_scale  + IR_intercepts[[1]] + IR_intercepts[[2]] + IR_intercepts[[3]] 
-MVB_intercepts <-  add_group_median_values(df, "MVB_log_2", "OmpK36_mutations_simple")
+        labels=c("≤0.25/4","0.5/4", "1/4","2/4","4/4","8/4","16/4","≥32/4"))  + labs(fill="ompK36 Status")  + theme_bw_me + ylim(NA,250) + figure_4_format_wo_element_markdown + ompK36_scale  + IR_intercepts[[1]] + IR_intercepts[[2]] + IR_intercepts[[3]]  
+MVB_intercepts <-  add_group_median_values(df, "MVB_log_2", "OmpK36_mutations_simple") 
 
 fig4c <- create_MIC_histogram(df$MVB_log_2,df$OmpK36_mutations_simple,"Meropenem-vaborbactam") + scale_x_continuous(breaks=c(-2,-1,0,1,2,3,4,5),
-        labels=c("≤0.25/8","0.5/8", "1/8","2/8","4/8","8/8","16/8","≥32/8")) + labs(fill="ompK36 Status") + theme_bw_me + ylim(NA,250) + figure_4_format + ompK36_scale  + MVB_intercepts[[1]] + MVB_intercepts[[2]] + MVB_intercepts[[3]]  
+        labels=c("≤0.25/8","0.5/8", "1/8","2/8","4/8","8/8","16/8","≥32/8")) + labs(fill="ompK36 Status") + theme_bw_me + ylim(NA,250) + figure_4_format_wo_element_markdown + ompK36_scale  + MVB_intercepts[[1]] + MVB_intercepts[[2]] + MVB_intercepts[[3]]  
   
 # Proportion of non-susceptibility
 MVB_ompk36_prop <- df %>% group_by(MVB_cat,OmpK36_mutations_simple)  %>%
   dplyr::summarise(n = n()) %>%
-  mutate(freq = n / sum(n)) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
+  mutate(freq = n / sum(n) *100) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
 IR_ompk36_prop <- df %>% group_by(IR_cat,OmpK36_mutations_simple)  %>%
   dplyr::summarise(n = n()) %>%
-  mutate(freq = n / sum(n)) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
+  mutate(freq = n / sum(n) * 100) %>% `colnames<-`(c("phenotype_cat","OmpK36_mutations","n","freq"))
 
-fig4b <- MIC_ompk36_prop_hist(IR_ompk36_prop,"") + theme_bw_me   + ompK36_scale + xlab("Resistance category")+ ylab("Proportion (%)") +figure_4_format + ompK36_scale
-fig4d <- MIC_ompk36_prop_hist(MVB_ompk36_prop,"") + theme_bw_me  + ompK36_scale + xlab("Resistance category") + ylab("Proportion (%)") +figure_4_format + ompK36_scale
+fig4b <- MIC_ompk36_prop_hist(IR_ompk36_prop) + theme_bw_me   + ompK36_scale + xlab("Resistance category")+ ylab("Percentage") +figure_4_format + ompK36_scale
+fig4d <- MIC_ompk36_prop_hist(MVB_ompk36_prop) + theme_bw_me  + ompK36_scale + xlab("Resistance category") + ylab("Percentage") +figure_4_format + ompK36_scale
 
 # KPC Data 
-fig4e <- KPC_copy_number_ompk_hist(df,y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 IR MIC") + xlab("Log-2 KPC copy number")   + figure_4_format + ompK36_color_scale
+fig4e <- KPC_copy_number_ompk_hist(df,y="IR_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log<sub>2</sub> IR MIC") + xlab("Log<sub>2</sub> <i> bla<sub>KPC</sub></i> copy number")   + figure_4_format + ompK36_color_scale
 
-fig4f <- KPC_copy_number_ompk_hist(df,y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log-2 MVB MIC") + xlab("Log-2 KPC copy number")   + figure_4_format + ompK36_color_scale
+fig4f <- KPC_copy_number_ompk_hist(df,y="MVB_log_2",x="KPNIH1_RS28775_chr_median_norm",color = "OmpK36_mutations_simple",title="",colors = ompK36_colors) + ylab("Log<sub>2</sub> MVB MIC") + xlab("Log<sub>2</sub> <i> bla<sub>KPC</sub></i> copy number")   + figure_4_format + ompK36_color_scale
  
-fig4.data <- plot_grid(fig4a + theme(legend.position = "none"),fig4b + theme(legend.position = "none"),fig4c + theme(legend.position = "none"),fig4d+ theme(legend.position = "none"), ncol=2,rel_widths = c(1,.75,1,.75),labels = "AUTO",label_size = 18)
+```
+
+```{r,fig.width=9,fig.height=9}
+fig4.data <- plot_grid(fig4a + theme(legend.position = "none"),fig4b + theme(legend.position = "none"),fig4c + theme(legend.position = "none"),fig4d+ theme(legend.position = "none"), ncol=2,rel_widths = c(1,.7,1,.7),labels = "AUTO",label_size = 18)
 fig4.data.2 <- plot_grid(fig4e + theme(legend.position = "none"),fig4f+ theme(legend.position = "none"), ncol=2,labels = c("E","F"),label_size=18)
 fig4.data.all <- plot_grid(fig4.data,fig4.data.2, ncol=1,rel_heights = c(1,.7))
 
@@ -97,12 +103,10 @@ ompk36_legend <- gontjesr::get_legend(fig4b + theme(plot.margin = unit(c(t=-25, 
 figure_4_legends <- cowplot::plot_grid(ompk36_legend) + theme(plot.margin = unit(c(t=-1 , 3, b=0,0 ), "cm"))
 
 figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,rel_heights = c(1,0.125),rel_widths=c(1,0.75),ncol=1 )+ theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
-```
 
-```{r,fig.width=9,fig.height=9}
 figure_4
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = figure_4, filename = './figures/figure_4.png', width = 9, height = 9,limitsize=FALSE,bg='white')
+ggsave(plot = figure_4, filename = './figures/figure_4.png', width = 9, height = 9,limitsize=FALSE,bg='white',dpi=900)
 ```

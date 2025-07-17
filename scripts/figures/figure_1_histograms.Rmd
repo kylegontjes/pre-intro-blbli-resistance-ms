@@ -47,14 +47,14 @@ MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=-0.25, 0
 
 # Create cowplot Figure
 MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 20)
-figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.14)) 
+figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.145)) 
 ``` 
 
 ## Figure
-```{r,message=F,error=F,warning=F,fig.width=9.5,fig.height=5.5}
+```{r,message=F,error=F,warning=F,fig.width=9.5,fig.height=5}
 figure1
 ```
 
 ```{r}
-ggsave(plot = figure1, filename = './figures/figure_1.png', width = 9.5, height = 5.5, bg = "white")
+ggsave(plot = figure1, filename = './figures/figure_1.png', width = 9.5, height = 5, bg = "white",dpi=900)
 ```
