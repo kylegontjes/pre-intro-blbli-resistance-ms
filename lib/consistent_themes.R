@@ -21,6 +21,8 @@ resistance_cat_scale_v <- scale_fill_manual(values=resistance_cat_colors, name="
 feature_colors <- c(`1` = "black",`0`="white")
 feature_scale <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Tip state", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 feature_scale_v <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Tip state", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+genotype_scale_v <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Genotype", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+
 MVB_IR_scale <- scale_fill_manual(breaks = c("IR_num_log_2_diff","MVB_num_log_2_diff"),values=c(5,6),labels = c(" Imipenem-relebactam","Meropenem-vaborbactam"),name="Antibiotic", guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 
 # Non-Susceptibility
@@ -112,10 +114,10 @@ consistent_theme_sfigure_6 <- theme(legend.position = 'bottom',legend.direction=
 
 consistent_theme_GWAS <- theme(legend.position = 'bottom',legend.direction="horizontal", 
                                     legend.justification = "center", legend.key = element_rect(colour = c('black')),
-                                    legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") ,
-                                    legend.title = element_text(size=21),legend.text = element_text(size=19),
+                                    legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
+                                    legend.title = element_text(size=20),legend.text = element_text(size=18),
                                     legend.title.align=0.5,legend.text.align = 0,
-                                    legend.margin=margin(t=-1,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
+                                    legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.10, "cm"))
 
 # Favorite kable
 favorite_kable <- function (x){
