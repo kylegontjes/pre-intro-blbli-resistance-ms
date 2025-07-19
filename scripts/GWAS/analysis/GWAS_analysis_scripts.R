@@ -387,7 +387,7 @@ variants_freq <- function(locus_tags,df){
 freq_plot <- function(hits_data){
   melted <- hits_data %>%  select(locus_tag,genotype,blbli_sus_prop,blbli_res_prop,`Significant Hit`) %>% reshape2::melt()
   melted$frequency <- melted$value * 100
-  figure <- ggplot(data=melted,aes(fill=variable,y=`Significant Hit`,x = frequency)) + geom_bar(position="dodge", stat="identity") + xlim(0,100.1) + resistance_prop_scale + theme_bw() + xlab("Percentage of isolates with genotype")  +ylab("")
+  figure <- ggplot(data=melted,aes(fill=variable,y=`Significant Hit`,x = frequency)) + geom_bar(position="dodge", stat="identity") + xlim(0,100.1) + resistance_prop_scale + theme_bw() + xlab("Percentage with genotype")  +ylab("")
   return(figure)
 }
 
@@ -409,15 +409,15 @@ nn_plot <- function(nn_data_melt){
 gwas_figures <- function(df,tr,gwas_mat,sig_hits_name){
   rownames(df) <- df$isolate_no
   #Step #1: Clades
-  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 Clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05)   + clade_colors_scale_v + consistent_theme_GWAS
+  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05)   + clade_colors_scale_v + consistent_theme_GWAS
 
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill()
-  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI Clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000125) + cluster_scale_2_col + consistent_theme_GWAS
+  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000125) + cluster_scale_2_col + consistent_theme_GWAS
 
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI Resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000025) + resistance_scale + consistent_theme_GWAS
+  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000025) + resistance_scale + consistent_theme_GWAS
 
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()

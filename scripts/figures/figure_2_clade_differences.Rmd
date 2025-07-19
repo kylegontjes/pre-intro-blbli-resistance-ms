@@ -50,11 +50,11 @@ add_clade_median_values <- function(dataframe, variable, clade_variable) {
 
 IR_intercepts <-  add_clade_median_values(df, "IR_log_2", "clade_I")
 
-fig2a <- create_MIC_histogram(df$IR_log_2,df$clade_I,"Imipenem-Relebactam") + ylim(NA,250)   +figure_2_format + clade_colors_scale_3_col   +MIC_scale + IR_intercepts[[1]] + IR_intercepts[[2]]
+fig2a <- create_MIC_histogram(df$IR_log_2,df$clade_I,"Imipenem-relebactam") + ylim(NA,250)   +figure_2_format + clade_colors_scale_3_col   +MIC_scale + IR_intercepts[[1]] + IR_intercepts[[2]]
 
 MVB_intercepts <-  add_clade_median_values(df, "MVB_log_2", "clade_I")
 
-fig2c <- create_MIC_histogram(df$MVB_log_2,df$clade_I,"Meropenem-Vaborbactam")  + MIC_scale  + ylim(NA,250) +figure_2_format + clade_colors_scale_3_col + MVB_intercepts[[1]] + MVB_intercepts[[2]]
+fig2c <- create_MIC_histogram(df$MVB_log_2,df$clade_I,"Meropenem-vaborbactam")  + MIC_scale  + ylim(NA,250) +figure_2_format + clade_colors_scale_3_col + MVB_intercepts[[1]] + MVB_intercepts[[2]]
    
 ```
 

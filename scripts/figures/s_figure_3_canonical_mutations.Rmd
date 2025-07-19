@@ -24,6 +24,9 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 source("./lib/consistent_themes.R")
 source("./lib/common_functions.R")
 source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+
+# Set null device
+set_null_device("png")
 ```
 
 # Data
@@ -61,35 +64,33 @@ carbapenem <- c(drug_entry,drug_exit,target_modification)
 # FA - phylogeny 
 ```{r ,fig.height=15,fig.width=15,echo=F,message=F,error=F,warning=F} 
 rownames(df) <- df$isolate_no 
- 
-consistent_theme_sfig3 <- theme(legend.position = 'bottom',legend.direction="horizontal", legend.justification = "center", legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") , legend.title = element_text(size=12),legend.text = element_text(size=10),legend.title.align=0.5,legend.text.align = 0, legend.margin=margin(t=-1,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.25, "cm")) 
 
   #Step #1: Clades
-  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 Clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05)   + clade_colors_scale_v + consistent_theme_sfig3
+  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05)   + clade_colors_scale_v + consistent_theme_sfigure_3
 
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill()
-  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI Clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000125) + cluster_scale_2_col + consistent_theme_sfig3
+  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000125) + cluster_scale_2_col + consistent_theme_sfigure_3
 
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI Resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000025) + resistance_scale + consistent_theme_sfig3
+  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000025) + resistance_scale + consistent_theme_sfigure_3
 
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
-  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.1,offset =.0000375) + Log2_scale + consistent_theme_sfig3
+  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.1,offset =.0000375) + Log2_scale + consistent_theme_sfigure_3
 
   # Step #7: Add tn4401 allele
   p.7.1 <- p.7 + new_scale_fill() 
-  p8 <-  gheatmap(p.7.1,df %>% select(tn4401_allele) %>% mutate_all(as.factor)  %>% `colnames<-`("tn4401 isoform"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000625)  + tn4401_scale + consistent_theme_sfig3 + ylim(NA,480)
+  p8 <-  gheatmap(p.7.1,df %>% select(tn4401_allele) %>% mutate_all(as.factor)  %>% `colnames<-`("tn4401 isoform"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000625)  + tn4401_scale + consistent_theme_sfigure_3 + ylim(NA,480)
 
 # KPC allele
   p8.1 <- p8 + new_scale_fill()
-  p9 <-  gheatmap(p8.1,df %>% select(KPC_type) %>% mutate_all(as.factor)  %>% `colnames<-`("KPC allele"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000075)  +kpc_scale + consistent_theme_sfig3 + ylim(NA,480)
+  p9 <-  gheatmap(p8.1,df %>% select(KPC_type) %>% mutate_all(as.factor)  %>% `colnames<-`("blaKPC allele"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000075)  +kpc_scale + consistent_theme_sfigure_3 + ylim(NA,480)
 0
 # relevant alleles
   p9.1 <- p9 + new_scale_fill()
-  s_figure_3_A <-  gheatmap(p9.1,df %>% select(any_of(carbapenem)) %>% mutate_all(as.factor) %>% `colnames<-`(recode(colnames(.,),'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD loop 3 insertion','OmpK36TD'='TD loop 3 insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 PFAV','OmpK36_intergenic'='Mutation in intergenic region of ompK36','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.7,offset =.0000875) + feature_scale_v  + consistent_theme_sfig3 + ylim(NA,645)
+  s_figure_3_A <-  gheatmap(p9.1,df %>% select(any_of(carbapenem)) %>% mutate_all(as.factor) %>% `colnames<-`(recode(colnames(.,),'OmpK35-25'='Truncation in ompK35 porin at 25%','OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD loop 3 insertion in ompK36','OmpK36TD'='TD loop 3 insertion in ompK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.7,offset =.0000875) + feature_scale_v  + consistent_theme_sfigure_3 + ylim(NA,655)
 ```
 
 # FB - non freq s
@@ -99,9 +100,20 @@ variables_to_use <- carbapenem %>% subset(.!='OmpK35-25%')
 gwas_nons_freq <- variants_freq(variables_to_use,df)   
 gwas_nons_freq$locus_tag<- factor(gwas_nons_freq$locus_tag, levels=rev(unique(variables_to_use)))
                                   
-gwas_nons_freq$`Significant Hit` <- recode(gwas_nons_freq$locus_tag ,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD loop 3 insertion','OmpK36TD'='TD loop 3 insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 PFAV','OmpK36_intergenic'='Mutation in intergenic region of ompK36','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')  
+gwas_nons_freq$`Significant Hit` <- recode(gwas_nons_freq$locus_tag  ,'OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36GD'='GD loop 3 insertion in ompK36','OmpK36TD'='TD loop 3 insertion in ompK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')  
+levels(gwas_nons_freq$`Significant Hit`)  <- gsub("ompK36","<i>ompK36</i>",levels(gwas_nons_freq$`Significant Hit` )  )
+levels(gwas_nons_freq$`Significant Hit`)  <- gsub("ompK35","<i>ompK35</i>",levels(gwas_nons_freq$`Significant Hit` )  )
+levels(gwas_nons_freq$`Significant Hit`)  <- gsub("acrAB-tolC","<i>acrAB-tolC</i>",levels(gwas_nons_freq$`Significant Hit` )  )
+levels(gwas_nons_freq$`Significant Hit`)  <- gsub("ramR","<i>ramR</i>",levels(gwas_nons_freq$`Significant Hit` )  )
+levels(gwas_nons_freq$`Significant Hit`)  <- gsub("ramA","<i>ramA</i>",levels(gwas_nons_freq$`Significant Hit` )  )   
 
-s_figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",axis.text = element_text(size=12,colour = "black"),axis.title = element_text(size=14,colour = "black"),legend.title = element_text(size=16 ,colour = "black"),legend.text = element_text(size=14,colour = "black"),legend.title.align=0.5 ,legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
+fix_hyphens <- function(x) {
+gsub("-", "\u202F-\u202F", x)
+} 
+levels(gwas_nons_freq$`Significant Hit`) <- fix_hyphens(levels(gwas_nons_freq$`Significant Hit`)) 
+remove_hyphen_spaces <- function(x) gsub("[\u202F\u00A0 ]*-[\u202F\u00A0 ]*", "-", x)
+
+levels(gwas_nons_freq$`Significant Hit`) <- remove_hyphen_spaces(levels(gwas_nons_freq$`Significant Hit`))
 
 s_figure_3_B <- freq_plot(gwas_nons_freq) +  s_figure_3_descriptive_plot_theme
 ```
@@ -109,24 +121,28 @@ s_figure_3_B <- freq_plot(gwas_nons_freq) +  s_figure_3_descriptive_plot_theme
 # FC - nn data 
 ```{r,fig.height=7.5,fig.width=10}
 # C. FC MIC (MVB * IR overlay) 
-nn_data_melt <- lapply(variables_to_use,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)
-nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(variables_to_use)))  
+nn_data_melt <- lapply(variables_to_use,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)  
 nn_data_melt$locus_tag<- factor(nn_data_melt$locus_tag, levels=rev(unique(variables_to_use)))
                                   
-nn_data_melt$locus_tag<- recode(nn_data_melt$locus_tag ,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD loop 3 insertion','OmpK36TD'='TD loop 3 insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 PFAV','OmpK36_intergenic'='Mutation in intergenic region of ompK36','OmpK36_promoter_IS'='Insertion seqeunce at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant') 
+nn_data_melt$locus_tag<- recode(nn_data_melt$locus_tag ,'OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in ompK36','OmpK36GD'='GD loop 3 insertion in ompK36','OmpK36TD'='TD loop 3 insertion in ompK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence at ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP_any'='Non-synonymous mutations in penicillin-binding proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')  
+levels(nn_data_melt$locus_tag) <- gsub("ompK36","<i>ompK36</i>",levels(nn_data_melt$locus_tag))  
+levels(nn_data_melt$locus_tag) <- gsub("ompK35","<i>ompK35</i>",levels(nn_data_melt$locus_tag))  
+levels(nn_data_melt$locus_tag) <- gsub("acrAB-tolC","<i>acrAB-tolC</i>",levels(nn_data_melt$locus_tag))  
+levels(nn_data_melt$locus_tag) <- gsub("ramR","<i>ramR</i>",levels(nn_data_melt$locus_tag))  
+levels(nn_data_melt$locus_tag) <- gsub("ramA","<i>ramA</i>",levels(nn_data_melt$locus_tag))     
      
 s_figure_3_C <- nn_plot(nn_data_melt)   + s_figure_3_descriptive_plot_theme
 ```
 
-```{r,fig.height=12.5,fig.width=19}
-s_figure_3BC <- plot_grid(s_figure_3_B,s_figure_3_C ,nrow = 2,labels = c("B","C"),label_size = 22,align = "hv",label_x = -0.02)
+```{r,fig.height=12.5,fig.width=18.75}
+s_figure_3BC <- plot_grid(s_figure_3_B,s_figure_3_C ,nrow = 2,labels = c("B","C"),label_size = 22,align = "hv",label_x = -0.0325)
 
-s_figure_3 <- plot_grid(s_figure_3_A,s_figure_3BC,labels = c("A",""),label_size = 22,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 
+s_figure_3 <- plot_grid(s_figure_3_A,s_figure_3BC,labels = c("A",""),label_size = 22,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.69)) 
 
 s_figure_3
 ```
 
-```{r,message=F,echo=F,error=F,warning=F,fig.height=12.5,fig.width=19.75} 
-ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.5, width = 19,  limitsize=FALSE, bg='white')
+```{r,message=F,echo=F,error=F,warning=F,fig.height=12.5,fig.width=18} 
+ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.5, width = 18.75,  limitsize=FALSE, bg='white',dpi=900)
 ```
  

@@ -37,9 +37,9 @@ x_log_breaks <- c(-2,-1,0,1,2,3,4,5)
 MIC_x_scale <- scale_x_continuous(breaks=x_log_breaks, labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))
 
 # Figure
-figure1A <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-Relebactam")+ MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale 
+figure1A <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-relebactam")+ MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale 
 
-figure1B <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-Vaborbactam") + MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
+figure1B <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-vaborbactam") + MIC_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
 
 # Legend
 MIC_legend <- get_legend(figure1A)

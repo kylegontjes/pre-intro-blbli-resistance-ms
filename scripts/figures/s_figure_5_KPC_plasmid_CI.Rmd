@@ -105,13 +105,13 @@ df_CI_relevant_plasmids <- left_join(df_CI_KPC_plasmid_mat %>% mutate(isolate_no
   p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.15,offset =.0000525) + Log2_scale 
    
  p.8 <- p.7 + new_scale_fill() 
-A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 KPC plasmid","AA018 non-KPC plasmid","AA552 KPC plasmid","AA552 non-KPC plasmid","Other KPC plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,215) + theme(legend.position = 'bottom') + consistent_theme_sfigure_6
+A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 blaKPC plasmid","AA018 non-blaKPC plasmid","AA552 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmids")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,232.5) + theme(legend.position = 'bottom') + consistent_theme_sfigure_6
 ```
 
 # B KPC copy number
 ```{r} 
 df_CI$KPC_plasmid_simplified <- ifelse(df_CI$AA018_KPC == 1, "AA018",ifelse(df_CI$AA552_KPC == 1,"AA552","Other"))
-B <- ggplot(data= df_CI) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.6))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("KPC copy number") + xlab("KPC plasmid cluster")+ theme_bw_me + sfig6_format + theme(legend.position='none') + ylim(NA,10.01)
+B <- ggplot(data= df_CI) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.6))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("bla<sub>KPC</sub></i> copy number") + xlab("<i>bla<sub>KPC</sub></i> plasmid cluster")+ theme_bw_me + s_figure_5_descriptive_plot_format + theme(legend.position='none') + ylim(NA,10.01)
 ```
 
 # C membership in clusters
@@ -123,22 +123,22 @@ blbli_plasmid_prop <- df_CI %>% group_by(blbli_cluster_simplified,AA552_like)  %
   dplyr::summarise(n = n()) %>%
   mutate(freq = n / sum(n)) %>% `colnames<-`(c("clustering_simple","AA552_like","n","freq")) %>% as.data.frame
  
-C <-  ggplot(data=blbli_plasmid_prop,aes(x=clustering_simple,fill=AA552_like,y=n))+geom_bar(position="stack",stat="identity",width = .75)  +ylab("No. isolates") +xlab("Phylogenetics of resistance")   + theme_bw_me + sfig6_format  +ylim(NA,115) + AA552_fill
+C <-  ggplot(data=blbli_plasmid_prop,aes(x=clustering_simple,fill=AA552_like,y=n))+geom_bar(position="stack",stat="identity",width = .75)  +ylab("Isolates") +xlab("Phylogenetics of resistance")   + theme_bw_me + s_figure_5_descriptive_plot_format  +ylim(NA,115) + AA552_fill
 ```
 
 ```{r ,fig.height = 10, fig.width = 10,echo=F,message=F,error=F,warning=F}
-s_figure_6BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 28) 
+s_figure_5BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 28) 
 ```
 
 ```{r ,fig.height=10,fig.width=11} 
-s_figure_6A <- cowplot::plot_grid(A,labels = c("A"),label_size=28)  
+s_figure_5A <- cowplot::plot_grid(A,labels = c("A"),label_size=28)  
 ```
 
-```{r ,fig.height=12,fig.width=21.25}
-s_figure_6 <- plot_grid(s_figure_6A,s_figure_6BC,rel_heights = c(1,1),rel_widths = c(1,.325))  
-s_figure_6
+```{r ,fig.height=12,fig.width=21.5}
+s_figure_5 <- plot_grid(s_figure_5A,s_figure_5BC,rel_heights = c(1,1),rel_widths = c(1,.35))  
+s_figure_5
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=21.5,fig.height=15} 
-ggsave(plot = s_figure_6, filename = './figures/s_figure_5.png', width = 21.5, height = 12,limitsize=FALSE, bg='white')
+ggsave(plot = s_figure_5, filename = './figures/s_figure_5.png', width = 21.5, height = 12,limitsize=FALSE, bg='white',dpi=900)
 ```

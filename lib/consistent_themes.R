@@ -24,7 +24,7 @@ feature_scale <- scale_fill_manual(breaks = c(1,0), values = c('black','white') 
 feature_scale_v <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Tip state", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
 genotype_scale_v <- scale_fill_manual(breaks = c(1,0), values = c('black','white') ,labels=c("Present","Absent"),name="Genotype", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
 
-MVB_IR_scale <- scale_fill_manual(breaks = c("IR_num_log_2_diff","MVB_num_log_2_diff"),values=c(5,6),labels = c(" Imipenem-relebactam","Meropenem-vaborbactam"),name="Antibiotic", guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
+MVB_IR_scale <- scale_fill_manual(breaks = c("IR_num_log_2_diff","MVB_num_log_2_diff"),values=c(5,6),labels = c("Imipenem-relebactam","Meropenem-vaborbactam"),name="Antibiotic", guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 
 # Non-Susceptibility
 resistance_prop_scale <- scale_fill_manual(breaks = c("blbli_res_prop","blbli_sus_prop"),values=c("black","gray"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
@@ -32,7 +32,7 @@ resistance_scale <- scale_fill_manual(breaks = c("Non-Susceptible","Susceptible"
  
 # MIC Numeric
 colfunc <- colorRampPalette(c("white", "red")) 
-Log2_scale <-scale_fill_manual(breaks = c(-2,-1,0,1,2,3,4,5),values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum Inhibitory Concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=4),drop = FALSE ,limits=force)
+Log2_scale <-scale_fill_manual(breaks = c(-2,-1,0,1,2,3,4,5),values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=4),drop = FALSE ,limits=force)
 
 # Clade 
 clade_colors <- c("Clade I" = "red","Clade II"="blue")
@@ -47,12 +47,9 @@ cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels
 cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
 cluster_scale_2_col <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=2, title.position = "top", label.position = "right"))
 
-# Potential scale
-potential_scale_general <- scale_fill_manual(breaks = c("Modulator","Mediator","None"),values=c("gray","#4d3227","white"),labels = c("Resistance Modulator","Resistance Mediator","None"),name="Genotype Category",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 5)) 
-
 # Panels
-panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + Novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
-panel_scale_v <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + Novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 1)) 
+panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
+panel_scale_v <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 1)) 
 
 # OmpK36 scale
 ompK36_colors <- rev(c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB"))
@@ -66,7 +63,7 @@ tn4401_scale <- scale_fill_manual(breaks=c("Tn4401a","Tn4401b","Tn4401d","Tn4401
 kpc_scale <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","No KPC"),values = c(5,6,7,"white"),labels=c("KPC-2","KPC-3","KPC-5","No KPC"),name = "KPC",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
 
 # AA552
-AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 KPC Plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 blaKPC plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Variant type
 variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","gray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
@@ -100,14 +97,16 @@ mytheme_GWAS <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.05,
 # Figure 3 Tree
 consistent_theme_sfigure_3 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
                                legend.justification = "center", legend.key = element_rect(colour = c('black')),
-                               legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.25, "cm"),legend.key.width = unit(0.25, "cm") ,
+                               legend.box.spacing = unit(.000005, "cm"),
+                               legend.key.size = unit(0.15, "cm"),legend.key.width = unit(0.15, "cm") ,
                                legend.title = element_text(size=12),legend.text = element_text(size=10),
                                legend.title.align=0.5,legend.text.align = 0,
                                legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
 consistent_theme_sfigure_6 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
                                     legend.justification = "center", legend.key = element_rect(colour = c('white')),
-                                    legend.box.spacing = unit(.000005, "cm"),legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
+                                    legend.box.spacing = unit(.000005, "cm"),
+                                    legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
                                     legend.title = element_text(size=20),legend.text = element_text(size=18),
                                     legend.title.align=0.5,legend.text.align = 0,
                                     legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
@@ -115,7 +114,8 @@ consistent_theme_sfigure_6 <- theme(legend.position = 'bottom',legend.direction=
 
 consistent_theme_GWAS <- theme(legend.position = 'bottom',legend.direction="horizontal", 
                                     legend.justification = "center", legend.key = element_rect(colour = c('black')),
-                                    legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
+                                    legend.box.spacing = unit(.00001, "cm"),
+                                    legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
                                     legend.title = element_text(size=20),legend.text = element_text(size=18),
                                     legend.title.align=0.5,legend.text.align = 0,
                                     legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.10, "cm"))
@@ -158,15 +158,45 @@ figure_4_format_wo_element_markdown <-   theme(legend.position = "bottom",
                            legend.text =   element_text(size=12,color="black"),
                            legend.title = element_text(size = 14,color="black"),
                            plot.title = element_text(size = 16,color="black")) 
+# S figure 3
+s_figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",
+                                            axis.text = element_markdown(size=12,colour = "black"),
+                                            axis.title = element_markdown(size=14,colour = "black"),
+                                            legend.title = element_text(size=16 ,colour = "black"),
+                                            legend.text = element_text(size=14,colour = "black"),
+                                            legend.title.align=0.5 ,legend.key.size = unit(0.5, "cm"),
+                                            legend.key.width = unit(0.5, "cm")) 
 
-# S fig 6
-sfig6_format <-  theme(legend.position = "bottom",
-                       axis.text =   element_text(size=20,color="black"),
-                       axis.title = element_text(size = 24,color="black"),
+# S figure 4
+s_figure_4_descriptive_plot_theme <-  theme(legend.position="bottom",
+                                            axis.text = element_markdown(size=19,colour = "black"),
+                                            axis.title = element_markdown(size=21,colour = "black"),
+                                            legend.title = element_text(size=21,colour = "black"),
+                                            legend.text = element_text(size=19,colour = "black"),
+                                            legend.title.align=0.5 ,
+                                            legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
+
+# S figure 5
+s_figure_5_descriptive_plot_format <-  theme(legend.position = "bottom",
+                       axis.text =   element_markdown(size=20,color="black"),
+                       axis.title = element_markdown(size = 24,color="black"),
                        legend.text =   element_text(size=22,color="black"),
                        legend.title = element_text(size = 24,color="black"),
                        plot.title = element_text(size = 26,color="black"),
 )
+
+# S figure 6
+s_figure_6_format <- theme(legend.position = "bottom",
+      axis.text =   element_markdown(size=14,color="black"),
+      axis.title = element_markdown(size = 18,color="black"),
+      legend.text =   element_markdown(size=18,color="black"),
+      strip.background = element_rect(fill="lightgray",color="black")   , 
+      legend.title = element_text(size = 0,color="black"),
+      strip.text = element_text(size = 12),
+      legend.margin = margin(t = -5, r = 0, b = 0, l = 0),
+      strip.text.x = element_markdown(size=10,color='black'),
+      strip.text.y = element_markdown(size=10,color='black'),
+      panel.spacing = unit(0.3, "cm", data = NULL)) 
 
 # S fig 9
 sfig9_format <-  theme(legend.position = "bottom",

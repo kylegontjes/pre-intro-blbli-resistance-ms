@@ -51,10 +51,10 @@ s_figure_2 <- plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", alig
 ```
 
 # Print & Save 
-```{r,message=F,error=F,warning=F,fig.width=7.25,fig.height=5}
+```{r,message=F,error=F,warning=F,fig.width=6.25,fig.height=5}
 s_figure_2
 ```
 
 ```{r}
-ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 7.25, height = 5,bg='white')
+ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 6.25, height = 5,bg='white', dpi=900)
 ```

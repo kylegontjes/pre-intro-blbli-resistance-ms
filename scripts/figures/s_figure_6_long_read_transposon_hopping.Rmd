@@ -1,5 +1,5 @@
 ---
-title: "s_figure_8_alignment_tn4401"
+title: "Supplemental Figure 6: tn4401 hopping"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -21,6 +21,9 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 #Scripts  
 source("./lib/common_functions.R")   
 source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
 ```
 
 ```{r}
@@ -91,11 +94,12 @@ lr_isolates <- left_join(lr_isolates,lr_KPC_cluster)
 # Read in data
 
 ```{r}
-kpc_contigs <- blast_lr %>% subset(element_symbol  %in% c('KPC',"KPC-2","KPC-3","KPC-5"))%>% select(isolate_no,contig,element_symbol) %>% distinct
+kpc_contigs <- blast_lr %>% subset(element_symbol  %in% c("KPC-2","KPC-3","KPC-5"))%>% select(isolate_no,contig,element_symbol) %>% distinct
 
 contig_data <- mobcontigs_lr %>% select(isolate_no,contig,primary_cluster_id,mash_nearest_neighbor,size) %>% left_join(kpc_contigs) 
+contig_data$element_symbol <- gsub("KPC-2","<i>bla<sub>KPC-2</sub></i>",contig_data$element_symbol)  %>% gsub("KPC-3","<i>bla<sub>KPC-3</sub></i>",.)  %>% gsub("KPC-5","<i>bla<sub>KPC-5</sub></i>",.) 
 contig_data$primary_cluster_id <- ifelse(contig_data$primary_cluster_id == "-","Chromosome",contig_data$primary_cluster_id) 
-contig_data$contig_name <- paste0(contig_data$contig,"-",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor,"-",contig_data$element_symbol,"-",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.)
+contig_data$contig_name <- paste0(contig_data$contig," ",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor," ",contig_data$element_symbol," ",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.)
 ```
 
 # tn4401 data
@@ -108,10 +112,7 @@ tn4401_blast$qseqid <- str_split(tn4401_blast$qseqid,";",simplify = T) %>% .[,1]
 
 # Create figures
 
-```{r ,fig.width=12.5,fig.height=10}
-library(tidyverse)
-library(ggplot2)
-
+```{r ,fig.width=12.5,fig.height=10} 
  reorder_blast_df <- function(blast_isolate_df,name,contig_name,num){ 
   if(blast_isolate_df["sstart"]>blast_isolate_df["send"]){
     blast_df <- blast_isolate_df %>% t %>% as.data.frame %>% `colnames<-`(c(name,contig_name,paste0("[E",num,"]"),paste0("[S",num,"]"),"send","sstart"))
@@ -172,14 +173,7 @@ make_plots <- function(filename,contig_data,blast_data){
   contig_data$map2_chr <- factor(contig_data$map2_chr,levels = c(isolate_2_contigs %>% arrange(-size) %>% .$contig_name)) 
   
     figure <- ggplot(data=coords, aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`)) + geom_segment() +  geom_segment(data=tn4401_merge,aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`,color="red"))  + geom_segment(data=contig_data,aes(x=`X`,xend=`X`,y=`Y`,yend=`Y`),color="white") +
-    facet_grid(map2_chr~map1_chr,scales = 'free',drop = F)   + xlab(paste0(unique(coords$map1_name)," position (bp)")) + ylab(paste0(unique(coords$map2_name)," position (bp)")) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = "off") + ggplot2::theme_bw()  + scale_color_manual(values="red",labels="tn4401 KPC transposon", name="", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) + theme(legend.position = "bottom") + theme(legend.position = "bottom",
-                     axis.text =   element_text(size=14,color="black"),
-                     axis.title = element_text(size = 18,color="black"),
-                     legend.text =   element_text(size=18,color="black"),
-                     legend.title = element_text(size = 0,color="black"),
-                      strip.text = element_text(size = 12),
-                     legend.margin = margin(t = -5, r = 0, b = 0, l = 0),
-                     panel.spacing = unit(0.3, "cm", data = NULL)) 
+    facet_grid(map2_chr~map1_chr,scales = 'free',drop = F)   + xlab(paste0(unique(coords$map1_name)," position (bp)")) + ylab(paste0(unique(coords$map2_name)," position (bp)")) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = "off") + ggplot2::theme_bw()  + scale_color_manual(values="red",labels="<i>bla<sub>KPC</sub></i>-containing <i>tn4401</i> transposon", name="", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) + s_figure_6_format
  
   figure
 }
@@ -214,18 +208,10 @@ phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_d
 
 # Main figure
 
-```{r,fig.width=17,fig.height=13}
+```{r,fig.width=14,fig.height=10.5}
 setwd("./data/mummer_hybrid/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 tn4401_hopping
 
-ggsave("../../figures/s_figure_6.png",plot=tn4401_hopping,width = 17,height = 13)
-```
-
-# Alternative
-
-```{r,fig.width=18,fig.height=20}
-setwd("./data/mummer_hybrid/")
-tn4401_hopping_2 <- make_plots(filename = 'PCMP_H148_PCMP_H307.coords',contig_data = contig_data,blast_data = tn4401_blast) 
-tn4401_hopping_2
+ggsave("../../figures/s_figure_6.png",plot=tn4401_hopping,width = 14,height = 10.5,dpi=900)
 ```

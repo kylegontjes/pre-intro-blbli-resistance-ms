@@ -39,9 +39,10 @@ genotype_count <- function(dataframe,annots){
   genotype_ct <- lapply(variants,FUN=function(x){
     dataframe[,x] %>% sum()
   }) %>% unlist
-  genotype_freq <- genotype_ct/nrow(dataframe)
+  genotype_freq <- genotype_ct/nrow(dataframe) 
   genotype_freq_under_1 = {ifelse(genotype_freq<0.01,"yes","no")}
-  results_df <- cbind.data.frame(raw_rownames=variants,genotype_ct=genotype_ct,genotype_freq=genotype_freq,genotype_freq_under_1=genotype_freq_under_1)
+  genotype_percentage <- genotype_freq*100
+  results_df <- cbind.data.frame(raw_rownames=variants,genotype_ct=genotype_ct,genotype_freq=genotype_freq,genotype_freq_under_1=genotype_freq_under_1,genotype_percentage=genotype_percentage)
   return(results_df)
   }
   
@@ -60,7 +61,7 @@ convert_tableone_into_df(genotype_data,vars="genotype_freq_under_1")
 ```{r,fig.width=5,fig.height=4}
 # Overall
 variant_freq_histogram <- function(annots_df,bins=NULL){
-  figure <- ggplot(data=annots_df) + geom_histogram(aes(x=genotype_freq,fill=var_cat),bins=bins) + theme_bw_me + xlab("Proportion of isolates with variant") + ylab("Number of variants") + theme(legend.position = "bottom") + variant_type_scale
+  figure <- ggplot(data=annots_df) + geom_histogram(aes(x=genotype_percentage,fill=var_cat),bins=bins) + theme_bw_me + xlab("Percentage of isolates with variant") + ylab("Number of variants") + theme(legend.position = "bottom") + variant_type_scale
   return(figure)
 }
 
@@ -71,10 +72,10 @@ grepl(pattern = "yes",all_variants_annots$genotype_freq_under_1) %>% sum / nrow(
 s_figure_10_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_10_format
 s_figure_10_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
 
-s_figure_10 <- s_figure_10_main +  annotation_custom(ggplotGrob(s_figure_10_inlet), xmin = 0.4, xmax = 1, ymin = 1250, ymax = 4000)
+s_figure_10 <- s_figure_10_main +  annotation_custom(ggplotGrob(s_figure_10_inlet), xmin = 40, xmax = 100, ymin = 500, ymax = 4000)
 s_figure_10 
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=5.5,fig.height=4.5} 
-ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 5, height = 4,limitsize=FALSE)
+ggsave(plot = s_figure_10, filename = './figures/s_figure_10.png', width = 5, height = 4,limitsize=FALSE,bg='white',dpi=900)
 ```

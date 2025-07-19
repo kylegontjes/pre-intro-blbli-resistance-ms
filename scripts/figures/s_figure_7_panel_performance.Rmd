@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gridExtra",'kableExtra',"tableone")
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone",'cowplot')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -23,6 +23,9 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 source("./lib/consistent_themes.R")
 source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 source("./lib/common_functions.R")
+
+# Set null device
+set_null_device("png")
 ```
 
 ```{r} 
@@ -163,11 +166,11 @@ E <- ggplot(data=BLBLI_panel,aes(fill=panels,y=accuracy,x=population)) +  geom_b
 
 ```{r,fig.height=12,fig.width=10.5}
 fig_legend <- get_legend(A)
-s_figure_9 <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),E+ theme(legend.position = "none"),fig_legend,labels = c("A","B","C","D","E",""),ncol=2,label_size = 18,rel_widths = c(1,1,1,1,1,1),label_y = 1,label_x = -0.009)
+s_figure_7 <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),E+ theme(legend.position = "none"),fig_legend,labels = c("A","B","C","D","E",""),ncol=2,label_size = 18,rel_widths = c(1,1,1,1,1,1),label_y = 1,label_x = -0.009)
  
-s_figure_9
+s_figure_7
 ```
 
 ```{r}
-ggsave(plot = s_figure_9, filename = './figures/s_figure_7.png', width = 12, height = 10.5,limitsize=FALSE,bg='white')
+ggsave(plot = s_figure_7, filename = './figures/s_figure_7.png', width = 12, height = 10.5,limitsize=FALSE,bg='white',dpi=900)
 ```

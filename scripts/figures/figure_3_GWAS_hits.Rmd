@@ -29,6 +29,9 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 # Print
 Sys.info()
 sessionInfo() 
+
+# Set null device
+set_null_device("png")
 ```
  
 

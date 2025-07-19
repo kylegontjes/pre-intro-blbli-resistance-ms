@@ -51,9 +51,9 @@ co_occurrence_merged <- do.call(cbind,co_occurrence_merged) %>% as.data.frame %>
 # Complex heatmap
 drugs <- gsub("_dich_num","",colnames(co_occurrence_merged))
 ## Heatmap
-co_occurrence_heatmap <- ComplexHeatmap::pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-Resistance",legend=F,fontsize = 14,
-    row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 20)),
-    column_names_max_height = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 20)),
+co_occurrence_heatmap <- ComplexHeatmap::pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-r esistance",legend=F,fontsize = 12,
+    row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 18)),
+    column_names_max_height = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 18)),
     legend_breaks = c(0, 25, 50, 75, 100),legend_labels = c("0%", "25%", "50%", "75%", "100%"),
     cluster_rows=F,cluster_cols = F,display_numbers = as.matrix(co_occurrence_merged),labels_row = rownames(co_occurrence_merged),labels_col = drugs,number_color = "black")
 
@@ -63,20 +63,20 @@ for(i in 1:100){
   one_hundred_breaks[i] <- 1*i
 }  
 
-fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Cross-Resistance",direction = "horizontal",col_fun = colorRamp2(breaks = one_hundred_breaks,colors = colorRampPalette(rev(brewer.pal(n = 7, name =  "RdYlBu")))(100)), title_gp = gpar(fontsize = 20),labels_gp=gpar(fontsize=18),legend_width = unit(15, "cm"),title_position = 'topcenter')
+fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Cross-resistance",direction = "horizontal",col_fun = colorRamp2(breaks = one_hundred_breaks,colors = colorRampPalette(rev(brewer.pal(n = 7, name =  "RdYlBu")))(100)), title_gp = gpar(fontsize = 18),labels_gp=gpar(fontsize=16),legend_width = unit(15, "cm"),title_position = 'topcenter')
 
 # Print heatmap
 fig_heatmap_image <- grid.grabExpr(draw(co_occurrence_heatmap))
 fig_legend_image <- grid.grabExpr(draw(fig_legend))
 
-s_figure_1 <-plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.15))  
+s_figure_1 <-plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.16))  
 ```
 
 # Print & Save
-```{r,message=F,error=F,warning=F,fig.width=11.5,fig.height=5.5}
+```{r,message=F,error=F,warning=F,fig.width=9.75,fig.height=5.25}
 s_figure_1
 ```
 
 ```{r}
-ggsave(plot = s_figure_1, filename = './figures/s_figure_1.png', width = 11.5, height = 5.5, bg = "white")
+ggsave(plot = s_figure_1, filename = './figures/s_figure_1.png', width = 9.75, height = 5.25, bg = "white",dpi=900)
 ```
