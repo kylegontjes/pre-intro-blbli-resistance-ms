@@ -87,7 +87,7 @@ lm(MVB_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_mo
 
 
 paste0("IR w/ KPC")
-lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CI) %>% tab_model()  
+lm(IR_log_2 ~ KPC_log_2 ,data=df_w_KPC_CII) %>% tab_model()  
 lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_model()   
 lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC_CII) %>% tab_model()   
 ```
