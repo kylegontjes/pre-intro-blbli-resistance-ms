@@ -202,8 +202,8 @@ s_figure_6_format <- theme(legend.position = "bottom",
 sfig9_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=16,color="black"),
                        axis.title = element_text(size = 18,color="black"),
-                       legend.text =   element_text(size=20,color="black"),
-                       legend.title = element_text(size = 22,color="black"),
+                       legend.text =   element_text(size=18,color="black"),
+                       legend.title = element_text(size = 20,color="black"),
                        plot.title = element_text(size = 24,color="black"),
                        legend.margin = margin(t=0,unit="cm")
 )
