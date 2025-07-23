@@ -75,5 +75,6 @@ table_reg <- tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adju
 table_reg
 
 html_file <- "tables/s_table_2.html"
-writeLines(as.character(table_reg$page.complete), html_file)
+writeLines(table_reg$page.complete, html_file)
+webshot2::webshot("tables/s_table_2.html", "tables/s_table_2.png",vwidth = 1800)
 ```
