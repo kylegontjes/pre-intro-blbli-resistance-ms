@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Tables 2-4: Descriptive stats + regression modeling for presence, emergence, and spread "
+title: "Supplemental Tables 3-5: Descriptive stats + regression modeling for presence, emergence, and spread"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -61,25 +61,25 @@ table_curation <- function(stats,ulogr,mlogr){
 ```
 
 ```{r}
-s_table_2 <- table_curation(descriptive_stats$present,purposeful_results$univariable$present,purposeful_results$multivariable$present$final_model_table)
-s_table_3 <- table_curation(descriptive_stats$singleton,purposeful_results$univariable$singleton,purposeful_results$multivariable$singleton$final_model_table)
-s_table_4 <- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)
+s_table_3 <- table_curation(descriptive_stats$present,purposeful_results$univariable$present,purposeful_results$multivariable$present$final_model_table)
+s_table_4 <- table_curation(descriptive_stats$singleton,purposeful_results$univariable$singleton,purposeful_results$multivariable$singleton$final_model_table)
+s_table_5 <- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)
 ```
 
 ```{r}
-s_table_2 %>% favorite_kable()
 s_table_3 %>% favorite_kable()
 s_table_4 %>% favorite_kable()
+s_table_5 %>% favorite_kable()
 ```
 
 
 ```{r}
-write_csv(s_table_2,"./tables/s_table_2.csv")
-saveRDS(s_table_2,"./tables/s_table_2.RDS")
-
 write_csv(s_table_3,"./tables/s_table_3.csv")
 saveRDS(s_table_3,"./tables/s_table_3.RDS")
 
 write_csv(s_table_4,"./tables/s_table_4.csv")
 saveRDS(s_table_4,"./tables/s_table_4.RDS")
+
+write_csv(s_table_5,"./tables/s_table_5.csv")
+saveRDS(s_table_5,"./tables/s_table_5.RDS")
 ```
