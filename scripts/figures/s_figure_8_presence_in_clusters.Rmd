@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 9 Differential potential for emergence and spread of β-lactam/β-lactamase inhibitor resistance-associated genotypes "
+title: "Supplemental Figure 8 Differential potential for emergence and spread of β-lactam/β-lactamase inhibitor resistance-associated genotypes "
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -64,7 +64,7 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 
 # A - Heatmap for presence by resistance category
 ```{r,fig.height=7,fig.width=12}
-source("./scripts/figures/s_figure_9_functions.R")
+source("./scripts/figures/s_figure_8_functions.R")
 
 # Heatmap curation
 df$blbli_asr_cluster_renamed_simple <- ifelse(df$blbli_asr_cluster_renamed_simple=="Singleton" & df$clade_I == "Clade I","Singleton - Clade I",ifelse(df$blbli_asr_cluster_renamed_simple == "Singleton" & df$clade_I == "Clade II","Singleton - Clade II",ifelse(df$blbli_asr_cluster_renamed_simple=="No feature" & df$clade_I == "Clade I","Susceptible - Clade I", ifelse(df$blbli_asr_cluster_renamed_simple=="No feature" & df$clade_I == "Clade II","Susceptible - Clade II",df$blbli_asr_cluster_renamed_simple)))) 
@@ -223,12 +223,12 @@ B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<
 
 # Cowplot supplemental figure
 ```{r, fig.height=6.5, fig.width=11.375} 
-s_figure_9.A <- ggdraw() + draw_image(tmpfile)
+s_figure_8.A <- ggdraw() + draw_image(tmpfile)
 unlink(tmpfile)
-s_figure_9 <- cowplot::plot_grid(s_figure_9.A,B_w_tree,labels = "AUTO",ncol=2,label_size = 20,rel_widths = c(1,0.625))
-s_figure_9
+s_figure_8 <- cowplot::plot_grid(s_figure_8.A,B_w_tree,labels = "AUTO",ncol=2,label_size = 20,rel_widths = c(1,0.625))
+s_figure_8
 ``` 
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 11.375, height = 6.5,limitsize=FALSE,bg='white',dpi=900)
+ggsave(plot = s_figure_8, filename = './figures/s_figure_8.png', width = 11.375, height = 6.5,limitsize=FALSE,bg='white',dpi=900)
 ```

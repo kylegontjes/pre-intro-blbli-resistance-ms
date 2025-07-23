@@ -105,7 +105,7 @@ df_CI_relevant_plasmids <- left_join(df_CI_KPC_plasmid_mat %>% mutate(isolate_no
   p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.15,offset =.0000525) + Log2_scale 
    
  p.8 <- p.7 + new_scale_fill() 
-A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 blaKPC plasmid","AA018 non-blaKPC plasmid","AA552 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmids")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,232.5) + theme(legend.position = 'bottom') + consistent_theme_sfigure_6
+A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 blaKPC plasmid","AA018 non-blaKPC plasmid","AA552 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmids")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,232.5) + theme(legend.position = 'bottom') + consistent_theme_sfigure_5
 ```
 
 # B KPC copy number

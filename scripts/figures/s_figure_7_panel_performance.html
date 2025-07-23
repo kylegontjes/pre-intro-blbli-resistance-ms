@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2025-07-22" />
+<meta name="date" content="2025-07-23" />
 
 <title>Supplemental Figure 7: Panel performance</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Figure 7: Panel
 performance</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2025-07-22</h4>
+<h4 class="date">2025-07-23</h4>
 
 </div>
 
@@ -1246,15 +1246,15 @@ BLBLI_panel$accuracy &lt;- BLBLI_panel$accuracy *100
 BLBLI_panel$panels &lt;- factor(BLBLI_panel$panels,levels = c(&quot;known&quot;,&quot;novel_GWAS&quot;,&quot;known_ST258_GWAS&quot;))
 BLBLI_panel$population &lt;- factor(BLBLI_panel$population,levels = c(&quot;ST258&quot;,&quot;Clade I&quot;,&quot;Clade II&quot;))  </code></pre>
 <pre class="r"><code>A &lt;- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = &quot;identity&quot;,position=&#39;dodge&#39;) + theme_bw_me + ylab(&quot;Sensitivity&quot;) + xlab(&quot;&quot;)  + ylim(0,105) +
-     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale_v+ sfig9_format
+     geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale_v+ s_figure_7_format
 B &lt;- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = &quot;identity&quot;,position=&#39;dodge&#39;)+ theme_bw_me + ylab(&quot;Specificity&quot;) + xlab(&quot;&quot;) + ylim(0,105) +
-     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v+ sfig9_format
+     geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v+ s_figure_7_format
 C &lt;- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = &quot;identity&quot;,position=&#39;dodge&#39;)+ theme_bw_me+ ylab(&quot;Positive predictive value&quot;) + xlab(&quot;&quot;) + ylim(0,105)+
-     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + sfig9_format
+     geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + s_figure_7_format
 D &lt;- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = &quot;identity&quot;,position=&#39;dodge&#39;)+ theme_bw_me+ ylab(&quot;Negative predictive value&quot;) + xlab(&quot;&quot;) + ylim(0,105)+
-     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + sfig9_format
+     geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + s_figure_7_format
 E &lt;- ggplot(data=BLBLI_panel,aes(fill=panels,y=accuracy,x=population)) +  geom_bar(stat = &quot;identity&quot;,position=&#39;dodge&#39;)+ theme_bw_me+ ylab(&quot;Accuracy&quot;) + xlab(&quot;&quot;) + ylim(0,105)+
-     geom_text(aes(label=signif(accuracy,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + sfig9_format  </code></pre>
+     geom_text(aes(label=signif(accuracy,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + s_figure_7_format  </code></pre>
 <pre class="r"><code>fig_legend &lt;- get_legend(A)
 s_figure_7 &lt;- cowplot::plot_grid(A + theme(legend.position = &quot;none&quot;),B+ theme(legend.position = &quot;none&quot;),C+ theme(legend.position = &quot;none&quot;),D+ theme(legend.position = &quot;none&quot;),E+ theme(legend.position = &quot;none&quot;),fig_legend,labels = c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;,&quot;E&quot;,&quot;&quot;),ncol=2,label_size = 18,rel_widths = c(1,1,1,1,1,1),label_y = 1,label_x = -0.009)
  

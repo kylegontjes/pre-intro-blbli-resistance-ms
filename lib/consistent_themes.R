@@ -103,7 +103,7 @@ consistent_theme_sfigure_3 <- theme(legend.position = 'bottom',legend.direction=
                                legend.title.align=0.5,legend.text.align = 0,
                                legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
-consistent_theme_sfigure_6 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
+consistent_theme_sfigure_5 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
                                     legend.justification = "center", legend.key = element_rect(colour = c('white')),
                                     legend.box.spacing = unit(.000005, "cm"),
                                     legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
@@ -198,8 +198,8 @@ s_figure_6_format <- theme(legend.position = "bottom",
       strip.text.y = element_markdown(size=10,color='black'),
       panel.spacing = unit(0.3, "cm", data = NULL)) 
 
-# S fig 9
-sfig9_format <-  theme(legend.position = "bottom",
+# S fig 7
+s_figure_7_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=16,color="black"),
                        axis.title = element_text(size = 18,color="black"),
                        legend.text =   element_text(size=18,color="black"),
@@ -210,7 +210,7 @@ sfig9_format <-  theme(legend.position = "bottom",
 
 
 # S fig 12
-s_figure_10_format <-  theme(legend.position = "bottom",
+s_figure_9_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=12,color="black"),
                        axis.title = element_text(size = 14,color="black"),
                        legend.text =   element_text(size=14,color="black"),
