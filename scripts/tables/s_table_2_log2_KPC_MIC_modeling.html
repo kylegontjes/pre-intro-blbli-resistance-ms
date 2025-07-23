@@ -407,7 +407,8 @@ regression_results &lt;- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MV
 
 saveRDS(object = regression_results,file = &quot;./tables/s_table_2.RDS&quot;)
 
-tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T,show.df = F,file = &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/tables/s_table_2.html&quot;)  </code></pre>
+table_reg &lt;- tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T,file = NULL)  
+table_reg</code></pre>
 <table style="border-collapse:collapse; border:none;">
 <tr>
 <th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
@@ -995,6 +996,8 @@ AIC
 </td>
 </tr>
 </table>
+<pre class="r"><code>html_file &lt;- &quot;tables/s_table_2.html&quot;
+writeLines(as.character(table_reg$page.complete), html_file)</code></pre>
 </div>
 
 

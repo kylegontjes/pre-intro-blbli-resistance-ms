@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree",'sjPlot','sjtable2df')
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree",'sjPlot','webshot2')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -71,5 +71,9 @@ regression_results <- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_i
 
 saveRDS(object = regression_results,file = "./tables/s_table_2.RDS")
 
-tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T,show.df = F,file = "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/tables/s_table_2.html")  
+table_reg <- tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T,file = NULL)  
+table_reg
+
+html_file <- "tables/s_table_2.html"
+writeLines(as.character(table_reg$page.complete), html_file)
 ```
