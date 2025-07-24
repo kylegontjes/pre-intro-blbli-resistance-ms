@@ -54,12 +54,13 @@ KPC_clusters_in_CI <- df_CI %>% select(KPC_clusters) %>% colSums() %>% subset(.>
 
 traits_of_interest <- c("blbli_dich_num",KPC_clusters_in_CI)   
 trait_parent_child <- pbmcapply::pbmclapply(traits_of_interest,FUN=function(x){
-  asr(df_CI,tr_CI,tip_name_var = 'isolate_no',trait=x,model='MF') %>% .$parent_child_df
-},mc.cores=5) %>% `names<-`(traits_of_interest)
+  model <- ifelse(x == "blbli_dich_num","ER","MF")
+  asr(df_CI,tr_CI,tip_name_var = 'isolate_no',trait=x,model=model) %>% .$parent_child_df
+},mc.cores=7) %>% `names<-`(traits_of_interest)
 
 synchronous_changes_w_AA552 <- pbmcapply::pbmclapply(traits_of_interest %>% subset(.!="AA552_KPC"),FUN=function(x){
   phyloAMR::synchronous_transitions(comparitor_parent_child_df = trait_parent_child[[x]],trait_parent_child_df = trait_parent_child[['AA552_KPC']],node_states = 'joint')
-},mc.cores=5) %>% do.call(rbind.data.frame,.) %>% mutate(comparitor = traits_of_interest %>% subset(.!="AA552_KPC"))
+},mc.cores=7) %>% do.call(rbind.data.frame,.) %>% mutate(comparitor = traits_of_interest %>% subset(.!="AA552_KPC"))
 
 synchronous_changes_w_AA552 %>% subset(synchronous_transitions_num>0)
 
@@ -90,28 +91,28 @@ df_CI_KPC_plasmid_mat <- df_CI %>% select(KPC_clusters) %>% select_if(colSums(.)
 df_CI_relevant_plasmids <- left_join(df_CI_KPC_plasmid_mat %>% mutate(isolate_no = rownames(.)), df_CI %>% select(isolate_no, AA552_non_KPC,AA018_non_KPC)) %>% `rownames<-`(.$isolate_no) %>% select(-isolate_no) 
   #Step #1: Clades
   tree_obj_1 <- tree_obj + ggnewscale::new_scale_fill()
-  p.1 <- gheatmap(tree_obj_1,df_CI %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.075)   + clade_colors_scale_v
+  p.1 <- gheatmap(tree_obj_1,df_CI %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6.5, width = 0.075)   + clade_colors_scale_v + consistent_theme_sfigure_5
   
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill()
-  p.3 <-  gheatmap(p.2,df_CI %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.075,offset =.0000175) + cluster_scale_4  
+  p.3 <-  gheatmap(p.2,df_CI %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6.5, width = 0.075,offset =.0000175) + cluster_scale_4  +  consistent_theme_sfigure_5
   
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df_CI %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.075,offset =.0000350) + resistance_scale 
+  p.5 <-  gheatmap(p.4,df_CI %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6.5, width = 0.075,offset =.0000350) + resistance_scale + consistent_theme_sfigure_5
   
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
-  p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.15,offset =.0000525) + Log2_scale 
+  p.7 <-  gheatmap(p.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6.5, width = 0.15,offset =.0000525) + Log2_scale  + consistent_theme_sfigure_5
    
  p.8 <- p.7 + new_scale_fill() 
-A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 blaKPC plasmid","AA018 non-blaKPC plasmid","AA552 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmids")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 8, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,232.5) + theme(legend.position = 'bottom') + consistent_theme_sfigure_5
+A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 blaKPC plasmid","AA018 non-blaKPC plasmid","AA552 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmids")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6.5, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,230) + theme(legend.position = 'bottom') + consistent_theme_sfigure_5
 ```
 
 # B KPC copy number
 ```{r} 
 df_CI$KPC_plasmid_simplified <- ifelse(df_CI$AA018_KPC == 1, "AA018",ifelse(df_CI$AA552_KPC == 1,"AA552","Other"))
-B <- ggplot(data= df_CI) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.6))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("bla<sub>KPC</sub></i> copy number") + xlab("<i>bla<sub>KPC</sub></i> plasmid cluster")+ theme_bw_me + s_figure_5_descriptive_plot_format + theme(legend.position='none') + ylim(NA,10.01)
+B <- ggplot(data= df_CI %>% subset(KPNIH1_RS28775_chr_median_norm>0)) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.55))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("<i>bla</i><sub>KPC</sub> copy number") + xlab("<i>bla</i><sub>KPC</sub> plasmid cluster")+ theme_bw_me + s_figure_5_descriptive_plot_format + theme(legend.position='none') + ylim(NA,10.01)
 ```
 
 # C membership in clusters
@@ -134,11 +135,11 @@ s_figure_5BC <- cowplot::plot_grid(B,C,ncol=1,labels = c("B","C"),label_size = 2
 s_figure_5A <- cowplot::plot_grid(A,labels = c("A"),label_size=28)  
 ```
 
-```{r ,fig.height=12,fig.width=21.5}
-s_figure_5 <- plot_grid(s_figure_5A,s_figure_5BC,rel_heights = c(1,1),rel_widths = c(1,.35))  
+```{r, fig.height=9.85,fig.width=19.75}
+s_figure_5 <- plot_grid(s_figure_5A,s_figure_5BC,rel_heights = c(1,1),rel_widths = c(1,.375))  
 s_figure_5
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=21.5,fig.height=15} 
-ggsave(plot = s_figure_5, filename = './figures/s_figure_5.png', width = 21.5, height = 12,limitsize=FALSE, bg='white',dpi=900)
+ggsave(plot = s_figure_5, filename = './figures/s_figure_5.png', width = 19.75, height = 9.875, limitsize=FALSE, bg='white',  dpi=900)
 ```

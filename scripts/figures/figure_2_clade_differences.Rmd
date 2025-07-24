@@ -88,7 +88,7 @@ fig2e <- MIC_prop_hist_count(blbli_clade_phylo_prop) + cluster_scale + figure_2_
 
 # Figure Compilation
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5}
-fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),fig2b  + theme(legend.position = "none"),"",fig2c + theme(legend.position = "none"),fig2d + theme(legend.position = "none") , fig2e+ theme(legend.position = "none"), ncol=3,rel_widths = c(1,0.45,0.45,1,0.45,0.45),labels = c("A","B","","C","D","E"),label_size = 18)
+fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),fig2b  + theme(legend.position = "none"),"",fig2c + theme(legend.position = "none"),fig2d + theme(legend.position = "none") , fig2e + theme(legend.position = "none"), ncol=3,rel_widths = c(1,0.45,0.45,1,0.45,0.45), labels = c("A","B","","C","D","E"),label_size = 18)
 
 clade_legend <- get_legend(fig2a)
 resistance_legend <- get_legend(fig2b)
@@ -100,10 +100,10 @@ figure_2 <-  cowplot::plot_grid(fig2_data,fig2.legends,ncol=1,rel_heights = c(1,
 ```
 
 # Figure
-```{r,message=F,echo=F,error=F,warning=F,fig.width=9,fig.height=7.2}
+```{r,message=F,echo=F,error=F,warning=F,fig.width=8.75,fig.height=7}
 figure_2
 ```
 
 ```{r}
-ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 9, height = 7.2,bg = 'white',dpi=900)
+ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 8.75, height = 7,bg = 'white', dpi=900)
 ```

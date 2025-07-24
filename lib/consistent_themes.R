@@ -107,7 +107,7 @@ consistent_theme_sfigure_5 <- theme(legend.position = 'bottom',legend.direction=
                                     legend.justification = "center", legend.key = element_rect(colour = c('white')),
                                     legend.box.spacing = unit(.000005, "cm"),
                                     legend.key.size = unit(0.2, "cm"),legend.key.width = unit(0.2, "cm") ,
-                                    legend.title = element_text(size=20),legend.text = element_text(size=18),
+                                    legend.title = element_text(size=18),legend.text = element_text(size=16),
                                     legend.title.align=0.5,legend.text.align = 0,
                                     legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
@@ -209,11 +209,11 @@ s_figure_7_format <-  theme(legend.position = "bottom",
 )
 
 
-# S fig 12
+# S fig 9
 s_figure_9_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=12,color="black"),
                        axis.title = element_text(size = 14,color="black"),
-                       legend.text =   element_text(size=14,color="black"),
-                       legend.title = element_text(size = 16,color="black"),
+                       legend.text =   element_text(size=12,color="black"),
+                       legend.title = element_text(size = 14,color="black"),
                        plot.title = element_text(size = 18,color="black"),
 )

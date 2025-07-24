@@ -53,13 +53,13 @@ s_figure_4.A_tb$gene <- ifelse(grepl(pattern = 'ompK36',s_figure_4.A_tb$locus_ta
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "KPNIH1_RS18100","MdtA/MuxA family multidrug efflux RND <br>transporter periplasmic adaptor subunit",s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$gene=='ompK36','porin OmpC',s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(grepl(pattern = 'KPC',s_figure_4.A_tb$locus_tag),"blaKPC-associated plasmid cluster",s_figure_4.A_tb$product)
-s_figure_4.A_tb$locus_tag <- gsub("blaKPC-","<i>bla<sub>KPC</sub></i>-",s_figure_4.A_tb$locus_tag)
+s_figure_4.A_tb$locus_tag <- gsub("blaKPC-","<i>bla</i><sub>KPC</sub>-",s_figure_4.A_tb$locus_tag)
 s_figure_4.A_tb$locus_tag <- gsub("ompK36","<i>ompK36</i>",s_figure_4.A_tb$locus_tag) 
 s_figure_4.A_tb$gene <- gsub("ompK36","<i>ompK36</i>",s_figure_4.A_tb$gene) 
-s_figure_4.A_tb$product <- gsub("blaKPC","<i>bla<sub>KPC</sub></i>",s_figure_4.A_tb$product) 
+s_figure_4.A_tb$product <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",s_figure_4.A_tb$product) 
 s_figure_4.A_tb$locus_tag <-  gsub("associated","containing",s_figure_4.A_tb$locus_tag)
 s_figure_4.A_tb$product <-  gsub("associated","containing",s_figure_4.A_tb$product)
-s_figure_4.A_tb$sig_models_simple <- gsub("KPC-","<i>bla<sub>KPC</sub></i>-",s_figure_4.A_tb$sig_models_simple) %>% gsub("associated","containing",.)
+s_figure_4.A_tb$sig_models_simple <- gsub("KPC-","<i>bla</i><sub>KPC</sub>-",s_figure_4.A_tb$sig_models_simple) %>% gsub("associated","containing",.)
 s_figure_4.A_tb$sig_models_simple <- gsub("High-risk variants","Putative function-altering variants",s_figure_4.A_tb$sig_models_simple)
 
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "SHV-11","Broad-spectrum β-lactamase",s_figure_4.A_tb$product)
@@ -96,7 +96,7 @@ s_figure_4.FB <- plot_grid(s_figure_4.phylo,labels = "B",label_size=24)
 gwas_nons_freq <- variants_freq(gwas_table$genotype,df)  
 gwas_nons_freq$locus_tag <- recode(gwas_nons_freq$locus_tag,"AA018"="AA018 blaKPC-containing plasmid","AA552"="AA552 blaKPC-containing plasmid","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665" = "PFAV in ompK36")
 gwas_nons_freq$`Significant Hit` <- gwas_nons_freq$locus_tag
-gwas_nons_freq$`Significant Hit` <- gsub("blaKPC","<i>bla<sub>KPC</sub></i>",gwas_nons_freq$`Significant Hit`)
+gwas_nons_freq$`Significant Hit` <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",gwas_nons_freq$`Significant Hit`)
 gwas_nons_freq$`Significant Hit` <- gsub("ompK36","<i>ompK36</i>",gwas_nons_freq$`Significant Hit`)
 gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(gwas_nons_freq$`Significant Hit`)))  
 
@@ -107,8 +107,8 @@ s_figure_4.C <- freq_plot(gwas_nons_freq)  +s_figure_4_descriptive_plot_theme
 ```{r,fig.height=7.5,fig.width=10} 
 nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.) 
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 blaKPC-containing plasmid","AA552"="AA552 blaKPC-containing plasmid","OmpK36_loop3_insertion"="Loop 3 insertion in ompK36","OmpK36GD"="GD loop 3 insertion in ompK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665" = "PFAV in ompK36")
-nn_data_melt$locus_tag <-gsub("blaKPC","<i>bla<sub>KPC</sub></i>",nn_data_melt$locus_tag)
-nn_data_melt$locus_tag <-gsub("ompK36","<i>ompK36</i>",nn_data_melt$locus_tag)
+nn_data_melt$locus_tag <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",nn_data_melt$locus_tag)
+nn_data_melt$locus_tag <- gsub("ompK36","<i>ompK36</i>",nn_data_melt$locus_tag)  
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(nn_data_melt$locus_tag)))  
 
 s_figure_4.D <- nn_plot(nn_data_melt) + s_figure_4_descriptive_plot_theme
@@ -123,11 +123,12 @@ s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights =
 ```{r ,fig.height=18.5,fig.width=21.5}
 s_figure_4.A <- ggdraw() + draw_image("tab_kbl.png")
 unlink(c("tab_kbl.html", "tab_kbl.png"))
-s_figure_4.FA <- plot_grid(s_figure_4.A, labels = "A", label_size = 28, align = "hv", rel_widths = c(1))  
+s_figure_4.FA <- plot_grid(s_figure_4.A, labels = "A", label_size = 28, align = "hv", rel_widths = c(1))  +
+  theme(plot.margin = unit(c(0.1, 0, 0, 0), "cm"))
 s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,label_size = 28, rel_heights = c(0.35,1))   
 s_figure_4
 ```
 
-```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
+```{r,message=F,echo=F,error=F,warning=F,fig.width=21.5,fig.height=18.5} 
 ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 21.5, height = 18.5,limitsize=FALSE,bg='white',dpi=900)
 ```

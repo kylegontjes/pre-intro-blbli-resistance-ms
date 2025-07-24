@@ -135,14 +135,14 @@ s_figure_3_C <- nn_plot(nn_data_melt)   + s_figure_3_descriptive_plot_theme
 ```
 
 ```{r,fig.height=12.5,fig.width=18.75}
-s_figure_3BC <- plot_grid(s_figure_3_B,s_figure_3_C ,nrow = 2,labels = c("B","C"),label_size = 22,align = "hv",label_x = -0.0325)
+s_figure_3BC <- plot_grid(s_figure_3_B,s_figure_3_C ,nrow = 2,labels = c("B","C"),label_size = 24,align = "hv",label_x = -0.0355)
 
-s_figure_3 <- plot_grid(s_figure_3_A,s_figure_3BC,labels = c("A",""),label_size = 22,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.69)) 
+s_figure_3 <- plot_grid(s_figure_3_A,s_figure_3BC,labels = c("A",""),label_size = 24,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.69)) 
 
 s_figure_3
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.height=12.5,fig.width=18} 
-ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.5, width = 18.75,  limitsize=FALSE, bg='white',dpi=900)
+ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.5, width = 18.75,  limitsize=FALSE, bg='white', dpi=900)
 ```
  

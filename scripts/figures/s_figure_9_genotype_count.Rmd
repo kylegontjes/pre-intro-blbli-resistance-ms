@@ -58,7 +58,7 @@ convert_tableone_into_df(genotype_data,vars="genotype_freq_under_1")
 ```
 
 # Supplemental figure 10
-```{r,fig.width=5,fig.height=4}
+```{r,fig.width=4.5,fig.height=3.6}
 # Overall
 variant_freq_histogram <- function(annots_df,bins=NULL){
   figure <- ggplot(data=annots_df) + geom_histogram(aes(x=genotype_percentage,fill=var_cat),bins=bins) + theme_bw_me + xlab("Percentage of isolates with variant") + ylab("Number of variants") + theme(legend.position = "bottom") + variant_type_scale
@@ -69,13 +69,13 @@ paste0("Number and percentage of variants under 1%: ")
 table(all_variants_annots$genotype_freq_under_1)
 grepl(pattern = "yes",all_variants_annots$genotype_freq_under_1) %>% sum / nrow(all_variants_annots) 
 
-s_figure_9_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_9_format
+s_figure_9_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_9_format + ylim(NA,4050)
 s_figure_9_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
 
-s_figure_9 <- s_figure_9_main +  annotation_custom(ggplotGrob(s_figure_9_inlet), xmin = 40, xmax = 100, ymin = 500, ymax = 4000)
+s_figure_9 <- s_figure_9_main +  annotation_custom(ggplotGrob(s_figure_9_inlet), xmin = 40, xmax = 100, ymin = 500, ymax = 4250)
 s_figure_9 
 ```
 
-```{r,message=F,echo=F,error=F,warning=F,fig.width=5.5,fig.height=4.5} 
-ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 5, height = 4,limitsize=FALSE,bg='white',dpi=900)
+```{r,message=F,echo=F,error=F,warning=F,fig.width=4.5,fig.height=3.6} 
+ggsave(plot = s_figure_9, filename = './figures/s_figure_9.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
 ```

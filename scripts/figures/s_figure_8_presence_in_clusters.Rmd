@@ -164,7 +164,6 @@ synchronous_changes_w_blbli <- pbmcapply::pbmclapply(traits_of_interest %>% subs
 
 genotypes_w_transitions_in_parental_nodes <- apply(synchronous_changes_w_blbli,MARGIN = 1,FUN=function(x){
   transitions = x['synchronous_gains'] %>% str_split(.,",") %>% unlist
-  
   ifelse(sum(transitions>(tr$Nnode+1))>0,T,F)
 })
 
@@ -222,13 +221,13 @@ B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<
 ```
 
 # Cowplot supplemental figure
-```{r, fig.height=6.5, fig.width=11.375} 
+```{r, fig.height=6.5, fig.width=11} 
 s_figure_8.A <- ggdraw() + draw_image(tmpfile)
 unlink(tmpfile)
-s_figure_8 <- cowplot::plot_grid(s_figure_8.A,B_w_tree,labels = "AUTO",ncol=2,label_size = 20,rel_widths = c(1,0.625))
+s_figure_8 <- cowplot::plot_grid(s_figure_8.A,B_w_tree, labels = "AUTO", ncol=2, label_size = 20,rel_widths = c(1,0.65))
 s_figure_8
 ``` 
 
-```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5} 
-ggsave(plot = s_figure_8, filename = './figures/s_figure_8.png', width = 11.375, height = 6.5,limitsize=FALSE,bg='white',dpi=900)
+```{r,message=F,echo=F,error=F,warning=F,fig.width=11,fig.height=6.5} 
+ggsave(plot = s_figure_8, filename = './figures/s_figure_8.png', width = 11, height = 6.5, limitsize=FALSE, bg='white', dpi=900)
 ```

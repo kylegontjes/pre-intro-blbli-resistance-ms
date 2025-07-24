@@ -63,7 +63,7 @@ for(i in 1:100){
   one_hundred_breaks[i] <- 1*i
 }  
 
-fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Cross-resistance",direction = "horizontal",col_fun = colorRamp2(breaks = one_hundred_breaks,colors = colorRampPalette(rev(brewer.pal(n = 7, name =  "RdYlBu")))(100)), title_gp = gpar(fontsize = 18),labels_gp=gpar(fontsize=16),legend_width = unit(15, "cm"),title_position = 'topcenter')
+fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Cross-resistance",direction = "horizontal",col_fun = colorRamp2(breaks = one_hundred_breaks,colors = colorRampPalette(rev(brewer.pal(n = 7, name =  "RdYlBu")))(100)), title_gp = gpar(fontsize = 18),labels_gp=gpar(fontsize=16),legend_width = unit(12.5, "cm"),title_position = 'topcenter')
 
 # Print heatmap
 fig_heatmap_image <- grid.grabExpr(draw(co_occurrence_heatmap))

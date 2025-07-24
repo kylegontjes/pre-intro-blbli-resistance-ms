@@ -152,21 +152,21 @@ BLBLI_panel$population <- factor(BLBLI_panel$population,levels = c("ST258","Clad
 ```
 
 ```{r}
-A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity") + xlab("")  + ylim(0,105) +
+A <- ggplot(data=BLBLI_panel,aes(fill=panels,y=sens,x=population)) +  geom_bar(stat = "identity",position='dodge') + theme_bw_me + ylab("Sensitivity") + xlab("")  + ylim(0,101) +
      geom_text(aes(label=signif(sens,2)), position=position_dodge(width=0.9), vjust=-0.25)  + panel_scale_v+ s_figure_7_format
-B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity") + xlab("") + ylim(0,105) +
+B <- ggplot(data=BLBLI_panel,aes(fill=panels,y=spec,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me + ylab("Specificity") + xlab("") + ylim(0,101) +
      geom_text(aes(label=signif(spec,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v+ s_figure_7_format
-C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive predictive value") + xlab("") + ylim(0,105)+
+C <- ggplot(data=BLBLI_panel,aes(fill=panels,y=ppv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Positive predictive value") + xlab("") + ylim(0,101)+
      geom_text(aes(label=signif(ppv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + s_figure_7_format
-D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative predictive value") + xlab("") + ylim(0,105)+
+D <- ggplot(data=BLBLI_panel,aes(fill=panels,y=npv,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Negative predictive value") + xlab("") + ylim(0,101)+
      geom_text(aes(label=signif(npv,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + s_figure_7_format
-E <- ggplot(data=BLBLI_panel,aes(fill=panels,y=accuracy,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Accuracy") + xlab("") + ylim(0,105)+
+E <- ggplot(data=BLBLI_panel,aes(fill=panels,y=accuracy,x=population)) +  geom_bar(stat = "identity",position='dodge')+ theme_bw_me+ ylab("Accuracy") + xlab("") + ylim(0,101)+
      geom_text(aes(label=signif(accuracy,2)), position=position_dodge(width=0.9), vjust=-0.25) + panel_scale_v + s_figure_7_format  
 ```
 
 ```{r,fig.height=11.75,fig.width=9.4}
 fig_legend <- get_legend(A)
-s_figure_7 <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),E+ theme(legend.position = "none"),fig_legend,labels = c("A","B","C","D","E",""),ncol=2,label_size = 18,rel_widths = c(1,1,1,1,1,1),label_y = 1,label_x = -0.009)
+s_figure_7 <- cowplot::plot_grid(A + theme(legend.position = "none"),B+ theme(legend.position = "none"),C+ theme(legend.position = "none"),D+ theme(legend.position = "none"),E+ theme(legend.position = "none"),fig_legend,labels = c("A","B","C","D","E",""),ncol=2,label_size = 18,rel_widths = c(1,1,1,1,1,1),label_y = 1,label_x = 0)
  
 s_figure_7
 ```

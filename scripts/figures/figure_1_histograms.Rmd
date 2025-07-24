@@ -43,18 +43,18 @@ figure1B <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-vaborbactam"
 
 # Legend
 MIC_legend <- get_legend(figure1A)
-MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=-0.25, 0, 0, b=0), "cm"))
+MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=0, 0, 0, b=0), "cm"))
 
 # Create cowplot Figure
-MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 20)
-figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,0.145)) 
+MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 18)
+figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,.13)) 
 ``` 
 
 ## Figure
-```{r,message=F,error=F,warning=F,fig.width=9.5,fig.height=5}
+```{r,message=F,error=F,warning=F,fig.width=9.5,fig.height=4.75}
 figure1
 ```
 
 ```{r}
-ggsave(plot = figure1, filename = './figures/figure_1.png', width = 9.5, height = 5, bg = "white",dpi=900)
+ggsave(plot = figure1, filename = './figures/figure_1.png', width = 9.5, height = 4.75, bg = "white", dpi=900)
 ```

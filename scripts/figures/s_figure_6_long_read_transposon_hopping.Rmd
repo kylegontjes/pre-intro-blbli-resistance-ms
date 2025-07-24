@@ -97,9 +97,9 @@ lr_isolates <- left_join(lr_isolates,lr_KPC_cluster)
 kpc_contigs <- blast_lr %>% subset(element_symbol  %in% c("KPC-2","KPC-3","KPC-5"))%>% select(isolate_no,contig,element_symbol) %>% distinct
 
 contig_data <- mobcontigs_lr %>% select(isolate_no,contig,primary_cluster_id,mash_nearest_neighbor,size) %>% left_join(kpc_contigs) 
-contig_data$element_symbol <- gsub("KPC-2","<i>bla<sub>KPC-2</sub></i>",contig_data$element_symbol)  %>% gsub("KPC-3","<i>bla<sub>KPC-3</sub></i>",.)  %>% gsub("KPC-5","<i>bla<sub>KPC-5</sub></i>",.) 
+contig_data$element_symbol <- gsub("KPC-2","<i>bla</i><sub>KPC-2</sub>",contig_data$element_symbol)  %>% gsub("KPC-3","<i>bla</i><sub>KPC-3</sub>",.)  %>% gsub("KPC-5","<i>bla</i><sub>KPC-5</sub>",.) 
 contig_data$primary_cluster_id <- ifelse(contig_data$primary_cluster_id == "-","Chromosome",contig_data$primary_cluster_id) 
-contig_data$contig_name <- paste0(contig_data$contig," ",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor," ",contig_data$element_symbol," ",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.)
+contig_data$contig_name <- paste0(contig_data$contig," ",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor," ",contig_data$element_symbol," ",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.) %>% gsub("Chromosome-","Chromosome",.)
 ```
 
 # tn4401 data
@@ -173,11 +173,10 @@ make_plots <- function(filename,contig_data,blast_data){
   contig_data$map2_chr <- factor(contig_data$map2_chr,levels = c(isolate_2_contigs %>% arrange(-size) %>% .$contig_name)) 
   
     figure <- ggplot(data=coords, aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`)) + geom_segment() +  geom_segment(data=tn4401_merge,aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`,color="red"))  + geom_segment(data=contig_data,aes(x=`X`,xend=`X`,y=`Y`,yend=`Y`),color="white") +
-    facet_grid(map2_chr~map1_chr,scales = 'free',drop = F)   + xlab(paste0(unique(coords$map1_name)," position (bp)")) + ylab(paste0(unique(coords$map2_name)," position (bp)")) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = "off") + ggplot2::theme_bw()  + scale_color_manual(values="red",labels="<i>bla<sub>KPC</sub></i>-containing <i>tn4401</i> transposon", name="", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) + s_figure_6_format
+    facet_grid(map2_chr~map1_chr,scales = 'free',drop = F)   + xlab(paste0(unique(coords$map1_name)," position (bp)")) + ylab(paste0(unique(coords$map2_name)," position (bp)")) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = "off") + ggplot2::theme_bw()  + scale_color_manual(values="red",labels="<i>bla</i><sub>KPC</sub>-containing <i>tn4401</i> transposon", name="", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) + s_figure_6_format
  
   figure
 }
-
 ```
 
 # Get nearest neighbor of KPC-containing strains
@@ -206,12 +205,9 @@ phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_d
  
 ```
 
-# Main figure
-
 ```{r,fig.width=14,fig.height=10.5}
 setwd("./data/mummer_hybrid/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 tn4401_hopping
-
-ggsave("../../figures/s_figure_6.png",plot=tn4401_hopping,width = 14,height = 10.5,dpi=900)
+ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
 ```
