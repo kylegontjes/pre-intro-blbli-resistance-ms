@@ -93,7 +93,7 @@ paste0("Number of continuous hits: ")
 nrow(continuous)
 
 paste0("Number of continuous hits passing qc: ")
-continuous_pass <- subset(continuous, nn_qc=="Yes")
+continuous_pass <- subset(continuous, nn_qc=="Pass")
 nrow(continuous_pass)
 
 paste0("Genotypes passing:") 
@@ -143,7 +143,7 @@ paste0("Number of synchronous hits")
 nrow(synchronous)
 
 paste0("Synchronous hits that passed QC")
-synchronous_pass <- subset(synchronous, nn_qc=="Yes")
+synchronous_pass <- subset(synchronous, nn_qc=="Pass")
 
 synchronous_pass %>% select(locus_tag,gene,product,blbli_res_freq,blbli_sus_freq,`Singleton_prop`,blbli_dich_num_binary_diff_gain_prop,blbli_dich_num_binary_diff_loss_prop,best_model,genotype)  %>% favorite_kable
 
