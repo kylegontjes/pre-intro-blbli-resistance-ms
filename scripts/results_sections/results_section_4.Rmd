@@ -156,6 +156,7 @@ plasmid_table <- table(df$AA552_KPC,df$blbli_dich_num)
 plasmid_table
 prop.table(plasmid_table,margin=2)
 chisq.test( plasmid_table) 
+fisher.test( plasmid_table) 
 ```
 
 ```{r}

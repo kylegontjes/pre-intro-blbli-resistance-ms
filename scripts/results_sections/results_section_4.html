@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-07-25" />
+<meta name="date" content="2025-07-28" />
 
 <title>Convergence-based genome-wide association studies improved the explanation of BL/BLI resistance and illuminated distinct pathways to resistance across clades</title>
 
@@ -576,7 +576,7 @@ display: none;
 <h1 class="title toc-ignore">Convergence-based genome-wide association
 studies improved the explanation of BL/BLI resistance and illuminated
 distinct pathways to resistance across clades</h1>
-<h4 class="date">2025-07-25</h4>
+<h4 class="date">2025-07-28</h4>
 
 </div>
 
@@ -1258,6 +1258,18 @@ plasmid_table</code></pre>
 
 data:  plasmid_table
 X-squared = 108.01, df = 1, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>fisher.test( plasmid_table) </code></pre>
+<pre><code>
+    Fisher&#39;s Exact Test for Count Data
+
+data:  plasmid_table
+p-value &lt; 2.2e-16
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+  16.5726 221.8851
+sample estimates:
+odds ratio 
+  52.31661 </code></pre>
 <pre class="r"><code>df_CI &lt;- subset(df,clade_I == &#39;Clade I&#39;)
 convert_tableone_into_df(df_CI,vars=c(&quot;AA018&quot;,&quot;AA552&quot;),factorVars = c(&quot;AA018&quot;,&quot;AA552&quot;))</code></pre>
 <pre><code>       Variable Overall (n=145)
