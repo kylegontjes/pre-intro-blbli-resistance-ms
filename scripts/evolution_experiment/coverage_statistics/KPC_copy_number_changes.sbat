@@ -1,0 +1,13 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=KPC_copy_number_changes_evolved
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1 
+#SBATCH --output=KPC_copy_number_changes_evolved.out
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=11 --mem=55g --time=0:30:00
+
+Rscript -e "rmarkdown::render('KPC_copy_number_changes.Rmd')"

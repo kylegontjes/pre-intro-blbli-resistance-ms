@@ -1,0 +1,29 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=PCMP_H226_PCMP_H226_MVB_R_nucmer
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/evolution_experiment/mummer_evolution/PCMP_H226_PCMP_H226_MVB_R.out
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=3g --time=00:15:00
+
+echo 'Running nucmer' 
+
+# Move to relevant directory
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/mummer_evolved/
+
+# Note: Mummer is installed on our HPC, so we used mummer 4.0.0rc1 version here
+module load Bioinformatics
+module load mummer/4.0.0rc1
+
+# Nucmer
+nucmer -V
+nucmer -p PCMP_H226_PCMP_H226_MVB_R /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/hybrid/polypolish/PCMP_H226/PCMP_H226/PCMP_H226_flye_medaka_polypolish.fasta /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/hybrid/polypolish/PCMP_H226_MVB_R/PCMP_H226_MVB_R/PCMP_H226_MVB_R_flye_medaka_polypolish.fasta
+
+# show coords
+show-coords -r -c -l -T  PCMP_H226_PCMP_H226_MVB_R.delta > PCMP_H226_PCMP_H226_MVB_R.coords
+
+

@@ -1,0 +1,39 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=amrfinder_evolved_short
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/evolution_experiment/amrfinder_evolved_short/amrfinder_evolved_short.out
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=16 --mem=80g --time=0:30:00
+
+IFS=$'\n' # make newlines the only separator
+set -f # disable globbing
+
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/amrfinder_evolved_short
+
+# Version
+amrfinder --version
+
+isolates=`cat /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt`
+
+# Initiate a list of commands
+command_list_array=()
+
+# Run for loop, where it generates isolate command for each of the forward end files.
+for isolate in $isolates
+do
+        # Echo isolate name
+        echo $isolate
+        # Create current command
+        curr_cmd="amrfinder -n /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/$isolate/$isolate\_contigs_l1000.fasta --plus -o $isolate\_amrfinder_sr.out  --organism Klebsiella_pneumoniae"
+        echo $curr_cmd
+        # Add the amrfinder command to list
+        command_list_array+=("$curr_cmd")
+done
+
+# Run convict commands using the unix parallel command.
+parallel ::: "${command_list_array[@]}"

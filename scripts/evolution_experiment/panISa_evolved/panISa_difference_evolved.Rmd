@@ -1,0 +1,77 @@
+---
+title: "panISa_differences"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','gontjesr')
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T)) 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+sr_data <- read.delim("../../../Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt",header = F) %>% unlist
+parents <- unique(sr_data %>% gsub("_MVB_R","",.) %>% gsub("PCMP_H019","PCMP_H19",.)) %>% sort
+```
+
+```{r}
+isfinder_results <- read.delim("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/results/ISScreener_evolved_KPNIH1_pretrimmed/ISScreener_evolved_KPNIH1_pretrimmed_master.txt")
+isfinder_results$isolate_no <- isfinder_results$Sample %>% gsub("_panISa","",.) %>% gsub("PCMP_H019","PCMP_H19",.)
+isfinder_results$parent <- isfinder_results$isolate_no  %>% gsub("_MVB_R","",.) 
+isfinder_results$IS_id <- paste0(isfinder_results$Potential_IS,"_",isfinder_results$Start_Position,"_",isfinder_results$Stop_Position)
+
+KPNIH1_features <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS")
+
+isfinder_results$locus_tag <- apply(isfinder_results,1,FUN=function(x){
+  # Use Start_Position and Stop_Position to determine what gene the isfinder_results hit is in the KPNIH1 faetures dataset 
+  ## Also, account for intergenic region
+  is_start = as.numeric(x['Start_Position'])
+  is_end = as.numeric(x["Stop_Position"])
+  in_gene <- subset(KPNIH1_features,start <= is_start & end >= is_end) 
+  if(nrow(in_gene)>0){
+    in_gene$locus_tag
+  } else{
+    # Get the two genes that the position is found within using is_start and is_end
+    upstream_gene <- KPNIH1_features[KPNIH1_features$end < is_start,] %>% .[which.min(abs(.$end - is_start)),"locus_tag"]
+    
+    downstream_genes <- KPNIH1_features[KPNIH1_features$start > is_end,] %>% .[which.min(abs(.$start - is_end)),"locus_tag"]
+ 
+    paste0(upstream_gene,"-",downstream_genes)   
+  }
+})
+
+isfinder_results %>% arrange(parent) %>% favorite_kable()
+```
+
+```{r}
+lapply(parents,FUN=function(x){
+  isfinder_sub <- subset(isfinder_results,parent==x)
+  isfinder_sub_parent <- subset(isfinder_sub,isolate_no ==x)
+  isfinder_sub_evolved <- subset(isfinder_sub,isolate_no !=x)
+  parent = x
+  parent_IS = unique(isfinder_sub_parent$IS_id)
+  evolved_IS = unique(isfinder_sub_evolved$IS_id)
+  shared_IS = intersect(parent_IS,evolved_IS)
+  parent_only_IS = subset(parent_IS,!parent_IS %in% evolved_IS)
+  evolved_only_IS =  subset(evolved_IS,!evolved_IS %in% parent_IS)
+  different_IS_locations = sum(length(parent_only_IS),length(evolved_only_IS)) >0
+  
+  cbind.data.frame(parent,shared_IS  = paste0(shared_IS,collapse=';'), parent_only_IS  = paste0(parent_only_IS,collapse=';'), evolved_only_IS  = paste0(evolved_only_IS,collapse=';'),different_IS_locations)
+  
+}) %>% do.call(rbind,.) %>% favorite_kable()
+```
+

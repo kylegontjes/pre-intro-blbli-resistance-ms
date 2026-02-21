@@ -1,0 +1,84 @@
+---
+title: "curate_MVB_experiment_datapoints"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+```
+
+# Load data
+# Input data:
+## Strain = isolate
+## Cluster = 1 - 8 of the broth growups
+## Rep = MHA replicate
+## MVB column = Growth on MVB plate (number of colonies at 8/4)
+## 8-4 named columns indicate: MHA colony count at serial dilution of 10-8...4 
+```{r}
+MVB_population_data <- read.csv("./data/evolution_experiment/cleaned_MVB_resistance_experiment_data_010926.csv", check.names = FALSE) 
+```
+
+# Pivot long
+```{r}
+MVB_population_data_long <- MVB_population_data %>%
+  pivot_longer(cols = -c(strain,culture,replicate,isolate_no)) %>%
+  na.omit(value) 
+
+MVB_population_data_long$MHA_log <- as.numeric(gsub("_lg|MHA","",MVB_population_data_long$name)) 
+```
+
+# Get MHA data
+```{r}
+MVB_population_plated_cells_MHA <- MVB_population_data_long %>% 
+  mutate(plated_population = value*200*10**as.numeric(MHA_log)) %>%
+  group_by(strain,culture) %>%
+  na.omit(plated_population) %>%
+  summarise(MHA_average_population = mean(plated_population)) # average of technical triplicates
+```
+
+# Get MVB data
+```{r}
+MVB_population_recovered_cells_MVB <- MVB_population_data_long %>%
+  filter(name=="MVB_colony_count") %>%
+  mutate(MVB_colony_population = value*10) %>%
+  select(strain, culture, MVB_colony_population)
+```
+
+# Merge data
+```{r}
+# Merge data
+all_population_statistics <-  merge(MVB_population_plated_cells_MHA, MVB_population_recovered_cells_MVB, by = c("strain", "culture"), all = TRUE)
+
+# Calculate ratio
+all_population_statistics <- all_population_statistics %>%
+  group_by(strain, culture) %>%
+  mutate(MVB_ratio = MVB_colony_population/MHA_average_population)  
+
+# Ratio
+all_population_statistics$MVB_ratio <- ifelse(all_population_statistics$MVB_ratio == 0,1 / all_population_statistics$MHA_average_population ,all_population_statistics$MVB_ratio)
+
+# Limit of detection
+all_population_statistics$over_LoD <- all_population_statistics$MVB_ratio > (1/all_population_statistics$MHA_average_population)
+
+# Isolate number
+all_population_statistics$isolate_no <- paste0("PCMP_H",all_population_statistics$strain)
+```
+
+```{r}
+write_csv(all_population_statistics,"./data/evolution_experiment/curated_MVB_evolution_experiment_data.csv")
+```

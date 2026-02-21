@@ -1,0 +1,75 @@
+---
+title: "curate_amrfinder_data"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = F,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = F,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+
+```{r environment, echo=T, message=FALSE, include=T, results=T}
+#Packages
+packages <- c("tidyverse") 
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()
+```
+
+# Load data
+```{r}
+df <- readRDS("./data/dataset/df.RDS") 
+```
+
+# Load amrfinder
+```{r}
+amrfinder<- read_delim("./data/evolution_experiment/amrfinder_evolved_short/evolved_amrfinder_results_short.txt") 
+ 
+colnames(amrfinder) <- snakecase::to_snake_case(colnames(amrfinder) )%>% gsub("x_","",.)
+```
+
+# Load and curate amrfinder dataset
+```{r} 
+amrfinder$isolate_no <- pbmcapply::pbmclapply(amrfinder$contig_id, FUN=function(x){
+ x %>% gsub("hybrid_|_contig|;circular=true","",.)   %>% str_split(.,"_",simplify=T) %>% .[,1:(ncol(.)-1)] %>% paste0(.,collapse="_")  
+},mc.cores=5) %>% unlist  %>% gsub("PCMP_H019","PCMP_H19",.)
+
+# Curate new element_symbol
+amrfinder$element_symbol_renamed <- apply(amrfinder,1,FUN=function(x){
+  name <- x[["element_symbol"]] 
+  # Get name
+    if(x[["type"]] == "AMR" & x[["class"]] == "BETA-LACTAM" & x[["subtype"]] != "POINT"){
+      if(grepl("-",name) == F| str_split(name,"-",simplify=T) %>% .[,ncol(.)] %>% grepl("[0-9]", .) ==F){
+        if(x[["coverage_of_reference"]] < 100 | x[["identity_to_reference"]] < 100){
+          name <- str_split(x[["closest_reference_name"]],pattern = " ",simplify = T) %>% .[,ncol(.)] %>% paste0('bla',.)
+        }
+      }
+    }
+    if(x[["element_symbol"]] == 'ampC') {
+      name <- x[["element_symbol"]]
+    }
+    if(x[["coverage_of_reference"]] < 100){
+        name <- paste0(name,"?")
+    }
+    if(x[["identity_to_reference"]] <100) {
+        name <- paste0(name,"*")
+    }
+  # Point mutants
+  if(x[["subtype"]] == "POINT"){
+    name <- x[["element_symbol"]] 
+  }
+    return(name)
+})
+
+saveRDS(amrfinder,file="./data/evolution_experiment/amrfinder_evolved_short/amrfinder_curated_short.RDS")
+``` 

@@ -1,0 +1,341 @@
+---
+title: "Strain selection for BL/BLI evolution experiment"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree",'ggnewscale')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
+source("./lib/common_functions.R")
+```
+
+# Data
+
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+
+# KPC plasmids 
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters)
+Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))
+
+# Plasmid mobtyper data
+mobsuite_typer <- readRDS("./data/mobsuite/mobtyper.RDS")
+
+# Ompk36 data
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
+
+# Pclutering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+df <- left_join(df,pclustering %>% mutate(isolate_no = rownames(.)))
+```
+
+# In lab list
+```{r}
+inlab_initial <- read_delim("../../data/CRKP_isolates_inlab_052025.csv")
+inlab_new <- readLines("../../data/2025-09-12_ST258_2014-15_isolate_request.txt")
+
+inlab <- c(inlab_new,inlab_initial$isolate_no)
+df$inlab <- ifelse(df$isolate_no %in% inlab,T,F)
+```
+
+
+# Overall description
+```{r}
+df$AA018_KPC_AA552_non_KPC <- ifelse(df$AA018_KPC==1 & df$AA552_non_KPC==1,1,0)
+df$AA018_KPC_AA552_non_KPC_OmpK36_loop_3 <- ifelse(df$AA018_KPC_AA552_non_KPC==1 & df$OmpK36_L3_mutations==1,1,0)
+df$AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3 <- ifelse(df$AA018_KPC_AA552_non_KPC==1 & df$OmpK36_L3_mutations==0,1,0)
+df$no_AA018_KPC_AA552_non_KPC_OmpK36_w_loop_3 <- ifelse(df$AA018_KPC_AA552_non_KPC==0 & df$OmpK36_L3_mutations ==1,1,0)
+df$no_AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3 <- ifelse(df$AA018_KPC_AA552_non_KPC==0 & df$OmpK36_L3_mutations ==0,1,0)
+df$OmpK36_nonsyn_or_insertion <- ifelse(df$OmpK36_non_syn==1 | df$OmpK36_promoter_IS==1,1,0) 
+df$no_PBP_ompK36_RamA_mutations <- ifelse(df$OmpK36_nonsyn_or_insertion==0 & df$PBP_any ==0 & df$RamA==0 ,1,0)
+
+
+df_inlab <- subset(df,inlab==T)
+
+gontjesr::convert_tableone_into_df(dataset=df_inlab,vars = c('OmpK36_nonsyn_or_insertion',"OmpK36_putative_function_altering","OmpK36GD","OmpK36TD",'AA552_non_KPC','AA552_KPC','AA018_KPC',"AA018_non_KPC","AA018_KPC_AA552_non_KPC","AA018_KPC_AA552_non_KPC_OmpK36_loop_3","AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3"),strata = 'clade_I',outcome_names = c("Clade I","Clade II"),factorVars = c("OmpK36_nonsyn_or_insertion","OmpK36_putative_function_altering","OmpK36GD","OmpK36TD",'AA552_non_KPC','AA552_KPC','AA018_KPC',"AA018_non_KPC","AA018_KPC_AA552_non_KPC","AA018_KPC_AA552_non_KPC_OmpK36_loop_3","AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3")) %>% favorite_kable()
+
+df_inlab_blbli_sus <- subset(df,inlab==T & blbli_dich_num==0)
+
+gontjesr::convert_tableone_into_df(dataset=df_inlab_blbli_sus,vars = c("OmpK36_nonsyn_or_insertion","OmpK36_putative_function_altering","OmpK36GD","OmpK36TD",'AA552_non_KPC','AA552_KPC','AA018_KPC',"AA018_non_KPC","AA018_KPC_AA552_non_KPC","AA018_KPC_AA552_non_KPC_OmpK36_loop_3","AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3","no_AA018_KPC_AA552_non_KPC_OmpK36_w_loop_3"),strata = 'clade_I',outcome_names = c("Clade I","Clade II"),factorVars = c("OmpK36_nonsyn_or_insertion","OmpK36_putative_function_altering","OmpK36GD","OmpK36TD",'AA552_non_KPC','AA552_KPC','AA018_KPC',"AA018_non_KPC","AA018_KPC_AA552_non_KPC","AA018_KPC_AA552_non_KPC_OmpK36_loop_3","AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3"))  %>% favorite_kable()
+
+
+df_inlab_blbli_sus_lowest_MVB <- subset(df,inlab==T & blbli_dich_num==0 & MVB_num == "0.25")
+
+gontjesr::convert_tableone_into_df(dataset=df_inlab_blbli_sus_lowest_MVB,vars = c("OmpK36_nonsyn_or_insertion","OmpK36_putative_function_altering","OmpK36GD","OmpK36TD",'AA552_non_KPC','AA552_KPC','AA018_KPC',"AA018_non_KPC","AA018_KPC_AA552_non_KPC","AA018_KPC_AA552_non_KPC_OmpK36_loop_3","AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3","no_AA018_KPC_AA552_non_KPC_OmpK36_w_loop_3"),strata = 'clade_I',outcome_names = c("Clade I","Clade II"),factorVars = c("OmpK36_nonsyn_or_insertion","OmpK36_putative_function_altering","OmpK36GD","OmpK36TD",'AA552_non_KPC','AA552_KPC','AA018_KPC',"AA018_non_KPC","AA018_KPC_AA552_non_KPC","AA018_KPC_AA552_non_KPC_OmpK36_loop_3","AA018_KPC_AA552_non_KPC_OmpK36_no_loop_3"))  %>% favorite_kable()
+```
+
+# MIC distribution
+```{r} 
+ggplot(data=df_inlab,aes(x=MVB_log_2,fill=MVB_cat)) + geom_bar() + theme_bw_me + resistance_cat_scale + xlab("Log2 Meropenem-vaborbactam MIC")
+ggplot(data=df_inlab,aes(x=IR_log_2,fill=IR_cat)) + geom_bar() + theme_bw_me + resistance_cat_scale + xlab("Log2 Imipenem-relebactam MIC")
+```
+
+# Phylogeny
+```{r,fig.width=8.5,fig.height=8.5}
+consistent_theme_GWAS <- theme(legend.position = 'bottom',legend.direction="horizontal", 
+                                    legend.justification = "center", legend.key = element_rect(colour = c('black')),
+                                    legend.box.spacing = unit(.0001, "cm"),
+                                    legend.key.size = unit(0.165, "cm"),legend.key.width = unit(0.165, "cm") ,
+                                    legend.title = element_text(size=14),legend.text = element_text(size=12),
+                                    legend.title.align=0.5,legend.text.align = 0,
+                                    legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.1, "cm"))
+
+rownames(df) <- df$isolate_no
+  #Step #1: Clades
+  p.1 <- gheatmap(p = ggtree(tr),data = df %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = 0.1)   + clade_colors_scale_v 
+
+  #Step #3: BL/BLI Cluster
+  p.2 <- p.1 + theme() + new_scale_fill()
+  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = 0.1,offset =.000025) + cluster_scale_2_col + consistent_theme_GWAS
+
+  #Step #4: MVB Binary
+  p.4 <- p.3 + new_scale_fill()
+  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = 0.1,offset =.00005) + resistance_scale + consistent_theme_GWAS
+
+  #Step #6: MVB MIC
+  p.6 <- p.5 + new_scale_fill()
+  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .2,offset =.000075) + Log2_scale + consistent_theme_GWAS + ylim(NA,550)
+```
+ 
+```{r,fig.width=11.5,fig.height=10}
+ p.8 <- p.7 + new_scale_fill()
+  
+ inlab_colors <- c(`1` = "black",`0`="white")
+ inlab_scale <- scale_fill_manual(breaks = c(T,F), values = c('brown','white') ,labels=c("Yes","Not"),name="In lab", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+
+p.9 <-  gheatmap(p.8,df %>% select(inlab) %>% `colnames<-`("In lab"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.000125 )  + consistent_theme_GWAS + ylim(NA,500) + inlab_scale
+
+ p.10 <- p.9 + new_scale_fill()
+
+overall_fig <-  gheatmap(p.10,df %>% select(OmpK36_c25t,OmpK36GD,OmpK36TD,AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("OmpK36 C>T25","OmpK36 GD","OmpK36 TD","AA018 KPC",'AA018 No KPC',"AA552 KPC","AA552 No KPC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .7,offset =.00015) + feature_scale_v + consistent_theme_GWAS + ylim(NA,525) 
+
+overall_fig
+```
+
+# Clade I
+## Descriptive data
+```{r}
+paste0("In lab")
+table(df_inlab$AA018_KPC_AA552_non_KPC,df_inlab$OmpK36_L3_mutations,df_inlab$clade_I,dnn=c("AA018 KPC + AA552 No KPC","Loop 3 mutation","Clade"))
+
+paste0("In lab: BL/BLI susceptible")
+table(df_inlab_blbli_sus$AA018_KPC_AA552_non_KPC,df_inlab_blbli_sus$OmpK36_L3_mutations,df_inlab_blbli_sus$clade_I,dnn=c("AA018 KPC + AA552 No KPC","Loop 3 mutation","Clade"))
+
+paste0("In lab: BL/BLI susceptible - loewest MVB value")
+table(df_inlab_blbli_sus_lowest_MVB$AA018_KPC_AA552_non_KPC,df_inlab_blbli_sus_lowest_MVB$OmpK36_L3_mutations,df_inlab_blbli_sus_lowest_MVB$clade_I,dnn=c("AA018 KPC + AA552 No KPC","Loop 3 mutation","Clade")) 
+```
+
+## Phylogeny
+```{r,fig.width=17.5,fig.height=12.5}
+rownames(df) <- df$isolate_no
+
+df$in_lab_lowest_MVB_MIC <- ifelse(df$inlab==T & df$MVB_num==0.25,T,F)
+df$in_lab_lowest_IR_MIC <- ifelse(df$inlab==T & df$IR_num==0.25,T,F)
+df$in_lab_lowest_IR_MVB_MIC <- ifelse(df$in_lab_lowest_IR_MIC==T & df$in_lab_lowest_MVB_MIC==T,T,F)
+ 
+df$inlab_category <- ifelse(df$clade_I=="Clade II" & df$OmpK36_nonsyn_or_insertion==1,"Clade II w/ OmpK36 mutation",
+                            ifelse(df$clade_I=="Clade II" & df$OmpK36_nonsyn_or_insertion==0,"Clade II w/o OmpK36 mutation",
+                                   ifelse(df$clade_I=="Clade I" & df$AA018_KPC_AA552_non_KPC==1 & df$OmpK36_L3_mutations==1,"Clade I w/ plasmid combo w/ Loop 3 insertion",
+                                          ifelse(df$clade_I=="Clade I" & df$AA018_KPC_AA552_non_KPC==1 & df$OmpK36_L3_mutations==0,"Clade I w/ plasmid combo w/o Loop 3 insertion",
+                                                 ifelse(df$clade_I=="Clade I" & df$AA018_KPC_AA552_non_KPC==0 & df$OmpK36_L3_mutations==1,"Clade I w/o plasmid combo w/ Loop 3 insertion",
+                                                        ifelse(df$clade_I=="Clade I" & df$AA018_KPC_AA552_non_KPC==0 & df$OmpK36_L3_mutations==0,"Clade I w/o plasmid combo w/o Loop 3 insertion","Other"))))))
+p.12 <- overall_fig + new_scale_fill()
+
+inlab_category_fill <- scale_fill_manual(values =  hues::iwanthue(6),name="Selection category", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+
+p.13 <-  gheatmap(p.12,df %>% select(inlab_category) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("In lab category")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.000335)  + consistent_theme_GWAS + ylim(NA,500) + inlab_category_fill
+
+p.14 <- p.13 + new_scale_fill()
+
+inlab_scale_w_lowest <- scale_fill_manual(breaks = c(T,F), values = c('orange','white') ,labels=c("Yes","Not"),name="In lab\nLowest MIC", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+ 
+p.15 <-  gheatmap(p.14,df %>% select(in_lab_lowest_MVB_MIC,in_lab_lowest_IR_MIC) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("In lab+lowest MVB","In lab+lowest IR")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .2,offset =.0003625)  + consistent_theme_GWAS + ylim(NA,550) + inlab_scale_w_lowest
+p.15
+```
+
+```{r,fig.width=17.5,fig.height=12.5}
+df_CI <- df %>% subset(clade_I == "Clade I")
+tr_CI <- tr %>% keep.tip(df_CI$isolate_no)
+isolates_of_interest <- df_CI %>% subset(in_lab_lowest_IR_MIC ==T) %>% select(isolate_no,clade_I,LTACH,blbli_dich,MVB,MVB_log_2,IR,IR_log_2,OmpK36_c25t,OmpK36GD,OmpK36TD,AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,no_PBP_ompK36_RamA_mutations,inlab,inlab_category) %>% arrange(inlab_category)
+
+rownames(df_CI) <- df_CI$isolate_no
+  #Step #1: Clades
+  pc.1 <- gheatmap(p = ggtree(tr_CI)  + geom_tiplab(aes(label = ifelse(label %in% isolates_of_interest$isolate_no,label,NA)),size=1.5),data = df_CI %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = 0.1)   + clade_colors_scale_v 
+
+  #Step #3: BL/BLI Cluster
+  pc1.2 <- pc.1 + theme() + new_scale_fill()
+  pc1.3 <-  gheatmap(pc1.2,df_CI %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = 0.1,offset =.000025) + cluster_scale_2_col + consistent_theme_GWAS
+
+  #Step #4: MVB Binary
+  pc1.4 <- pc1.3 + new_scale_fill()
+  pc1.5 <-  gheatmap(pc1.4,df_CI %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = 0.1,offset =.00005) + resistance_scale + consistent_theme_GWAS
+
+  #Step #6: MVB MIC
+  pc1.6 <- pc1.5 + new_scale_fill()
+  pc1.7 <-  gheatmap(pc1.6,df_CI %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .2,offset =.000075) + Log2_scale + consistent_theme_GWAS + ylim(NA,550) 
+
+# With two hits 
+ pc1.8 <- pc1.7 + new_scale_fill()
+  
+ inlab_colors <- c(`1` = "black",`0`="white")
+ inlab_scale <- scale_fill_manual(breaks = c(T,F), values = c('brown','white') ,labels=c("Yes","Not"),name="In lab", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+
+pc1.9 <-  gheatmap(pc1.8,df_CI %>% select(inlab) %>% `colnames<-`("In lab"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.000125 )  + consistent_theme_GWAS + ylim(NA,500) + inlab_scale
+
+ pc1.10 <- pc1.9 + new_scale_fill()
+
+pc1.11 <-  gheatmap(pc1.10,df_CI %>% select(OmpK36_c25t,OmpK36GD,OmpK36TD,AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("OmpK36 C>T25","OmpK36 GD","OmpK36 TD","AA018 KPC",'AA018 No KPC',"AA552 KPC","AA552 No KPC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .7,offset =.00015) + feature_scale_v + consistent_theme_GWAS + ylim(NA,500) 
+
+ 
+pc1.12 <- pc1.11 + new_scale_fill()
+
+inlab_category_fill <- scale_fill_manual(values =  hues::iwanthue(6),name="Selection category", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+
+pc1.13 <-  gheatmap(pc1.12,df_CI %>% select(inlab_category) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("In lab category")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.000335)  + consistent_theme_GWAS + ylim(NA,500) + inlab_category_fill
+
+pc1.14 <- pc1.13 + new_scale_fill()
+
+inlab_scale_w_lowest <- scale_fill_manual(breaks = c(T,F), values = c('orange','white') ,labels=c("Yes","Not"),name="In lab\nLowest MIC", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+ 
+pc1.15 <-  gheatmap(pc1.14,df_CI %>% select(in_lab_lowest_MVB_MIC,in_lab_lowest_IR_MIC) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("In lab+lowest MVB","In lab+lowest IR")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .2,offset =.0003625)  + consistent_theme_GWAS + ylim(NA,190) + inlab_scale_w_lowest
+
+chosen_isolates <- c(
+'PCMP_H318',
+'PCMP_H414',
+'PCMP_H464',
+'PCMP_H261',
+'PCMP_H323',
+'PCMP_H142',
+'PCMP_H19',
+'PCMP_H167')
+
+df_CI$chosen_isolates <- ifelse(df_CI$isolate_no %in% chosen_isolates,T,F)
+
+chosen_isolates_scale <- scale_fill_manual(breaks = c(T,F), values = c('red','white') ,labels=c("Chosen","Not"),name="Chosen isolate", guide = guide_legend(ncol=1, title.position = "top", label.position = "right"))
+
+pc1.16 <- pc1.15 + new_scale_fill()
+
+pc1.17 <-  gheatmap(pc1.16,df_CI %>% select(chosen_isolates) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("Chosen isolate")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.000415)  + consistent_theme_GWAS + ylim(NA,190) + chosen_isolates_scale
+pc1.17
+```
+
+## Chosen isolates 
+```{r}
+chosen_isolates_df <- isolates_of_interest %>% subset(isolate_no %in%  chosen_isolates) %>% arrange(inlab_category) 
+
+table(chosen_isolates_df$inlab_category)
+
+chosen_isolates_df %>%  favorite_kable()
+
+```
+
+# Clade II
+```{r,fig.height=9.75,fig.width=10}
+table(df$blbli_dich,df$no_PBP_ompK36_RamA_mutations,df$clade_I,dnn = c("BL/BLI resistance","PBP, ompK36, RamA mutations","Clade"))
+
+table(df_inlab$blbli_dich,df_inlab$no_PBP_ompK36_RamA_mutations,df_inlab$clade_I,dnn = c("BL/BLI resistance","PBP, ompK36, RamA mutations","Clade"))
+
+clade_labeled_tree <- ggtree(tr) + geom_cladelab(node=594, label="CIIA\ntop", align=TRUE, barcolor = "black")  + geom_cladelab(node=567, label="CIIA\nbottom", align=TRUE, barcolor = "darkgray")  + geom_cladelab(node=671, label="CIIB\ntop", align=TRUE, barcolor = "darkblue")  + geom_cladelab(node=762, label="CIIB\nbottom", align=TRUE, barcolor = "blue")
+
+gheatmap(p.10,df %>% select(no_PBP_ompK36_RamA_mutations) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("No PBP, ompK36, RamA mutations")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.00015) + feature_scale_v + consistent_theme_GWAS + ylim(NA,775)
+ 
+gheatmap(clade_labeled_tree, df %>% select(state),color = NULL)
+
+CIIA_top <-tr$tip.label[phangorn::Descendants(tr,594,type='tips') %>% unlist]
+CIIA_bottom <- tr$tip.label[phangorn::Descendants(tr,567,type='tips') %>% unlist]
+CIIB_top <- tr$tip.label[phangorn::Descendants(tr,671,type='tips') %>% unlist]
+CIIB_bottom <- tr$tip.label[phangorn::Descendants(tr,762,type='tips') %>% unlist]
+
+df$clade_groups <- ifelse(df$isolate_no %in% CIIA_bottom,"Clade IIA CA bottom",
+                   ifelse(df$isolate_no %in% CIIA_top, "Clade IIA CA top",
+                          ifelse(df$isolate_no %in% CIIB_top, "Clade IIB CA top",
+                                 ifelse(df$isolate_no %in% CIIB_bottom, "Clade IIB CA bottom",
+                                        ifelse(df$clade_I=="Clade I","Clade I","Clade II Other")))))
+gheatmap(clade_labeled_tree,df %>% select(clade_groups))
+
+
+p11 <- gheatmap(p.10,df %>% select(no_PBP_ompK36_RamA_mutations) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("No PBP, ompK36, RamA mutations")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.00015) + feature_scale_v + consistent_theme_GWAS + ylim(NA,775)
+
+p12 <- p11 + ggnewscale::new_scale_fill()
+p13 <-  gheatmap(p12,df %>% select(clade_groups) %>% mutate_all(as.factor)  %>%`colnames<-`(c("Clade_group")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.00018)  + consistent_theme_GWAS + ylim(NA,775)
+
+p14<- p13 + ggnewscale::new_scale_fill() 
+p15 <-  gheatmap(p14,df %>% select(in_lab_lowest_MVB_MIC,in_lab_lowest_IR_MIC,in_lab_lowest_IR_MVB_MIC) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("In lab+lowest MVB","In lab+lowest IR","In lab + lowest MVB + lowest IR")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .2,offset =.00021)  + consistent_theme_GWAS + ylim(NA,775) + inlab_scale_w_lowest
+
+table(df$in_lab_lowest_IR_MVB_MIC,df$clade_groups,df$no_PBP_ompK36_RamA_mutations,dnn = c("In lab lowest IR and MVB MIC","Clade groups","No Mutations of interest"))
+
+## Nearest resistant neighbor (find one with lowest phylo distance!)
+eligible_CI_isolates <- df %>% subset(!clade_groups %in% c("Clade I","Clade II Other")) %>% subset(in_lab_lowest_IR_MVB_MIC ==T) %>% subset(no_PBP_ompK36_RamA_mutations==1) %>% .$isolate_no
+
+SNP_distance <- readRDS("./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS")
+phylo_distance <- readRDS("./data/tree/phylo_dist.RDS")
+
+nearest_neighbor_analyses <- lapply(eligible_CI_isolates,FUN=phyloAMR::nearest_neighbor_algorithm,tip_name_variable = 'isolate_no',phylogenetic_distance=phylo_distance,variant_distance = SNP_distance,metadata = df, annotate=T,variables_of_interest = c("clade_groups","LTACH","Patient_ID"),comparison=T,comparison_feature = 'blbli_dich_num') %>% do.call(rbind,.)
+
+
+minimum_per_group <- nearest_neighbor_analyses %>% group_by(clade_groups) %>% filter(nearest_neighbor_phylogenetic_distance ==min(nearest_neighbor_phylogenetic_distance))
+
+
+minimum_per_group %>% favorite_kable()
+  
+clade_II_isolates <- df %>% subset(isolate_no %in% minimum_per_group$tip_name) %>% select(isolate_no,clade_I,LTACH,blbli_dich,MVB,MVB_log_2,IR,IR_log_2,OmpK36_c25t,OmpK36GD,OmpK36TD,AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,no_PBP_ompK36_RamA_mutations,inlab,inlab_category)
+
+clade_II_isolates %>% favorite_kable()
+ 
+```
+
+# Resistant control
+## IR MIC = 16
+### Clade II strain with 16
+```{r}
+resistant_control <- df %>% subset(inlab==T & IR_num==16)  %>% select(isolate_no,clade_I,LTACH,blbli_dich,MVB,MVB_log_2,IR,IR_log_2,OmpK36_c25t,OmpK36GD,OmpK36TD,AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,no_PBP_ompK36_RamA_mutations,inlab,inlab_category)
+
+resistant_control %>% favorite_kable()
+```
+
+
+# Merged dataset
+```{r,fig.width=17.5,fig.height=12.5}
+all_chosen_isolates <- bind_rows(resistant_control,chosen_isolates_df) %>% bind_rows(.,clade_II_isolates)
+
+all_chosen_isolates$resistant_control <- ifelse(all_chosen_isolates$blbli_dich=='Non-Susceptible',T,F)
+all_chosen_isolates <- left_join(all_chosen_isolates,df %>% select(isolate_no,clade_groups)) 
+
+all_chosen_isolates <- all_chosen_isolates %>% select(isolate_no,clade_I,clade_groups,LTACH,blbli_dich,MVB,MVB_log_2,IR,IR_log_2,OmpK36_c25t,OmpK36GD,OmpK36TD,AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,no_PBP_ompK36_RamA_mutations,inlab,inlab_category,resistant_control)
+
+all_chosen_isolates %>% favorite_kable()
+
+
+df$chosen_isolate <- ifelse(df$isolate_no %in% all_chosen_isolates$isolate_no,T,F)
+p16<- p15 + ggnewscale::new_scale_fill() 
+p17 <-  gheatmap(p14,df %>% select(chosen_isolate) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("Final chosen isolate")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6, width = .1,offset =.00021)  + consistent_theme_GWAS + ylim(NA,650) + chosen_isolates_scale
+
+p17
+
+write_csv(all_chosen_isolates,'./data/evolution_experiment/IR_evolution_experiment_chosen_isolates_102825.csv')
+```
+

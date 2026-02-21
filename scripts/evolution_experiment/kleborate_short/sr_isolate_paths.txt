@@ -1,0 +1,16 @@
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H19/PCMP_H19_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H019_MVB_R/PCMP_H019_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H116/PCMP_H116_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H116_MVB_R/PCMP_H116_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H226/PCMP_H226_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H226_MVB_R/PCMP_H226_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H261/PCMP_H261_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H261_MVB_R/PCMP_H261_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H318/PCMP_H318_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H318_MVB_R/PCMP_H318_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H323/PCMP_H323_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H323_MVB_R/PCMP_H323_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H414/PCMP_H414_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H414_MVB_R/PCMP_H414_MVB_R_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H464/PCMP_H464_contigs_l1000.fasta
+/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/PCMP_H464_MVB_R/PCMP_H464_MVB_R_contigs_l1000.fasta

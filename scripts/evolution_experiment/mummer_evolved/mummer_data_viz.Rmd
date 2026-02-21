@@ -1,0 +1,194 @@
+---
+title: "mummer_data_viz"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+```
+
+# Evolved strains
+```{r}
+mobsuite_typer_evolved <- read_delim("./data/evolution_experiment/mobsuite_evolved/mobtyper_results_evolved.txt")
+mobsuite_typer_evolved$isolate_no <- gsub("_flye_medaka_polypolish","",mobsuite_typer_evolved$sample_id) %>% str_split(.,":",simplify=T) %>% .[,1] %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+mobsuite_typer_evolved$parent <- gsub("_MVB_R","",mobsuite_typer_evolved$isolate_no)
+
+mobsuite_contigs_evolved <- read_delim("./data/evolution_experiment/mobsuite_evolved/mobsuite_contig_report_evolved.txt")
+mobsuite_contigs_evolved$isolate_no <- gsub("_flye_medaka_polypolish","",mobsuite_contigs_evolved$sample_id)  %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+mobsuite_contigs_evolved$parent <- gsub("_MVB_R","",mobsuite_contigs_evolved$isolate_no)
+mobsuite_contigs_evolved$contig_id_renamed <- gsub(" polypolish","",mobsuite_contigs_evolved$contig_id)
+mobsuite_contigs_evolved$contig <- mobsuite_contigs_evolved$contig_id %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_") %>% lapply(.,FUN=function(x){x[(length(x)-1):length(x)]} %>% paste0(collapse="_")) %>% unlist
+```
+
+# KPC blast data
+```{r}
+KPC_blast <- read_delim("./data/evolution_experiment/KPC_blast_evolved/KPC_blast_master_evolved.txt")
+KPC_blast$isolate_no <-  gsub("_flye_medaka_polypolish","",KPC_blast$isolate_no) %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+KPC_blast$parent <- gsub("_MVB_R","",KPC_blast$isolate_no)
+KPC_blast$element_symbol <- ifelse(grepl("KPC-2",KPC_blast$sseqid),"KPC-2",ifelse(grepl("KPC-3",KPC_blast$sseqid),"KPC-3",ifelse(grepl("KPC-5",KPC_blast$sseqid),"KPC-5","Other")))
+KPC_blast$contig <- KPC_blast$qseqid %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_") %>% lapply(.,FUN=function(x){x[(length(x)-1):length(x)]} %>% paste0(collapse="_")) %>% unlist
+KPC_blast$qseqid <- KPC_blast$qseqid  %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_") %>% lapply(.,FUN=function(x){x[(length(x)-1):length(x)]} %>% paste0(collapse="_")) %>% unlist
+
+ 
+
+```
+
+# Tn4401 blast data
+```{r}
+tn4401_blast <- read_delim("./data/evolution_experiment/tn4401_blast_evolved/tn4401_blast_master_evolved.txt")
+tn4401_blast$isolate_no <-  gsub("_flye_medaka_polypolish","",tn4401_blast$isolate_no) %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+tn4401_blast$parent <- gsub("_MVB_R","",tn4401_blast$isolate_no) 
+tn4401_blast$qseqid <- tn4401_blast$qseqid  %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_") %>% lapply(.,FUN=function(x){x[(length(x)-1):length(x)]} %>% paste0(collapse="_")) %>% unlist
+```
+
+# Curate data
+```{r}
+kpc_contigs <- KPC_blast %>% subset(element_symbol  %in% c("KPC-2","KPC-3","KPC-5"))%>% select(isolate_no,contig,element_symbol) %>% distinct
+contig_data <- mobsuite_contigs_evolved %>% select(isolate_no,contig,primary_cluster_id,mash_nearest_neighbor,size) %>% left_join(kpc_contigs)
+contig_data$element_symbol <- gsub("KPC-2","<i>bla</i><sub>KPC-2</sub>",contig_data$element_symbol)  %>% gsub("KPC-3","<i>bla</i><sub>KPC-3</sub>",.)  %>% gsub("KPC-5","<i>bla</i><sub>KPC-5</sub>",.) 
+contig_data$primary_cluster_id <- ifelse(contig_data$primary_cluster_id == "-","Chromosome",contig_data$primary_cluster_id) 
+contig_data$contig_name <- paste0(contig_data$contig," ",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor," ",contig_data$element_symbol," ",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.) %>% gsub("Chromosome-","Chromosome",.)
+```
+
+# Create figures
+
+```{r ,fig.width=12.5,fig.height=10} 
+ reorder_blast_df <- function(blast_isolate_df,name,contig_name,num){ 
+  if(blast_isolate_df["sstart"]>blast_isolate_df["send"]){
+    blast_df <- blast_isolate_df %>% t %>% as.data.frame %>% `colnames<-`(c(name,contig_name,paste0("[E",num,"]"),paste0("[S",num,"]"),"send","sstart"))
+  } else {
+    
+    blast_df <- blast_isolate_df %>% t %>% as.data.frame %>% `colnames<-`(c(name,contig_name,paste0("[S",num,"]"),paste0("[E",num,"]"),"sstart","send")) 
+  } 
+  return(blast_df)
+ }
+ 
+make_plots <- function(filename,contig_data,blast_data){
+  coords <- read_delim(filename, 
+                       delim = "\t", escape_double = FALSE, 
+                       trim_ws = TRUE, skip = 3,col_names = T) %>% as.data.frame
+  coords$`[TAGS]` <- gsub("\\t"," ",coords$`[TAGS]`)
+  coords$map1_chr <- str_split(coords$`[TAGS]`," ",simplify=T) %>% .[,1] %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,(ncol(.)-1):ncol(.)]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+  coords$map2_chr <- str_split(coords$`[TAGS]`," ",simplify=T) %>% .[,2] %>% str_split(.,";",simplify = T) %>% .[,1] %>% unlist %>% str_split(.,"_",simplify=T) %>% .[,(ncol(.)-1):ncol(.)]  %>% as.data.frame %>% apply(.,1,paste0,collapse="_")
+  coords$map1_name <- gsub(".coords","",filename) %>% str_split(.,"_",simplify=T) %>% .[,1:2] %>% paste0(collapse="_")
+  coords$map2_name <- gsub(".coords","",filename) %>% str_split(.,"_",simplify=T) %>% .[,3:length(.)] %>% paste0(collapse="_")
+  coords$map1_pos <- coords$`[S1]`
+  coords$map2_pos <- coords$`[S2]` 
+  
+  # Contig renaming
+  ## Isolate 1
+  isolate_1 <- coords$map1_name %>% unique
+  isolate_1_contigs <- contig_data %>% subset(isolate_no == isolate_1)
+  isolate_1_contigs_names <- isolate_1_contigs$contig_name  %>% `names<-`(isolate_1_contigs$contig)
+  coords$map1_chr <- recode(coords$map1_chr,!!!as.list(isolate_1_contigs_names))
+  coords$map1_chr <- factor(coords$map1_chr,levels = c(isolate_1_contigs %>% arrange(-size) %>% .$contig_name))
+  ### tn4401 data
+  tn4401_blast_1 <- blast_data %>% subset(isolate_no == isolate_1)%>% select(isolate_no,qseqid,qstart,qend,sstart,send) 
+  tn4401_blast_1 <- apply(tn4401_blast_1,1,FUN=reorder_blast_df,name="map1_name",contig_name="map1_chr",num="1") %>% bind_rows
+  tn4401_blast_1$map1_chr <- recode(tn4401_blast_1$map1_chr,!!!as.list(isolate_1_contigs_names))
+  tn4401_blast_1$map1_chr <- factor(tn4401_blast_1$map1_chr,levels = c(isolate_1_contigs %>% arrange(-size) %>% .$contig_name)) 
+  ## Isolate 2
+  isolate_2 <- coords$map2_name %>% unique
+  isolate_2_contigs <- contig_data %>% subset(isolate_no == isolate_2)
+  isolate_2_contigs_names <- isolate_2_contigs$contig_name  %>% `names<-`(isolate_2_contigs$contig)
+  coords$map2_chr <- recode(coords$map2_chr,!!!as.list(isolate_2_contigs_names))
+  coords$map2_chr <- factor(coords$map2_chr,levels = c(isolate_2_contigs %>% arrange(-size) %>% .$contig_name))
+  ### tn4401 data
+  tn4401_blast_2 <- blast_data %>% subset(isolate_no == isolate_2)  %>% select(isolate_no,qseqid,qstart,qend,sstart,send) 
+  tn4401_blast_2 <- apply(tn4401_blast_2,1,FUN=reorder_blast_df,name="map2_name",contig_name="map2_chr",num="2") %>% bind_rows
+  tn4401_blast_2$map2_chr <- recode(tn4401_blast_2$map2_chr,!!!as.list(isolate_2_contigs_names))
+  tn4401_blast_2$map2_chr <- factor(tn4401_blast_2$map2_chr,levels = c(isolate_2_contigs %>% arrange(-size) %>% .$contig_name)) 
+  # Merge KPC data 
+  tn4401_merge <- left_join(tn4401_blast_1,tn4401_blast_2)
+  tn4401_merge <- tn4401_merge %>% mutate_if(colnames(.) %in% c("[E1]",'[E2]','[S1]','[S2]'),as.numeric) 
+  # Contig barriers
+  contig_data <- lapply(isolate_1_contigs_names,FUN=function(x){
+    contig_info_1 <- isolate_1_contigs %>% subset(contig_name==x)  %>% select(contig_name,size) %>% `colnames<-`(c("map1_chr","X"))
+  combinded <- lapply(isolate_2_contigs_names,function(y){
+      contig_info_2 <- isolate_2_contigs %>% subset(contig_name==y)  %>% select(contig_name,size) %>% `colnames<-`(c("map2_chr","Y"))
+      cbind(contig_info_1,contig_info_2)
+    }) %>% do.call(rbind,.) %>% `rownames<-`(NULL)
+    return(combinded)
+  }) %>% do.call(rbind,.) 
+  contig_data$map1_chr <- factor(contig_data$map1_chr,levels = c(isolate_1_contigs %>% arrange(-size) %>% .$contig_name)) 
+  contig_data$map2_chr <- factor(contig_data$map2_chr,levels = c(isolate_2_contigs %>% arrange(-size) %>% .$contig_name)) 
+  
+    figure <- ggplot(data=coords, aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`)) + geom_segment() +  geom_segment(data=tn4401_merge,aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`,color="red"))  + geom_segment(data=contig_data,aes(x=`X`,xend=`X`,y=`Y`,yend=`Y`),color="white") +
+    facet_grid(map2_chr~map1_chr,scales = 'free',drop = F)   + xlab(paste0(unique(coords$map1_name)," position (bp)")) + ylab(paste0(unique(coords$map2_name)," position (bp)")) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = "off") + ggplot2::theme_bw()  + scale_color_manual(values="red",labels="<i>bla</i><sub>KPC</sub>-containing <i>tn4401</i> transposon", name="", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) + s_figure_6_format
+ 
+  figure
+}
+```
+
+```{r,fig.width=14,fig.height=14}
+setwd("./data/evolution_experiment/mummer_evolved/")
+tn4401_hopping <- make_plots(filename = 'PCMP_H116_PCMP_H116_MVB_R.coords',contig_data = contig_data,blast_data = KPC_blast) 
+tn4401_hopping
+#ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+```
+
+
+```{r,fig.width=14,fig.height=10.5}
+setwd("./data/evolution_experiment/mummer_evolved/")
+tn4401_hopping <- make_plots(filename = 'PCMP_H19_PCMP_H019_MVB_R.coords',contig_data = contig_data,blast_data = KPC_blast) 
+tn4401_hopping
+#ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+```
+
+
+```{r,fig.width=19,fig.height=19}
+setwd("./data/evolution_experiment/mummer_evolved/")
+tn4401_hopping <- make_plots(filename = 'PCMP_H226_PCMP_H226_MVB_R.coords',contig_data = contig_data,blast_data = KPC_blast) 
+tn4401_hopping
+#ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+```
+
+
+```{r,fig.width=14,fig.height=10.5}
+setwd("./data/evolution_experiment/mummer_evolved/")
+tn4401_hopping <- make_plots(filename = 'PCMP_H323_PCMP_H323_MVB_R.coords',contig_data = contig_data,blast_data = KPC_blast) 
+tn4401_hopping
+#ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+```
+
+
+```{r,fig.width=18,fig.height=18}
+setwd("./data/evolution_experiment/mummer_evolved/")
+tn4401_hopping <- make_plots(filename = 'PCMP_H414_PCMP_H414_MVB_R.coords',contig_data = contig_data,blast_data = KPC_blast) 
+tn4401_hopping
+#ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+```
+
+
+```{r,fig.width=18,fig.height=18}
+setwd("./data/evolution_experiment/mummer_evolved/")
+tn4401_hopping <- make_plots(filename = 'PCMP_H464_PCMP_H464_MVB_R.coords',contig_data = contig_data,blast_data = KPC_blast) 
+tn4401_hopping
+#ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+```

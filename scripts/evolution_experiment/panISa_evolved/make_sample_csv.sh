@@ -1,0 +1,2 @@
+echo "sample_id" > /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/config/sample_id_MVB_evolved_panISA.tsv
+cat /nfs/turbo/umms-esnitkin/qProject_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt >> /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/config/sample_id_MVB_evolved_panISA.tsv

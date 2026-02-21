@@ -1,0 +1,43 @@
+---
+title: "Update MVB population data"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+```
+
+# Load population data 
+## Changelog
+### - Add isolate number
+### - Change 138 to 135
+```{r}
+# Input data:
+## Strain = isolate
+## Cluster = 1 - 8 of the broth growups
+## Rep = MHA replicate
+## MVB column = Growth on MVB plate (number of colonies at 8/4)
+## 8-4 named columns indicate: MHA colony count at serial dilution of 10-8...4 
+MVB_pop_data <- read.csv("./data/evolution_experiment/1-9-26 MVB resistance - Sheet3.csv", check.names = FALSE) 
+colnames(MVB_pop_data) <- c("strain","culture","replicate","MVB_colony_count","MHA_lg8","MHA_lg7","MHA_lg6","MHA_lg5","MHA_lg4")
+MVB_pop_data$strain <- ifelse(MVB_pop_data$strain==138, 135,MVB_pop_data$strain)
+MVB_pop_data$isolate_no <- paste0("PCMP_H",MVB_pop_data$strain)  
+```
+
+```{r}
+write_csv(MVB_pop_data,"./data/evolution_experiment/cleaned_MVB_resistance_experiment_data_010926.csv")
+```

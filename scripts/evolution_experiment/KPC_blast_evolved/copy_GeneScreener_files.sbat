@@ -1,0 +1,28 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=copy_GeneScreener_KPC_evolved
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=copy_GeneScreener.out
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=1 --mem=50g --time=0:10:00 
+
+# results
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/KPC_blast_evolved
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/results/*blast_clean.tsv .  
+
+# Scripts
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/KPC_blast_evolved
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/config .
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/scripts/* .
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/GeneScreener*evolved*smk .  
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/*evolved*sbat .  
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/README.md .  
+
+# Log files
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/evolution_experiment/KPC_blast_evolved
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/slurm-* .
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/blast_KPC_evolved/GeneScreener/slurm_out .

@@ -1,0 +1,39 @@
+---
+title: "curate_TETyper"
+output: html_document
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+``` 
+
+```{r}
+library(ape)
+library(tidyverse)
+source("./lib/common_functions.R")
+```
+
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+```
+
+# Load tn4401 TETyper data
+```{r}
+tn4401 <- read.delim("./data/evolution_experiment/TETyper_evolved/TETyper_results.txt") 
+tn4401$isolate_no <- tn4401$isolate_no %>% gsub("PCMP_H019","PCMP_H19",.)
+tn4401_ST258 <- tn4401  %>% `rownames<-`(.$isolate_no) 
+
+tn4401_curated <- get_presence_absence_matrix('Structural_variant',tn4401_ST258)  %>% as.data.frame %>% mutate(isolate_no = rownames(.))
+tn4401_curated <- left_join(tn4401_ST258,tn4401_curated) 
+
+tn4401_curated$tn4401_allele <- ifelse(tn4401_curated$Tn4401a == 1, "Tn4401a", 
+                                  ifelse(tn4401_curated$Tn4401d == 1,"Tn4401d","Other"))
+
+saveRDS(tn4401_curated,"./data/evolution_experiment/TETyper_evolved/TETyper_curated.RDS")
+```

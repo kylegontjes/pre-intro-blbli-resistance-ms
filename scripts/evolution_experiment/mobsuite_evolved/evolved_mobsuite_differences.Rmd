@@ -1,0 +1,182 @@
+---
+title: "mobsuite_differences"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+```
+
+# Evolved strains
+```{r}
+mobsuite_typer_evolved <- read_delim("./data/evolution_experiment/mobsuite_evolved/mobtyper_results_evolved.txt")
+mobsuite_typer_evolved$isolate_no <- gsub("_flye_medaka_polypolish","",mobsuite_typer_evolved$sample_id) %>% str_split(.,":",simplify=T) %>% .[,1] %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+mobsuite_typer_evolved$parent <- gsub("_MVB_R","",mobsuite_typer_evolved$isolate_no)
+
+mobsuite_contigs_evolved <- read_delim("./data/evolution_experiment/mobsuite_evolved/mobsuite_contig_report_evolved.txt")
+mobsuite_contigs_evolved$isolate_no <- gsub("_flye_medaka_polypolish","",mobsuite_contigs_evolved$sample_id)  %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+mobsuite_contigs_evolved$parent <- gsub("_MVB_R","",mobsuite_contigs_evolved$isolate_no)
+mobsuite_contigs_evolved$contig_id_renamed <- gsub(" polypolish","",mobsuite_contigs_evolved$contig_id)
+```
+
+# KPC blast data
+```{r}
+KPC_blast <- read_delim("./data/evolution_experiment/KPC_blast_evolved/KPC_blast_master_evolved.txt")
+KPC_blast$isolate_no <-  gsub("_flye_medaka_polypolish","",KPC_blast$isolate_no) %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)
+KPC_blast$parent <- gsub("_MVB_R","",KPC_blast$isolate_no)
+```
+
+
+# Evolved pairs
+## Those with pairs
+```{r}
+pairs <- c("PCMP_H116","PCMP_H19","PCMP_H226","PCMP_H323","PCMP_H414","PCMP_H464")
+
+differences <- lapply(pairs,FUN=function(x){
+  # Plasmid
+  mobtyper_data <- subset(mobsuite_typer_evolved,parent==x)
+  parent = x
+  parent_plasmid_clusters <- mobtyper_data[mobtyper_data$isolate_no == x,'primary_cluster_id'] %>% unlist %>% sort %>% paste0(.,collapse=',')
+  parent_plasmid_clusters_num <- nrow(mobtyper_data[mobtyper_data$isolate_no == x,'primary_cluster_id'])
+  evolved_plasmid_clusters <- mobtyper_data[mobtyper_data$isolate_no != x,'primary_cluster_id'] %>% unlist %>% sort %>% paste0(.,collapse=',')
+  evolved_plasmid_clusters_num <- nrow(mobtyper_data[mobtyper_data$isolate_no != x,'primary_cluster_id'])
+  same_plasmids <- parent_plasmid_clusters == evolved_plasmid_clusters 
+  # KPC location on plasmid
+  kpc_data <-  subset(KPC_blast,parent==x)
+  mobcontig_data <- subset(mobsuite_contigs_evolved,parent==x)
+  parent_kpc_contig <- kpc_data[kpc_data$isolate_no == x,'qseqid']   %>% unlist
+  parent_kpc_contig_str <- parent_kpc_contig %>% paste0(.,collapse=',')
+  parent_kpc_contig_num <- length(parent_kpc_contig)
+  parent_kpc_plasmid <- mobcontig_data[mobcontig_data$isolate_no == x & mobcontig_data$contig_id_renamed %in% parent_kpc_contig,'primary_cluster_id'] %>% unlist%>% paste0(.,collapse=',')
+  parent_kpc_plasmid_size <- mobtyper_data[mobtyper_data$isolate_no ==x & mobtyper_data$primary_cluster_id%in% parent_kpc_plasmid,'size'] %>% unlist%>% paste0(.,collapse=',')
+  evolved_kpc_contig <- kpc_data[kpc_data$isolate_no != x,'qseqid']  %>% unlist
+  evolved_kpc_contig_str <- evolved_kpc_contig %>% paste0(.,collapse=',')
+  evolved_kpc_contig_num <- length(evolved_kpc_contig)
+  evolved_kpc_plasmid <- mobcontig_data[mobcontig_data$isolate_no != x & mobcontig_data$contig_id_renamed %in% evolved_kpc_contig,'primary_cluster_id'] %>% unlist%>% paste0(.,collapse=',')
+  evolved_kpc_plasmid_size <- mobtyper_data[mobtyper_data$isolate_no !=x & mobtyper_data$primary_cluster_id%in% evolved_kpc_plasmid,'size'] %>% unlist%>% paste0(.,collapse=',')
+  same_kpc_plasmids <- parent_kpc_plasmid == evolved_kpc_plasmid
+  kpc_plasmid_size_difference <- as.numeric(evolved_kpc_plasmid_size) - as.numeric(parent_kpc_plasmid_size)
+  cbind.data.frame(parent = x, parent_plasmid_clusters,parent_plasmid_clusters_num,parent_kpc_contig_num,parent_kpc_plasmid,parent_kpc_plasmid_size,evolved_plasmid_clusters,evolved_plasmid_clusters_num,evolved_kpc_plasmid,evolved_kpc_contig_num,evolved_kpc_plasmid_size,same_plasmids,same_kpc_plasmids,kpc_plasmid_size_difference)
+}) %>% do.call(rbind,.) 
+
+differences$both_hybrid <- T  
+
+```
+
+# Short + long
+```{r}
+mobsuite_typer_evolved_sr <- read_delim("./data/evolution_experiment/mobsuite_short/mobtyper_results_evolved_short.txt")
+mobsuite_typer_evolved_sr$isolate_no <- gsub("_flye_medaka_polypolish","",mobsuite_typer_evolved_sr$sample_id) %>% str_split(.,":",simplify=T) %>% .[,1] %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.) %>% gsub("_contigs_l1000","",.)
+mobsuite_typer_evolved_sr$parent <- gsub("_MVB_R","",mobsuite_typer_evolved_sr$isolate_no) 
+
+mobcontigs_typer_evolved_sr <- read_delim("./data/evolution_experiment/mobsuite_short/mobsuite_contig_report_evolved_short.txt")
+mobcontigs_typer_evolved_sr$isolate_no <- gsub("_flye_medaka_polypolish","",mobcontigs_typer_evolved_sr$sample_id) %>% str_split(.,":",simplify=T) %>% .[,1] %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)%>% gsub("_contigs_l1000","",.)
+mobcontigs_typer_evolved_sr$parent <- gsub("_MVB_R","",mobcontigs_typer_evolved_sr$isolate_no) 
+mobcontigs_typer_evolved_sr$contig_id_renamed <- gsub(" polypolish","",mobcontigs_typer_evolved_sr$contig_id)
+
+amrfinder <- readRDS("./data/evolution_experiment/amrfinder_evolved/amrfinder_hybrid_curated.RDS")
+amrfinder$parent <- gsub("_MVB_R","",amrfinder$isolate_no) 
+
+amrfinder_sr <- readRDS("./data/evolution_experiment/amrfinder_evolved_short/amrfinder_curated_short.RDS")
+amrfinder_sr$parent <- gsub("_MVB_R","",amrfinder_sr$isolate_no) 
+```
+
+```{r}
+get_mobsuite_diff <- function(parent_name ,parent_short, evolved ,evolved_short, mobcontig_short, mobsuite_short,amrfinder_short ,mobcontig_hybrid,mobsuite_hybrid,amrfinder_hybrid){
+  parent = parent_name
+  if(parent_short ==T){
+    parent_amrfinder <- subset(amrfinder_short,isolate_no == parent_name) 
+    parent_mobtyper <- subset(mobsuite_short,isolate_no == parent_name) 
+    parent_mobcontig <- subset(mobcontig_short,isolate_no == parent_name) 
+  } else {
+    parent_amrfinder <- subset(amrfinder_hybrid,isolate_no == parent_name) 
+    parent_mobtyper <- subset(mobsuite_hybrid,isolate_no == parent_name) 
+    parent_mobcontig <- subset(mobcontig_hybrid,isolate_no == parent_name) 
+  }
+  
+  if(evolved_short == T){
+     evolved_amrfinder <- subset(amrfinder_short,isolate_no == evolved) 
+    evolved_mobtyper <- subset(mobsuite_short,isolate_no == evolved) 
+    evolved_mobcontig <- subset(mobcontig_short,isolate_no == evolved) 
+  } else {
+    evolved_amrfinder <- subset(amrfinder_hybrid,isolate_no == evolved) 
+    evolved_mobtyper <- subset(mobsuite_hybrid,isolate_no == evolved) 
+    evolved_mobcontig <- subset(mobcontig_hybrid,isolate_no == evolved) 
+  }
+  
+  parent_plasmid_clusters <- parent_mobtyper[,'primary_cluster_id'] %>% unlist %>% sort %>% paste0(.,collapse=',')
+  parent_plasmid_clusters_num <- nrow(parent_mobtyper[,'primary_cluster_id'])
+  
+  evolved_plasmid_clusters <- evolved_mobtyper[,'primary_cluster_id'] %>% unlist %>% sort %>% paste0(.,collapse=',')
+  evolved_plasmid_clusters_num <- nrow(evolved_mobtyper[,'primary_cluster_id'])
+     
+  same_plasmids <- parent_plasmid_clusters == evolved_plasmid_clusters 
+  # KPC location on plasmid
+  parent_kpc_data <- subset(parent_amrfinder,grepl("blaKPC",element_symbol_renamed))
+  evolved_kpc_data <- subset(evolved_amrfinder,grepl("blaKPC",element_symbol_renamed))
+  parent_kpc_contig <- parent_kpc_data[,'contig_id']   %>% unlist
+  evolved_kpc_contig <- evolved_kpc_data[,'contig_id']   %>% unlist
+  parent_kpc_contig_str <- parent_kpc_contig %>% paste0(.,collapse=',')
+  parent_kpc_contig_num <- length(parent_kpc_contig)
+  parent_kpc_plasmid <- parent_mobcontig[parent_mobcontig$contig_id_renamed %in% parent_kpc_contig,'primary_cluster_id'] %>% unlist %>% unique %>% paste0(.,collapse=',')
+  parent_kpc_plasmid_size <- parent_mobtyper[parent_mobtyper$primary_cluster_id %in% parent_kpc_plasmid,'size'] %>% unlist%>% paste0(.,collapse=',') 
+  evolved_kpc_contig_str <- evolved_kpc_contig %>% paste0(.,collapse=',')
+  evolved_kpc_contig_num <- length(evolved_kpc_contig)
+  evolved_kpc_plasmid <- evolved_mobcontig[evolved_mobcontig$contig_id_renamed %in% evolved_kpc_contig,'primary_cluster_id'] %>% unique %>% unlist%>% paste0(.,collapse=',')
+  evolved_kpc_plasmid_size <- evolved_mobtyper[evolved_mobtyper$primary_cluster_id%in% evolved_kpc_plasmid,'size'] %>% unlist%>% paste0(.,collapse=',')
+  same_kpc_plasmids <- parent_kpc_plasmid == evolved_kpc_plasmid
+  kpc_plasmid_size_difference <- as.numeric(evolved_kpc_plasmid_size) - as.numeric(parent_kpc_plasmid_size)
+  cbind.data.frame(parent = parent_name, parent_plasmid_clusters,parent_plasmid_clusters_num,parent_kpc_contig_num,parent_kpc_plasmid,parent_kpc_plasmid_size,evolved_plasmid_clusters,evolved_plasmid_clusters_num,evolved_kpc_plasmid,evolved_kpc_contig_num,evolved_kpc_plasmid_size,same_plasmids,same_kpc_plasmids,kpc_plasmid_size_difference) 
+}
+```
+
+## PCMP_H261
+
+```{r}
+PCMP_H261 <- get_mobsuite_diff(parent_name = "PCMP_H261", parent_short = T, evolved = "PCMP_H261_MVB_R", evolved_short = T , mobcontig_short = mobcontigs_typer_evolved_sr ,mobsuite_short = mobsuite_typer_evolved_sr,amrfinder_short = amrfinder_sr,mobcontig_hybrid = mobsuite_contigs_evolved,mobsuite_hybrid = mobsuite_typer_evolved,amrfinder_hybrid = amrfinder)
+PCMP_H261$both_hybrid <- F
+```
+
+## PCMP_H318
+
+```{r}
+PCMP_H318 <- get_mobsuite_diff(parent_name =  "PCMP_H318",parent_short = T,evolved = "PCMP_H318_MVB_R",evolved_short = F , mobcontig_short = mobcontigs_typer_evolved_sr ,mobsuite_short = mobsuite_typer_evolved_sr,amrfinder_short = amrfinder_sr,mobcontig_hybrid = mobsuite_contigs_evolved,mobsuite_hybrid = mobsuite_typer_evolved,amrfinder_hybrid = amrfinder)
+PCMP_H318$both_hybrid <- F
+```
+
+# Table
+```{r}
+mobsuite_differences <- rbind(differences,PCMP_H261 )%>% rbind(.,PCMP_H318) 
+
+mobsuite_differences <-   mobsuite_differences%>% arrange(parent)
+
+mobsuite_differences %>% favorite_kable()
+
+```
+

@@ -1,0 +1,212 @@
+---
+title: "amrfinder_evolved_comparisons"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+```
+
+```{r}
+amrfinder <- readRDS("./data/evolution_experiment/amrfinder_evolved/amrfinder_hybrid_curated.RDS")
+amrfinder$parent <- gsub("_MVB_R","",amrfinder$isolate_no) 
+```
+
+# Genotypes
+## All
+```{r}
+pairs <- c("PCMP_H116","PCMP_H19","PCMP_H226","PCMP_H323","PCMP_H414","PCMP_H464") %>% sort
+
+gene_diffs <- lapply(pairs,FUN=function(x){
+  # Plasmid
+  amrfinder_sub <- subset(amrfinder,parent==x)
+  parent = x
+  parent_genotypes <- subset(amrfinder_sub,isolate_no==x) %>% select(element_symbol_renamed) %>% unlist   %>% sort %>% unique
+  parent_genotypes_num <- n_distinct(parent_genotypes) 
+  evolved_genotypes <- subset(amrfinder_sub,isolate_no!=x) %>% select(element_symbol_renamed) %>% unlist   %>% sort %>% unique
+  evolved_genotypes_num <- n_distinct(evolved_genotypes) 
+  parent_genotypes_unique <- subset(parent_genotypes,!parent_genotypes %in% evolved_genotypes) %>% unique %>% sort %>% paste0(collapse=";")
+  evolved_genotypes_unique <- subset(evolved_genotypes,!evolved_genotypes %in% parent_genotypes) %>% unique %>% sort %>% paste0(collapse=";")
+  genotype_ct_diff <- evolved_genotypes_num - parent_genotypes_num
+  cbind.data.frame(parent,parent_genotypes = paste0(parent_genotypes,collapse=";"),parent_genotypes_num,evolved_genotypes = paste0(evolved_genotypes,collapse=";"),evolved_genotypes_num,genotype_ct_diff,parent_genotypes_unique,evolved_genotypes_unique)
+}) %>% do.call(rbind,.) #%>% favorite_kable()
+gene_diffs$both_hybrid <- T
+``` 
+
+## Copy change in genes (per amrfinder)
+```{r}
+copy_change <- lapply(pairs,FUN=function(x){ 
+  # Plasmid
+  amrfinder_sub <- subset(amrfinder,parent==x)
+  parent = x
+  parent_genotypes <- subset(amrfinder_sub,isolate_no==x) %>% select(element_symbol_renamed) %>% unlist   %>% sort 
+  parent_genotypes_ct <- table(parent_genotypes)
+  evolved_genotypes <- subset(amrfinder_sub,isolate_no!=x) %>% select(element_symbol_renamed) %>% unlist   %>% sort 
+  evolved_genotypes_ct <- table(evolved_genotypes)
+  shared_genotypes <- unique(c(parent_genotypes,evolved_genotypes)  )
+  # Differences in count from parent vs genotype
+  genotype_diffs <- lapply(shared_genotypes,FUN=function(geno){  
+    parent_count <- subset(parent_genotypes_ct,names(parent_genotypes_ct)==geno) %>% {ifelse(is_empty(.),0,.)}
+    evolved_count <- subset(evolved_genotypes_ct,names(evolved_genotypes_ct)==geno)%>% {ifelse(is_empty(.),0,.)}
+    geno_ct_difference <- evolved_count - parent_count
+    genotype_event <- ifelse(parent_count==0 & evolved_count>0,"novel_genotype",
+                   ifelse(parent_count>0 & evolved_count<=0,"lost_genotype",
+                          ifelse(parent_count>evolved_count,"lost_copy",
+                                 ifelse(parent_count<evolved_count,"gain_copy","no_change"))))
+    cbind.data.frame(genotype = geno,parent_count,evolved_count,geno_ct_difference,genotype_event)
+  }) %>% do.call(rbind,.)
+  lost_genotype <-genotype_diffs %>% subset(genotype_event == "lost_genotype") %>% .$genotype %>% paste0(collapse=";")
+  lost_copy <-genotype_diffs %>% subset(genotype_event == "lost_copy") %>% .$genotype %>% paste0(collapse=";")
+  gain_copy <-genotype_diffs %>% subset(genotype_event == "gain_copy") %>% .$genotype %>% paste0(collapse=";")
+  novel_genotype <-genotype_diffs %>% subset(genotype_event == "novel_genotype") %>% .$genotype %>% paste0(collapse=";")
+  cbind.data.frame(parent,lost_genotype,lost_copy,gain_copy,novel_genotype)
+}) %>% do.call(rbind,.) #%>% favorite_kable()
+copy_change$both_hybrid <- T
+```
+
+# Analysis for PCMP_H318 (hybrid evolved, )
+```{r}
+amrfinder_sr <- readRDS("./data/evolution_experiment/amrfinder_evolved_short/amrfinder_curated_short.RDS")
+amrfinder_sr$parent <- gsub("_MVB_R","",amrfinder_sr$isolate_no) 
+```
+
+```{r}
+get_amrfinder_gene_diff_data <- function(parent_name,parent_short,evolved,evolved_short,amrfinder_short,amrfinder_hybrid){
+  parent = parent_name
+  if(parent_short ==T){
+    parent_amrfinder <- subset(amrfinder_short,isolate_no == parent_name) 
+  } else {
+    parent_amrfinder <- subset(amrfinder_hybrid,isolate_no == parent_name) 
+  }
+  
+  if(evolved_short == T){
+     evolved_amrfinder <- subset(amrfinder_short,isolate_no == evolved) 
+  } else {
+    evolved_amrfinder <- subset(amrfinder_hybrid,isolate_no == evolved) 
+  }
+  
+  parent_genotypes <- parent_amrfinder %>% select(element_symbol_renamed) %>% unlist   %>% sort %>% unique
+  parent_genotypes_num <- n_distinct(parent_genotypes) 
+  evolved_genotypes <- evolved_amrfinder %>% select(element_symbol_renamed) %>% unlist   %>% sort%>% unique
+  evolved_genotypes_num <- n_distinct(evolved_genotypes) 
+  parent_genotypes_unique <- subset(parent_genotypes,!parent_genotypes %in% evolved_genotypes) %>% unique %>% sort %>% paste0(collapse=";")
+  evolved_genotypes_unique <- subset(evolved_genotypes,!evolved_genotypes %in% parent_genotypes) %>% unique %>% sort %>% paste0(collapse=";")
+  genotype_ct_diff <- evolved_genotypes_num - parent_genotypes_num
+  cbind.data.frame(parent,parent_genotypes = paste0(parent_genotypes,collapse=";"),parent_genotypes_num,evolved_genotypes = paste0(evolved_genotypes,collapse=";"),evolved_genotypes_num,genotype_ct_diff,parent_genotypes_unique,evolved_genotypes_unique)
+  
+}
+```
+
+## PCMP_H261
+
+```{r}
+PCMP_H261 <- get_amrfinder_gene_diff_data(parent_name =  "PCMP_H261",parent_short = T,evolved = "PCMP_H261_MVB_R",evolved_short = T ,amrfinder_short = amrfinder_sr,amrfinder_hybrid =amrfinder)
+PCMP_H261$both_hybrid <- F
+```
+
+## PCMP_H318
+
+```{r}
+PCMP_H318 <- get_amrfinder_gene_diff_data(parent_name =  "PCMP_H318",parent_short = T,evolved = "PCMP_H318_MVB_R",evolved_short = F ,amrfinder_short = amrfinder_sr,amrfinder_hybrid =amrfinder)
+PCMP_H318$both_hybrid <- F
+```
+
+```{r}
+gene_diff_tbl <- rbind(gene_diffs,PCMP_H261) %>%  rbind(.,PCMP_H318) 
+gene_diff_tbl <- gene_diff_tbl %>% arrange(parent)
+gene_diff_tbl%>% favorite_kable()
+```
+
+
+# Now, let's look at copy
+```{r}
+get_amrfinder_gene_diff_ct <- function(parent_name,parent_short,evolved,evolved_short,amrfinder_short,amrfinder_hybrid){
+  parent = parent_name
+  if(parent_short ==T){
+    parent_amrfinder <- subset(amrfinder_short,isolate_no == parent_name) 
+  } else {
+    parent_amrfinder <- subset(amrfinder_hybrid,isolate_no == parent_name) 
+  }
+  
+  if(evolved_short == T){
+     evolved_amrfinder <- subset(amrfinder_short,isolate_no == evolved) 
+  } else {
+    evolved_amrfinder <- subset(amrfinder_hybrid,isolate_no == evolved) 
+  }
+  
+  
+  parent_genotypes <- parent_amrfinder %>% select(element_symbol_renamed) %>% unlist   %>% sort  
+  parent_genotypes_ct <- table(parent_genotypes) 
+  evolved_genotypes <- evolved_amrfinder %>% select(element_symbol_renamed) %>% unlist   %>% sort 
+  evolved_genotypes_ct <- table(evolved_genotypes) 
+  
+  shared_genotypes <- unique(c(parent_genotypes,evolved_genotypes)  )
+  # Differences in count from parent vs genotype
+  genotype_diffs <- lapply(shared_genotypes,FUN=function(geno){  
+    parent_count <- subset(parent_genotypes_ct,names(parent_genotypes_ct)==geno) %>% {ifelse(is_empty(.),0,.)}
+    evolved_count <- subset(evolved_genotypes_ct,names(evolved_genotypes_ct)==geno)%>% {ifelse(is_empty(.),0,.)}
+    geno_ct_difference <- evolved_count - parent_count
+    genotype_event <- ifelse(parent_count==0 & evolved_count>0,"novel_genotype",
+                   ifelse(parent_count>0 & evolved_count<=0,"lost_genotype",
+                          ifelse(parent_count>evolved_count,"lost_copy",
+                                 ifelse(parent_count<evolved_count,"gain_copy","no_change"))))
+    cbind.data.frame(genotype = geno,parent_count,evolved_count,geno_ct_difference,genotype_event)
+  }) %>% do.call(rbind,.)
+  lost_genotype <-genotype_diffs %>% subset(genotype_event == "lost_genotype") %>% .$genotype %>% paste0(collapse=";")
+  lost_copy <-genotype_diffs %>% subset(genotype_event == "lost_copy") %>% .$genotype %>% paste0(collapse=";")
+  gain_copy <-genotype_diffs %>% subset(genotype_event == "gain_copy") %>% .$genotype %>% paste0(collapse=";")
+  novel_genotype <-genotype_diffs %>% subset(genotype_event == "novel_genotype") %>% .$genotype %>% paste0(collapse=";")
+  cbind.data.frame(parent,lost_genotype,lost_copy,gain_copy,novel_genotype)
+  
+}  
+```
+
+
+## PCMP_H261
+
+```{r}
+PCMP_H261_c <- get_amrfinder_gene_diff_ct(parent_name =  "PCMP_H261",parent_short = T,evolved = "PCMP_H261_MVB_R",evolved_short = T ,amrfinder_short = amrfinder_sr,amrfinder_hybrid =amrfinder)
+
+PCMP_H261_c$both_hybrid <- F
+```
+
+## PCMP_H318
+
+```{r}
+PCMP_H318_c <- get_amrfinder_gene_diff_ct(parent_name =  "PCMP_H318",parent_short = T,evolved = "PCMP_H318_MVB_R",evolved_short = F ,amrfinder_short = amrfinder_sr,amrfinder_hybrid =amrfinder)
+
+PCMP_H318_c$both_hybrid <- F
+```
+
+```{r}
+gene_copy_change_tbl <- rbind(copy_change,PCMP_H261_c) %>%  rbind(.,PCMP_H318_c)  
+
+gene_copy_change_tbl <- gene_copy_change_tbl %>% arrange(parent)
+gene_copy_change_tbl%>% favorite_kable()
+```

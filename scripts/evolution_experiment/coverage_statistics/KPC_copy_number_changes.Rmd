@@ -1,0 +1,230 @@
+---
+title: "Comparison of coverage across parent and evolved genomes"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse",'vroom')
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T)) 
+```
+
+# Long read 
+## Data
+```{r}
+sr_data <- read.delim("/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt",header = F) %>% unlist
+parents <- unique(sr_data %>% gsub("_MVB_R","",.) %>% gsub("PCMP_H019","PCMP_H19",.)) %>% sort 
+amrfinder_lr <- readRDS("/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/amrfinder_evolved/amrfinder_hybrid_curated.RDS")
+mobcontigs_lr <- read_delim("/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/mobsuite_evolved/mobsuite_contig_report_evolved.txt")
+mobcontigs_lr$isolate_no <- mobcontigs_lr$sample_id %>% gsub("_flye_medaka_polypolish","",.)%>% gsub("H019","H19",.)
+mobcontigs_lr$contig_id_renamed <- gsub(" polypolish","",mobcontigs_lr$contig_id)
+```
+
+## Script
+```{r}
+get_copy_data <- function(parent,evolved,base_path,amrfinder_data,mobsuite_data){
+  parent_cov <- vroom::vroom(paste0(base_path,parent,"/gatk/",parent,"_summary"), num_threads=10)
+  parent_cov$contig <- str_split(string = parent_cov$Locus,":",simplify = T) %>% .[,1] 
+  evolved_cov <- vroom::vroom(paste0(base_path,evolved,"/gatk/",evolved,"_summary"), num_threads=10)
+  evolved_cov$contig <- str_split(string = evolved_cov$Locus,":",simplify = T) %>% .[,1] 
+  
+  isolate_kpc_gene <- amrfinder_data %>% subset(isolate_no == parent & grepl(pattern = "blaKPC",element_symbol))  
+  kpc_start <- isolate_kpc_gene$start
+  kpc_end <- isolate_kpc_gene$stop
+  kpc_contig <- isolate_kpc_gene$contig_id %>% unique
+  kpc_plasmid <- subset(mobsuite_data,isolate_no == parent & contig_id_renamed == kpc_contig) %>% .$primary_cluster_id  %>% unique
+  kpc_plasmid_contigs <- subset(mobsuite_data,isolate_no == parent & primary_cluster_id %in% kpc_plasmid) %>% .$contig_id_renamed  %>% unique
+  chromosome <- names(table(parent_cov$contig) %>% subset(.==max(.)))
+  
+  region <- paste0(kpc_contig,":",kpc_start:kpc_end)
+  
+  #Parent
+  ## Chromsome
+  parent_cov_chromosome <- subset(parent_cov,contig %in% chromosome)
+  parent_cov_chromosome_median <- median(parent_cov_chromosome$Total_Depth)
+  ## Plasmid
+  parent_cov_kpc_plasmid <- subset(parent_cov,contig %in% kpc_plasmid_contigs)
+  parent_cov_kpc_plasmid_median <- median(parent_cov_kpc_plasmid$Total_Depth)
+  ## KPC
+  parent_cov_kpc_sub <- subset(parent_cov,Locus %in% region)
+  parent_cov_kpc_median <- median(parent_cov_kpc_sub$Total_Depth)
+  ## Normalize
+  parent_kpc_chr_norm <-  parent_cov_kpc_median / parent_cov_chromosome_median
+  parent_kpc_plasmid_norm <-  parent_cov_kpc_median / parent_cov_kpc_plasmid_median
+  parent_kpc_plasmid_chr_norm <- parent_cov_kpc_plasmid_median / parent_cov_chromosome_median
+  
+  # Evolved
+  ## Chromosome
+  evol_cov_chromosome <- subset(evolved_cov,contig %in% chromosome)
+  evol_cov_chromosome_median <- median(evol_cov_chromosome$Total_Depth)
+  ## KPC plasmid
+  evol_cov_kpc_plasmid <- subset(evolved_cov,contig %in% kpc_plasmid_contigs)
+  evol_cov_kpc_plasmid_median <- median(evol_cov_kpc_plasmid$Total_Depth)
+  ## KPC
+  evol_cov_kpc_sub <- subset(evolved_cov,Locus %in% region)
+  evol_cov_kpc_median <- median(evol_cov_kpc_sub$Total_Depth)
+  ## Normalize
+  evol_kpc_chr_norm <-  evol_cov_kpc_median / evol_cov_chromosome_median
+  evol_kpc_plasmid_norm <-  evol_cov_kpc_median / evol_cov_kpc_plasmid_median
+  evol_kpc_plasmid_chr_norm <- evol_cov_kpc_plasmid_median / evol_cov_chromosome_median
+ 
+  # Comparisons
+  kpc_copy_change <- evol_kpc_chr_norm / parent_kpc_chr_norm
+  kpc_plasmid_change <- evol_kpc_plasmid_chr_norm / parent_kpc_plasmid_chr_norm
+  
+  cbind.data.frame(parent,kpc_gene = isolate_kpc_gene$element_symbol,kpc_contig=kpc_contig,kpc_plasmid ,
+                   
+                   parent_cov_chromosome_median,parent_cov_kpc_plasmid_median,parent_cov_kpc_median,
+             parent_kpc_chr_norm,  parent_kpc_plasmid_norm,parent_kpc_plasmid_chr_norm ,
+             evol_cov_chromosome_median,evol_cov_kpc_plasmid_median,evol_cov_kpc_median,
+             evol_kpc_chr_norm,evol_kpc_plasmid_norm,evol_kpc_plasmid_chr_norm,
+             kpc_copy_change,kpc_plasmid_change)
+}
+```
+
+## Results for LR Parents 
+
+### PCMP_H116
+```{r}
+PCMP_H116_coverage_stats <- get_copy_data(parent = "PCMP_H116",evolved = "PCMP_H116_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H116/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H116_coverage_stats$assembly <- "hybrid"
+```
+
+### PCMP_H19
+```{r}
+PCMP_H19_coverage_stats <- get_copy_data(parent = "PCMP_H19",evolved = "PCMP_H019_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H19/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H19_coverage_stats$assembly <- "hybrid"
+```
+
+### PCMP_H226
+```{r}
+PCMP_H226_coverage_stats <- get_copy_data(parent = "PCMP_H226",evolved = "PCMP_H226_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H226/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H226_coverage_stats$assembly <- "hybrid"
+```
+
+### PCMP_H323
+```{r}
+PCMP_H323_coverage_stats <- get_copy_data(parent = "PCMP_H323",evolved = "PCMP_H323_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H323/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+
+PCMP_H323_coverage_stats$assembly <- "hybrid"
+```
+
+### PCMP_H414
+```{r}
+PCMP_H414_coverage_stats <- get_copy_data(parent = "PCMP_H414",evolved = "PCMP_H414_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H414/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+
+PCMP_H414_coverage_stats$assembly <- "hybrid"
+```
+
+### PCMP_H464
+```{r}
+PCMP_H464_coverage_stats <- get_copy_data(parent = "PCMP_H464",evolved = "PCMP_H464_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H464/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+
+PCMP_H464_coverage_stats$assembly <- "hybrid"
+```
+
+# Short read
+## Data
+```{r}
+mobsuite_contigs_sr <- read_delim("./data/evolution_experiment/mobsuite_short/mobsuite_contig_report_evolved_short.txt")
+mobsuite_contigs_sr$isolate_no <- gsub("_flye_medaka_polypolish","",mobsuite_contigs_sr$sample_id) %>% str_split(.,":",simplify=T) %>% .[,1] %>% gsub("PCMP_H019_MVB_R","PCMP_H19_MVB_R",.)%>% gsub("_contigs_l1000","",.)
+mobsuite_contigs_sr$parent <- gsub("_MVB_R","",mobsuite_contigs_sr$isolate_no) 
+mobsuite_contigs_sr$contig_id_renamed <- gsub(" polypolish","",mobsuite_contigs_sr$contig_id)
+```
+
+## Scripts
+```{r}
+get_copy_data_sr <- function(parent,evolved,base_path,mobsuite_data){
+  parent_cov <- vroom::vroom(paste0(base_path,parent,"/gatk/",parent,"_summary"), num_threads=10)
+  parent_cov$contig <- str_split(string = parent_cov$Locus,":",simplify = T) %>% .[,1] 
+  evolved_cov <- vroom::vroom(paste0(base_path,evolved,"/gatk/",evolved,"_summary"), num_threads=10)
+  evolved_cov$contig <- str_split(string = evolved_cov$Locus,":",simplify = T) %>% .[,1] 
+  
+  # Amrfinder dat
+  amrfinder_report <- read_delim(paste0("./data/evolution_experiment/amrfinder_evolved_short/",parent,"_amrfinder_sr.out"))
+  amrfinder_report_kpc <- amrfinder_report %>% subset(grepl("blaKPC",`Element symbol`))
+  kpc_start <- amrfinder_report_kpc$Start
+  kpc_end <- amrfinder_report_kpc$Stop
+  kpc_contig <- amrfinder_report_kpc$`Contig id`
+  region <- paste0(kpc_contig,":",kpc_start:kpc_end)
+  
+  # Get choromsome and plasmid data from mobsuite
+  mobsuite_contigs_sub <- subset(mobsuite_data,isolate_no==parent) 
+  mobsuite_contigs_chromosome_contigs <- subset(mobsuite_contigs_sub,molecule_type=="chromosome") %>% .$contig_id
+  mobsuite_contigs_kpc_plasmid <- subset(mobsuite_contigs_sub,contig_id %in% amrfinder_report_kpc$`Contig id`) %>% .$primary_cluster_id %>% unique
+  mobsuite_contigs_plasmid_contigs <- subset(mobsuite_contigs_sub,primary_cluster_id==mobsuite_contigs_kpc_plasmid) %>% .$contig_id
+  
+  #Parent
+  ## Chromsome
+  parent_cov_chromosome <- subset(parent_cov,contig %in% mobsuite_contigs_chromosome_contigs)
+  parent_cov_chromosome_median <- median(parent_cov_chromosome$Total_Depth)
+  ## Plasmid
+  parent_cov_kpc_plasmid <- subset(parent_cov,contig %in% mobsuite_contigs_plasmid_contigs)
+  parent_cov_kpc_plasmid_median <- median(parent_cov_kpc_plasmid$Total_Depth)
+  ## KPC
+  parent_cov_kpc_sub <- subset(parent_cov,Locus %in% region)
+  parent_cov_kpc_median <- median(parent_cov_kpc_sub$Total_Depth)
+  ## Normalize
+  parent_kpc_chr_norm <-  parent_cov_kpc_median / parent_cov_chromosome_median
+  parent_kpc_plasmid_norm <-  parent_cov_kpc_median / parent_cov_kpc_plasmid_median
+  parent_kpc_plasmid_chr_norm <- parent_cov_kpc_plasmid_median / parent_cov_chromosome_median
+  
+  # Evolved
+  ## Chromosome
+  evol_cov_chromosome <- subset(evolved_cov,contig %in% mobsuite_contigs_chromosome_contigs)
+  evol_cov_chromosome_median <- median(evol_cov_chromosome$Total_Depth)
+  ## KPC plasmid
+  evol_cov_kpc_plasmid <- subset(evolved_cov,contig %in% mobsuite_contigs_plasmid_contigs)
+  evol_cov_kpc_plasmid_median <- median(evol_cov_kpc_plasmid$Total_Depth)
+  ## KPC
+  evol_cov_kpc_sub <- subset(evolved_cov,Locus %in% region)
+  evol_cov_kpc_median <- median(evol_cov_kpc_sub$Total_Depth)
+  ## Normalize
+  evol_kpc_chr_norm <-  evol_cov_kpc_median / evol_cov_chromosome_median
+  evol_kpc_plasmid_norm <-  evol_cov_kpc_median / evol_cov_kpc_plasmid_median
+  evol_kpc_plasmid_chr_norm <- evol_cov_kpc_plasmid_median / evol_cov_chromosome_median
+ 
+  # Comparisons
+  kpc_copy_change <- evol_kpc_chr_norm / parent_kpc_chr_norm
+  kpc_plasmid_change <- evol_kpc_plasmid_chr_norm / parent_kpc_plasmid_chr_norm
+  
+  cbind.data.frame(parent,kpc_gene = amrfinder_report_kpc$`Element symbol`,kpc_contig=kpc_contig,kpc_plasmid=mobsuite_contigs_kpc_plasmid,
+                   parent_cov_chromosome_median,parent_cov_kpc_plasmid_median,parent_cov_kpc_median,
+             parent_kpc_chr_norm,  parent_kpc_plasmid_norm,parent_kpc_plasmid_chr_norm ,
+             evol_cov_chromosome_median,evol_cov_kpc_plasmid_median,evol_cov_kpc_median,
+             evol_kpc_chr_norm,evol_kpc_plasmid_norm,evol_kpc_plasmid_chr_norm,
+             kpc_copy_change,kpc_plasmid_change)
+}
+```
+
+### PCMP_H261
+```{r}
+PCMP_H261_coverage_stats <- get_copy_data_sr(parent = "PCMP_H261",evolved = "PCMP_H261_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H261/',mobsuite_data = mobsuite_contigs_sr)
+PCMP_H261_coverage_stats$assembly <- "short"
+```
+
+### PCMP_H318
+```{r}
+PCMP_H318_coverage_stats <- get_copy_data_sr(parent = "PCMP_H318",evolved = "PCMP_H318_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H318/',mobsuite_data = mobsuite_contigs_sr)
+PCMP_H318_coverage_stats$assembly <- "short"
+```
+
+# Merged data
+
+```{r}
+coverage_stats <- rbind(PCMP_H116_coverage_stats,PCMP_H19_coverage_stats) %>% rbind(.,PCMP_H226_coverage_stats) %>% rbind(.,PCMP_H323_coverage_stats) %>% rbind(.,PCMP_H414_coverage_stats) %>% rbind(.,PCMP_H464_coverage_stats) %>% rbind(.,PCMP_H261_coverage_stats) %>% rbind(.,PCMP_H318_coverage_stats)
+saveRDS(coverage_stats,"/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS")
+
+coverage_stats 
+```

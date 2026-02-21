@@ -1,0 +1,37 @@
+---
+title: "KPC_copy_number_table_viz"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree','gontjesr')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+coverage_stats <- readRDS("./data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS")
+coverage_stats <- coverage_stats %>% arrange(parent) %>% distinct
+
+favorite_kable(coverage_stats)
+```
+

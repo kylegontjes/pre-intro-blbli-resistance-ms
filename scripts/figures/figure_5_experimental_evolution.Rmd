@@ -1,0 +1,149 @@
+---
+title: "Figure 5: Experimental evolution of meropenem-vaborbactam resistance"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext","grid",'ComplexHeatmap')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+```
+
+# Load data
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+
+# Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+df <- left_join(df,canonical)
+
+# tn4401 data
+tn4401 <- readRDS("./data/TETyper/TETyper_curated.RDS")  
+df <- left_join(df,tn4401)
+
+# load the kleborate
+kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame
+df <- left_join(df,kleborate) 
+
+# KPC Plasmids 
+KPC_info_plasmids <- readRDS("./data/KPC_plasmid/KPC_containing_plasmids_mat.RDS") %>% as.data.frame
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters)
+Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))  
+df$KPC_plasmid <- lapply(df$isolate_no,FUN=function(x){
+  KPC_containing_clusters[rownames(KPC_containing_clusters) == x,] %>% select_if(colSums(.)>0) %>% colnames() %>% {ifelse(length(.)==0,"None",paste0(.,collapse=" + "))}})  %>% unlist
+```
+
+## MVB experiment
+```{r}
+MVB_evolution_data <- read_csv("./data/evolution_experiment/curated_MVB_evolution_experiment_data.csv")
+```
+# Create annotated evolution dataset
+```{r}
+  MVB_evolution_data <- MVB_evolution_data %>% left_join(.,df %>% select(isolate_no,MVB,clade_I,PBP_any,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_truncation_kleborate,OmpK36_non_syn,OmpK36_promoter_IS,tn4401_allele,KPC_present,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC))
+MVB_evolution_data$category <- MVB_evolution_data %>% select(clade_I,KPC_type,OmpK36_L3_mutations,AA018_KPC,AA552_non_KPC) %>% apply(.,1,FUN=function(x){paste0(c(x["clade_I"],x["KPC_type"],names(x %>% subset(. %in% c(1)))),collapse=" + ")}) %>% gsub("OmpK36_L3_mutations",'Loop 3 insertion',.) %>% gsub("AA552_non_KPC","AA552 non-KPC plasmid",.) %>% gsub("AA018_KPC","AA018 KPC plasmid",.)  %>% gsub("+ No KPC +","",.) %>% gsub("\\+\\+","\\+",.)
+MVB_evolution_data$category_simple <- ifelse(MVB_evolution_data$clade_I == "Clade II","Clade II without ompK36 mutation",ifelse(MVB_evolution_data$clade_I == "Clade I" & MVB_evolution_data$OmpK36_L3_mutations==1,"Clade I with Loop 3 insertion","Clade I without Loop 3 insertion" ))
+```
+
+
+# E = Isolate specific
+```{r}  
+MVB_evolution_data$category <- factor(MVB_evolution_data$category,levels = sort(MVB_evolution_data$category) %>% unique())
+MVB_evolution_data <- MVB_evolution_data %>% arrange(clade_I,category) 
+MVB_evolution_data$isolate_no <- factor(MVB_evolution_data$isolate_no,levels = MVB_evolution_data$isolate_no %>% unique) 
+MVB_evolution_data$plasmid_type <- ifelse(MVB_evolution_data$AA018_KPC==1 & MVB_evolution_data$AA552_non_KPC==1, "AA018 with blaKPC + AA552 without blaKPC",
+                                          ifelse(MVB_evolution_data$AA018_KPC==1 ,"AA018 with blaKPC",ifelse(MVB_evolution_data$AA552_non_KPC==1,"AA552 without blaKPC","Other blaKPC plasmid")))
+
+categories <- c("#7684C0","maroon","lightgray",'black')
+
+A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + scale_color_manual(values = categories,name = "Plasmid type",guide=guide_legend(ncol=1)) + scale_fill_manual(values = c("#FC4E07","pink","blue"),guide= guide_legend(ncol=1),name = "Porin") + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
+    scale_x_log10(
+        limits = c(5e-13, 2e-6),
+        breaks = c(1e-12, 1e-10, 1e-8,1e-6)
+    )  + scale_color_manual(breaks = c(T,F),values = c("black","#A9A9A9"),labels = c("Over","Under"),name = "Limit of detection",guide=guide_legend(ncol=1)) + theme(legend.position='bottom',legend.title.position = 'top',axis.text.x = element_text(size=12),legend.title = element_text(size=12),legend.text = element_text(size=10),axis.text.y = element_text(size=14),axis.title.x = element_text(size=14))
+A
+```
+
+# Isolate info
+
+```{r}
+info_matrix <- MVB_evolution_data %>% select(isolate_no,clade_I,OmpK36GD,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC) %>% distinct %>% arrange(rev(isolate_no)) 
+info_matrix <- info_matrix %>% mutate(clade_I = recode(clade_I,"Clade I" = "I",
+                              "Clade II" = "II"),
+                              OmpK36GD = recode(OmpK36GD,`0`='',
+                                                `1`="Present"),
+                              AA018_KPC = recode(AA018_KPC,`0`='',
+                                                `1`="Present"),
+                              AA552_non_KPC = recode(AA552_non_KPC,`0`='',
+                                                `1`="Present")) 
+colnames(info_matrix) <- c("Isolate","Clade","GD insertion\nin ompK36","blaKPC\nallele","blaKPC\nplasmid","AA018 blaKPC\nplasmid","AA552 non-blaKPC\nplasmid")
+
+mytheme <- ttheme_minimal(core = list(fg_params = list(hjust=0, vjust = 0.5 ,x=0.1, fontsize=8.75),padding = unit(c(4.75, 2.5), "mm")),
+                          colhead = list(fg_params = list(hjust=0, vjust = 0.5, x=0.1, fontsize=8.75, fontface="bold"),padding = unit(c(2.5, 2.5), "mm")),
+                          rowhead=list(fg_params=list(hjust=0, x=0)))
+
+
+B <- cowplot::plot_grid(tableGrob(info_matrix,rows = NULL,theme=mytheme)) 
+```
+
+# Binary heatmap
+```{r}
+info_matrix_bin <- MVB_evolution_data %>% select(isolate_no,clade_I,OmpK36GD,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC) %>% distinct %>% arrange(rev(isolate_no)) 
+info_matrix_bin$clade_I_bin <- ifelse(info_matrix_bin$clade_I=="Clade I",1,0)
+info_matrix_bin$clade_I_bin <- ifelse(info_matrix_bin$clade_I=="Clade I",1,0)
+info_matrix_bin$KPC3 <- ifelse(info_matrix_bin$KPC_type=="KPC-3",1,0)
+info_matrix_bin$KPC2 <- ifelse(info_matrix_bin$KPC_type=="KPC-2",1,0)
+info_matrix_bin$AA018 <- ifelse(info_matrix_bin$KPC_plasmid=="AA018_KPC",1,0)
+info_matrix_bin$AA275 <- ifelse(info_matrix_bin$KPC_plasmid=="AA275_KPC",1,0) 
+info_matrix_bin$Other_KPC <- ifelse(info_matrix_bin$KPC_plasmid %in% c('AA356_KPC','AD548_KPC','AA274_KPC','AA357_KPC',"AA275_KPC"),1,0) 
+ 
+
+info_matrix_bin_mat <- info_matrix_bin %>% select(isolate_no,clade_I_bin,KPC2,OmpK36GD,AA018,AA552_non_KPC,Other_KPC,KPC3)
+info_matrix_bin_mat <- as.data.frame(info_matrix_bin_mat)
+rownames(info_matrix_bin_mat) <- info_matrix_bin_mat$isolate_no
+info_matrix_bin_mat <- info_matrix_bin_mat %>% select(-isolate_no)
+colnames(info_matrix_bin_mat) <- c("Clade I","blaKPC-2","GD insertion in ompK36","AA018 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmid","blaKPC-3")
+matrix_viz <- ComplexHeatmap::Heatmap(info_matrix_bin_mat,cluster_rows = F,cluster_columns = F,col = c(`1`='black',`0`='white'),column_names_side ='bottom',show_row_names = T,row_names_side = 'left',
+        heatmap_legend_param = list(
+            title = "Presence",      
+            at = c(1, 0),            
+            labels = c("Yes", "No")  
+        ),height = unit(11.5,"cm"),
+        rect_gp = gpar(col = NA))
+
+p2 = grid.grabExpr(draw(matrix_viz))
+```
+
+
+# Combined
+
+```{r,fig.width=10.5,fig.height=5.25}
+A + theme(legend.position = 'right')
+```
+
+```{r,fig.width=11,fig.height=7.33}
+A_fig <-  cowplot::plot_grid(NULL,A + theme(axis.ticks.y = element_blank(),axis.text.y = element_text(size=0)),NULL,ncol=1,rel_heights = c(0.03,1,0.055))
+B <- cowplot::plot_grid(p2,NULL,ncol=1,rel_heights = c(1,0.025))
+figure <- cowplot::plot_grid(A_fig,B,ncol=2,labels = c("",""),rel_widths = c(1,0.475))
+figure
+```
+
+# Save figure
+```{r}
+ggsave("./figures/figure_5_experimental_evolution.png",figure,dpi=900,width=11,height=7.33,bg='white')
+```

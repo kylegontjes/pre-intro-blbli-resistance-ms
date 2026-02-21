@@ -1,0 +1,179 @@
+---
+title: "evolved_kleborate_differences"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+```
+
+# Kleborate
+```{r}
+kleborate_hybrid <- read_delim("./data/kleborate_hybrid/klebsiella_pneumo_complex_output.txt")
+kleborate_hybrid$isolate_no <- gsub("_flye_medaka_polypolish","",kleborate_hybrid$strain)  %>% gsub("PCMP_H019","PCMP_H19",.)
+kleborate_hybrid$parent <- gsub("_MVB_R","",kleborate_hybrid$isolate_no)
+kleborate_hybrid$type <- "hybrid"
+
+kleborate_short <- read_delim("./data/evolution_experiment/kleborate_short/klebsiella_pneumo_complex_output.txt")
+kleborate_short$isolate_no <- gsub("_contigs_l1000","",kleborate_short$strain)  %>% gsub("PCMP_H019","PCMP_H19",.)
+kleborate_short$parent <- gsub("_MVB_R","",kleborate_short$isolate_no)
+kleborate_short$type <- "short"
+
+parents <- unique(kleborate_short$parent ) %>% sort
+```
+
+# Get prefered entry
+```{r}
+isolates <- c(kleborate_short$isolate_no) %>% sort
+
+kleborate_type_data <- lapply(isolates,FUN=function(x){
+  hybrid <- subset(kleborate_hybrid,isolate_no ==x) 
+  in_hybrid <- nrow(hybrid) >0
+  if(in_hybrid){
+    hybrid
+  } else {
+    subset(kleborate_short,isolate_no ==x)
+  }
+  
+}) %>% do.call(rbind,.)
+```
+
+
+# Genome data
+```{r} 
+genome_data <- lapply(parents,FUN=function(x){
+  # Plasmid
+  kleborate_data <- subset(kleborate_type_data,parent==x)
+  parent = x
+  parent_data <- subset(kleborate_data,isolate_no==x) %>% select(total_size,contig_count,largest_contig) %>% `colnames<-`(paste0("parent_",colnames(.)))
+  evolved_data <- subset(kleborate_data,isolate_no!=x) %>% select(total_size,contig_count,largest_contig) %>% `colnames<-`(paste0("evolved_",colnames(.)))
+  merged_assembly_stats <- cbind.data.frame(parent,parent_data,evolved_data)
+  merged_assembly_stats$total_size_diff <- merged_assembly_stats$evolved_total_size - merged_assembly_stats$parent_total_size
+  merged_assembly_stats$largest_contig_size_diff <- merged_assembly_stats$evolved_largest_contig - merged_assembly_stats$parent_largest_contig
+  merged_assembly_stats$contig_count_diff <- merged_assembly_stats$evolved_contig_count - merged_assembly_stats$parent_contig_count
+  merged_assembly_stats
+}) %>% do.call(rbind,.)  
+
+genome_data <- genome_data %>% arrange(parent)
+
+favorite_kable(genome_data)
+```
+
+# K and O locus
+## No change
+```{r}
+klocus <- lapply(parents,FUN=function(x){
+  # Plasmid
+  kleborate_data <- subset(kleborate_type_data,parent==x)
+  parent = x
+  parent_data <- subset(kleborate_data,isolate_no==x) %>% select(K_locus,K_type,K_locus_confidence,K_locus_problems,K_locus_identity,K_Missing_expected_genes,O_locus,O_type, O_locus_confidence,O_locus_problems,O_locus_identity,O_Missing_expected_genes) %>% `colnames<-`(paste0("parent_",colnames(.)))
+  evolved_data <- subset(kleborate_data,isolate_no!=x) %>% select(K_locus,K_type,K_locus_confidence,K_locus_problems,K_locus_identity,K_Missing_expected_genes,O_locus,O_type, O_locus_confidence,O_locus_problems,O_locus_identity,O_Missing_expected_genes) %>% `colnames<-`(paste0("evolved_",colnames(.)))
+  merged_assembly_stats <- cbind.data.frame(parent,parent_data,evolved_data) 
+  merged_assembly_stats$different_K_locus <- merged_assembly_stats$parent_K_locus != merged_assembly_stats$evolved_K_locus
+  merged_assembly_stats$different_O_locus <- merged_assembly_stats$parent_O_locus != merged_assembly_stats$evolved_O_locus
+  merged_assembly_stats
+}) %>% do.call(rbind.data.frame,.) 
+
+klocus <- klocus %>% arrange(parent)
+
+favorite_kable(klocus)
+```
+
+# OmpK36
+## One genome had ompK36 loss truncation per Kleborate
+```{r}
+ompk36 <- lapply(parents,FUN=function(x){
+  # Plasmid
+  kleborate_data <- subset(kleborate_type_data,parent==x)
+  parent = x
+  parent_data <- subset(kleborate_data,isolate_no==x) %>% select(Omp_mutations) %>% `colnames<-`(paste0("parent_",colnames(.)))
+  parent_muts <- parent_data$parent_Omp_mutations %>% str_split(.,";") %>% unlist%>% unique
+  evolved_data <- subset(kleborate_data,isolate_no!=x) %>% select(Omp_mutations) %>% `colnames<-`(paste0("evolved_",colnames(.))) 
+  evolved_muts <- evolved_data$evolved_Omp_mutations %>% str_split(.,";") %>% unlist%>%  unique
+  
+  merged_assembly_stats <- cbind.data.frame(parent,parent_data,evolved_data) 
+  
+  merged_assembly_stats$parent_only <- subset(parent_muts,!parent_muts %in% evolved_muts) %>% {ifelse(is_empty(.),"",.)} %>% paste0(collapse=';')
+  merged_assembly_stats$evolved_only <- subset(evolved_muts,!evolved_muts %in% parent_muts) %>% {ifelse(is_empty(.),"",.)} %>% paste0(collapse=';')
+   
+  merged_assembly_stats$different_ompK36_mutations <- merged_assembly_stats$parent_Omp_mutations != merged_assembly_stats$evolved_Omp_mutations
+  
+  return(merged_assembly_stats)
+}) %>% do.call(rbind.data.frame,.) 
+
+ompk36 <- ompk36 %>% arrange(parent)
+
+favorite_kable(ompk36)
+``` 
+
+# Resistance gene data
+## Summary stats
+```{r}
+resistance_gene <- lapply(parents,FUN=function(x){
+  # Plasmid
+  kleborate_data <- subset(kleborate_type_data,parent==x)
+  parent = x
+  parent_data <- subset(kleborate_data,isolate_no==x) %>% select(resistance_score,num_resistance_classes,num_resistance_genes) %>% `colnames<-`(paste0("parent_",colnames(.)))
+  evolved_data <- subset(kleborate_data,isolate_no!=x) %>% select(resistance_score,num_resistance_classes,num_resistance_genes) %>% `colnames<-`(paste0("evolved_",colnames(.)))
+  merged_assembly_stats <- cbind.data.frame(parent,parent_data,evolved_data) 
+  merged_assembly_stats$different_resistance_score <- merged_assembly_stats$parent_resistance_score != merged_assembly_stats$evolved_resistance_score
+  merged_assembly_stats$different_resistance_class_ct <- merged_assembly_stats$parent_num_resistance_classes != merged_assembly_stats$evolved_num_resistance_classes
+  merged_assembly_stats$different_resistance_gene_ct <- merged_assembly_stats$parent_num_resistance_genes != merged_assembly_stats$evolved_num_resistance_genes
+  merged_assembly_stats
+}) %>% do.call(rbind.data.frame,.) 
+
+resistance_gene <- resistance_gene %>% arrange(parent)
+
+favorite_kable(resistance_gene)
+```
+
+## Different genes
+```{r}
+resistance_genotypes <- colnames(kleborate_hybrid) %>% .[74:97]
+diff_genes <- lapply(parents,FUN=function(x){
+  # Plasmid
+  kleborate_data <- subset(kleborate_type_data,parent==x)
+  parent = x
+  parent_data <- subset(kleborate_data,isolate_no==x) %>% select(any_of(resistance_genotypes)) %>% `colnames<-`(paste0("parent_",colnames(.)))
+  parent_genes <- unique(unlist(parent_data)) %>% subset(.!='-') %>% str_split(pattern = ";") %>% unlist %>% sort
+  evolved_data <- subset(kleborate_data,isolate_no!=x) %>% select(any_of(resistance_genotypes)) %>% `colnames<-`(paste0("evolved_",colnames(.)))
+  evolved_genes <- unique(unlist(evolved_data)) %>% subset(.!='-') %>% str_split(pattern = ";") %>% unlist %>% sort
+  parent_unique_genes <- parent_genes %>% subset(!. %in% evolved_genes) %>% paste0(collapse=";")
+  evolved_unique_genes <- evolved_genes %>% subset(!. %in% parent_genes) %>% paste0(collapse=";")
+  cbind.data.frame(parent,parent_genes = paste0(parent_genes,collapse=";"),
+                   evolved_genes = paste0(evolved_genes,collapse=";"),
+                   parent_unique_genes,
+                   evolved_unique_genes) 
+}) %>% do.call(rbind.data.frame,.) 
+
+diff_genes <- diff_genes %>% arrange(parent)
+
+favorite_kable(diff_genes)
+```
+ 

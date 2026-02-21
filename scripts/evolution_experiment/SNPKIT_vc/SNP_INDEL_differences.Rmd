@@ -1,0 +1,159 @@
+---
+title: "SNP_INDEL_differences"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','snitkitr','gontjesr')
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T))  
+
+# Set null device
+set_null_device("png")
+```
+```{r}
+return_grouped_matrix <- function(mat_list,annots_list){
+  merged_matrix <- bind_cols(lapply(mat_list,get)) %>% t %>% as.matrix()
+  merged_annots <-  bind_rows(lapply(annots_list,get))
+  merged_gene_list <- select(merged_annots,locus_tag) %>% as.vector() %>% unlist %>%  as.character()
+  merged_grouped_matrix <- prewas::collapse_snps_into_genes(merged_matrix,merged_gene_list) %>% t %>% as.data.frame
+  return(merged_grouped_matrix)
+}
+
+clean_snpkit_datasets <- function(variant_matrix){
+  #Add Rownames Because Column Row is The Variant Data
+  variant_matrix <- column_to_rownames(variant_matrix, var = colnames(variant_matrix[,1]))
+  #Update column names
+  colnames(variant_matrix) <- gsub('_R1.fastq.gz','',colnames(variant_matrix))
+  return(variant_matrix)
+}
+
+remove_rows_with_no_variants_in_subset <- function(parsed){
+  bin_mat <- parsed$bin$mat %>% subset(.,rowSums(.)>0) %>% t %>% as.data.frame
+  annots <- parsed$bin$annots %>% subset(.,raw_rownames %in% colnames(bin_mat)) %>% as.data.frame
+  list(bin = bin_mat,annots = annots)
+}
+remove_rows_with_no_variants_in_subset_unparsed <- function(matrix,annots){
+  bin_mat <- matrix %>% subset(.,rowSums(.)>0) %>% t %>% as.data.frame
+  annots <- annots %>% subset(.,raw_rownames %in% colnames(bin_mat)) %>% as.data.frame
+  list(bin = bin_mat,annots = annots)
+}
+
+clean_snpkit_output_SNP_evol <- function(code,allele,conf){
+  ## Change colnames so that subset it to the isolates in ST258
+  SNP_code_clean <- clean_snpkit_datasets(code)  
+  SNP_allele_clean <- clean_snpkit_datasets(allele) 
+  ## Parse annotations and keep variants with code 0,1, and -1 in code matrix
+  SNP_parsed <- parse_snps(SNP_code_clean,SNP_allele_clean,tree=NULL, og=NULL, remove_multi_annots = TRUE,ref_to_anc=FALSE,keep_conf_only = conf)
+  ## Remove variants that are not present in an isolate, subset annotation dataset, and format binary matrix for easy manipulation as heatmap or dataset
+  SNP_parsed_post_processing <- remove_rows_with_no_variants_in_subset(SNP_parsed)
+  return(SNP_parsed_post_processing)
+}
+
+clean_snpkit_output_INDEL_evol <- function(code,allele,conf){
+  # Change colnames so that subset it to the isolates in ST258
+  Indel_code <- clean_snpkit_datasets(code)  
+  Indel_allele <- clean_snpkit_datasets(allele) 
+  # Parse annotations and keep variants with code 0,1, and -1 in code matrix
+  Indel_parsed <- parse_indels(Indel_code,Indel_allele,tree=NULL, og=NULL, remove_multi_annots = TRUE, ref_to_anc=FALSE, keep_conf_only = conf)
+  # Remove variants that are not present in an isolate, subset annotation dataset, and format binary matrix for easy manipulation as heatmap or dataset
+  Indel_parsed_post_processing <- remove_rows_with_no_variants_in_subset(Indel_parsed)
+  return(Indel_parsed_post_processing)
+}
+``` 
+
+```{r}
+SNP_matrix_code <- data.table::fread("~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/SNP_matrix_code.tsv")
+SNP_matrix_allele <-data.table::fread("~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/SNP_matrix_allele_new.tsv")
+  
+INDEL_matrix_code <- data.table::fread("~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/Indel_matrix_code.tsv")
+INDEL_matrix_allele <-data.table::fread("~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/Indel_matrix_allele.tsv")
+
+
+## SNP parse
+SNP_parsed <- clean_snpkit_output_SNP_evol(SNP_matrix_code,SNP_matrix_allele,conf=F) 
+SNP_parsed_bin <- SNP_parsed$bin 
+rownames(SNP_parsed_bin) <- gsub("H019","H19",rownames(SNP_parsed_bin))
+
+saveRDS(SNP_parsed_bin,"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_parsed.RDS")
+
+## INDEL
+INDEL_parsed <- clean_snpkit_output_INDEL_evol(INDEL_matrix_code,INDEL_matrix_allele,conf=F) 
+INDEL_parsed_bin <- INDEL_parsed$bin 
+rownames(INDEL_parsed_bin) <- gsub("H019","H19",rownames(INDEL_parsed_bin))
+
+saveRDS(INDEL_parsed,"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_parsed.RDS")
+```
+
+```{r}
+kleborate_short <- read_delim("./data/evolution_experiment/kleborate_short/klebsiella_pneumo_complex_output.txt")
+kleborate_short$isolate_no <- gsub("_contigs_l1000","",kleborate_short$strain)  %>% gsub("PCMP_H019","PCMP_H19",.)
+kleborate_short$parent <- gsub("_MVB_R","",kleborate_short$isolate_no)
+kleborate_short$type <- "short"
+
+parents <- unique(kleborate_short$parent ) %>% sort
+```
+
+# SNP diffs
+```{r}
+lapply(parents,FUN=function(x){
+  parent <- SNP_parsed_bin[rownames(SNP_parsed_bin)==x,]
+  parent_SNPs <- parent %>% select_if(colSums(.)>0) %>% colnames()
+  evolved <-  SNP_parsed_bin[rownames(SNP_parsed_bin)==paste0(x,"_MVB_R"),]
+  evolved_SNPs <- evolved %>% select_if(colSums(.)>0) %>% colnames()
+  shared_SNPs <- intersect(parent_SNPs,evolved_SNPs)
+  shared_SNPs_num <- length(shared_SNPs)
+  shared_SNPs_str <- paste0(shared_SNPs,collapse=";")
+  
+  parent_unique_SNPs <- subset(parent_SNPs,!parent_SNPs %in% evolved_SNPs)  
+  parent_unique_num <- length(parent_unique_SNPs)
+  parent_unique_str <- paste0(parent_unique_SNPs,collapse=";")
+  
+  
+  evolved_unique_SNPs <- subset(evolved_SNPs,!evolved_SNPs %in% parent_SNPs)
+  evolved_unique_num <- length(evolved_unique_SNPs)
+  evolved_unique_str <- paste0(evolved_unique_SNPs,collapse=";")
+  
+  cbind.data.frame(parent = x,shared_SNPs_num,parent_unique_num,parent_unique_str,evolved_unique_num,evolved_unique_str)
+  
+  
+}) %>% do.call(rbind,.) %>% favorite_kable()
+```
+
+# INDEL diffs
+```{r}
+lapply(parents,FUN=function(x){
+  parent <- INDEL_parsed_bin[rownames(INDEL_parsed_bin)==x,]
+  parent_indels <- parent %>% select_if(colSums(.)>0) %>% colnames()
+  evolved <-  INDEL_parsed_bin[rownames(INDEL_parsed_bin)==paste0(x,"_MVB_R"),]
+  evolved_indels <- evolved %>% select_if(colSums(.)>0) %>% colnames()
+  shared_indels <- intersect(parent_indels,evolved_indels)
+  shared_indels_num <- length(shared_indels)
+  shared_indels_str <- paste0(shared_indels,collapse=";")
+  
+  parent_unique_indels <- subset(parent_indels,!parent_indels %in% evolved_indels)  
+  parent_unique_num <- length(parent_unique_indels)
+  parent_unique_str <- paste0(parent_unique_indels,collapse=";")
+  
+  
+  evolved_unique_indels <- subset(evolved_indels,!evolved_indels %in% parent_indels)
+  evolved_unique_num <- length(evolved_unique_indels)
+  evolved_unique_str <- paste0(evolved_unique_indels,collapse=";")
+  
+  cbind.data.frame(parent = x,shared_indels_num,parent_unique_num,parent_unique_str,evolved_unique_num,evolved_unique_str)
+  
+  
+}) %>% do.call(rbind,.) %>% favorite_kable()
+```
+ 

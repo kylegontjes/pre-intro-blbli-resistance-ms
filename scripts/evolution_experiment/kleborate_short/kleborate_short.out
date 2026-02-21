@@ -1,0 +1,18 @@
+Kleborate v3.1.3
+strain	species	N50	ST	virulence_score	resistance_score	num_resistance_classes	num_resistance_genes
+PCMP_H19_contigs_l1000	Klebsiella pneumoniae	248897	ST258	0	2	7	9
+PCMP_H019_MVB_R_contigs_l1000	Klebsiella pneumoniae	142824	ST258	0	2	8	10
+PCMP_H116_contigs_l1000	Klebsiella pneumoniae	209760	ST258	2	2	5	5
+PCMP_H116_MVB_R_contigs_l1000	Klebsiella pneumoniae	130592	ST258	2	2	4	4
+PCMP_H226_contigs_l1000	Klebsiella pneumoniae	203931	ST258	0	2	8	13
+PCMP_H226_MVB_R_contigs_l1000	Klebsiella pneumoniae	152302	ST258	0	2	8	14
+PCMP_H261_contigs_l1000	Klebsiella pneumoniae	269738	ST258	0	2	3	2
+PCMP_H261_MVB_R_contigs_l1000	Klebsiella pneumoniae	185082	ST258	0	2	4	3
+PCMP_H318_contigs_l1000	Klebsiella pneumoniae	270799	ST258	0	2	8	14
+PCMP_H318_MVB_R_contigs_l1000	Klebsiella pneumoniae	152613	ST258	0	2	8	14
+PCMP_H323_contigs_l1000	Klebsiella pneumoniae	270452	ST258	0	2	4	3
+PCMP_H323_MVB_R_contigs_l1000	Klebsiella pneumoniae	156706	ST258	0	2	4	3
+PCMP_H414_contigs_l1000	Klebsiella pneumoniae	182180	ST258	0	2	9	15
+PCMP_H414_MVB_R_contigs_l1000	Klebsiella pneumoniae	154281	ST258	0	2	8	14
+PCMP_H464_contigs_l1000	Klebsiella pneumoniae	328952	ST258	0	2	3	2
+PCMP_H464_MVB_R_contigs_l1000	Klebsiella pneumoniae	173593	ST258	0	2	4	3

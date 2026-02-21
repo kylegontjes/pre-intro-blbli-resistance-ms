@@ -1,0 +1,111 @@
+---
+title: "Setup CoverageStats analysis for evolved analysis"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+--- 
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T)) 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+sr_data <- read.delim("../../../Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt",header = F) %>% unlist
+lr_data <-  read.delim("../../../Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_strains.txt",header = F) %>% unlist
+
+# Short read
+sr_assembly <-  sr_data %>% subset(!. %in% c(lr_data))
+lr_assembly <- lr_data
+
+# Parents
+sr_parents <- unique(sr_data %>% gsub("_MVB_R","",.) %>% gsub("PCMP_H019","PCMP_H19",.)) %>% sort %>% subset(!. %in% lr_assembly)
+lr_parents <- unique(sr_data %>% gsub("_MVB_R","",.) %>% gsub("PCMP_H019","PCMP_H19",.)) %>% sort %>% subset(. %in% lr_assembly)
+parents <- c(sr_parents,lr_parents)
+```
+
+# Copy files
+```{r}
+lr_copy <- lapply(lr_parents,FUN=function(x){
+  paste0("cp /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/hybrid/polypolish/",x,"/",x,"/",x,"_flye_medaka_polypolish.fasta ",
+         "/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/database/",x,".fasta") 
+}) %>% unlist
+
+sr_copy <- lapply(sr_parents,FUN=function(x){
+  paste0("cp /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/",x,"/",x,"_contigs_l1000.fasta ",
+         "/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/database/",x,".fasta") 
+}) %>% unlist
+
+bin <- "#!/bin/sh"
+write_lines(x = c(bin,lr_copy,sr_copy),file = "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/coverage_statistics/setup/copy_assembly_to_create_database.sh")
+```
+
+# Write samples.tsv 
+```{r}  
+for(i in parents){ 
+  header <- "sample_id"
+  if(i == "PCMP_H19"){
+    isolates <- c("PCMP_H19","PCMP_H019_MVB_R")
+  } else {
+    isolates <- c(i,paste0(i,"_MVB_R"))
+  } 
+  text <- c(header,isolates)
+  writeLines(text,con = paste0("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/config/sample_",i,".tsv"))
+} 
+```
+
+# Edit config.yaml file
+```{r}
+for(i in parents){
+  tx <- readLines("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/config/config_pretrimmed_MVB_evolved_model.yaml")
+  tx <- gsub("parent",i,tx)
+  writeLines(tx,paste0("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/config/config_pretrimmed_",i,".yaml"))
+}
+```
+
+# Edit snakemake file
+```{r}
+for(i in parents){
+  tx <- readLines("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/CoverageStats_pretrimmed_model.smk")
+  tx <- gsub("parent",i,tx)
+  writeLines(tx,paste0("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/CoverageStats_pretrimmed_",i,".smk"))
+}
+```
+
+# Edit sbat file
+```{r}
+for(i in parents){
+  tx <- readLines("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/CoverageStats_pretrimmed_model.sbat")
+  tx <- gsub("parent",i,tx)
+  writeLines(tx,paste0("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/CoverageStats_",i,".sbat"))
+}
+```
+
+# Write script for samtools faidx!
+```{r}
+shebang <- "#!/bin/bash"
+cd_file <- "cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/database/"
+module <- "module load Bioinformatics samtools" 
+samtools_commands <- paste0("samtools faidx ",parents,".fasta")
+module_purge <- "module purge"
+module_load_bwa <- "module load Bioinformatics bwa"
+commands_bwa <- paste0("bwa index ",parents,".fasta")
+module_purge <- "module purge" 
+module_load_gatk <- "module load Bioinformatics gatk"
+commands_gatk <- paste0("gatk CreateSequenceDictionary -R ",parents,".fasta")
+final <- c(shebang,cd_file,module,samtools_commands,module_purge,module_load_bwa,commands_bwa,module_purge,module_load_gatk,commands_gatk,module_purge)
+
+writeLines(final,"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/coverage_statistics/setup/reference_genome_setup.sh")
+```

@@ -1,0 +1,28 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=kleborate_short
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=kleborate_short.out
+# Number of cores, amount of memory, and walltime
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=10g --time=1:00:00
+
+# Job commands
+kleborate --version
+
+isolates=$(cat /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt)
+
+touch sr_isolate_paths.txt
+for i in $isolates
+do
+echo -e "/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/assembly/illumina/spades/${i}/${i}_contigs_l1000.fasta" >> sr_isolate_paths.txt
+done
+
+
+
+
+kleborate -a $(cat sr_isolate_paths.txt) -p kpsc -o /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/kleborate_short --trim_headers

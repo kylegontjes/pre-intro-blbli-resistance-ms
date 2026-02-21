@@ -1,0 +1,47 @@
+---
+title: "short_read_qc_data"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+qc <- read_csv("~/Desktop/gl_mount/Sequence_data/illumina_fastq/master_qc_summary.csv")
+evolved_strains <- subset(qc,grepl("MVB_R",Sample))
+evolved_strains %>% favorite_kable
+
+Perent__strains <-subset(qc,Sample %in% gsub("_MVB_R","",evolved_strains$Sample))
+Perent__strains %>% favorite_kable
+```
+
+```{r}
+ONT_qc <- read_csv("~/Desktop/gl_mount/Sequence_data/ONT/master_qc_summary.csv")
+ONT_evolved_strains <- subset(ONT_qc,grepl("MVB_R",sample_long_read))
+ONT_evolved_strains %>% favorite_kable
+ONT_parent_strains <- subset(ONT_qc,sample_long_read %in% gsub("_MVB_R","",ONT_evolved_strains$sample_long_read))
+ONT_parent_strains %>% favorite_kable
+```
+
+
