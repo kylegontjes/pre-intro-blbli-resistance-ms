@@ -10,3 +10,9 @@ KPC_copy_number_ompk_hist <- function(dataset,y,x,color,title,colors){
   figure <- ggplot(data= data) + geom_point(aes(y=y, x=log2(x),color=color) ) + theme(legend.position = "bottom")  + theme_bw_me       + geom_smooth(method='lm',mapping = aes(x=log2(x),y=y,color=color)) + ggtitle(title)
   return(figure)
 }
+
+KPC_copy_number_ompk_hist_facet <- function(dataset,y,x,color,title,colors){
+  data <- dataset %>% select(y,x,color) %>% `colnames<-`(c("y","x","color")) 
+  figure <- ggplot(data= data) + geom_point(aes(y=y, x=log2(x),color=color) ) + theme(legend.position = "bottom")  + theme_bw_me       + geom_smooth(method='lm',mapping = aes(x=log2(x),y=y,color=color)) + ggtitle(title) + facet_wrap(~color)
+  return(figure)
+}

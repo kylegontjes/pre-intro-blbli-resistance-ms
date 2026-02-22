@@ -1,0 +1,290 @@
+---
+title: "s_figure_X_plasmid_overview"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse","cowplot","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap")
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+# Load data
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS") 
+
+# KPC Plasmids 
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+## KPC containing clusters
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters)
+## Non KPC clusters
+Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
+## Merge data
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))
+
+# Mobtyper
+mobsuite_contigs <- readRDS("./data/mobsuite/mobsuite_contigs.RDS")
+kpc_locations <- read_delim("./data/KPC_blast/KPC_blast_master.txt") 
+mobtyper <- readRDS("./data/mobsuite/mobtyper.RDS")
+isolates_KPC_plasmid <- lapply(rownames(KPC_containing_clusters),FUN=function(x){ 
+  KPC_plasmid <-  KPC_containing_clusters %>% subset(rownames(.) ==x) %>% colSums(.) %>% subset(.>0) %>% names %>% gsub("_KPC","",.)
+  if(is_empty(KPC_plasmid)){
+    KPC_plasmid <- 'none'
+  }
+  names(KPC_plasmid) <- x 
+  return(KPC_plasmid)
+}) %>% unlist
+
+mobtyper$KPC_plasmid <- apply(mobtyper,MARGIN=1,FUN=function(x){
+  isolate <- x[['isolate_no']]
+  isolate_KPC_plasmid <- subset(isolates_KPC_plasmid,names(isolates_KPC_plasmid)==isolate)
+  x[['primary_cluster_id']] == isolate_KPC_plasmid
+  
+})
+mobtyper$gc_perc <- mobtyper$gc*100
+ 
+# Join 
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))    
+
+# KPC data
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+mobtyper <- left_join(mobtyper,df %>% select(isolate_no,KPC_allele,clade_I))
+```
+
+# A. KPC plasmid frequency across cluster frequency
+```{r}
+mobtyper_sum <- mobtyper %>% group_by(primary_cluster_id) %>% summarise(n=n(),KPC_plasmid = sum(KPC_plasmid),Non_KPC_plasmid = n-KPC_plasmid)  
+KPC_plasmids <- subset(mobtyper_sum,KPC_plasmid>0) %>% arrange(-KPC_plasmid) %>%  .$primary_cluster_id
+ 
+KPC_plasmid_scale <-  scale_fill_manual(breaks = c(T,F),values=c("red","gray"),name = "blaKPC-containing",guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+
+A <- ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid)) + geom_bar(stat='count')  + KPC_plasmid_scale  + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
+  labs(x="Primary MOB-cluster",y="Isolates",fill="blaKPC-containing plasmid") +
+  geom_text(stat = "count", 
+  position = position_stack(vjust = 0.5),
+  aes(
+    label = after_stat(count),
+    y = after_stat(count) + ifelse(after_stat(count) < 3, 7.5, ifelse(after_stat(count)<6,10, ifelse(after_stat(count) <7,15,ifelse(after_stat(count)<13,15,0))))
+  ),
+  size = 3
+) + facet_grid(~clade_I)
+A
+```
+ 
+# B. Primary cluster by KPC allele
+```{r}
+B <- ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids) %>% subset(KPC_plasmid==T),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_allele)) + geom_bar(stat='count')  + kpc_scale_h + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
+  labs(x="Primary MOB-cluster",y="Isolates",fill="blaKPC allele")   + facet_grid(~clade_I)
+
+B
+```
+
+# C. Contig count
+```{r}
+C <-  ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid),y=num_contigs) + geom_boxplot(aes(y=num_contigs)) + KPC_plasmid_scale + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
+  labs(x="",y="Number of contigs",fill="blaKPC-containing plasmid")  
+
+C
+```
+
+# D. Size
+```{r}
+D <-  ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid),y=size) + geom_boxplot(aes(y=size))  + KPC_plasmid_scale + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
+  labs(x="",y="Size of plasmid (bp)",fill="blaKPC-containing plasmid")  + scale_y_continuous(breaks = c(0,10000,25000,50000,75000,100000,150000,200000,250000,300000))
+
+D
+```
+
+# E. KPC contig size 
+```{r}
+mobsuite_contigs$KPC_contig <- mobsuite_contigs$contig_id %in% kpc_locations$qseqid
+
+get_isolates_KPC_plasmids_df <- function(isolate,mobsuite_contigs,isolates_KPC_plasmid){
+  KPC_plasmid <- isolates_KPC_plasmid %>% subset(names(.) == isolate)  
+  subset(mobsuite_contigs,isolate_no == isolate & primary_cluster_id == KPC_plasmid)
+  
+}
+
+KPC_containing_isolates <- subset(df,KPC_allele !="$KPC_allele") %>% .$isolate_no
+KPC_contig_data <- lapply(KPC_containing_isolates,get_isolates_KPC_plasmids_df,mobsuite_contigs,isolates_KPC_plasmid) %>% do.call(rbind,.)
+
+E <-  ggplot(data=KPC_contig_data  ,aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_contig),y=size) + geom_boxplot(aes(y=size))  + KPC_plasmid_scale + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
+  labs(x="",y="Contig size (bp)",fill="blaKPC-containing plasmid")  + geom_hline(yintercept = 10000,linetype = 2)  + scale_y_continuous(breaks = c(0,10000,25000,50000,75000,100000,120000))
+
+E
+```
+
+# F. Predicted Mobility
+```{r}
+mobility_scale <- scale_fill_manual(values = c("brown","blue","#C0C0C0"),breaks = c("conjugative",'mobilizable','non-mobilizable'),labels = c("Conjugative","Mobilizable","Non-Mobilizable"),name="Predicted mobility",guide = guide_legend(nrow=2, title.position = "top", label.position = "right"))
+
+## Predicted mobility 
+mobtyper$KPC_plasmid_name <- ifelse(mobtyper$KPC_plasmid ==T,"blaKPC-containing plasmid","Non-blaKPC plasmid")
+f <- ggplot(data=mobtyper%>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=primary_cluster_id,fill=predicted_mobility))  + geom_bar()+ facet_wrap(~KPC_plasmid_name,)  +   labs(x="",y="Isolates",fill="Predicted mobility") + theme_bw_me + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1),
+                      strip.background = element_rect(color = 'black',linewidth = 1)) + mobility_scale
+  
+f
+```
+
+# G. Observed host range
+
+```{r}
+color_range <- hues::iwanthue(n = 4,hmin = 0,hmax = 75,plot = T)
+
+host_range_scale <- scale_fill_manual(values = c("darkgray", color_range ),breaks = c("Actinomycetota,Bacillota,Pseudomonadota","Klebsiella","Enterobacteriaceae","Enterobacterales"                            ,"Gammaproteobacteria"),labels =  c("Actinomycetota, Bacillota, Pseudomonadota","Klebsiella","Enterobacteriaceae","Enterobacterales"                            ,"Gammaproteobacteria"),name="Observed host range",guide = guide_legend(nrow=2, title.position = "top", label.position = "right"))
+
+G <-    ggplot(data=mobtyper%>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=primary_cluster_id,fill=observed_host_range_ncbi_name))  + geom_bar()+ facet_wrap(~KPC_plasmid_name)    +  labs(x="",y="Isolates",fill="Observed host range")+ theme_bw_me + 
+  theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1),
+                      strip.background = element_rect(color = 'black',linewidth = 1)) + host_range_scale
+
+G
+```
+
+# H. Replicon type
+```{r}
+heatmap
+rep_type_matrix <- mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids) %>% select(isolate_no,primary_cluster_id,rep_types)%>%
+  separate_rows(rep_types,sep=",") %>%
+  group_by(primary_cluster_id,rep_types) %>%
+  summarise(n=n(),.groups='drop') %>% as.data.frame %>% mutate(rep_types = recode(rep_types,"-" = 'Absent')) %>% 
+  pivot_wider(names_from = rep_types,values_from = n,values_fill = 0) %>%
+  as.data.frame() %>% `rownames<-`(.$primary_cluster_id) %>% select(-primary_cluster_id)  
+
+H <- ComplexHeatmap::Heatmap(rep_type_matrix,col=c('white','red'),name = 'Count',cell_fun =  function(j, i, x, y, width, height, fill) {
+  if(rep_type_matrix[i, j]>0){
+    grid.text(sprintf("%.3s", rep_type_matrix[i, j]), x, y, gp = gpar(fontsize = 11))
+  }
+},show_heatmap_legend = F,cluster_rows = F,column_title = "Replicon type",height = unit(5.5, "cm"),show_column_dend = T,width =ncol(rep_type_matrix)*unit(0.75, "cm"), column_names_max_height = unit(5, "cm"))
+
+H
+
+maxchar <- colnames(rep_type_matrix) %>% sapply(nchar) %>% max
+```
+
+# I. Relaxase type
+```{r}
+relaxase_type_matrix <- mobtyper  %>% subset(primary_cluster_id %in% KPC_plasmids) %>% select(isolate_no,primary_cluster_id,relaxase_types)%>%
+  separate_rows(relaxase_types,sep=",") %>%
+  group_by(primary_cluster_id,relaxase_types) %>%
+  summarise(n=n(),.groups='drop')  %>% as.data.frame %>% mutate(relaxase_types = recode(relaxase_types,"-" = 'Absent')) %>%
+  pivot_wider(names_from = relaxase_types,values_from = n,values_fill = 0) %>%
+  as.data.frame() %>% `rownames<-`(.$primary_cluster_id) %>% select(-primary_cluster_id) 
+
+colnames(relaxase_type_matrix) <- sapply(colnames(relaxase_type_matrix),FUN=function(x){
+  charl <- nchar(x)
+  padding <- maxchar - charl +10
+  paste0(paste0(rep(" ",padding),collapse=""),x,collapse = "")
+})
+
+I <- ComplexHeatmap::Heatmap(relaxase_type_matrix,col=c('white','red'),name = 'Count',cell_fun =  function(j, i, x, y, width, height, fill) {
+  if(relaxase_type_matrix[i, j]>0){
+    grid.text(sprintf("%.3s", relaxase_type_matrix[i, j]), x, y, gp = gpar(fontsize = 11))
+  }
+},show_heatmap_legend = F,cluster_rows = F,column_title = "Relaxase type",height = unit(5.5, "cm"),show_column_dend = T, width =ncol(relaxase_type_matrix)*unit(0.75, "cm"), column_names_max_height = unit(5, "cm"))
+
+I
+```
+
+# J. MPF Type
+```{r}
+mpf_type_matrix <- mobtyper  %>% subset(primary_cluster_id %in% KPC_plasmids)  %>% select(isolate_no,primary_cluster_id,mpf_type)%>%
+  separate_rows(mpf_type,sep=",") %>%
+  group_by(primary_cluster_id,mpf_type) %>%
+  summarise(n=n(),.groups='drop') %>% as.data.frame %>% mutate(mpf_type = recode(mpf_type,"-" = 'Absent'))  %>%
+  pivot_wider(names_from = mpf_type,values_from = n,values_fill = 0) %>%
+  as.data.frame() %>% `rownames<-`(.$primary_cluster_id) %>% select(-primary_cluster_id) 
+
+colnames(mpf_type_matrix) <- sapply(colnames(mpf_type_matrix),FUN=function(x){
+  charl <- nchar(x)
+  padding <- maxchar - charl +10
+  paste0(paste0(rep(" ",padding),collapse=""),x,collapse = "")
+})
+
+J <- ComplexHeatmap::Heatmap(mpf_type_matrix,col=c('white','red'),name = 'Count',cell_fun =  function(j, i, x, y, width, height, fill) {
+  if(mpf_type_matrix[i, j]>0){
+    grid.text(sprintf("%.3s", mpf_type_matrix[i, j]), x, y, gp = gpar(fontsize = 11))
+  }
+},show_heatmap_legend = F,cluster_rows = F,column_title = "MPF type",height = unit(5.5, "cm"),show_column_dend = T,width =ncol(mpf_type_matrix)*unit(0.75, "cm"), column_names_max_height = unit(5, "cm"))
+
+J
+```
+
+# K. oriT type
+```{r}
+orit_type_matrix <- mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids) %>% select(isolate_no,primary_cluster_id,orit_types)%>%
+  separate_rows(orit_types,sep=",") %>%
+  group_by(primary_cluster_id,orit_types) %>%
+  summarise(n=n(),.groups='drop') %>% as.data.frame %>% mutate(orit_types = recode(orit_types,"-" = 'Absent')) %>%
+  pivot_wider(names_from = orit_types,values_from = n,values_fill = 0) %>%
+  as.data.frame() %>% `rownames<-`(.$primary_cluster_id) %>% select(-primary_cluster_id) 
+
+colnames(orit_type_matrix) <- sapply(colnames(orit_type_matrix),FUN=function(x){
+  charl <- nchar(x)
+ padding <- maxchar - charl+10
+  paste0(paste0(rep(" ",padding),collapse=""),x,collapse = "")
+})
+
+K <- ComplexHeatmap::Heatmap(orit_type_matrix,col=c('white','red'),name = 'Count',cell_fun =  function(j, i, x, y, width, height, fill) {
+  if(orit_type_matrix[i, j]>0){
+    grid.text(sprintf("%.3s", orit_type_matrix[i, j]), x, y, gp = gpar(fontsize = 11))
+  }
+},show_heatmap_legend = F,cluster_rows = F,column_title = "oriT type",height = unit(5.5, "cm"),width = ncol(orit_type_matrix)*unit(0.75, "cm"),show_column_dend = T, column_names_max_height = unit(5, "cm"))
+
+K 
+```
+
+# Grouped figure
+```{r,fig.height=15,fig.width=12}
+fig_histograms <- cowplot::plot_grid(A,B ,NULL,ncol=3,labels = c("A","B",""),rel_widths = c(1,1,0.25))
+fig_histograms2 <- cowplot::plot_grid(C +theme(legend.position='none'),D+ theme(legend.position='none'),E + theme(legend.position='none'),ncol=3,labels = c("C","D","E"))
+
+fig_facet_histograms <-  cowplot::plot_grid(f,G,NULL,ncol=3,rel_widths=c(1,1,0.25),labels = c("F","G","")) 
+  
+I_mat <-  grid.grabExpr(draw(H))
+J_mat <-  grid.grabExpr(draw(I))
+K_mat <-  grid.grabExpr(draw(J))
+L_mat <-  grid.grabExpr(draw(K))
+
+heatmaps_cow <- cowplot::plot_grid(I_mat,J_mat,K_mat,L_mat,nrow=1,labels = c('H','I',"J",'K'),rel_widths = c(1,0.5,0.5,0.5),align='hv')
+
+figure <- cowplot::plot_grid(fig_histograms,fig_histograms2,fig_facet_histograms,heatmaps_cow,ncol=1,rel_heights=c(0.66,0.5,0.66,1))
+
+figure
+```
+
+# Save
+
+```{r}
+ggsave("./figures/s_figure_X_mobtyper_plasmid_overview.png", plot=figure, units='in', height=15, width=12, dpi=900, bg='white')
+```

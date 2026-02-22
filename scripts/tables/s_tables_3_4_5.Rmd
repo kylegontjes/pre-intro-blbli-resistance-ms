@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Tables 3-5: Descriptive stats + regression modeling for presence, emergence, and spread"
+title: "Supplemental Tables 3-5: Descriptive stats + regression modeling for BL/BLI resistance mechanism"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"

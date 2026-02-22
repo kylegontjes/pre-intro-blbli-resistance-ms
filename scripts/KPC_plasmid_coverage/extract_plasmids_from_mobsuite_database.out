@@ -1,0 +1,761 @@
+
+    Provides Bioinformatics software.
+    For more information please use:
+
+        $ module help Bioinformatics
+
+
+
+    Provides Bioinformatics software.
+    For more information please use:
+
+        $ module help Bioinformatics
+
+
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP006919.fasta
+[main] Real time: 0.029 sec; CPU: 0.008 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.04 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.02 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP007729.fasta
+[main] Real time: 0.084 sec; CPU: 0.060 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP008833.fasta
+[main] Real time: 0.049 sec; CPU: 0.029 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP009773.fasta
+[main] Real time: 0.040 sec; CPU: 0.020 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP009776.fasta
+[main] Real time: 0.049 sec; CPU: 0.029 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP010362.fasta
+[main] Real time: 0.042 sec; CPU: 0.022 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.02 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP011977.fasta
+[main] Real time: 0.078 sec; CPU: 0.054 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP011978.fasta
+[main] Real time: 0.042 sec; CPU: 0.020 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP018430.fasta
+[main] Real time: 0.072 sec; CPU: 0.051 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP020075.fasta
+[main] Real time: 0.025 sec; CPU: 0.007 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP021548.fasta
+[main] Real time: 0.029 sec; CPU: 0.007 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP021752.fasta
+[main] Real time: 0.075 sec; CPU: 0.052 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP021778.fasta
+[main] Real time: 0.038 sec; CPU: 0.019 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP021853.fasta
+[main] Real time: 0.065 sec; CPU: 0.045 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP021900.fasta
+[main] Real time: 0.036 sec; CPU: 0.017 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP025009.fasta
+[main] Real time: 0.063 sec; CPU: 0.044 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP025010.fasta
+[main] Real time: 0.053 sec; CPU: 0.030 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP027152.fasta
+[main] Real time: 0.074 sec; CPU: 0.052 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.04 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.02 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP028181.fasta
+[main] Real time: 0.083 sec; CPU: 0.056 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP029136.fasta
+[main] Real time: 0.071 sec; CPU: 0.047 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP032209.fasta
+[main] Real time: 0.061 sec; CPU: 0.040 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP036441.fasta
+[main] Real time: 0.025 sec; CPU: 0.007 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP036449.fasta
+[main] Real time: 0.025 sec; CPU: 0.007 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP039971.fasta
+[main] Real time: 0.049 sec; CPU: 0.029 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.04 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.02 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index CP039975.fasta
+[main] Real time: 0.096 sec; CPU: 0.070 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index FJ223607.fasta
+[main] Real time: 0.038 sec; CPU: 0.019 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index HG969997.fasta
+[main] Real time: 0.048 sec; CPU: 0.029 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index HQ589350.fasta
+[main] Real time: 0.027 sec; CPU: 0.007 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index JX430448.fasta
+[main] Real time: 0.064 sec; CPU: 0.041 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.04 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.02 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index JX442974.fasta
+[main] Real time: 0.085 sec; CPU: 0.061 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index KF954759.fasta
+[main] Real time: 0.040 sec; CPU: 0.019 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.03 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index KJ721789.fasta
+[main] Real time: 0.074 sec; CPU: 0.042 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.02 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index KU665642.fasta
+[main] Real time: 0.055 sec; CPU: 0.028 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index KU934011.fasta
+[main] Real time: 0.041 sec; CPU: 0.014 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index KY930324.fasta
+[main] Real time: 0.032 sec; CPU: 0.014 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.01 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index KY940546.fasta
+[main] Real time: 0.061 sec; CPU: 0.023 sec
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index NC_019151.fasta
+[main] Real time: 0.023 sec; CPU: 0.004 sec
+
+    Provides Bioinformatics software.
+    For more information please use:
+
+        $ module help Bioinformatics
+
+
+INFO	2025-10-28 22:06:39	CreateSequenceDictionary	Output dictionary will be written in CP006919.dict
+22:06:39.139 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:39 EDT 2025] CreateSequenceDictionary --REFERENCE CP006919.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:39 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:39 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP006919.fasta
+INFO	2025-10-28 22:06:42	CreateSequenceDictionary	Output dictionary will be written in CP007729.dict
+22:06:42.525 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:42 EDT 2025] CreateSequenceDictionary --REFERENCE CP007729.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:42 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:42 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP007729.fasta
+INFO	2025-10-28 22:06:45	CreateSequenceDictionary	Output dictionary will be written in CP008833.dict
+22:06:45.938 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:45 EDT 2025] CreateSequenceDictionary --REFERENCE CP008833.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:46 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:46 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP008833.fasta
+INFO	2025-10-28 22:06:49	CreateSequenceDictionary	Output dictionary will be written in CP009773.dict
+22:06:49.371 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:49 EDT 2025] CreateSequenceDictionary --REFERENCE CP009773.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:49 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:49 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP009773.fasta
+INFO	2025-10-28 22:06:52	CreateSequenceDictionary	Output dictionary will be written in CP009776.dict
+22:06:52.837 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:52 EDT 2025] CreateSequenceDictionary --REFERENCE CP009776.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:53 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:53 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP009776.fasta
+INFO	2025-10-28 22:06:56	CreateSequenceDictionary	Output dictionary will be written in CP010362.dict
+22:06:56.218 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:56 EDT 2025] CreateSequenceDictionary --REFERENCE CP010362.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:56 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:56 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP010362.fasta
+INFO	2025-10-28 22:06:59	CreateSequenceDictionary	Output dictionary will be written in CP011977.dict
+22:06:59.528 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:06:59 EDT 2025] CreateSequenceDictionary --REFERENCE CP011977.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:06:59 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:06:59 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP011977.fasta
+INFO	2025-10-28 22:07:02	CreateSequenceDictionary	Output dictionary will be written in CP011978.dict
+22:07:02.805 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:02 EDT 2025] CreateSequenceDictionary --REFERENCE CP011978.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:03 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:03 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP011978.fasta
+INFO	2025-10-28 22:07:06	CreateSequenceDictionary	Output dictionary will be written in CP018430.dict
+22:07:06.121 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:06 EDT 2025] CreateSequenceDictionary --REFERENCE CP018430.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:06 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:06 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP018430.fasta
+INFO	2025-10-28 22:07:09	CreateSequenceDictionary	Output dictionary will be written in CP020075.dict
+22:07:09.407 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:09 EDT 2025] CreateSequenceDictionary --REFERENCE CP020075.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:09 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:09 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP020075.fasta
+INFO	2025-10-28 22:07:12	CreateSequenceDictionary	Output dictionary will be written in CP021548.dict
+22:07:12.725 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:12 EDT 2025] CreateSequenceDictionary --REFERENCE CP021548.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:12 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:12 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP021548.fasta
+INFO	2025-10-28 22:07:16	CreateSequenceDictionary	Output dictionary will be written in CP021752.dict
+22:07:16.068 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:16 EDT 2025] CreateSequenceDictionary --REFERENCE CP021752.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:16 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:16 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP021752.fasta
+INFO	2025-10-28 22:07:19	CreateSequenceDictionary	Output dictionary will be written in CP021778.dict
+22:07:19.359 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:19 EDT 2025] CreateSequenceDictionary --REFERENCE CP021778.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:19 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:19 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP021778.fasta
+INFO	2025-10-28 22:07:22	CreateSequenceDictionary	Output dictionary will be written in CP021853.dict
+22:07:22.691 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:22 EDT 2025] CreateSequenceDictionary --REFERENCE CP021853.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:22 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:22 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP021853.fasta
+INFO	2025-10-28 22:07:25	CreateSequenceDictionary	Output dictionary will be written in CP021900.dict
+22:07:25.992 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:26 EDT 2025] CreateSequenceDictionary --REFERENCE CP021900.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:26 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:26 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP021900.fasta
+INFO	2025-10-28 22:07:29	CreateSequenceDictionary	Output dictionary will be written in CP025009.dict
+22:07:29.299 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:29 EDT 2025] CreateSequenceDictionary --REFERENCE CP025009.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:29 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:29 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP025009.fasta
+INFO	2025-10-28 22:07:32	CreateSequenceDictionary	Output dictionary will be written in CP025010.dict
+22:07:32.614 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:32 EDT 2025] CreateSequenceDictionary --REFERENCE CP025010.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:32 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:32 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP025010.fasta
+INFO	2025-10-28 22:07:35	CreateSequenceDictionary	Output dictionary will be written in CP027152.dict
+22:07:35.905 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:35 EDT 2025] CreateSequenceDictionary --REFERENCE CP027152.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:36 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:36 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP027152.fasta
+INFO	2025-10-28 22:07:39	CreateSequenceDictionary	Output dictionary will be written in CP028181.dict
+22:07:39.240 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:39 EDT 2025] CreateSequenceDictionary --REFERENCE CP028181.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:39 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:39 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP028181.fasta
+INFO	2025-10-28 22:07:42	CreateSequenceDictionary	Output dictionary will be written in CP029136.dict
+22:07:42.561 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:42 EDT 2025] CreateSequenceDictionary --REFERENCE CP029136.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:42 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:42 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP029136.fasta
+INFO	2025-10-28 22:07:45	CreateSequenceDictionary	Output dictionary will be written in CP032209.dict
+22:07:45.924 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:45 EDT 2025] CreateSequenceDictionary --REFERENCE CP032209.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:46 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:46 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP032209.fasta
+INFO	2025-10-28 22:07:49	CreateSequenceDictionary	Output dictionary will be written in CP036441.dict
+22:07:49.212 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:49 EDT 2025] CreateSequenceDictionary --REFERENCE CP036441.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:49 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:49 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP036441.fasta
+INFO	2025-10-28 22:07:52	CreateSequenceDictionary	Output dictionary will be written in CP036449.dict
+22:07:52.523 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:52 EDT 2025] CreateSequenceDictionary --REFERENCE CP036449.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:52 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:52 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP036449.fasta
+INFO	2025-10-28 22:07:55	CreateSequenceDictionary	Output dictionary will be written in CP039971.dict
+22:07:55.768 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:55 EDT 2025] CreateSequenceDictionary --REFERENCE CP039971.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:55 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:56 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP039971.fasta
+INFO	2025-10-28 22:07:59	CreateSequenceDictionary	Output dictionary will be written in CP039975.dict
+22:07:59.072 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:07:59 EDT 2025] CreateSequenceDictionary --REFERENCE CP039975.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:07:59 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:07:59 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R CP039975.fasta
+INFO	2025-10-28 22:08:02	CreateSequenceDictionary	Output dictionary will be written in FJ223607.dict
+22:08:02.393 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:02 EDT 2025] CreateSequenceDictionary --REFERENCE FJ223607.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:02 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:02 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R FJ223607.fasta
+INFO	2025-10-28 22:08:05	CreateSequenceDictionary	Output dictionary will be written in HG969997.dict
+22:08:05.706 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:05 EDT 2025] CreateSequenceDictionary --REFERENCE HG969997.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:05 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:05 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R HG969997.fasta
+INFO	2025-10-28 22:08:09	CreateSequenceDictionary	Output dictionary will be written in HQ589350.dict
+22:08:09.028 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:09 EDT 2025] CreateSequenceDictionary --REFERENCE HQ589350.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:09 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:09 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R HQ589350.fasta
+INFO	2025-10-28 22:08:12	CreateSequenceDictionary	Output dictionary will be written in JX430448.dict
+22:08:12.352 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:12 EDT 2025] CreateSequenceDictionary --REFERENCE JX430448.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:12 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:12 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R JX430448.fasta
+INFO	2025-10-28 22:08:15	CreateSequenceDictionary	Output dictionary will be written in JX442974.dict
+22:08:15.687 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:15 EDT 2025] CreateSequenceDictionary --REFERENCE JX442974.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:15 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:15 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R JX442974.fasta
+INFO	2025-10-28 22:08:18	CreateSequenceDictionary	Output dictionary will be written in KF954759.dict
+22:08:18.977 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:19 EDT 2025] CreateSequenceDictionary --REFERENCE KF954759.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:19 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:19 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R KF954759.fasta
+INFO	2025-10-28 22:08:22	CreateSequenceDictionary	Output dictionary will be written in KJ721789.dict
+22:08:22.279 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:22 EDT 2025] CreateSequenceDictionary --REFERENCE KJ721789.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:22 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:22 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R KJ721789.fasta
+INFO	2025-10-28 22:08:25	CreateSequenceDictionary	Output dictionary will be written in KU665642.dict
+22:08:25.536 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:25 EDT 2025] CreateSequenceDictionary --REFERENCE KU665642.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:25 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:25 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R KU665642.fasta
+INFO	2025-10-28 22:08:28	CreateSequenceDictionary	Output dictionary will be written in KU934011.dict
+22:08:28.856 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:28 EDT 2025] CreateSequenceDictionary --REFERENCE KU934011.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:29 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:29 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R KU934011.fasta
+INFO	2025-10-28 22:08:32	CreateSequenceDictionary	Output dictionary will be written in KY930324.dict
+22:08:32.188 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:32 EDT 2025] CreateSequenceDictionary --REFERENCE KY930324.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:32 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:32 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R KY930324.fasta
+INFO	2025-10-28 22:08:35	CreateSequenceDictionary	Output dictionary will be written in KY940546.dict
+22:08:35.501 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:35 EDT 2025] CreateSequenceDictionary --REFERENCE KY940546.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:35 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:35 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R KY940546.fasta
+INFO	2025-10-28 22:08:38	CreateSequenceDictionary	Output dictionary will be written in NC_019151.dict
+22:08:38.880 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Oct 28 22:08:38 EDT 2025] CreateSequenceDictionary --REFERENCE NC_019151.fasta --TRUNCATE_NAMES_AT_WHITESPACE true --NUM_SEQUENCES 2147483647 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --GA4GH_CLIENT_SECRETS client_secrets.json --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Tue Oct 28 22:08:39 EDT 2025] Executing as kgontjes@gl3058.arc-ts.umich.edu on Linux 4.18.0-553.50.1.el8_10.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_452-b09; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.3.0.0
+[Tue Oct 28 22:08:39 EDT 2025] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=811073536
+Tool returned:
+0
+Using GATK jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /sw/pkgs/med/gatk/4.3.0.0/gatk-package-4.3.0.0-local.jar CreateSequenceDictionary -R NC_019151.fasta

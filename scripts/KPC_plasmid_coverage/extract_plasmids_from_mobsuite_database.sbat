@@ -1,0 +1,13 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=extract_plasmids_from_mobsuite_database
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=extract_plasmids_from_mobsuite_database.out
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=1 --mem=50g --time=1:00:00 
+
+bash extract_plasmids_from_mobsuite_database.sh

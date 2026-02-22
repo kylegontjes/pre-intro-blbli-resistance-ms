@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-07-28" />
+<meta name="date" content="2025-09-18" />
 
 <title>Convergence-based genome-wide association studies improved the explanation of BL/BLI resistance and illuminated distinct pathways to resistance across clades</title>
 
@@ -576,7 +576,7 @@ display: none;
 <h1 class="title toc-ignore">Convergence-based genome-wide association
 studies improved the explanation of BL/BLI resistance and illuminated
 distinct pathways to resistance across clades</h1>
-<h4 class="date">2025-07-28</h4>
+<h4 class="date">2025-09-18</h4>
 
 </div>
 
@@ -598,6 +598,8 @@ KPC_containing_clusters &lt;- KPC_info_clusters %&gt;% `colnames&lt;-`(paste0(co
 KPC_clusters &lt;- colnames(KPC_containing_clusters)
 Non_KPC_clusters &lt;- KPC_info_clusters %&gt;% `colnames&lt;-`(paste0(colnames(.),&quot;_non_KPC&quot;)) %&gt;% {ifelse(.==&quot;Non-KPC plasmid&quot;,1,0)} %&gt;% as.data.frame %&gt;% select_if(colSums(.)&gt;0)
 df &lt;- left_join(df,KPC_containing_clusters %&gt;% mutate(isolate_no = rownames(.))) %&gt;% left_join(Non_KPC_clusters %&gt;% mutate(isolate_no = rownames(.)))
+## Plasmid data
+mobsuite_typer &lt;- readRDS(&quot;./data/mobsuite/mobtyper.RDS&quot;)
 ## Core genome burden models
 models &lt;- c(&quot;model1&quot;,&quot;model1.2&quot;,&quot;model2&quot;,&quot;model2.2&quot;,&quot;model3&quot;,&quot;model3.2&quot;)
 for(x in models){
@@ -1239,8 +1241,112 @@ AA552
 </table>
 <pre class="r"><code>novel_synchronous &lt;- synchronous_pass %&gt;% subset(!locus_tag %in% c(&quot;KPNIH1_RS18665&quot;,&quot;KPNIH1_RS07805&quot;)) %&gt;% .$genotype</code></pre>
 </div>
+<div id="aa018-plasmid" class="section level1">
+<h1>AA018 plasmid</h1>
+<div id="plasmid-incompatability-group" class="section level2">
+<h2>Plasmid incompatability group</h2>
+<pre class="r"><code>AA018 &lt;- mobsuite_typer %&gt;% subset(primary_cluster_id == &quot;AA018&quot;) 
+
+convert_tableone_into_df(dataset = AA018, vars = c(&#39;size&#39;,&#39;gc&#39;,&#39;rep_types&#39;,&#39;relaxase_types&#39;,&#39;mpf_type&#39;,&#39;orit_type&#39;,&#39;predicted_mobility&#39;,&#39;predicted_host_range_overall_rank&#39;,&quot;observed_host_range_ncbi_name&quot;))</code></pre>
+<pre><code>                                                     Variable
+2                                            size (mean (SD))
+3                                              gc (mean (SD))
+4                                               rep_types (%)
+5     ColRNAI_rep_cluster_1857,IncFIB,IncFII,rep_cluster_2183
+6                                                      IncFIB
+7                              IncFIB,IncFII,rep_cluster_2183
+8                                          relaxase_types (%)
+9                                                           -
+10                                             MOBC,MOBF,MOBF
+11                                                  MOBF,MOBF
+12                                             MOBF,MOBF,MOBF
+13                                       mpf_type = MPF_F (%)
+14                   predicted_mobility = non-mobilizable (%)
+15                      predicted_host_range_overall_rank (%)
+16                                                      class
+17                                                     family
+18                                                      order
+19                          observed_host_range_ncbi_name (%)
+20                                           Enterobacterales
+21                                         Enterobacteriaceae
+22                                        Gammaproteobacteria
+       Overall (n=103)
+2  112833.34 (6813.52)
+3          0.54 (0.00)
+4                     
+5              1 (1.0)
+6              1 (1.0)
+7           101 (98.1)
+8                     
+9              1 (1.0)
+10             1 (1.0)
+11          100 (97.1)
+12             1 (1.0)
+13          102 (99.0)
+14             1 (1.0)
+15                    
+16             1 (1.0)
+17           35 (34.0)
+18           67 (65.0)
+19                    
+20           67 (65.0)
+21           35 (34.0)
+22             1 (1.0)</code></pre>
+<pre class="r"><code>table(AA018$predicted_mobility)</code></pre>
+<pre><code>
+    conjugative non-mobilizable 
+            102               1 </code></pre>
+</div>
+</div>
 <div id="aa552-plasmid" class="section level1">
 <h1>AA552 plasmid</h1>
+<div id="plasmid-incompatability-group-1" class="section level2">
+<h2>Plasmid incompatability group</h2>
+<pre class="r"><code>AA552 &lt;- mobsuite_typer %&gt;% subset(primary_cluster_id == &quot;AA552&quot;)
+AA552$FJ223607 &lt;- ifelse(AA552$mash_nearest_neighbor == &quot;FJ223607&quot;,T,F)
+
+convert_tableone_into_df(dataset = AA552, vars = c(&#39;size&#39;,&#39;gc&#39;,&#39;rep_types&#39;,&#39;relaxase_types&#39;,&#39;mpf_type&#39;,&#39;orit_type&#39;,&#39;predicted_mobility&#39;,&#39;predicted_host_range_overall_rank&#39;,&quot;observed_host_range_ncbi_name&quot;),strata = &#39;FJ223607&#39;,outcome_names = c(&quot;Not F&quot;,&quot;FJ&quot;))</code></pre>
+<pre><code>                                                  Variable     Overall (n=112)
+2                                         size (mean (SD)) 53910.48 (15144.06)
+3                                           gc (mean (SD))         0.52 (0.01)
+4                                            rep_types (%)                    
+5                                                        -             5 (4.5)
+6                            ColRNAI_rep_cluster_1857,IncN             6 (5.4)
+7                                                     IncN          101 (90.2)
+8                                       relaxase_types (%)                    
+9                                                        -             6 (5.4)
+10                                                    MOBC             1 (0.9)
+11                                               MOBC,MOBF             5 (4.5)
+12                                                    MOBF          100 (89.3)
+13                                    mpf_type = MPF_T (%)          107 (95.5)
+14                                  predicted_mobility (%)                    
+15                                             conjugative          106 (94.6)
+16                                             mobilizable             1 (0.9)
+17                                         non-mobilizable             5 (4.5)
+18           predicted_host_range_overall_rank = class (%)         112 (100.0)
+19 observed_host_range_ncbi_name = Gammaproteobacteria (%)         112 (100.0)
+          Not F (n=86)          FJ (n=26) p-value
+2  48572.80 (12458.29) 71565.88 (8269.19)  &lt;0.001
+3          0.51 (0.01)        0.53 (0.00)  &lt;0.001
+4                                           0.018
+5              5 (5.8)            0 (0.0)        
+6              2 (2.3)           4 (15.4)        
+7            79 (91.9)          22 (84.6)        
+8                                           0.010
+9              6 (7.0)            0 (0.0)        
+10             1 (1.2)            0 (0.0)        
+11             1 (1.2)           4 (15.4)        
+12           78 (90.7)          22 (84.6)        
+13           81 (94.2)         26 (100.0)   0.474
+14                                          0.384
+15           80 (93.0)         26 (100.0)        
+16             1 (1.2)            0 (0.0)        
+17             5 (5.8)            0 (0.0)        
+18          86 (100.0)         26 (100.0)      NA
+19          86 (100.0)         26 (100.0)      NA</code></pre>
+</div>
+<div id="overall-data" class="section level2">
+<h2>Overall data</h2>
 <pre class="r"><code>plasmid_table &lt;- table(df$AA552_KPC,df$blbli_dich_num) 
 plasmid_table</code></pre>
 <pre><code>   
@@ -1300,6 +1406,7 @@ alternative hypothesis: true location shift is not equal to 0</code></pre>
 <pre class="r"><code>convert_tableone_into_df(df_CI,&quot;AA018_non_KPC&quot;,strata=&quot;AA552_KPC&quot;,factorVars = &quot;AA018_non_KPC&quot;,outcome_names = c(&quot;Absent&quot;,&quot;Present&quot;))</code></pre>
 <pre><code>               Variable Overall (n=145) Absent (n=121) Present (n=24) p-value
 2 AA018_non_KPC = 1 (%)         1 (0.7)        1 (0.8)        0 (0.0)   1.000</code></pre>
+</div>
 </div>
 
 

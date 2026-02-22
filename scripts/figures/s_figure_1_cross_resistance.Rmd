@@ -31,8 +31,7 @@ df <- readRDS("./data/dataset/df.RDS")
 
 # Code for figure
 ```{r}
-last_line_res_numeric <- df %>% select("MERO_dich_num","IMI_dich_num","blbli_dich_num","MVB_dich_num","IR_dich_num","CZA_dich_num","TGC_dich_num","CST_dich_num","AMK_dich_num","PLZ_dich_num") 
-colnames(last_line_res_numeric) <- gsub("blbli","BL/BLI",colnames(last_line_res_numeric))
+last_line_res_numeric <- df %>% select("MERO_dich_num","IMI_dich_num","MVB_dich_num","IR_dich_num","CZA_dich_num","TGC_dich_num","CST_dich_num","AMK_dich_num","PLZ_dich_num")  
 
 # Get content
 total_occurrences <- colSums(last_line_res_numeric) 
@@ -69,14 +68,14 @@ fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "
 fig_heatmap_image <- grid.grabExpr(draw(co_occurrence_heatmap))
 fig_legend_image <- grid.grabExpr(draw(fig_legend))
 
-s_figure_1 <-plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.16))  
+s_figure_1 <- cowplot::plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.175))  
 ```
 
 # Print & Save
-```{r,message=F,error=F,warning=F,fig.width=9.75,fig.height=5.25}
+```{r,message=F,error=F,warning=F,fig.width=9.25,fig.height=4.625}
 s_figure_1
 ```
 
 ```{r}
-ggsave(plot = s_figure_1, filename = './figures/s_figure_1.png', width = 9.75, height = 5.25, bg = "white",dpi=900)
+ggsave(plot = s_figure_1, filename = './figures/s_figure_1.png', width = 9.25, height = 4.625, bg = "white",dpi=900)
 ```

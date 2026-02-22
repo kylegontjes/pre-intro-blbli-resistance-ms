@@ -1,0 +1,55 @@
+---
+title: "TETyper_comparisons"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r , echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts  
+source("./lib/common_functions.R")   
+source("./lib/consistent_themes.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r}
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+```
+
+# TETyper
+```{r}
+TETyper <- readRDS("./data/evolution_experiment/TETyper_evolved/TETyper_curated.RDS")
+TETyper$parent <- gsub("_MVB_R","",TETyper$isolate_no)
+```
+
+```{r}
+pairs <- c("PCMP_H116","PCMP_H19","PCMP_H226","PCMP_H323","PCMP_H414","PCMP_H464")
+
+lapply(pairs,FUN=function(x){
+  # Plasmid
+  parent=x
+  TETyper_sub <- subset(TETyper,parent==x)
+  parent_TETyper <- subset(TETyper_sub,isolate_no==x) %>% select(tn4401_allele,Deletions,Structural_variant,SNP_variant) %>% `colnames<-`(paste0("parent_",colnames(.)))
+  evolved_TETyper <- subset(TETyper_sub,isolate_no!=x) %>% select(tn4401_allele,Deletions,Structural_variant,SNP_variant) %>% `colnames<-`(paste0("evolved_",colnames(.)))
+  different_tn4401_allele <- parent_TETyper$parent_tn4401_allele != evolved_TETyper$evolved_tn4401_allele
+  cbind.data.frame(parent,parent_TETyper,evolved_TETyper,different_tn4401_allele)
+}) %>% do.call(rbind,.) %>% favorite_kable()
+```
+

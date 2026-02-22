@@ -13,7 +13,7 @@ knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistanc
 # Environment
 ```{r}
 # Packages
-packages <- c("readxl","tidyverse","ape","phytools")
+packages <- c("readxl","tidyverse","ape","phytools",'kableExtra','gontjesr')
 lapply(packages,library,character.only=T)
 
 # Functions
@@ -55,8 +55,7 @@ metadata <- metadata %>% mutate(# Region
                                                                 # Tampa
                                                                 FB = "S", FD = "T",
                                                                 # Louisville
-                                                                EZ = "U"),  
-                                          LOSbeforeCx = dplyr::recode(LOSbeforeCx, '-202' = 202))
+                                                                EZ = "U"))
 
 ```
 
@@ -250,6 +249,27 @@ clade_2_descendants = tr_midpoint$tip.label[ phangorn::Descendants(x = tr_midpoi
 
 df$clade_I <- ifelse(df$isolate_no %in% clade_1_descendants,"Clade I","Clade II")
 gheatmap(ggtree(tr_midpoint),df %>% select(clade_I))
+```
+
+# Recoded participant 13's initial entry due to incorrect admit and discharge date
+## Participant 13 had >1 isolate. Although the age was accurate (i.e., age different correlated with collection date difference), the two isolates had 
+```{r}
+wrong_Cx_data <- df %>% subset(LOSbeforeCx <0) %>% select(isolate_no,Patient_ID,Cx_date,admit_date,discharge_date,LOSbeforeCx,LOS_after_cx)
+paste0("Incorrect isolate with bad admit and discharge data: ")
+wrong_Cx_data %>% gontjesr::favorite_kable()
+
+# Recode df when LOSbeforeCx variable is less than 0, make the admit_date, discharge_date, LOSbeforeCx, and LOS_after_cx variables all NA
+df <- df %>%
+  mutate(
+    across(c(admit_date, discharge_date, LOSbeforeCx, LOS_after_cx),
+           ~ if_else(LOSbeforeCx < 0, NA, .))
+  ) 
+
+paste0("Recoded the initial isolate to have NA admit date: ")
+df%>% subset(Patient_ID %in% wrong_Cx_data$Patient_ID) %>% select(isolate_no,Patient_ID,Cx_date,admit_date,discharge_date,LOSbeforeCx,LOS_after_cx)  %>% gontjesr::favorite_kable()
+
+# Create a flag
+df$has_full_metadata <- !df$isolate_no %in% wrong_Cx_data$isolate_no
 ```
 
 # Write final dataframes

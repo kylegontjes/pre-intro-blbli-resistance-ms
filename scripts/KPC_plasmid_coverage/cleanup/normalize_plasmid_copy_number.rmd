@@ -1,0 +1,83 @@
+---
+title: "Normalize plasmid data to chromosome"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+# GWAS table
+## KPC Plasmids 
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters)
+Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))
+## Mobtyper
+mobtyper <- readRDS("./data/mobsuite/mobtyper.RDS")
+isolates_KPC_plasmid <- lapply(rownames(KPC_containing_clusters),FUN=function(x){ 
+  KPC_plasmid <-  KPC_containing_clusters %>% subset(rownames(.) ==x) %>% colSums(.) %>% subset(.>0) %>% names %>% gsub("_KPC","",.)
+  if(is_empty(KPC_plasmid)){
+    KPC_plasmid <- 'none'
+  }
+  names(KPC_plasmid) <- x 
+  return(KPC_plasmid)
+}) %>% unlist
+
+mobtyper$KPC_plasmid <- apply(mobtyper,MARGIN=1,FUN=function(x){
+  isolate <- x[['isolate_no']]
+  isolate_KPC_plasmid <- subset(isolates_KPC_plasmid,names(isolates_KPC_plasmid)==isolate)
+  x[['primary_cluster_id']] == isolate_KPC_plasmid
+  
+})
+mobtyper$gc_perc <- mobtyper$gc*100
+
+## BLBLI clustering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+blbli_asr <- readRDS("./data/asr_clustering/blbli_asr.RDS") 
+# Join 
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
+df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed))
+df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No feature"="Susceptible" )
+```
+
+# Plasmid data
+```{r}
+plasmid_data <- read_delim("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/KPC_plasmid_coverage/results/master_KPC_plasmid_coverage_summary.txt") 
+colnames(plasmid_data) <- recode(colnames(plasmid_data),
+                                 'isolate'='isolate_no',
+                                 'reference'='KPC_plasmid_reference',
+                                 'mean'="plasmid_mean_depth",
+                                  'median'="plasmid_median_depth",
+                                 'mean_non_zero'="plasmid_mean_depth_non_zero",
+                                 'median_non_zero'="plasmid_median_depth_non_zero") 
+chromosome_data <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/KPC_coverage/KPNIH1/KPNIH1_depth_summary.RDS")
+joint_data <- left_join(chromosome_data,plasmid_data)
+
+joint_data$KPC_plasmid_median_copy_chromosome_normalized  <- joint_data$plasmid_median_depth_non_zero / joint_data$KPNIH1_median_depth_non_zero
+
+saveRDS(joint_data,"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/KPC_plasmid_coverage/KPC_plasmid_copy_number_chromosome_normalized.RDS")
+```

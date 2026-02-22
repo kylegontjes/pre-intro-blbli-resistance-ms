@@ -12,6 +12,8 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+1. Update: Dropped one isolate due to recently identified incorrect LOS data (12/1/25)
+
 # Environment
 ```{r environment, echo=T, message=T, include=T, results=T}
 #Packages
@@ -24,11 +26,14 @@ sessionInfo()
 ``` 
 
 # Load data
-```{r load data,include=T,echo=T,results=F,message=F}
+```{r load data,include=T,echo=T,results=T,message=F}
 # Patient Metadata & Phylogeny
 df <- readRDS("./data/dataset/df.RDS")  
 # Rownames
 rownames(df) <- df$isolate_no 
+# Drop isolate without LoS data
+df <- df %>% subset(!is.na(LOSbeforeCx))
+paste0("Total isolates in cleaned dataset: ",nrow(df))
 ```
  
 # Variable curation 
@@ -118,6 +123,7 @@ df_fin <- left_join(resistance, factor_vars_df %>% mutate(isolate_no = rownames(
 paste0("Eligible variables: ")
 other_vars <-  c("age","LOSbeforeCx","sex.female",device_vars,comorb_vars)
 variables <- c(other_vars,abx_vars_of_interest) 
+variables
 
 df_final <- df_fin %>% select(variables,isolate_no,source,clade_I,Patient_ID,Cx_date,pheno,'multimorbid','any_antibiotic_1d','any_device','device_ct','comorb_ct','AG_1d')
 ```

@@ -1,0 +1,23 @@
+Kleborate v3.1.3
+strain	species	N50	ST	virulence_score	resistance_score	num_resistance_classes	num_resistance_genes
+PCMP_H019_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5198880	ST258	0	2	9	14
+PCMP_H116_flye_medaka_polypolish	Klebsiella pneumoniae	5497555	ST258	2	2	5	5
+PCMP_H116_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5498756	ST258	2	2	5	4
+PCMP_H148_flye_medaka_polypolish	Klebsiella pneumoniae	5285997	ST258	0	2	4	4
+PCMP_H15_flye_medaka_polypolish	Klebsiella pneumoniae	5344901	ST258	0	2	8	15
+PCMP_H173_flye_medaka_polypolish	Klebsiella pneumoniae	5284741	ST258	0	2	3	4
+PCMP_H19_flye_medaka_polypolish	Klebsiella pneumoniae	5197681	ST258	0	2	8	13
+PCMP_H226_flye_medaka_polypolish	Klebsiella pneumoniae	5382501	ST258	0	2	8	15
+PCMP_H226_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5382451	ST258	0	2	8	16
+PCMP_H276_flye_medaka_polypolish	Klebsiella pneumoniae	5295007	ST258	0	2	4	4
+PCMP_H307_flye_medaka_polypolish	Klebsiella pneumoniae	5417203	ST258	2	2	5	6
+PCMP_H318_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5230256	ST258	0	2	9	17
+PCMP_H323_flye_medaka_polypolish	Klebsiella pneumoniae	5290268	ST258	0	2	4	3
+PCMP_H323_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5290267	ST258	0	2	4	4
+PCMP_H339_flye_medaka_polypolish	Klebsiella pneumoniae	5377074	ST258	0	2	7	10
+PCMP_H414_flye_medaka_polypolish	Klebsiella pneumoniae	5294317	ST258	0	2	9	20
+PCMP_H414_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5295055	ST258	0	2	9	19
+PCMP_H416_flye_medaka_polypolish	Klebsiella pneumoniae	5222293	ST258	0	2	4	3
+PCMP_H434_flye_medaka_polypolish	Klebsiella pneumoniae	5469412	ST258	2	3	6	4
+PCMP_H464_flye_medaka_polypolish	Klebsiella pneumoniae	5293835	ST258	0	2	4	5
+PCMP_H464_MVB_R_flye_medaka_polypolish	Klebsiella pneumoniae	5293804	ST258	0	2	4	4

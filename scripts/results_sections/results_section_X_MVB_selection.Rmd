@@ -1,0 +1,223 @@
+---
+title: "results_section_X_MVB_rates"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
+rm(list = ls())
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+
+```{r environment, echo=F, message=FALSE, include=F, results=F}
+#Packages
+packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext",'lme4','sjPlot')
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+```
+
+# Load data
+
+```{r}
+df <- readRDS("./data/dataset/df.RDS")
+df$clade_I_num <- ifelse(df$clade_I == "Clade I",1,0)
+
+# Canonical
+canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+df <- left_join(df,canonical)
+
+# tn4401 data
+tn4401 <- readRDS("./data/TETyper/TETyper_curated.RDS")  
+df <- left_join(df,tn4401)
+
+# load the kleborate
+kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame
+df <- left_join(df,kleborate) 
+
+# KPC Plasmids 
+KPC_info_plasmids <- readRDS("./data/KPC_plasmid/KPC_containing_plasmids_mat.RDS") %>% as.data.frame
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters)
+Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))  
+df$KPC_plasmid <- lapply(df$isolate_no,FUN=function(x){
+  KPC_containing_clusters[rownames(KPC_containing_clusters) == x,] %>% select_if(colSums(.)>0) %>% colnames() %>% {ifelse(length(.)==0,"None",paste0(.,collapse=" + "))}})  %>% unlist
+
+# KC depth input
+KPC_plasmid_depth <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS")
+KPC_plasmid_depth$isolate_no <- rownames(KPC_plasmid_depth)
+                                         
+KPC_gene_depth <- KPC_plasmid_depth %>% select(isolate_no,KPNIH1_RS28775_chr_median_norm)
+
+df <- left_join(df,KPC_gene_depth)
+```
+
+## MVB experiment
+```{r}
+MVB_evolution_data <- read_csv("./data/evolution_experiment/curated_MVB_evolution_experiment_data.csv")
+```
+
+# Create annotated evolution dataset
+```{r}
+MVB_evolution_data <- MVB_evolution_data %>% left_join(.,df %>% select(isolate_no,MVB,KPNIH1_RS28775_chr_median_norm,clade_I,clade_I_num,PBP_any,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_truncation_kleborate,OmpK36_non_syn,OmpK36_promoter_IS,tn4401_allele,KPC_present,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC))
+MVB_evolution_data$category <- MVB_evolution_data %>% select(clade_I,KPC_type,OmpK36_L3_mutations,AA018_KPC,AA552_non_KPC) %>% apply(.,1,FUN=function(x){paste0(c(x["clade_I"],x["KPC_type"],names(x %>% subset(. %in% c(1)))),collapse=" + ")}) %>% gsub("OmpK36_L3_mutations",'Loop 3 insertion',.) %>% gsub("AA552_non_KPC","AA552 non-KPC plasmid",.) %>% gsub("AA018_KPC","AA018 KPC plasmid",.)  %>% gsub("+ No KPC +","",.) %>% gsub("\\+\\+","\\+",.)
+MVB_evolution_data$MVB_ratio_log10 <- log10(MVB_evolution_data$MVB_ratio)
+MVB_evolution_data$AA018_KPC_AA552_nonKPC <- ifelse(MVB_evolution_data$AA018_KPC==1 & MVB_evolution_data$AA552_non_KPC==1,1,0)
+MVB_evolution_data$cens <- ifelse(MVB_evolution_data$over_LoD, "none", "left")
+MVB_evolution_data$cens <- factor(MVB_evolution_data$cens, levels = c("none", "left"))
+```
+
+
+# Across
+```{r}
+MVB_evolution_data_avg <- MVB_evolution_data %>% subset(over_LoD==T) %>% group_by(isolate_no) %>% mutate(ratio_avg = mean(MVB_ratio))  %>% distinct
+```
+
+# Question A - Differences across isolates  
+```{r}
+paste0("Overall modeling")
+lm(MVB_ratio_log10~isolate_no ,data=MVB_evolution_data) %>% anova
+paste0("Overall modeling w/ over LoD specific")
+lm(MVB_ratio_log10~isolate_no,data=MVB_evolution_data%>% subset(over_LoD==T)) %>% anova
+``` 
+
+# Question B - Differences between clades?  
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~ 1 + clade_I_num + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling LOD")
+lmer(MVB_ratio_log10~ clade_I_num + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
+```
+
+# Question C: Impact of loop 3?
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~OmpK36GD + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~OmpK36GD + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I")) %>% tab_model()
+paste0("Overall modeling > LoD")
+lmer(MVB_ratio_log10~OmpK36GD + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
+paste0("Overall modeling >LoD in clade I")
+lmer(MVB_ratio_log10~OmpK36GD + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
+```
+
+# Question D: Impact of AA018 plasmid 
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~AA018_KPC + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~AA018_KPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model()
+paste0("Overall modeling > LOD")
+lmer(MVB_ratio_log10~AA018_KPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
+paste0("Overall modeling > LOD in clade I")
+lmer(MVB_ratio_log10~AA018_KPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
+```
+
+# Question E: Presence of both AA018 + AA552 plasmid
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model()
+paste0("Overall modeling LOD")
+lmer(MVB_ratio_log10~AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
+paste0("Overall modeling LOD in clade I")
+lmer(MVB_ratio_log10~AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
+```
+
+# Question F: Plasmid and loop 3 modeled  
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model()
+paste0("Overall modeling LOD")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
+paste0("Overall modeling LOD in clade I")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
+
+```
+
+# Question G: Plasmid interaction with loop 3
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~OmpK36GD*AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~OmpK36GD*AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model()
+paste0("Modeling > LOD")
+lmer(MVB_ratio_log10~OmpK36GD*AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
+paste0("Modeling > LOD in clade I")
+lmer(MVB_ratio_log10~OmpK36GD*AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
+```
+
+# Question H: KPC copy number
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model() 
+paste0("Modeling > LOD in clade I")
+lmer(MVB_ratio_log10~KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T)) %>% tab_model()
+paste0("Modeling > LOD in clade I")
+lmer(MVB_ratio_log10~KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
+```
+
+# Question I: L3 + KPC
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~OmpK36GD+KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~OmpK36GD+KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model() 
+paste0("Modeling > LOD")
+lmer(MVB_ratio_log10~ OmpK36GD+ KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T)) %>% tab_model()
+paste0("Modeling > LOD in clade I")
+lmer(MVB_ratio_log10~OmpK36GD + KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I"))%>% tab_model()
+```
+
+# Question J: Loop 3 insertion with KPC copy number  
+```{r}
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~OmpK36GD*KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~OmpK36GD*KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model() 
+paste0("Modeling > LOD")
+lmer(MVB_ratio_log10~ OmpK36GD*KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T)) %>% tab_model()
+paste0("Modeling > LOD in clade I")
+lmer(MVB_ratio_log10~OmpK36GD*KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T &clade_I=="Clade I"))  %>% tab_model()
+```
+
+# Full model
+```{r}
+
+paste0("Overall modeling")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC+ KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
+paste0("Overall modeling in clade I")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC+ KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(clade_I=="Clade I") ) %>% tab_model() 
+paste0("Modeling > LOD")
+lmer(MVB_ratio_log10~ OmpK36GD+AA018_KPC_AA552_nonKPC+KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T)) %>% tab_model()
+paste0("Modeling > LOD in clade I")
+lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC+KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T &clade_I=="Clade I"))  %>% tab_model()
+```
+
+
+# TLDR:
+
+1. Positive association with clade
+
+2. Positive association with Loop 3
+
+3. Positive association with having AA018 KPC
+
+4. No association having both AA018 w/ KPC and AA552 without KPC
+
+5. Interaction modeling didn't have important findings

@@ -33,7 +33,7 @@ eligible_variables <- readLines("./data/regression/eligible_variables.txt")
 # Purposeful selection algorithm
 ## Without confounding (i.e., set confounding_criteria to a very high number)  
 ```{r} 
-purposeful_output <-  phyloaware_regression(trait = 'blbli_dich_num',variables =eligible_variables,df=df,first_present=T,patient_id="Patient_ID",culture_date="Cx_date",multivariable='purposeful',stepwise_direction = NULL,entry_criteria = 0.20,retention_criteria = 0.1,confounding_criteria = 1000e100)
+purposeful_output <-  phyloaware_regression(trait = 'blbli_dich_num',variables =eligible_variables,df=df,first_present=T,patient_id="Patient_ID",culture_date="Cx_date",multivariable='purposeful',stepwise_direction = NULL,entry_criteria = 0.20,retention_criteria = 0.10,confounding_criteria = 1000e1000)
 
 saveRDS(purposeful_output,"./data/regression/purposeful_regression_results.RDS")
 ```

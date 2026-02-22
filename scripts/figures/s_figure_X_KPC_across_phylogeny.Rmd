@@ -1,0 +1,110 @@
+---
+title: "s_figure_X_KPC_across_phylogeny"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+```{r}
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer")
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+# Data
+
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile") 
+
+## KPC Plasmids 
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters) 
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
+
+## BLBLI clustering
+pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
+blbli_asr <- readRDS("./data/asr_clustering/blbli_asr.RDS")
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
+df <- left_join(df,pclustering %>% select(isolate_no,blbli_asr_cluster_renamed))
+df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No Feature"="Susceptible" )
+
+# KPC_copy number
+KPC_copy_number <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS") %>% select(KPNIH1_RS28775_chr_median_norm) %>% rename(KPC_copy_number=KPNIH1_RS28775_chr_median_norm) %>% mutate(isolate_no = rownames(.))
+
+df <- left_join(df,KPC_copy_number)
+
+df$KPC_plasmid <- sapply(df$isolate_no,FUN=function(x){
+  plasmid <- KPC_containing_clusters %>% subset(rownames(.)==x) %>% colSums(.) %>% subset(.>0)%>% names()
+  ifelse(length(plasmid)==0,"No Plasmid",plasmid)
+}) %>% unlist
+
+# KPC plasmid copy number
+KPC_plasmid_copy_number <- readRDS("./data/KPC_plasmid_coverage/KPC_plasmid_copy_number_chromosome_normalized.RDS")
+df <- left_join(df,KPC_plasmid_copy_number)
+
+# KPC gene
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+```
+
+# Plot on the tree
+```{r,fig.height=9.5,fig.width=11.08333}
+df$KPC_copy_number_log2 <- log2(df$KPC_copy_number)
+df$KPC_plasmid_copy_number_log2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
+
+consistent_theme_phylo <-  theme(legend.position = 'bottom',legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(.35, "cm"),legend.key.width = unit(.35, "cm"),legend.spacing.x=unit(.0001, "cm"), legend.title = element_text(size=12,hjust=0.5),legend.text = element_text(size=10,hjust=0))
+ 
+rownames(df) <- df$isolate_no
+
+log2_cont_scale <- scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, na.value = "lightgrey",name = "Log2 Copy Number",guide=guide_colourbar(direction = "vertical",order = 5))
+
+p0 <- gheatmap(ggtree(tr),data=df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05) + cluster_scale  + ylim(NA,550) + consistent_theme_phylo
+
+p0.1 <- p0+ggnewscale::new_scale_fill()
+
+p1 <- gheatmap(p0.1,data=df %>% select(blbli_dich) %>% mutate_all(as.factor) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.0000125) + resistance_scale + ylim(NA,550) + consistent_theme_phylo
+
+p1.1 <- p1+ggnewscale::new_scale_fill()
+
+p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.000025) + Log2_scale + ylim(NA,550) + consistent_theme_phylo
+
+p2.1 <- p2+ggnewscale::new_scale_fill()
+
+p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC allele")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.00005) + kpc_scale + consistent_theme_phylo
+
+p3.1 <- p3+ggnewscale::new_scale_fill()
+
+p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("Log-2 blaKPC plasmid copy number","Log-2 blaKPC copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.00006125) + log2_cont_scale + ylim(NA,550)  + consistent_theme_phylo
+   
+p4.1 <- p4+ggnewscale::new_scale_fill()
+  
+figure <- gheatmap(p4.1,data=KPC_containing_clusters %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing Plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.5,offset =.0000875) + feature_scale_v + ylim(NA,600)   + consistent_theme_phylo
+
+figure
+```
+
+```{r}
+ggsave("./figures/s_figure_X_KPC_copy_number_across_phylogeny.png",plot=figure, units='in',height=9.5,width=11.08333,dpi=900,bg='white')
+```

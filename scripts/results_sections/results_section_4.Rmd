@@ -42,6 +42,8 @@ KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.)
 KPC_clusters <- colnames(KPC_containing_clusters)
 Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
 df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))
+## Plasmid data
+mobsuite_typer <- readRDS("./data/mobsuite/mobtyper.RDS")
 ## Core genome burden models
 models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
 for(x in models){
@@ -150,7 +152,27 @@ synchronous_pass %>% select(locus_tag,gene,product,blbli_res_freq,blbli_sus_freq
 novel_synchronous <- synchronous_pass %>% subset(!locus_tag %in% c("KPNIH1_RS18665","KPNIH1_RS07805")) %>% .$genotype
 ```
 
+# AA018 plasmid
+## Plasmid incompatability group
+```{r}
+AA018 <- mobsuite_typer %>% subset(primary_cluster_id == "AA018") 
+
+convert_tableone_into_df(dataset = AA018, vars = c('size','gc','rep_types','relaxase_types','mpf_type','orit_type','predicted_mobility','predicted_host_range_overall_rank',"observed_host_range_ncbi_name"))
+
+table(AA018$predicted_mobility)
+```
+
+
 # AA552 plasmid
+## Plasmid incompatability group
+```{r} 
+AA552 <- mobsuite_typer %>% subset(primary_cluster_id == "AA552")
+AA552$FJ223607 <- ifelse(AA552$mash_nearest_neighbor == "FJ223607",T,F)
+
+convert_tableone_into_df(dataset = AA552, vars = c('size','gc','rep_types','relaxase_types','mpf_type','orit_type','predicted_mobility','predicted_host_range_overall_rank',"observed_host_range_ncbi_name"),strata = 'FJ223607',outcome_names = c("Not F","FJ"))
+```
+
+## Overall data
 ```{r} 
 plasmid_table <- table(df$AA552_KPC,df$blbli_dich_num) 
 plasmid_table

@@ -1,0 +1,208 @@
+---
+title: "s_figure_X_KPC_copy_number_dynamics"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+```
+
+# Environment
+```{r}
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source("./lib/common_functions.R")
+source("./lib/consistent_themes.R")
+source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
+
+# Set null device
+set_null_device("png")
+```
+
+# Load data
+
+```{r} 
+# Standard data
+df <- readRDS("./data/dataset/df.RDS")
+tr <- read.tree("./data/tree/tree.treefile")
+
+## KPC Plasmids 
+KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
+KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+KPC_clusters <- colnames(KPC_containing_clusters) 
+df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) 
+
+# KPC_copy number
+KPC_copy_number <- readRDS("./data/KPC_coverage/normalized/KPNIH1_KPC_plasmid_depth_by_feature_median_chromosome_normalized.RDS") %>% select(KPNIH1_RS28775_chr_median_norm) %>% rename(KPC_copy_number=KPNIH1_RS28775_chr_median_norm) %>% mutate(isolate_no = rownames(.))
+
+df <- left_join(df,KPC_copy_number)
+df$KPC_plasmid <- sapply(df$isolate_no,FUN=function(x){
+  plasmid <- KPC_containing_clusters %>% subset(rownames(.)==x) %>% colSums(.) %>% subset(.>0)%>% names() %>% gsub("_KPC","",.)
+  ifelse(length(plasmid)==0,"No Plasmid",plasmid)
+}) %>% unlist
+
+# KPC plasmid copy number
+KPC_plasmid_copy_number <- readRDS("./data/KPC_plasmid_coverage/KPC_plasmid_copy_number_chromosome_normalized.RDS")
+df <- left_join(df,KPC_plasmid_copy_number)
+
+# KPC data
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+
+df$KPC_copy_number_log_2 <- log2(df$KPC_copy_number)
+df$KPC_plasmid_copy_number_log_2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
+```
+
+## A. KPC copy number distributoin
+```{r}
+A <- ggplot(df, aes(x= KPC_copy_number_log_2)) + geom_histogram(fill='black')  + theme_bw_me  + xlab("Log2 blaKPC copy number") + ylab("Isolates")  + geom_vline(xintercept = 1,linetype = 2,colour = 'brown')  + geom_vline(xintercept = 0,linetype = 2,colour = 'darkgray')   
+ A 
+```
+
+## B. blaKPC copy number
+```{r}
+B <- ggplot(df, aes(x = KPC_allele, y = KPC_copy_number_log_2)) +
+  geom_boxplot(outliers=F) +
+  geom_jitter( height=0,
+              size = 0.5, alpha = 0.7)  + theme_bw_me  + xlab("blaKPC allele") + ylab("Log2 blaKPC copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + ylim(-3,5)
+
+B
+```
+
+## C. KPC by copy number
+```{r}
+C <- ggplot(df, aes(x = KPC_plasmid, y = KPC_copy_number_log_2)) +
+  geom_boxplot(outliers=F) +
+  geom_jitter( height=0,
+              size = 0.5, alpha = 0.7)  + theme_bw_me  + xlab("blaKPC-containing plasmid") + ylab("Log2 blaKPC copy number")  + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')   + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))  + ylim(-3,5)
+
+C
+```
+
+## D. blaKPC plasmid copy number
+```{r}
+D <- ggplot(df, aes(x = KPC_plasmid, y = KPC_plasmid_copy_number_log_2)) +
+  geom_boxplot(outliers=F) +
+  geom_jitter( height=0,
+              size = 0.5, alpha = 0.7)  + theme_bw_me  + xlab("") + ylab("Log2 plasmid copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))  + theme(axis.title.x = element_blank())  + ylim(-3,5)
+
+D
+```
+
+## E. Association between KPC and plasmid copy number
+```{r}
+E <-ggplot(df %>% subset(KPC_plasmid != "No Plasmid"), aes(x = KPC_plasmid_copy_number_log_2, y = KPC_copy_number_log_2)) + geom_point(size=0.5) + geom_abline(linetype = 2) +   theme_bw_me  + xlab("Log2 plasmid copy number") + ylab("Log2 blaKPC copy number")  + geom_smooth(method = 'glm')  + ylim(-3,5)  + xlim(-3,5)
+
+E
+```
+
+## F. KPC copy number by clade 
+```{r}
+f <- ggplot(df, aes(x = clade_I, y = KPC_copy_number_log_2)) +
+  geom_boxplot(aes(fill=clade_I),outliers = F ) +
+  geom_jitter(aes(color=clade_I), height = 0,
+              size = 0.5, alpha = 0.7) + theme_bw_me  + xlab("") + ylab("Log2 blaKPC copy number")  + clade_colors_scale_point + clade_colors_scale+ geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'darkgray')   + theme(axis.title.x = element_blank()) + ylim(-3,5)
+f
+```
+
+## G. blaKPC copy number
+```{r}
+G<- ggplot(df, aes(x = KPC_plasmid, y = KPC_copy_number_log_2, fill = clade_I)) +
+  geom_boxplot(position = position_dodge(width = 0.8),outliers=F) +
+  geom_jitter( 
+              position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8),
+              size = 0.5, alpha = 0.7) +
+  ggpubr::stat_compare_means() + theme_bw_me  + xlab("") + ylab("Log2 blaKPC copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + clade_colors_scale   + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank()) + ylim(-3,5)
+
+G
+```
+
+# Nearest neighbor analysis
+```{r} 
+isolates_w_plasmid <- subset(df,KPC_plasmid!="No Plasmid") %>% .$isolate_no
+isolates_w_KPC <- subset(df,KPC_copy_number>0) %>% .$isolate_no
+nn_dataset <-  df %>% select(isolate_no,KPC_plasmid,KPC_copy_number,blbli_dich_num) %>% subset(isolate_no %in% isolates_w_KPC)
+
+phylogenetic_distance <- readRDS("./data/tree/phylo_dist.RDS") %>% as.data.frame %>% subset(rownames(.) %in% df$isolate_no) %>% select(any_of(df$isolate_no)) %>% subset(rownames(.) %in% isolates_w_KPC) %>% select(any_of(isolates_w_KPC)) %>% as.matrix
+ 
+variant_distance <- readRDS("./data/nearest_neighbor_comparisons/pairwise_snp_dist_mat.RDS") %>% as.data.frame %>% select(any_of(isolates_w_KPC)) %>% subset(rownames(.) %in% isolates_w_KPC)  %>% as.matrix
+
+plasmids <- colnames(KPC_containing_clusters)
+
+nn_comps_all_vars_of_interest <- pbmcapply::pbmclapply(plasmids,function(variable_name){
+  isolates_w_plasmid <- df[,c("isolate_no",variable_name)] %>% subset(get(paste(variable_name))==1) %>% select(isolate_no) %>% unlist
+ variant_nn_data <- lapply(isolates_w_plasmid,FUN=nearest_neighbor_algorithm,tip_name_variable = 'isolate_no',phylogenetic_distance = phylogenetic_distance,variant_distance = variant_distance,annotate=T,metadata=df,variables_of_interest=c("clade_I","KPC_plasmid","KPC_copy_number",'blbli_dich_num',"MVB_num","IR_num"), comparison=T,comparison_feature = 'KPC_plasmid') %>% do.call(rbind,.)
+  nn_comps_with_variant <- nearest_neighbor_analysis(variant_nn_data,binary_vars = c("blbli_dich_num"),categorical_vars = c("KPC_plasmid","clade_I"), continuous_vars = c("KPC_copy_number","MVB_num","IR_num"),log_2=T)%>% as.data.frame
+  nn_comps_with_variant_sum <- nearest_neighbor_summary_statistics(nn_comps_with_variant,binary_vars = c("blbli_dich_num"),categorical_vars = c("KPC_plasmid","clade_I"), continuous_vars = c("KPC_copy_number","MVB_num","IR_num"),log_2=T)   
+  lists <- list(variant_nn_data,nn_comps_with_variant,nn_comps_with_variant_sum) %>% `names<-`(c("variant_nn_data","nn_comps_with_variant","nn_comps_with_variant_sum")) 
+  return(lists)
+},mc.cores=7) %>% `names<-`(plasmids)
+
+variant_stats <- lapply(nn_comps_all_vars_of_interest,FUN=function(x){x$nn_comps_with_variant}) %>% do.call(rbind,.)
+summary_stats <-  lapply(nn_comps_all_vars_of_interest,FUN=function(x){x$nn_comps_with_variant_sum }) %>% do.call(rbind,.) %>% mutate(plasmid=names(nn_comps_all_vars_of_interest))
+variant_stats$KPC_copy_number_change <- ifelse(variant_stats$KPC_copy_number_diff>0,"increase",ifelse(variant_stats$KPC_copy_number_diff<0,"decrease","neutral"))
+``` 
+
+## H. Change in copy number by plasmid type
+```{r}
+H <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=KPC_copy_number_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1) + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's KPC plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in blaKPC copy number")  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  
+
+H
+```
+
+## I. Directional change in KPC copy number
+```{r}
+I <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=KPC_copy_number_change)) + geom_bar() + xlab("") + ylab("Isolates") + theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(breaks = c("increase","decrease"),values = c("maroon","gray"),name = 'Change in blaKPC copy number',labels = c("Increase","Decrease"), guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())
+ 
+I_legend <- cowplot::get_legend(I) %>% cowplot::plot_grid()
+
+I
+```
+
+## J. MVB change
+```{r}
+J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's blaKPC-containing plasmid",guide = guide_legend(nrow=2,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log2 MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())
+
+J
+```
+
+## K. IR Change
+```{r}
+K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's KPC plasmid",guide = guide_legend(nrow=2,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log2 IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())
+
+K_legend <- cowplot::get_legend(K) %>% cowplot::plot_grid()
+
+K
+```
+
+## L. BL/BLI change
+```{r}  
+L <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=blbli_dich_num_binary_diff)) + geom_bar() + xlab("") + ylab("Isolates")+ theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(values = c("black","gray","green4"),breaks = c("gain","same",'loss'),labels = c("Acquisition","Same","Reversion"),name = "Change in BL/BLI resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())
+
+L_legend <- cowplot::get_legend(L) %>% cowplot::plot_grid()
+
+L
+```
+
+```{r,fig.height=13.75,fig.width=11}
+legends <- cowplot::plot_grid(I_legend,K_legend,L_legend,ncol=3)
+figure <- cowplot::plot_grid(A + theme(legend.position = 'none'),B,C,D,E ,f + theme(legend.position = 'none'),G+ theme(legend.position = 'none'),H + theme(legend.position = 'none'),I+ theme(legend.position = 'none'),J+ theme(legend.position = 'none'),K+ theme(legend.position = 'none'),L+ theme(legend.position = 'none'),ncol=3,labels = "AUTO")
+figure_w_legends <- cowplot::plot_grid(figure,legends,ncol=1,rel_heights = c(1,0.1))
+figure_w_legends
+```
+
+```{r}
+ggsave("./figures/s_figure_X_KPC_copy_number_dynamics.png",plot=figure, units='in',height=13.75,width=11,dpi=900,bg='white')
+```

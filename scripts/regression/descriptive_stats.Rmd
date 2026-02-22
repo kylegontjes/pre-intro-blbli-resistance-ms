@@ -41,5 +41,3 @@ descriptive_data$cluster$term <- eligible_variables
 ```{r}
 saveRDS(descriptive_data,"./data/regression/descriptive_stats.RDS")
 ```
-
-

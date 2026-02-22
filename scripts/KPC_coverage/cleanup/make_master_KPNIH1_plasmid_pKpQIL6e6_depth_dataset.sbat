@@ -1,0 +1,13 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=make_KPNIH1_plasmid_depth_matrix
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/KPC_coverage/cleanup/KPNIH1_plasmid_depth_matrix.out
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=50g --time=2:00:00
+echo 'Running depth'
+bash make_master_KPNIH1_plasmid_pKpQIL6e6_depth_dataset.sh
