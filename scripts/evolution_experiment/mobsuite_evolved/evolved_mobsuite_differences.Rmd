@@ -176,7 +176,8 @@ mobsuite_differences <- rbind(differences,PCMP_H261 )%>% rbind(.,PCMP_H318)
 
 mobsuite_differences <-   mobsuite_differences%>% arrange(parent)
 
-mobsuite_differences %>% favorite_kable()
+saveRDS(mobsuite_differences,"./data/evolution_experiment/mobsuite_evolved/mobsuite_evolved_differences.RDS")
 
+mobsuite_differences %>% favorite_kable()
 ```
 

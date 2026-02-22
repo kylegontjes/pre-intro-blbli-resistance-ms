@@ -86,7 +86,7 @@ SNP_parsed <- clean_snpkit_output_SNP_evol(SNP_matrix_code,SNP_matrix_allele,con
 SNP_parsed_bin <- SNP_parsed$bin 
 rownames(SNP_parsed_bin) <- gsub("H019","H19",rownames(SNP_parsed_bin))
 
-saveRDS(SNP_parsed_bin,"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_parsed.RDS")
+saveRDS(SNP_parsed_bin,"~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_parsed.RDS")
 
 ## INDEL
 INDEL_parsed <- clean_snpkit_output_INDEL_evol(INDEL_matrix_code,INDEL_matrix_allele,conf=F) 
@@ -107,7 +107,7 @@ parents <- unique(kleborate_short$parent ) %>% sort
 
 # SNP diffs
 ```{r}
-lapply(parents,FUN=function(x){
+get_difference_vc <- function(x,SNP_parsed_bin){
   parent <- SNP_parsed_bin[rownames(SNP_parsed_bin)==x,]
   parent_SNPs <- parent %>% select_if(colSums(.)>0) %>% colnames()
   evolved <-  SNP_parsed_bin[rownames(SNP_parsed_bin)==paste0(x,"_MVB_R"),]
@@ -125,16 +125,41 @@ lapply(parents,FUN=function(x){
   evolved_unique_num <- length(evolved_unique_SNPs)
   evolved_unique_str <- paste0(evolved_unique_SNPs,collapse=";")
   
-  cbind.data.frame(parent = x,shared_SNPs_num,parent_unique_num,parent_unique_str,evolved_unique_num,evolved_unique_str)
+  cbind.data.frame(parent = x,shared_SNPs_str,shared_SNPs_num,parent_unique_num,parent_unique_str,evolved_unique_num,evolved_unique_str)
   
-  
-}) %>% do.call(rbind,.) %>% favorite_kable()
+}
+```
+# SNP
+## Overall
+```{r}
+SNP_differences <- lapply(parents,FUN=function(x){
+  get_difference_vc(x,SNP_parsed_bin = SNP_parsed_bin) 
+}) %>% do.call(rbind,.)
+
+favorite_kable(SNP_differences)
+
+saveRDS(SNP_differences, "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_overall.RDS")
+```
+
+## Canonical mutations
+```{r}
+canonical_SNPs <- colnames(SNP_parsed_bin)[grepl("KPNIH1_RS18665|KPNIH1_RS07240|KPNIH1_RS07230|KPNIH1_RS06200|KPNIH1_RS07805|KPNIH1_RS24320",colnames(SNP_parsed_bin))]
+
+SNP_parsed_bin_canonical <- SNP_parsed_bin %>% select(any_of(canonical_SNPs))
+
+SNP_differences_canonical <- lapply(parents,FUN=function(x){
+  get_difference_vc(x,SNP_parsed_bin = SNP_parsed_bin_canonical) 
+}) %>% do.call(rbind,.)
+
+favorite_kable(SNP_differences_canonical)
+
+saveRDS(SNP_differences_canonical, "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS")
 ```
 
 # INDEL diffs
 ```{r}
-lapply(parents,FUN=function(x){
-  parent <- INDEL_parsed_bin[rownames(INDEL_parsed_bin)==x,]
+get_differences_indel <- function(x,INDEL_parsed_bin){
+   parent <- INDEL_parsed_bin[rownames(INDEL_parsed_bin)==x,]
   parent_indels <- parent %>% select_if(colSums(.)>0) %>% colnames()
   evolved <-  INDEL_parsed_bin[rownames(INDEL_parsed_bin)==paste0(x,"_MVB_R"),]
   evolved_indels <- evolved %>% select_if(colSums(.)>0) %>% colnames()
@@ -151,9 +176,33 @@ lapply(parents,FUN=function(x){
   evolved_unique_num <- length(evolved_unique_indels)
   evolved_unique_str <- paste0(evolved_unique_indels,collapse=";")
   
-  cbind.data.frame(parent = x,shared_indels_num,parent_unique_num,parent_unique_str,evolved_unique_num,evolved_unique_str)
-  
-  
-}) %>% do.call(rbind,.) %>% favorite_kable()
+  cbind.data.frame(parent = x,shared_indels_str,shared_indels_num,parent_unique_num,parent_unique_str,evolved_unique_num,evolved_unique_str)
+}
+```
+
+## Overall
+```{r}
+INDEL_diff_overall <- lapply(parents,FUN=function(x){
+  get_differences_indel(x,INDEL_parsed_bin)
+}) %>% do.call(rbind,.) 
+
+favorite_kable(INDEL_diff_overall)
+
+saveRDS(INDEL_diff_overall, "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_overall.RDS")
+```
+
+## Canonical
+```{r}
+canonical_INDELs <- colnames(INDEL_parsed_bin)[grepl("KPNIH1_RS18665|KPNIH1_RS07240|KPNIH1_RS07230|KPNIH1_RS06200|KPNIH1_RS07805|KPNIH1_RS24320",colnames(INDEL_parsed_bin))]
+
+INDEL_parsed_bin_canonical <- INDEL_parsed_bin %>% select(any_of(canonical_INDELs))
+
+INDEL_differences_canonical <- lapply(parents,FUN=function(x){
+  get_differences_indel(x,INDEL_parsed_bin = INDEL_parsed_bin_canonical) 
+}) %>% do.call(rbind,.)
+
+favorite_kable(INDEL_differences_canonical)
+
+saveRDS(INDEL_differences_canonical, "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS")
 ```
  

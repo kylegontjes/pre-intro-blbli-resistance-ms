@@ -58,11 +58,11 @@ isfinder_results %>% arrange(parent) %>% favorite_kable()
 ```
 
 ```{r}
-lapply(parents,FUN=function(x){
-  isfinder_sub <- subset(isfinder_results,parent==x)
-  isfinder_sub_parent <- subset(isfinder_sub,isolate_no ==x)
-  isfinder_sub_evolved <- subset(isfinder_sub,isolate_no !=x)
-  parent = x
+get_difference <- function(isolate,isfinder){
+  isfinder_sub <- subset(isfinder,parent==isolate)
+  isfinder_sub_parent <- subset(isfinder_sub,isolate_no ==isolate)
+  isfinder_sub_evolved <- subset(isfinder_sub,isolate_no !=isolate)
+  parent = isolate
   parent_IS = unique(isfinder_sub_parent$IS_id)
   evolved_IS = unique(isfinder_sub_evolved$IS_id)
   shared_IS = intersect(parent_IS,evolved_IS)
@@ -71,7 +71,33 @@ lapply(parents,FUN=function(x){
   different_IS_locations = sum(length(parent_only_IS),length(evolved_only_IS)) >0
   
   cbind.data.frame(parent,shared_IS  = paste0(shared_IS,collapse=';'), parent_only_IS  = paste0(parent_only_IS,collapse=';'), evolved_only_IS  = paste0(evolved_only_IS,collapse=';'),different_IS_locations)
-  
-}) %>% do.call(rbind,.) %>% favorite_kable()
+}
 ```
+
+
+```{r}
+is_finder_data_overall <-  lapply(parents,FUN=function(x){
+  get_difference(isolate=x,isfinder=isfinder_results) 
+  
+}) %>% do.call(rbind,.) 
+
+favorite_kable(is_finder_data_overall)
+
+saveRDS(is_finder_data_overall,"data/evolution_experiment/panISa_evolved/panISa_differences_overall.RDS")
+```
+
+# Genes of interest
+```{r} 
+isfinder_results_goi <- subset(isfinder_results,grepl("KPNIH1_RS18665|KPNIH1_RS07240|KPNIH1_RS07230|KPNIH1_RS06200|KPNIH1_RS07805|KPNIH1_RS24320",isfinder_results$locus_tag))
+
+is_finder_data_goi <-  lapply(parents,FUN=function(x){
+  get_difference(isolate=x,isfinder=isfinder_results_goi) 
+  
+}) %>% do.call(rbind,.) 
+
+favorite_kable(is_finder_data_goi)
+
+saveRDS(is_finder_data_goi,"./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS")
+```
+
 

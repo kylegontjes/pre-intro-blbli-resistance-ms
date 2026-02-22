@@ -13,7 +13,7 @@
 
 <meta name="date" content="2026-02-21" />
 
-<title>evolved_kleborate_differences</title>
+<title>Table 2: Comparative changes</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -574,96 +574,136 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">evolved_kleborate_differences</h1>
+<h1 class="title toc-ignore">Table 2: Comparative changes</h1>
 <h4 class="author">Kyle Gontjes</h4>
 <h4 class="date">2026-02-21</h4>
 
 </div>
 
 
-<pre class="r"><code># Standard data
-df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
-tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;) </code></pre>
-<div id="kleborate" class="section level1">
-<h1>Kleborate</h1>
-<pre class="r"><code>kleborate_hybrid &lt;- read_delim(&quot;./data/kleborate_hybrid/klebsiella_pneumo_complex_output.txt&quot;)
-kleborate_hybrid$isolate_no &lt;- gsub(&quot;_flye_medaka_polypolish&quot;,&quot;&quot;,kleborate_hybrid$strain)  %&gt;% gsub(&quot;PCMP_H019&quot;,&quot;PCMP_H19&quot;,.)
-kleborate_hybrid$parent &lt;- gsub(&quot;_MVB_R&quot;,&quot;&quot;,kleborate_hybrid$isolate_no)
-kleborate_hybrid$type &lt;- &quot;hybrid&quot;
+<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;cowplot&quot;,&quot;ggtree&quot;,&quot;ape&quot;,&quot;phytools&quot;,&quot;gridExtra&quot;,&quot;kableExtra&quot;,&quot;colorRamp2&quot;,&quot;RColorBrewer&quot;,&quot;ComplexHeatmap&quot;,&#39;phyloAMR&#39;)
 
-kleborate_short &lt;- read_delim(&quot;./data/evolution_experiment/kleborate_short/klebsiella_pneumo_complex_output.txt&quot;)
-kleborate_short$isolate_no &lt;- gsub(&quot;_contigs_l1000&quot;,&quot;&quot;,kleborate_short$strain)  %&gt;% gsub(&quot;PCMP_H019&quot;,&quot;PCMP_H19&quot;,.)
-kleborate_short$parent &lt;- gsub(&quot;_MVB_R&quot;,&quot;&quot;,kleborate_short$isolate_no)
-kleborate_short$type &lt;- &quot;short&quot;
+# Load packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+source(&quot;./lib/common_functions.R&quot;)
+source(&quot;./lib/consistent_themes.R&quot;)
+source(&quot;./scripts/GWAS/analysis/GWAS_analysis_scripts.R&quot;) 
 
-parents &lt;- unique(kleborate_short$parent ) %&gt;% sort</code></pre>
+# Set null device
+set_null_device(&quot;png&quot;)</code></pre>
+<div id="kpc-data" class="section level1">
+<h1>KPC data</h1>
+<pre class="r"><code>coverage_stats &lt;- readRDS(&quot;./data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS&quot;)
+coverage_stats &lt;- coverage_stats %&gt;% arrange(parent) %&gt;% distinct
+
+
+plasmid_copy_numer_data &lt;- coverage_stats %&gt;% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)# %&gt;% `colnames&lt;-`(c(&quot;Parent&quot;,&quot;blaKPC allele&quot;,&quot;Parental blaKPC plasmid&quot;,&quot;Parental blaKPC CN&quot;,&quot;Parental blaKPC plasmid CN&quot;,&quot;Evolved blaKPC CN&quot;,&quot;Evolved blaKPC plasmid CN&quot;,&quot;blaKPC CN fold change&quot;,&quot;blaKPC plasmid CN fold change&quot;))</code></pre>
 </div>
-<div id="get-prefered-entry" class="section level1">
-<h1>Get prefered entry</h1>
-<pre class="r"><code>isolates &lt;- c(kleborate_short$isolate_no) %&gt;% sort
+<div id="mobsuite-data" class="section level1">
+<h1>Mobsuite data</h1>
+<pre class="r"><code>mobsuite_differences &lt;- readRDS(&quot;./data/evolution_experiment/mobsuite_evolved/mobsuite_evolved_differences.RDS&quot;)
 
-kleborate_type_data &lt;- lapply(isolates,FUN=function(x){
-  hybrid &lt;- subset(kleborate_hybrid,isolate_no ==x) 
-  in_hybrid &lt;- nrow(hybrid) &gt;0
-  if(in_hybrid){
-    hybrid
+mobsuite_differences_tbl &lt;- mobsuite_differences %&gt;% select(parent,evolved_kpc_plasmid,kpc_plasmid_size_difference)
+
+#colnames(mobsuite_differences_tbl) &lt;- c(&quot;Parent&quot;,&quot;Evolved blaKPC plasmid&quot;,&quot;blaKPC plasmid size difference (bp)&quot;)</code></pre>
+</div>
+<div id="dataframe" class="section level1">
+<h1>Dataframe</h1>
+<pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
+
+df_hits &lt;- df %&gt;% select(isolate_no,clade_I) %&gt;% subset(isolate_no %in% mobsuite_differences$parent)
+df_hits$parent &lt;- df_hits$isolate_no</code></pre>
+</div>
+<div id="kleborate-data" class="section level1">
+<h1>Kleborate data</h1>
+<pre class="r"><code>kleb_diffs &lt;- readRDS(&quot;./data/evolution_experiment/kleborate_evolved/kleborate_evolved_differences.RDS&quot;)
+
+kleb_diffs_hits &lt;- kleb_diffs %&gt;% select(parent,parent_Omp_mutations)
+kleb_diffs_hits$ompK36_parental &lt;- gsub(&quot;OmpK35-25%&quot;,&quot;&quot;,kleb_diffs_hits$parent_Omp_mutations)   %&gt;% trimws(.,which=&#39;left&#39;,whitespace=&#39;;&#39;)
+kleb_diffs_hits$ompK36_parental &lt;- recode(kleb_diffs_hits$ompK36_parental,
+                                          &quot;OmpK36_c25t&quot; = &quot;25 C&gt;T transition&quot;,
+                                          &quot;OmpK36GD;OmpK36_c25t&quot; = &quot;25 C&gt;T transition &amp; GD insertion in loop 3&quot;)
+kleb_diffs_hits_sub &lt;- kleb_diffs_hits %&gt;% select(parent,ompK36_parental)</code></pre>
+</div>
+<div id="is-element-data" class="section level1">
+<h1>IS element data</h1>
+<pre class="r"><code>is_finder_data_goi &lt;- readRDS(&quot;./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS&quot;)
+
+KPNIH1_features &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS&quot;)
+
+is_finder_location_data &lt;-   lapply(is_finder_data_goi$evolved_only_IS,FUN=function(x){
+  hit &lt;- x
+  if(hit==&#39;&#39;){
+    evolved_only_IS=NA
+    is_element=NA
+    Start_Position = NA
+    Stop_Position = NA
+    locus_tag=NA
   } else {
-    subset(kleborate_short,isolate_no ==x)
+    
+  Start_Position &lt;- str_split(hit,&quot;_&quot;,simplify=T) %&gt;% .[,2]
+  Stop_Position &lt;- str_split(hit,&quot;_&quot;,simplify=T) %&gt;% .[,3] 
+  is_element = str_split(hit,&quot;_&quot;,simplify=T) %&gt;% .[,1]
+  is_start = as.numeric(Start_Position)
+  is_end = as.numeric(Stop_Position)
+  in_gene &lt;- subset(KPNIH1_features,start &lt;= is_start &amp; end &gt;= is_end) 
+  if(nrow(in_gene)&gt;0){
+    locus_tag &lt;- in_gene$locus_tag
+  } else{
+    # Get the two genes that the position is found within using is_start and is_end
+    upstream_gene &lt;- KPNIH1_features[KPNIH1_features$end &lt; is_start,] %&gt;% .[which.min(abs(.$end - is_start)),&quot;locus_tag&quot;]
+    
+    downstream_genes &lt;- KPNIH1_features[KPNIH1_features$start &gt; is_end,] %&gt;% .[which.min(abs(.$start - is_end)),&quot;locus_tag&quot;]
+ 
+    locus_tag &lt;- paste0(upstream_gene,&quot;-&quot;,downstream_genes)   
   }
+  evolved_only_IS=hit
   
-}) %&gt;% do.call(rbind,.)</code></pre>
+  
+  
+  }
+  cbind.data.frame(evolved_only_IS=evolved_only_IS,is_element,locus_tag,Start_Position,Stop_Position)
+})  %&gt;% do.call(rbind,.)
+
+is_finder_data_goi &lt;- left_join(is_finder_data_goi,is_finder_location_data)
+is_finder_data_goi$gene &lt;- recode(is_finder_data_goi$locus_tag,
+                                  &quot;KPNIH1_RS18665&quot; = &#39;ompK36&#39;,
+                                  &quot;KPNIH1_RS18665-KPNIH1_RS18675&quot; = &#39;upstream ompK36&#39;)
+is_finder_data_goi$canonical_IS &lt;- ifelse(is_finder_data_goi$evolved_only_IS== &quot;&quot;,&quot;&quot;,
+                                           paste0(is_finder_data_goi$gene,&quot; [&quot;,is_finder_data_goi$is_element,&quot;]; &quot; ,is_finder_data_goi$Start_Position) ) 
+
+is_finder_data_goi_data &lt;- is_finder_data_goi %&gt;% select(parent,canonical_IS)</code></pre>
 </div>
-<div id="genome-data" class="section level1">
-<h1>Genome data</h1>
-<pre class="r"><code>genome_data &lt;- lapply(parents,FUN=function(x){
-  # Plasmid
-  kleborate_data &lt;- subset(kleborate_type_data,parent==x)
-  parent = x
-  parent_data &lt;- subset(kleborate_data,isolate_no==x) %&gt;% select(total_size,contig_count,largest_contig) %&gt;% `colnames&lt;-`(paste0(&quot;parent_&quot;,colnames(.)))
-  evolved_data &lt;- subset(kleborate_data,isolate_no!=x) %&gt;% select(total_size,contig_count,largest_contig) %&gt;% `colnames&lt;-`(paste0(&quot;evolved_&quot;,colnames(.)))
-  merged_assembly_stats &lt;- cbind.data.frame(parent,parent_data,evolved_data)
-  merged_assembly_stats$total_size_diff &lt;- merged_assembly_stats$evolved_total_size - merged_assembly_stats$parent_total_size
-  merged_assembly_stats$largest_contig_size_diff &lt;- merged_assembly_stats$evolved_largest_contig - merged_assembly_stats$parent_largest_contig
-  merged_assembly_stats$contig_count_diff &lt;- merged_assembly_stats$evolved_contig_count - merged_assembly_stats$parent_contig_count
-  merged_assembly_stats
-}) %&gt;% do.call(rbind,.)  
+<div id="snpindel-data" class="section level1">
+<h1>SNP/INDEL data</h1>
+<div id="no-evolved-snps" class="section level2">
+<h2>No evolved SNPs</h2>
+<pre class="r"><code>SNP_differences &lt;- readRDS( &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS&quot;)
 
-genome_data &lt;- genome_data %&gt;% arrange(parent)
-
-
-favorite_kable(genome_data)</code></pre>
+SNP_differences %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
 <th style="text-align:left;">
 parent
 </th>
-<th style="text-align:right;">
-parent_total_size
+<th style="text-align:left;">
+shared_SNPs_str
 </th>
 <th style="text-align:right;">
-parent_contig_count
+shared_SNPs_num
 </th>
 <th style="text-align:right;">
-parent_largest_contig
+parent_unique_num
+</th>
+<th style="text-align:left;">
+parent_unique_str
 </th>
 <th style="text-align:right;">
-evolved_total_size
+evolved_unique_num
 </th>
-<th style="text-align:right;">
-evolved_contig_count
-</th>
-<th style="text-align:right;">
-evolved_largest_contig
-</th>
-<th style="text-align:right;">
-total_size_diff
-</th>
-<th style="text-align:right;">
-largest_contig_size_diff
-</th>
-<th style="text-align:right;">
-contig_count_diff
+<th style="text-align:left;">
+evolved_unique_str
 </th>
 </tr>
 </thead>
@@ -672,697 +712,120 @@ contig_count_diff
 <td style="text-align:left;">
 PCMP_H116
 </td>
-<td style="text-align:right;">
-5743466
+<td style="text-align:left;">
+Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional
+regulator;;Non-Coding SNP at 1437807 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230-KPNIH1_RS07235 Strand Information:
+KPNIH1_RS07230=-/KPNIH1_RS07235=+/;A|intergenic_region|MODIFIER|KPNIH1_RS07230-KPNIH1_RS07235|n.1437807T&gt;A||||null
+or hypothetical protein,null or hypothetical protein|TetR/AcrR family
+transcriptional regulator,MBL fold metallo-hydrolase,;;Coding SNP at
+3713483 &gt; A functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand
+Information:
+KPNIH1_RS18665=-;A|missense_variant|MODERATE|KPNIH1_RS18665|c.578G&gt;T|p.Arg193Leu|578/1110|193/369|null
+or hypothetical protein|porin OmpC;;Non-Coding SNP at 3714068 &gt; T
+functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665-KPNIH1_RS18675 Strand
+Information:
+KPNIH1_RS18665=-/KPNIH1_RS18675=+/;T|intergenic_region|MODIFIER|KPNIH1_RS18665-KPNIH1_RS18675|n.3714068A&gt;T||||null
+or hypothetical protein,rcsD|porin OmpC,phosphotransferase
+RcsD,;;Non-Coding SNP at 3714069 &gt; T functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665-KPNIH1_RS18675 Strand Information:
+KPNIH1_RS18665=-/KPNIH1_RS18675=+/;T|intergenic_region|MODIFIER|KPNIH1_RS18665-KPNIH1_RS18675|n.3714069C&gt;T||||null
+or hypothetical protein,rcsD|porin OmpC,phosphotransferase RcsD,;
 </td>
 <td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5497555
-</td>
-<td style="text-align:right;">
-5742979
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5498756
-</td>
-<td style="text-align:right;">
--487
-</td>
-<td style="text-align:right;">
-1201
+5
 </td>
 <td style="text-align:right;">
 0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H19
 </td>
-<td style="text-align:right;">
-5555986
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-4
+0
 </td>
 <td style="text-align:right;">
-5197681
+0
+</td>
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-5604536
+0
 </td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-5198880
-</td>
-<td style="text-align:right;">
-48550
-</td>
-<td style="text-align:right;">
-1199
-</td>
-<td style="text-align:right;">
-2
+<td style="text-align:left;">
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H226
 </td>
-<td style="text-align:right;">
-5890160
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-5382501
-</td>
-<td style="text-align:right;">
-5849555
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-5382451
-</td>
-<td style="text-align:right;">
--40605
-</td>
-<td style="text-align:right;">
--50
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
 <td style="text-align:left;">
-PCMP_H261
-</td>
-<td style="text-align:right;">
-5412144
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512388
-</td>
-<td style="text-align:right;">
-5401269
-</td>
-<td style="text-align:right;">
-65
-</td>
-<td style="text-align:right;">
-449615
-</td>
-<td style="text-align:right;">
--10875
-</td>
-<td style="text-align:right;">
--62773
+Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional regulator;
 </td>
 <td style="text-align:right;">
 1
 </td>
-</tr>
-<tr>
+<td style="text-align:right;">
+0
+</td>
 <td style="text-align:left;">
-PCMP_H318
-</td>
-<td style="text-align:right;">
-5500899
-</td>
-<td style="text-align:right;">
-70
-</td>
-<td style="text-align:right;">
-427736
-</td>
-<td style="text-align:right;">
-5598893
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5230256
-</td>
-<td style="text-align:right;">
-97994
-</td>
-<td style="text-align:right;">
-4802520
-</td>
-<td style="text-align:right;">
--65
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H323
-</td>
-<td style="text-align:right;">
-5417748
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5290268
-</td>
-<td style="text-align:right;">
-5431193
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5290267
-</td>
-<td style="text-align:right;">
-13445
-</td>
-<td style="text-align:right;">
--1
 </td>
 <td style="text-align:right;">
 0
 </td>
+<td style="text-align:left;">
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
-PCMP_H414
+PCMP_H261
+</td>
+<td style="text-align:left;">
+Coding SNP at 1242816 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS06200 Strand Information:
+KPNIH1_RS06200=-;A|missense_variant|MODERATE|KPNIH1_RS06200|c.2147G&gt;T|p.Arg716Leu|2147/3147|716/1048|null
+or hypothetical protein|multidrug efflux RND transporter permease
+subunit;;Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional
+regulator;;Coding SNP at 3714036 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.25C&gt;T|p.Leu9Leu|25/1110|9/369|null
+or hypothetical protein|porin OmpC;;Coding SNP at 3714037 &gt; A
+functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.24C&gt;T|p.Leu8Leu|24/1110|8/369|null
+or hypothetical protein|porin OmpC;
 </td>
 <td style="text-align:right;">
-5638929
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5294317
-</td>
-<td style="text-align:right;">
-5644462
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5295055
-</td>
-<td style="text-align:right;">
-5533
-</td>
-<td style="text-align:right;">
-738
+4
 </td>
 <td style="text-align:right;">
 0
 </td>
-</tr>
-<tr>
 <td style="text-align:left;">
-PCMP_H464
 </td>
 <td style="text-align:right;">
-5486503
+0
 </td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5293835
-</td>
-<td style="text-align:right;">
-5475105
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5293804
-</td>
-<td style="text-align:right;">
--11398
-</td>
-<td style="text-align:right;">
--31
-</td>
-<td style="text-align:right;">
--1
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="k-and-o-locus" class="section level1">
-<h1>K and O locus</h1>
-<div id="no-change" class="section level2">
-<h2>No change</h2>
-<pre class="r"><code>klocus &lt;- lapply(parents,FUN=function(x){
-  # Plasmid
-  kleborate_data &lt;- subset(kleborate_type_data,parent==x)
-  parent = x
-  parent_data &lt;- subset(kleborate_data,isolate_no==x) %&gt;% select(K_locus,K_type,K_locus_confidence,K_locus_problems,K_locus_identity,K_Missing_expected_genes,O_locus,O_type, O_locus_confidence,O_locus_problems,O_locus_identity,O_Missing_expected_genes) %&gt;% `colnames&lt;-`(paste0(&quot;parent_&quot;,colnames(.)))
-  evolved_data &lt;- subset(kleborate_data,isolate_no!=x) %&gt;% select(K_locus,K_type,K_locus_confidence,K_locus_problems,K_locus_identity,K_Missing_expected_genes,O_locus,O_type, O_locus_confidence,O_locus_problems,O_locus_identity,O_Missing_expected_genes) %&gt;% `colnames&lt;-`(paste0(&quot;evolved_&quot;,colnames(.)))
-  merged_assembly_stats &lt;- cbind.data.frame(parent,parent_data,evolved_data) 
-  merged_assembly_stats$different_K_locus &lt;- merged_assembly_stats$parent_K_locus != merged_assembly_stats$evolved_K_locus
-  merged_assembly_stats$different_O_locus &lt;- merged_assembly_stats$parent_O_locus != merged_assembly_stats$evolved_O_locus
-  merged_assembly_stats
-}) %&gt;% do.call(rbind.data.frame,.) 
-
-klocus &lt;- klocus %&gt;% arrange(parent)
-
-favorite_kable(klocus)</code></pre>
-<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
-<thead>
-<tr>
-<th style="text-align:left;">
-parent
-</th>
-<th style="text-align:left;">
-parent_K_locus
-</th>
-<th style="text-align:left;">
-parent_K_type
-</th>
-<th style="text-align:left;">
-parent_K_locus_confidence
-</th>
-<th style="text-align:left;">
-parent_K_locus_problems
-</th>
-<th style="text-align:left;">
-parent_K_locus_identity
-</th>
-<th style="text-align:left;">
-parent_K_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-parent_O_locus
-</th>
-<th style="text-align:left;">
-parent_O_type
-</th>
-<th style="text-align:left;">
-parent_O_locus_confidence
-</th>
-<th style="text-align:left;">
-parent_O_locus_problems
-</th>
-<th style="text-align:left;">
-parent_O_locus_identity
-</th>
-<th style="text-align:left;">
-parent_O_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-evolved_K_locus
-</th>
-<th style="text-align:left;">
-evolved_K_type
-</th>
-<th style="text-align:left;">
-evolved_K_locus_confidence
-</th>
-<th style="text-align:left;">
-evolved_K_locus_problems
-</th>
-<th style="text-align:left;">
-evolved_K_locus_identity
-</th>
-<th style="text-align:left;">
-evolved_K_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-evolved_O_locus
-</th>
-<th style="text-align:left;">
-evolved_O_type
-</th>
-<th style="text-align:left;">
-evolved_O_locus_confidence
-</th>
-<th style="text-align:left;">
-evolved_O_locus_problems
-</th>
-<th style="text-align:left;">
-evolved_O_locus_identity
-</th>
-<th style="text-align:left;">
-evolved_O_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-different_K_locus
-</th>
-<th style="text-align:left;">
-different_O_locus
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-PCMP_H116
-</td>
-<td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.04%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.04%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H19
-</td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.09%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.09%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H226
-</td>
-<td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.10%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.10%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H261
-</td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
 <td style="text-align:left;">
-FALSE
 </td>
 </tr>
 <tr>
@@ -1370,82 +833,34 @@ FALSE
 PCMP_H318
 </td>
 <td style="text-align:left;">
-KL106
+Coding SNP at 1242816 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS06200 Strand Information:
+KPNIH1_RS06200=-;A|missense_variant|MODERATE|KPNIH1_RS06200|c.2147G&gt;T|p.Arg716Leu|2147/3147|716/1048|null
+or hypothetical protein|multidrug efflux RND transporter permease
+subunit;;Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional
+regulator;;Coding SNP at 3714036 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.25C&gt;T|p.Leu9Leu|25/1110|9/369|null
+or hypothetical protein|porin OmpC;;Coding SNP at 3714037 &gt; A
+functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.24C&gt;T|p.Leu8Leu|24/1110|8/369|null
+or hypothetical protein|porin OmpC;
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:left;">
-unknown (KL106)
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-?2+!
-</td>
-<td style="text-align:left;">
-99.99%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
--+!
-</td>
-<td style="text-align:left;">
-99.99%
-</td>
-<td style="text-align:left;">
-KL106_17;KL106_18_ugd
-</td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
--!
-</td>
-<td style="text-align:left;">
-98.37%
-</td>
-<td style="text-align:left;">
-O1/O2v2_03_wbbM;O1/O2v2_02_wzt;O1/O2v2_01_wzm
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
 </td>
 </tr>
 <tr>
@@ -1453,950 +868,32 @@ FALSE
 PCMP_H323
 </td>
 <td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H414
-</td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H464
-</td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-</tbody>
-</table></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
-</div>
-<div id="ompk36" class="section level1">
-<h1>OmpK36</h1>
-<div id="one-genome-had-ompk36-loss-truncation-per-kleborate" class="section level2">
-<h2>One genome had ompK36 loss truncation per Kleborate</h2>
-<pre class="r"><code>ompk36 &lt;- lapply(parents,FUN=function(x){
-  # Plasmid
-  kleborate_data &lt;- subset(kleborate_type_data,parent==x)
-  parent = x
-  parent_data &lt;- subset(kleborate_data,isolate_no==x) %&gt;% select(Omp_mutations) %&gt;% `colnames&lt;-`(paste0(&quot;parent_&quot;,colnames(.)))
-  parent_muts &lt;- parent_data$parent_Omp_mutations %&gt;% str_split(.,&quot;;&quot;) %&gt;% unlist%&gt;% unique
-  evolved_data &lt;- subset(kleborate_data,isolate_no!=x) %&gt;% select(Omp_mutations) %&gt;% `colnames&lt;-`(paste0(&quot;evolved_&quot;,colnames(.))) 
-  evolved_muts &lt;- evolved_data$evolved_Omp_mutations %&gt;% str_split(.,&quot;;&quot;) %&gt;% unlist%&gt;%  unique
-  
-  merged_assembly_stats &lt;- cbind.data.frame(parent,parent_data,evolved_data) 
-  
-  merged_assembly_stats$parent_only &lt;- subset(parent_muts,!parent_muts %in% evolved_muts) %&gt;% {ifelse(is_empty(.),&quot;&quot;,.)} %&gt;% paste0(collapse=&#39;;&#39;)
-  merged_assembly_stats$evolved_only &lt;- subset(evolved_muts,!evolved_muts %in% parent_muts) %&gt;% {ifelse(is_empty(.),&quot;&quot;,.)} %&gt;% paste0(collapse=&#39;;&#39;)
-   
-  merged_assembly_stats$different_ompK36_mutations &lt;- merged_assembly_stats$parent_Omp_mutations != merged_assembly_stats$evolved_Omp_mutations
-  
-  return(merged_assembly_stats)
-}) %&gt;% do.call(rbind.data.frame,.) 
-
-ompk36 &lt;- ompk36 %&gt;% arrange(parent)
-
-favorite_kable(ompk36)</code></pre>
-<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
-<thead>
-<tr>
-<th style="text-align:left;">
-parent
-</th>
-<th style="text-align:left;">
-parent_Omp_mutations
-</th>
-<th style="text-align:left;">
-evolved_Omp_mutations
-</th>
-<th style="text-align:left;">
-parent_only
-</th>
-<th style="text-align:left;">
-evolved_only
-</th>
-<th style="text-align:left;">
-different_ompK36_mutations
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-PCMP_H116
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36-0%
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-OmpK36-0%
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H19
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H226
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H261
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36-24%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-OmpK36-24%
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H318
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H323
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H414
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H464
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="resistance-gene-data" class="section level1">
-<h1>Resistance gene data</h1>
-<div id="summary-stats" class="section level2">
-<h2>Summary stats</h2>
-<pre class="r"><code>resistance_gene &lt;- lapply(parents,FUN=function(x){
-  # Plasmid
-  kleborate_data &lt;- subset(kleborate_type_data,parent==x)
-  parent = x
-  parent_data &lt;- subset(kleborate_data,isolate_no==x) %&gt;% select(resistance_score,num_resistance_classes,num_resistance_genes) %&gt;% `colnames&lt;-`(paste0(&quot;parent_&quot;,colnames(.)))
-  evolved_data &lt;- subset(kleborate_data,isolate_no!=x) %&gt;% select(resistance_score,num_resistance_classes,num_resistance_genes) %&gt;% `colnames&lt;-`(paste0(&quot;evolved_&quot;,colnames(.)))
-  merged_assembly_stats &lt;- cbind.data.frame(parent,parent_data,evolved_data) 
-  merged_assembly_stats$different_resistance_score &lt;- merged_assembly_stats$parent_resistance_score != merged_assembly_stats$evolved_resistance_score
-  merged_assembly_stats$different_resistance_class_ct &lt;- merged_assembly_stats$parent_num_resistance_classes != merged_assembly_stats$evolved_num_resistance_classes
-  merged_assembly_stats$different_resistance_gene_ct &lt;- merged_assembly_stats$parent_num_resistance_genes != merged_assembly_stats$evolved_num_resistance_genes
-  merged_assembly_stats
-}) %&gt;% do.call(rbind.data.frame,.) 
-
-resistance_gene &lt;- resistance_gene %&gt;% arrange(parent)
-
-favorite_kable(resistance_gene)</code></pre>
-<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
-<thead>
-<tr>
-<th style="text-align:left;">
-parent
-</th>
-<th style="text-align:right;">
-parent_resistance_score
-</th>
-<th style="text-align:right;">
-parent_num_resistance_classes
-</th>
-<th style="text-align:right;">
-parent_num_resistance_genes
-</th>
-<th style="text-align:right;">
-evolved_resistance_score
-</th>
-<th style="text-align:right;">
-evolved_num_resistance_classes
-</th>
-<th style="text-align:right;">
-evolved_num_resistance_genes
-</th>
-<th style="text-align:left;">
-different_resistance_score
-</th>
-<th style="text-align:left;">
-different_resistance_class_ct
-</th>
-<th style="text-align:left;">
-different_resistance_gene_ct
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-PCMP_H116
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H19
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H226
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H261
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
+Coding SNP at 1242816 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS06200 Strand Information:
+KPNIH1_RS06200=-;A|missense_variant|MODERATE|KPNIH1_RS06200|c.2147G&gt;T|p.Arg716Leu|2147/3147|716/1048|null
+or hypothetical protein|multidrug efflux RND transporter permease
+subunit;;Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional
+regulator;;Coding SNP at 3714036 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.25C&gt;T|p.Leu9Leu|25/1110|9/369|null
+or hypothetical protein|porin OmpC;;Coding SNP at 3714037 &gt; A
+functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.24C&gt;T|p.Leu8Leu|24/1110|8/369|null
+or hypothetical protein|porin OmpC;
 </td>
 <td style="text-align:right;">
 4
 </td>
 <td style="text-align:right;">
-3
+0
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H318
 </td>
 <td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-17
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H323
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H414
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H464
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="different-genes" class="section level2">
-<h2>Different genes</h2>
-<pre class="r"><code>resistance_genotypes &lt;- colnames(kleborate_hybrid) %&gt;% .[74:97]
-diff_genes &lt;- lapply(parents,FUN=function(x){
-  # Plasmid
-  kleborate_data &lt;- subset(kleborate_type_data,parent==x)
-  parent = x
-  parent_data &lt;- subset(kleborate_data,isolate_no==x) %&gt;% select(any_of(resistance_genotypes)) %&gt;% `colnames&lt;-`(paste0(&quot;parent_&quot;,colnames(.)))
-  parent_genes &lt;- unique(unlist(parent_data)) %&gt;% subset(.!=&#39;-&#39;) %&gt;% str_split(pattern = &quot;;&quot;) %&gt;% unlist %&gt;% sort
-  evolved_data &lt;- subset(kleborate_data,isolate_no!=x) %&gt;% select(any_of(resistance_genotypes)) %&gt;% `colnames&lt;-`(paste0(&quot;evolved_&quot;,colnames(.)))
-  evolved_genes &lt;- unique(unlist(evolved_data)) %&gt;% subset(.!=&#39;-&#39;) %&gt;% str_split(pattern = &quot;;&quot;) %&gt;% unlist %&gt;% sort
-  parent_unique_genes &lt;- parent_genes %&gt;% subset(!. %in% evolved_genes) %&gt;% paste0(collapse=&quot;;&quot;)
-  evolved_unique_genes &lt;- evolved_genes %&gt;% subset(!. %in% parent_genes) %&gt;% paste0(collapse=&quot;;&quot;)
-  cbind.data.frame(parent,parent_genes = paste0(parent_genes,collapse=&quot;;&quot;),
-                   evolved_genes = paste0(evolved_genes,collapse=&quot;;&quot;),
-                   parent_unique_genes,
-                   evolved_unique_genes) 
-}) %&gt;% do.call(rbind.data.frame,.) 
-
-diff_genes &lt;- diff_genes %&gt;% arrange(parent)
-
-favorite_kable(diff_genes)</code></pre>
-<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
-<thead>
-<tr>
-<th style="text-align:left;">
-parent
-</th>
-<th style="text-align:left;">
-parent_genes
-</th>
-<th style="text-align:left;">
-evolved_genes
-</th>
-<th style="text-align:left;">
-parent_unique_genes
-</th>
-<th style="text-align:left;">
-evolved_unique_genes
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-PCMP_H116
-</td>
-<td style="text-align:left;">
-238S;240K;35Q;35Q;aac(6’)-Ib’.v1;aph3-Ia.v1^;dfrA14.v2*;GyrA-83I;GyrA-87Y;KPC-3;OmpK35-25%;ParC-80I;SHV-11;SHV-12
-</td>
-<td style="text-align:left;">
-238S;240K;35Q;35Q;aac(6’)-Ib’.v1;aph3-Ia.v1<em>?-72%;dfrA14.v2</em>;GyrA-83I;GyrA-87Y;KPC-3;OmpK35-25%;OmpK36-0%;ParC-80I;SHV-11;SHV-12
-</td>
-<td style="text-align:left;">
-aph3-Ia.v1^
-</td>
-<td style="text-align:left;">
-aph3-Ia.v1*?-72%;OmpK36-0%
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H19
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA2<sup>;aph3-Ia.v1</sup>;aph3-Ia.v1<sup>;catA1</sup>;dfrA12;GyrA-83I;KPC-2;KPC-2;mphA;Mrx;OmpK35-25%;OXA-9.v1*-42%;ParC-80I;SHV-11;sul1;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-238S;240K;35Q;35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA2<sup>;aph3-Ia.v1</sup>;aph3-Ia.v1<sup>;catA1</sup>;dfrA12;GyrA-83I;KPC-2;KPC-2;mphA;Mrx;OmpK35-25%;OXA-9.v1*-42%;ParC-80I;SHV-11;SHV-12;sul1;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-238S;240K;SHV-12
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H226
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IV;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1<em>;aadA2;aph(4)-Ia;catA1^;dfrA14.v2</em>;GyrA-83I;KPC-3;mphA;Mrx;OmpK35-25%;ParC-80I;SHV-11;strA.v1<sup>;strB.v1;sul2;sul3?-0%;sul3?-44%;TEM-1D.v1</sup>
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IV;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1<em>;aadA2;aph(4)-Ia;catA1^;dfrA14.v2</em>;GyrA-83I;KPC-3;mphA;Mrx;OmpK35-25%;ParC-80I;SHV-11;strA.v1<sup>;strB.v1;sul2;sul3;TEM-1D.v1</sup>
-</td>
-<td style="text-align:left;">
-sul3?-0%;sul3?-44%
-</td>
-<td style="text-align:left;">
-sul3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H261
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OXA-9.v1*-42%;ParC-80I;SHV-11
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36-24%;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-OmpK36-24%;TEM-1D.v1^
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H318
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aadA5;CTX-M-14;dfrA17;ermB.v1<em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1</em>-42%;ParC-80I;SHV-11;strA.v1</sup>;strB.v1*;sul1;sul2;tet(A).v1
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA5;CTX-M-14;dfrA17;ermB.v1<em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1</em>-42%;ParC-80I;SHV-11;strA.v1</sup>;strB.v1*;sul1;sul2;TEM-1D.v1<sup>;TEM-1D.v1</sup>;tet(A).v1
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-TEM-1D.v1<sup>;TEM-1D.v1</sup>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H323
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
+0
 </td>
 <td style="text-align:left;">
 </td>
@@ -2406,12 +903,32 @@ PCMP_H323
 PCMP_H414
 </td>
 <td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA5;CTX-M-14;CTX-M-14;dfrA17;ermB.v1<em>;ermB.v1</em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OXA-9.v1<em>-42%;ParC-80I;SHV-11;strA.v1^;strB.v1</em>;sul1;sul2;TEM-1D.v1</sup>;TEM-1D.v1^;tet(A).v1
+Coding SNP at 1242816 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS06200 Strand Information:
+KPNIH1_RS06200=-;A|missense_variant|MODERATE|KPNIH1_RS06200|c.2147G&gt;T|p.Arg716Leu|2147/3147|716/1048|null
+or hypothetical protein|multidrug efflux RND transporter permease
+subunit;;Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional
+regulator;;Coding SNP at 3714036 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.25C&gt;T|p.Leu9Leu|25/1110|9/369|null
+or hypothetical protein|porin OmpC;;Coding SNP at 3714037 &gt; A
+functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.24C&gt;T|p.Leu8Leu|24/1110|8/369|null
+or hypothetical protein|porin OmpC;
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA5;CTX-M-14;dfrA17;ermB.v1<em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OXA-9.v1</em>-42%;ParC-80I;SHV-11;strA.v1</sup>;strB.v1*;sul1;sul2;TEM-1D.v1<sup>;TEM-1D.v1</sup>;tet(A).v1
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:left;">
 </td>
@@ -2421,189 +938,72 @@ PCMP_H414
 PCMP_H464
 </td>
 <td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
+Coding SNP at 1242816 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS06200 Strand Information:
+KPNIH1_RS06200=-;A|missense_variant|MODERATE|KPNIH1_RS06200|c.2147G&gt;T|p.Arg716Leu|2147/3147|716/1048|null
+or hypothetical protein|multidrug efflux RND transporter permease
+subunit;;Coding SNP at 1437556 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|missense_variant|MODERATE|KPNIH1_RS07230|c.125T&gt;G|p.Val42Gly|125/585|42/194|null
+or hypothetical protein|TetR/AcrR family transcriptional
+regulator;;Coding SNP at 3714036 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.25C&gt;T|p.Leu9Leu|25/1110|9/369|null
+or hypothetical protein|porin OmpC;;Coding SNP at 3714037 &gt; A
+functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|synonymous_variant|LOW|KPNIH1_RS18665|c.24C&gt;T|p.Leu8Leu|24/1110|8/369|null
+or hypothetical protein|porin OmpC;
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:left;">
 </td>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>SNP_differences$SNP_canonical &lt;- SNP_differences$evolved_unique_str
+SNP_differences_hits &lt;- SNP_differences %&gt;% select(parent,SNP_canonical)</code></pre>
 </div>
 </div>
-<div id="master-kleborate-data" class="section level1">
-<h1>Master kleborate data</h1>
-<pre class="r"><code>kleborate_evolved_differences &lt;- left_join(genome_data,klocus) %&gt;% left_join(.,ompk36) %&gt;% left_join(.,resistance_gene) %&gt;% left_join(.,diff_genes)
+<div id="indels" class="section level1">
+<h1>INDELs</h1>
+<div id="evolved-several-in-ompk36" class="section level2">
+<h2>Evolved several in ompK36</h2>
+<pre class="r"><code>INDEL_differences &lt;-  readRDS( &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS&quot;) 
 
-favorite_kable(kleborate_evolved_differences)</code></pre>
+INDEL_differences %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
 <th style="text-align:left;">
 parent
 </th>
-<th style="text-align:right;">
-parent_total_size
-</th>
-<th style="text-align:right;">
-parent_contig_count
+<th style="text-align:left;">
+shared_indels_str
 </th>
 <th style="text-align:right;">
-parent_largest_contig
+shared_indels_num
 </th>
 <th style="text-align:right;">
-evolved_total_size
+parent_unique_num
+</th>
+<th style="text-align:left;">
+parent_unique_str
 </th>
 <th style="text-align:right;">
-evolved_contig_count
-</th>
-<th style="text-align:right;">
-evolved_largest_contig
-</th>
-<th style="text-align:right;">
-total_size_diff
-</th>
-<th style="text-align:right;">
-largest_contig_size_diff
-</th>
-<th style="text-align:right;">
-contig_count_diff
+evolved_unique_num
 </th>
 <th style="text-align:left;">
-parent_K_locus
-</th>
-<th style="text-align:left;">
-parent_K_type
-</th>
-<th style="text-align:left;">
-parent_K_locus_confidence
-</th>
-<th style="text-align:left;">
-parent_K_locus_problems
-</th>
-<th style="text-align:left;">
-parent_K_locus_identity
-</th>
-<th style="text-align:left;">
-parent_K_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-parent_O_locus
-</th>
-<th style="text-align:left;">
-parent_O_type
-</th>
-<th style="text-align:left;">
-parent_O_locus_confidence
-</th>
-<th style="text-align:left;">
-parent_O_locus_problems
-</th>
-<th style="text-align:left;">
-parent_O_locus_identity
-</th>
-<th style="text-align:left;">
-parent_O_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-evolved_K_locus
-</th>
-<th style="text-align:left;">
-evolved_K_type
-</th>
-<th style="text-align:left;">
-evolved_K_locus_confidence
-</th>
-<th style="text-align:left;">
-evolved_K_locus_problems
-</th>
-<th style="text-align:left;">
-evolved_K_locus_identity
-</th>
-<th style="text-align:left;">
-evolved_K_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-evolved_O_locus
-</th>
-<th style="text-align:left;">
-evolved_O_type
-</th>
-<th style="text-align:left;">
-evolved_O_locus_confidence
-</th>
-<th style="text-align:left;">
-evolved_O_locus_problems
-</th>
-<th style="text-align:left;">
-evolved_O_locus_identity
-</th>
-<th style="text-align:left;">
-evolved_O_Missing_expected_genes
-</th>
-<th style="text-align:left;">
-different_K_locus
-</th>
-<th style="text-align:left;">
-different_O_locus
-</th>
-<th style="text-align:left;">
-parent_Omp_mutations
-</th>
-<th style="text-align:left;">
-evolved_Omp_mutations
-</th>
-<th style="text-align:left;">
-parent_only
-</th>
-<th style="text-align:left;">
-evolved_only
-</th>
-<th style="text-align:left;">
-different_ompK36_mutations
-</th>
-<th style="text-align:right;">
-parent_resistance_score
-</th>
-<th style="text-align:right;">
-parent_num_resistance_classes
-</th>
-<th style="text-align:right;">
-parent_num_resistance_genes
-</th>
-<th style="text-align:right;">
-evolved_resistance_score
-</th>
-<th style="text-align:right;">
-evolved_num_resistance_classes
-</th>
-<th style="text-align:right;">
-evolved_num_resistance_genes
-</th>
-<th style="text-align:left;">
-different_resistance_score
-</th>
-<th style="text-align:left;">
-different_resistance_class_ct
-</th>
-<th style="text-align:left;">
-different_resistance_gene_ct
-</th>
-<th style="text-align:left;">
-parent_genes
-</th>
-<th style="text-align:left;">
-evolved_genes
-</th>
-<th style="text-align:left;">
-parent_unique_genes
-</th>
-<th style="text-align:left;">
-evolved_unique_genes
+evolved_unique_str
 </th>
 </tr>
 </thead>
@@ -2612,967 +1012,142 @@ evolved_unique_genes
 <td style="text-align:left;">
 PCMP_H116
 </td>
-<td style="text-align:right;">
-5743466
+<td style="text-align:left;">
+Coding Indel at 3713649 &gt; T functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null
+or hypothetical protein|porin OmpC;
 </td>
 <td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5497555
-</td>
-<td style="text-align:right;">
-5742979
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5498756
-</td>
-<td style="text-align:right;">
--487
-</td>
-<td style="text-align:right;">
-1201
+1
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.04%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.04%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36-0%
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-OmpK36-0%
-</td>
-<td style="text-align:left;">
-TRUE
 </td>
 <td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-4
+0
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-238S;240K;35Q;35Q;aac(6’)-Ib’.v1;aph3-Ia.v1^;dfrA14.v2*;GyrA-83I;GyrA-87Y;KPC-3;OmpK35-25%;ParC-80I;SHV-11;SHV-12
-</td>
-<td style="text-align:left;">
-238S;240K;35Q;35Q;aac(6’)-Ib’.v1;aph3-Ia.v1<em>?-72%;dfrA14.v2</em>;GyrA-83I;GyrA-87Y;KPC-3;OmpK35-25%;OmpK36-0%;ParC-80I;SHV-11;SHV-12
-</td>
-<td style="text-align:left;">
-aph3-Ia.v1^
-</td>
-<td style="text-align:left;">
-aph3-Ia.v1*?-72%;OmpK36-0%
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H19
 </td>
-<td style="text-align:right;">
-5555986
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5197681
+<td style="text-align:left;">
+Coding Indel at 3713649 &gt; T functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null
+or hypothetical protein|porin OmpC;
 </td>
 <td style="text-align:right;">
-5604536
+1
 </td>
 <td style="text-align:right;">
-6
+0
+</td>
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-5198880
-</td>
-<td style="text-align:right;">
-48550
-</td>
-<td style="text-align:right;">
-1199
-</td>
-<td style="text-align:right;">
-2
+0
 </td>
 <td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.09%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.09%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA2<sup>;aph3-Ia.v1</sup>;aph3-Ia.v1<sup>;catA1</sup>;dfrA12;GyrA-83I;KPC-2;KPC-2;mphA;Mrx;OmpK35-25%;OXA-9.v1*-42%;ParC-80I;SHV-11;sul1;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-238S;240K;35Q;35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA2<sup>;aph3-Ia.v1</sup>;aph3-Ia.v1<sup>;catA1</sup>;dfrA12;GyrA-83I;KPC-2;KPC-2;mphA;Mrx;OmpK35-25%;OXA-9.v1*-42%;ParC-80I;SHV-11;SHV-12;sul1;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-238S;240K;SHV-12
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H226
 </td>
-<td style="text-align:right;">
-5890160
+<td style="text-align:left;">
+Coding Indel at 3713649 &gt; T functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null
+or hypothetical protein|porin OmpC;
 </td>
 <td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-5382501
-</td>
-<td style="text-align:right;">
-5849555
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-5382451
-</td>
-<td style="text-align:right;">
--40605
-</td>
-<td style="text-align:right;">
--50
+1
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.10%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL107
-</td>
-<td style="text-align:left;">
-unknown (KL107)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.97%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-!
-</td>
-<td style="text-align:left;">
-99.10%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-OmpK35-25%
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IV;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1<em>;aadA2;aph(4)-Ia;catA1^;dfrA14.v2</em>;GyrA-83I;KPC-3;mphA;Mrx;OmpK35-25%;ParC-80I;SHV-11;strA.v1<sup>;strB.v1;sul2;sul3?-0%;sul3?-44%;TEM-1D.v1</sup>
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IV;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1<em>;aadA2;aph(4)-Ia;catA1^;dfrA14.v2</em>;GyrA-83I;KPC-3;mphA;Mrx;OmpK35-25%;ParC-80I;SHV-11;strA.v1<sup>;strB.v1;sul2;sul3;TEM-1D.v1</sup>
-</td>
-<td style="text-align:left;">
-sul3?-0%;sul3?-44%
-</td>
-<td style="text-align:left;">
-sul3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-PCMP_H261
-</td>
-<td style="text-align:right;">
-5412144
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512388
-</td>
-<td style="text-align:right;">
-5401269
-</td>
-<td style="text-align:right;">
-65
-</td>
-<td style="text-align:right;">
-449615
-</td>
-<td style="text-align:right;">
--10875
-</td>
-<td style="text-align:right;">
--62773
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:left;">
-KL106
+Coding Indel at 3713046 &gt; A functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;A|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.967_1014delGTTGGCGCGACCTACTACTTCAACAAAAACATGTCCACCTATGTTGAC|p.Val323_Asp338del|1014/1110|323/369|null
+or hypothetical protein|porin OmpC;
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H261
 </td>
 <td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36-24%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-OmpK36-24%
-</td>
-<td style="text-align:left;">
-TRUE
+Coding Indel at 3713649 &gt; T functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null
+or hypothetical protein|porin OmpC;
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
 <td style="text-align:right;">
-3
+0
+</td>
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-3
+1
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OXA-9.v1*-42%;ParC-80I;SHV-11
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36-24%;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-OmpK36-24%;TEM-1D.v1^
+Coding Indel at 3713864 &gt; TGGGTTTC functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;TGGGTTTC|frameshift_variant|HIGH|KPNIH1_RS18665|c.190_196dupGAAACCC|p.Gln66fs|196/1110|66/369|null
+or hypothetical protein|porin OmpC;
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H318
 </td>
-<td style="text-align:right;">
-5500899
-</td>
-<td style="text-align:right;">
-70
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-427736
+0
 </td>
 <td style="text-align:right;">
-5598893
+0
+</td>
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5230256
-</td>
-<td style="text-align:right;">
-97994
-</td>
-<td style="text-align:right;">
-4802520
-</td>
-<td style="text-align:right;">
--65
+0
 </td>
 <td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-?2+!
-</td>
-<td style="text-align:left;">
-99.99%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
--+!
-</td>
-<td style="text-align:left;">
-99.99%
-</td>
-<td style="text-align:left;">
-KL106_17;KL106_18_ugd
-</td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
--!
-</td>
-<td style="text-align:left;">
-98.37%
-</td>
-<td style="text-align:left;">
-O1/O2v2_03_wbbM;O1/O2v2_02_wzt;O1/O2v2_01_wzm
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-17
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aadA5;CTX-M-14;dfrA17;ermB.v1<em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1</em>-42%;ParC-80I;SHV-11;strA.v1</sup>;strB.v1*;sul1;sul2;tet(A).v1
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA5;CTX-M-14;dfrA17;ermB.v1<em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1</em>-42%;ParC-80I;SHV-11;strA.v1</sup>;strB.v1*;sul1;sul2;TEM-1D.v1<sup>;TEM-1D.v1</sup>;tet(A).v1
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-TEM-1D.v1<sup>;TEM-1D.v1</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H323
 </td>
-<td style="text-align:right;">
-5417748
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5290268
-</td>
-<td style="text-align:right;">
-5431193
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5290267
-</td>
-<td style="text-align:right;">
-13445
-</td>
-<td style="text-align:right;">
--1
+0
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
 </td>
 <td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
+0
 </td>
 <td style="text-align:left;">
 </td>
@@ -3581,370 +1156,489 @@ TRUE
 <td style="text-align:left;">
 PCMP_H414
 </td>
-<td style="text-align:right;">
-5638929
+<td style="text-align:left;">
+Coding Indel at 1437453 &gt; C functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS07230 Strand Information:
+KPNIH1_RS07230=-;C|frameshift_variant|HIGH|KPNIH1_RS07230|c.227delC|p.Pro76fs|227/585|76/194|null
+or hypothetical protein|TetR/AcrR family transcriptional regulator;
 </td>
 <td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5294317
-</td>
-<td style="text-align:right;">
-5644462
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5295055
-</td>
-<td style="text-align:right;">
-5533
-</td>
-<td style="text-align:right;">
-738
+1
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
 </td>
 <td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-19
+1
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA5;CTX-M-14;CTX-M-14;dfrA17;ermB.v1<em>;ermB.v1</em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OXA-9.v1<em>-42%;ParC-80I;SHV-11;strA.v1^;strB.v1</em>;sul1;sul2;TEM-1D.v1</sup>;TEM-1D.v1^;tet(A).v1
-</td>
-<td style="text-align:left;">
-35Q;aac(3)-IId<sup>;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aadA5;CTX-M-14;dfrA17;ermB.v1<em>;GyrA-83I;KPC-2;mphA;Mrx;OmpK35-25%;OmpK36_c25t;OXA-9.v1</em>-42%;ParC-80I;SHV-11;strA.v1</sup>;strB.v1*;sul1;sul2;TEM-1D.v1<sup>;TEM-1D.v1</sup>;tet(A).v1
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
+Coding Indel at 3713649 &gt; T functional=NULL_NULL_NULL
+locus_tag=KPNIH1_RS18665 Strand Information:
+KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null
+or hypothetical protein|porin OmpC;
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 PCMP_H464
 </td>
-<td style="text-align:right;">
-5486503
-</td>
-<td style="text-align:right;">
-5
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-5293835
+0
 </td>
 <td style="text-align:right;">
-5475105
+0
+</td>
+<td style="text-align:left;">
 </td>
 <td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5293804
-</td>
-<td style="text-align:right;">
--11398
-</td>
-<td style="text-align:right;">
--31
-</td>
-<td style="text-align:right;">
--1
-</td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-KL106
-</td>
-<td style="text-align:left;">
-unknown (KL106)
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-+!
-</td>
-<td style="text-align:left;">
-100.00%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-O1/O2v2
-</td>
-<td style="text-align:left;">
-O2afg
-</td>
-<td style="text-align:left;">
-Typeable
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-99.07%
-</td>
-<td style="text-align:left;">
-<ul>
-<li></td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-OmpK35-25%;OmpK36GD;OmpK36_c25t
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
-35Q;aac(6’)-Ib’.v1;aac(6’)-Ib’.v1;GyrA-83I;KPC-2;OmpK35-25%;OmpK36_c25t;OmpK36GD;OXA-9.v1*-42%;ParC-80I;SHV-11;TEM-1D.v1^
-</td>
-<td style="text-align:left;">
+0
 </td>
 <td style="text-align:left;">
 </td>
 </tr>
 </tbody>
-</table></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
-<pre class="r"><code>saveRDS(kleborate_evolved_differences,&quot;./data/evolution_experiment/kleborate_evolved/kleborate_evolved_differences.RDS&quot;)</code></pre>
+</table>
+<pre class="r"><code>INDEL_differences$INDEL_canonical &lt;- INDEL_differences$evolved_unique_str
+INDEL_differences_hits &lt;- INDEL_differences %&gt;% select(parent,INDEL_canonical)</code></pre>
+</div>
+</div>
+<div id="merge" class="section level1">
+<h1>Merge</h1>
+<pre class="r"><code>final_dataset &lt;- left_join(plasmid_copy_numer_data,df_hits) %&gt;% left_join(.,INDEL_differences_hits) %&gt;% left_join(.,SNP_differences_hits) %&gt;% left_join(.,is_finder_data_goi_data) %&gt;% left_join(.,kleb_diffs_hits_sub) %&gt;% left_join(.,mobsuite_differences_tbl)
+
+final_dataset$INDEL_canonical_rename &lt;- recode(final_dataset$INDEL_canonical,
+                                               &quot;Coding Indel at 3713046 &gt; A functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;A|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.967_1014delGTTGGCGCGACCTACTACTTCAACAAAAACATGTCCACCTATGTTGAC|p.Val323_Asp338del|1014/1110|323/369|null or hypothetical protein|porin OmpC;&quot; = &#39;ompK36 (p.Val323_Asp338del); 3713046&#39;,
+                                               &quot;Coding Indel at 3713864 &gt; TGGGTTTC functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;TGGGTTTC|frameshift_variant|HIGH|KPNIH1_RS18665|c.190_196dupGAAACCC|p.Gln66fs|196/1110|66/369|null or hypothetical protein|porin OmpC;&quot; = &#39;ompK36 (c.190_196dupGAAACCC); 3713864&#39;,
+                                               &quot;Coding Indel at 3713649 &gt; T functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null or hypothetical protein|porin OmpC;&quot; = &quot;ompK36 (p.Gly136_Asp137del); 3713649&quot;
+                                               
+                                               )
+
+final_dataset$canonical_mutant &lt;- lapply(final_dataset$parent,FUN=function(x){
+  isolate_df &lt;- subset(final_dataset,parent ==x)
+  variants &lt;- c(isolate_df$INDEL_canonical_rename,
+         isolate_df$SNP_canonical,
+         isolate_df$canonical_IS) %&gt;% subset(.!=&#39;&#39;)
+  
+  paste0(variants, collapse = &quot; &amp; &quot;) 
+})  %&gt;% unlist
+
+final_dataset_sum &lt;- final_dataset %&gt;% select(parent,clade_I,ompK36_parental,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
+
+final_dataset_sum &lt;- final_dataset_sum %&gt;% mutate(across(where(is.numeric), ~ round(.,2)))
+
+final_dataset_sum$kpc_plasmid_size_difference &lt;- ifelse(final_dataset_sum$kpc_plasmid != final_dataset_sum$evolved_kpc_plasmid ,&quot;NA&quot;,final_dataset_sum$kpc_plasmid_size_difference)
+
+final_dataset_sum &lt;- final_dataset_sum %&gt;% arrange(desc(clade_I), ompK36_parental)
+final_dataset_sum$clade_I &lt;- gsub(&quot;Clade &quot;,&quot;&quot;,final_dataset_sum$clade_I)
+table_2 &lt;- final_dataset_sum
+colnames(table_2) &lt;- c(&quot;Parent&quot;,&quot;Clade&quot;,&quot;Parental ompK36 status&quot;,&quot;Evolved canonical mutation (gene [mutation]; position)&quot;,&#39;blaKPC&#39;,&quot;Parental blaKPC plasmid&quot;,&quot;Parental blaKPC CN&quot;,&quot;Parental blaKPC plasmid CN&quot;,
+                                 &quot;Evolved blaKPC plasmid&quot;,&quot;Evolved blaKPC CN&quot;,&quot;Evolved blaKPC plasmid CN&quot;,&quot;blaKPC CN fold change&quot;,&quot;blaKPC plasmid CN fold change&quot;,&quot;Plasmid size change (bp)&quot;)
+
+favorite_kable(table_2)</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:left;">
+Parent
+</th>
+<th style="text-align:left;">
+Clade
+</th>
+<th style="text-align:left;">
+Parental ompK36 status
+</th>
+<th style="text-align:left;">
+Evolved canonical mutation (gene [mutation]; position)
+</th>
+<th style="text-align:left;">
+blaKPC
+</th>
+<th style="text-align:left;">
+Parental blaKPC plasmid
+</th>
+<th style="text-align:right;">
+Parental blaKPC CN
+</th>
+<th style="text-align:right;">
+Parental blaKPC plasmid CN
+</th>
+<th style="text-align:left;">
+Evolved blaKPC plasmid
+</th>
+<th style="text-align:right;">
+Evolved blaKPC CN
+</th>
+<th style="text-align:right;">
+Evolved blaKPC plasmid CN
+</th>
+<th style="text-align:right;">
+blaKPC CN fold change
+</th>
+<th style="text-align:right;">
+blaKPC plasmid CN fold change
+</th>
+<th style="text-align:left;">
+Plasmid size change (bp)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PCMP_H116
+</td>
+<td style="text-align:left;">
+II
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+ompK36 [ISKpn26]; 3714050
+</td>
+<td style="text-align:left;">
+blaKPC-3
+</td>
+<td style="text-align:left;">
+AA357
+</td>
+<td style="text-align:right;">
+0.66
+</td>
+<td style="text-align:right;">
+0.69
+</td>
+<td style="text-align:left;">
+AA357
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+<td style="text-align:right;">
+0.86
+</td>
+<td style="text-align:right;">
+1.29
+</td>
+<td style="text-align:right;">
+1.25
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H226
+</td>
+<td style="text-align:left;">
+II
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+ompK36 (p.Val323_Asp338del); 3713046
+</td>
+<td style="text-align:left;">
+blaKPC-3
+</td>
+<td style="text-align:left;">
+AA274
+</td>
+<td style="text-align:right;">
+1.47
+</td>
+<td style="text-align:right;">
+0.97
+</td>
+<td style="text-align:left;">
+AA274
+</td>
+<td style="text-align:right;">
+1.67
+</td>
+<td style="text-align:right;">
+1.97
+</td>
+<td style="text-align:right;">
+1.13
+</td>
+<td style="text-align:right;">
+2.03
+</td>
+<td style="text-align:left;">
+-1132
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H19
+</td>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+upstream ompK36 [ISKpn26]; 3714091
+</td>
+<td style="text-align:left;">
+blaKPC-2
+</td>
+<td style="text-align:left;">
+AA275
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:left;">
+AA275
+</td>
+<td style="text-align:right;">
+1.08
+</td>
+<td style="text-align:right;">
+1.48
+</td>
+<td style="text-align:right;">
+1.47
+</td>
+<td style="text-align:right;">
+2.01
+</td>
+<td style="text-align:left;">
+-1418
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H261
+</td>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:left;">
+25 C&gt;T transition
+</td>
+<td style="text-align:left;">
+ompK36 (c.190_196dupGAAACCC); 3713864
+</td>
+<td style="text-align:left;">
+blaKPC-2
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.61
+</td>
+<td style="text-align:right;">
+0.56
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.78
+</td>
+<td style="text-align:right;">
+1.03
+</td>
+<td style="text-align:right;">
+1.29
+</td>
+<td style="text-align:right;">
+1.83
+</td>
+<td style="text-align:left;">
+728
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H414
+</td>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:left;">
+25 C&gt;T transition
+</td>
+<td style="text-align:left;">
+ompK36 (p.Gly136_Asp137del); 3713649 &amp; upstream ompK36 [ISKpn14];
+3714068
+</td>
+<td style="text-align:left;">
+blaKPC-2
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.49
+</td>
+<td style="text-align:right;">
+0.42
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+<td style="text-align:right;">
+0.91
+</td>
+<td style="text-align:right;">
+1.39
+</td>
+<td style="text-align:right;">
+2.15
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H318
+</td>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:left;">
+25 C&gt;T transition &amp; GD insertion in loop 3
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+blaKPC-2
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:left;">
+AA552
+</td>
+<td style="text-align:right;">
+4.55
+</td>
+<td style="text-align:right;">
+3.49
+</td>
+<td style="text-align:right;">
+7.04
+</td>
+<td style="text-align:right;">
+4.43
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H323
+</td>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:left;">
+25 C&gt;T transition &amp; GD insertion in loop 3
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+blaKPC-2
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.93
+</td>
+<td style="text-align:right;">
+0.96
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+2.18
+</td>
+<td style="text-align:right;">
+2.84
+</td>
+<td style="text-align:right;">
+2.34
+</td>
+<td style="text-align:right;">
+2.96
+</td>
+<td style="text-align:left;">
+-247
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H464
+</td>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:left;">
+25 C&gt;T transition &amp; GD insertion in loop 3
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+blaKPC-2
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+0.42
+</td>
+<td style="text-align:right;">
+0.53
+</td>
+<td style="text-align:left;">
+AA018
+</td>
+<td style="text-align:right;">
+1.07
+</td>
+<td style="text-align:right;">
+1.10
+</td>
+<td style="text-align:right;">
+2.58
+</td>
+<td style="text-align:right;">
+2.08
+</td>
+<td style="text-align:left;">
+-11368
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>write_csv(table_2,&quot;./tables/table_2_evolved_changes.csv&quot;)
+
+saveRDS(table_2,&quot;./tables/table_2_evolved_changes.RDS&quot;)</code></pre>
 </div>
 
 

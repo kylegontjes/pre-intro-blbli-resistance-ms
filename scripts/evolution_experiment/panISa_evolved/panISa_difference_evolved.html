@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-20" />
+<meta name="date" content="2026-02-21" />
 
 <title>panISa_differences</title>
 
@@ -576,7 +576,7 @@ display: none;
 
 <h1 class="title toc-ignore">panISa_differences</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-20</h4>
+<h4 class="date">2026-02-21</h4>
 
 </div>
 
@@ -4278,11 +4278,11 @@ KPNIH1_RS22400-KPNIH1_RS22405
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>lapply(parents,FUN=function(x){
-  isfinder_sub &lt;- subset(isfinder_results,parent==x)
-  isfinder_sub_parent &lt;- subset(isfinder_sub,isolate_no ==x)
-  isfinder_sub_evolved &lt;- subset(isfinder_sub,isolate_no !=x)
-  parent = x
+<pre class="r"><code>get_difference &lt;- function(isolate,isfinder){
+  isfinder_sub &lt;- subset(isfinder,parent==isolate)
+  isfinder_sub_parent &lt;- subset(isfinder_sub,isolate_no ==isolate)
+  isfinder_sub_evolved &lt;- subset(isfinder_sub,isolate_no !=isolate)
+  parent = isolate
   parent_IS = unique(isfinder_sub_parent$IS_id)
   evolved_IS = unique(isfinder_sub_evolved$IS_id)
   shared_IS = intersect(parent_IS,evolved_IS)
@@ -4291,8 +4291,13 @@ KPNIH1_RS22400-KPNIH1_RS22405
   different_IS_locations = sum(length(parent_only_IS),length(evolved_only_IS)) &gt;0
   
   cbind.data.frame(parent,shared_IS  = paste0(shared_IS,collapse=&#39;;&#39;), parent_only_IS  = paste0(parent_only_IS,collapse=&#39;;&#39;), evolved_only_IS  = paste0(evolved_only_IS,collapse=&#39;;&#39;),different_IS_locations)
+}</code></pre>
+<pre class="r"><code>is_finder_data_overall &lt;-  lapply(parents,FUN=function(x){
+  get_difference(isolate=x,isfinder=isfinder_results) 
   
-}) %&gt;% do.call(rbind,.) %&gt;% favorite_kable()</code></pre>
+}) %&gt;% do.call(rbind,.) 
+
+favorite_kable(is_finder_data_overall)</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
@@ -4447,6 +4452,158 @@ FALSE
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>saveRDS(is_finder_data_overall,&quot;data/evolution_experiment/panISa_evolved/panISa_differences_overall.RDS&quot;)</code></pre>
+<div id="genes-of-interest" class="section level1">
+<h1>Genes of interest</h1>
+<pre class="r"><code>isfinder_results_goi &lt;- subset(isfinder_results,grepl(&quot;KPNIH1_RS18665|KPNIH1_RS07240|KPNIH1_RS07230|KPNIH1_RS06200|KPNIH1_RS07805|KPNIH1_RS24320&quot;,isfinder_results$locus_tag))
+
+is_finder_data_goi &lt;-  lapply(parents,FUN=function(x){
+  get_difference(isolate=x,isfinder=isfinder_results_goi) 
+  
+}) %&gt;% do.call(rbind,.) 
+
+favorite_kable(is_finder_data_goi)</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:left;">
+parent
+</th>
+<th style="text-align:left;">
+shared_IS
+</th>
+<th style="text-align:left;">
+parent_only_IS
+</th>
+<th style="text-align:left;">
+evolved_only_IS
+</th>
+<th style="text-align:left;">
+different_IS_locations
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PCMP_H116
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+ISKpn26_3714050_3714053
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H19
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+ISKpn26_3714091_3714094
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H226
+</td>
+<td style="text-align:left;">
+IS1294_1437723_1437722
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H261
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H318
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H323
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H414
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+ISKpn14_3714068_3714076
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H464
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>saveRDS(is_finder_data_goi,&quot;./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS&quot;)</code></pre>
+</div>
 
 
 

@@ -82,6 +82,7 @@ genome_data <- lapply(parents,FUN=function(x){
 
 genome_data <- genome_data %>% arrange(parent)
 
+
 favorite_kable(genome_data)
 ```
 
@@ -176,4 +177,14 @@ diff_genes <- diff_genes %>% arrange(parent)
 
 favorite_kable(diff_genes)
 ```
+
+# Master kleborate data
+```{r}
+kleborate_evolved_differences <- left_join(genome_data,klocus) %>% left_join(.,ompk36) %>% left_join(.,resistance_gene) %>% left_join(.,diff_genes)
+
+favorite_kable(kleborate_evolved_differences)
+
+saveRDS(kleborate_evolved_differences,"./data/evolution_experiment/kleborate_evolved/kleborate_evolved_differences.RDS")
+```
+
  
