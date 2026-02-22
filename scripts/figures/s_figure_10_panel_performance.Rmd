@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 7: Panel performance"
+title: "Supplemental Figure 10: Panel performance"
 author: "Kyle Gontjes"
 output: html_document
 date: "`r Sys.Date()`"
@@ -172,5 +172,5 @@ s_figure_7
 ```
 
 ```{r}
-ggsave(plot = s_figure_7, filename = './figures/s_figure_7.png', height = 11.75, width = 9.4,limitsize=FALSE,bg='white',dpi=900)
+ggsave(plot = s_figure_7, filename = './figures/s_figure_10_panel_performance.png', height = 11.75, width = 9.4,limitsize=FALSE,bg='white',dpi=900)
 ```

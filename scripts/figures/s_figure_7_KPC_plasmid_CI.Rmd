@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 5:  Differences in blaKPC plasmid backbone contribute to elevated blaKPC copy number and the spread of resistance in clade I"
+title: "Supplemental Figure 7:  Differences in blaKPC plasmid backbone contribute to elevated blaKPC copy number and the spread of resistance in clade I"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -141,5 +141,5 @@ s_figure_5
 ```
  
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=21.5,fig.height=15} 
-ggsave(plot = s_figure_5, filename = './figures/s_figure_5.png', width = 19.75, height = 9.875, limitsize=FALSE, bg='white',  dpi=900)
+ggsave(plot = s_figure_5, filename = './figures/s_figure_7_plasmids_clade_I.png', width = 19.75, height = 9.875, limitsize=FALSE, bg='white',  dpi=900)
 ```

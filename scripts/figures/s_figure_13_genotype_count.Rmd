@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 12: Proportion of isolates with a core genome variant"
+title: "Supplemental Figure 13: Proportion of isolates with a core genome variant"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -77,5 +77,5 @@ s_figure_12
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=4.5,fig.height=3.6} 
-ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = s_figure_12, filename = './figures/s_figure_13_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
 ```

@@ -1,5 +1,5 @@
 ---
-title: "s_figure_X_KPC_copy_number_dynamics"
+title: "S Figure 9: KPC Copy Number"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -204,5 +204,5 @@ figure_w_legends
 ```
 
 ```{r}
-ggsave("./figures/s_figure_X_KPC_copy_number_dynamics.png",plot=figure, units='in',height=13.75,width=11,dpi=900,bg='white')
+ggsave("./figures/s_figure_9_KPC_copy_number_dynamics.png",plot=figure, units='in',height=13.75,width=11,dpi=900,bg='white')
 ```

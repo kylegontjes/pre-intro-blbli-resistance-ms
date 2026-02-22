@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 6: tn4401 hopping"
+title: "Supplemental Figure 8: tn4401 hopping"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -112,7 +112,7 @@ tn4401_blast$qseqid <- str_split(tn4401_blast$qseqid,";",simplify = T) %>% .[,1]
 
 # Create figures
 
-```{r ,fig.width=12.5,fig.height=10} 
+```{r ,fig.width=12.5,fig.height=10}
  reorder_blast_df <- function(blast_isolate_df,name,contig_name,num){ 
   if(blast_isolate_df["sstart"]>blast_isolate_df["send"]){
     blast_df <- blast_isolate_df %>% t %>% as.data.frame %>% `colnames<-`(c(name,contig_name,paste0("[E",num,"]"),paste0("[S",num,"]"),"send","sstart"))
@@ -209,5 +209,5 @@ phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_d
 setwd("./data/mummer_hybrid/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 tn4401_hopping
-ggsave("../../figures/s_figure_6.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+ggsave("../../figures/s_figure_8_transposon_hopping.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
 ```

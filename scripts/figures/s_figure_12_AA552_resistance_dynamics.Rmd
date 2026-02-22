@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure X: AA552 dynamics and BL/BLI dynamics"
+title: "Supplemental Figure 12: AA552 dynamics and BL/BLI dynamics"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -186,7 +186,7 @@ phenotype = 'blbli_asr_cluster_renamed_simple_recode'
     column_names_centered = TRUE,
     row_names_centered = FALSE,
     row_names_max_width = shared_rn_width,
-    row_names_gp = gpar(fontsize = 14)) 
+  row_names_gp = gpar(fontsize = 14)) 
     
 
 heatmap_for_cowplot  <-    grid.grabExpr(draw(fig)) 
@@ -212,7 +212,7 @@ figure
 
 # Save figure
 ```{r,fig.height=20,fig.width=10}
-ggsave("./figures/s_figure_spatiotemporal_distribution_BLBLI_AA552.png",plot=figure, units='in',height=16,width=12.8,dpi=900,bg='white')
+ggsave("./figures/s_figure_12_spatiotemporal_distribution_BLBLI_AA552.png",plot=figure, units='in',height=16,width=12.8,dpi=900,bg='white')
 ```
 
 # Patient summaries

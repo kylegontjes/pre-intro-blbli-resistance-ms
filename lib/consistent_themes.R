@@ -39,13 +39,18 @@ clade_colors <- c("Clade I" = "red","Clade II"="blue")
 clade_colors_scale <- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 clade_colors_scale_v <- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(order=1,ncol=1, title.position = "top", label.position = "right"))
 clade_colors_scale_3_col<- scale_fill_manual(values=clade_colors, name="Clade", guide = guide_legend(order=1,nrow=3, title.position = "top", label.position = "right"))
+clade_colors_scale_point <- scale_color_manual(values=clade_colors, name="Clade", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 ### Clustering
 cluster_colors <- c("No feature" = "white","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink',"Cluster 7" = "#F0E442","Cluster 8" = '#00CED1')
 cluster_labels <- names(cluster_colors) 
+cluster_colors_gray <- c("No feature" = "gray","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink',"Cluster 7" = "#F0E442","Cluster 8" = '#00CED1')
+cluster_labels_gray <- names(cluster_colors) 
 cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
 cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
 cluster_scale_2_col <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=2, title.position = "top", label.position = "right"))
+cluster_scale_gray <- scale_fill_manual(values=cluster_colors_gray,breaks = cluster_labels_gray,labels = cluster_labels_gray %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
+cluster_scale_gray_color <- scale_color_manual(values=cluster_colors_gray,breaks = cluster_labels_gray,labels = cluster_labels_gray %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
 
 # Panels
 panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=3,title.position = "top", label.position = "right",order = 1)) 
@@ -60,7 +65,8 @@ ompK36_color_scale <- scale_color_manual(values=ompK36_colors,name = "Status of 
 tn4401_scale <- scale_fill_manual(breaks=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),values = c(8,9,10,11,12,13),labels=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),name = "Tn4401 isoform",guide = guide_legend(order=5,title.position = "top", label.position = "right",ncol=1))
 
 #KPC Scale
-kpc_scale <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","No KPC"),values = c(5,6,7,"white"),labels=c("KPC-2","KPC-3","KPC-5","No KPC"),name = "KPC",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
+kpc_scale <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),values = c(5,6,7,4,"white"),labels=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),name = "KPC",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
+kpc_scale_h <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),values = c(5,6,7,4,"white"),labels=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),name = "KPC",guide = guide_legend(order=6,title.position = "top", label.position = "right",nrow=1))
 
 # AA552
 AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 blaKPC plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
@@ -150,7 +156,8 @@ figure_4_format <-   theme(legend.position = "bottom",
                            axis.title = element_markdown(size = 14,color="black"),
                            legend.text =   element_text(size=12,color="black"),
                            legend.title = element_markdown(size = 14,color="black"),
-                           plot.title = element_text(size = 16,color="black"))
+                           plot.title = element_text(size = 16,color="black"),
+                           strip.text = element_blank())
                            
 figure_4_format_wo_element_markdown <-   theme(legend.position = "bottom",
                            axis.text =   element_text(size=12,color="black"),
@@ -209,8 +216,8 @@ s_figure_7_format <-  theme(legend.position = "bottom",
 )
 
 
-# S fig 9
-s_figure_9_format <-  theme(legend.position = "bottom",
+# Supplemental Figure 12: count genotype
+s_figure_12_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=12,color="black"),
                        axis.title = element_text(size = 14,color="black"),
                        legend.text =   element_text(size=12,color="black"),

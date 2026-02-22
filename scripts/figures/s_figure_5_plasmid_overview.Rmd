@@ -1,5 +1,5 @@
 ---
-title: "s_figure_X_plasmid_overview"
+title: "Supplemental Figure 5: Carbapenemase plasmids"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -286,5 +286,5 @@ figure
 # Save
 
 ```{r}
-ggsave("./figures/s_figure_X_mobtyper_plasmid_overview.png", plot=figure, units='in', height=15, width=12, dpi=900, bg='white')
+ggsave("./figures/s_figure_5_mobtyper_plasmid_overview.png", plot=figure, units='in', height=15, width=12, dpi=900, bg='white')
 ```

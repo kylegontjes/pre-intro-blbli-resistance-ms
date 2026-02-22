@@ -1,5 +1,5 @@
 ---
-title: "s_figure_X_KPC_across_phylogeny"
+title: "Supplemental figure: KPC across tree plasmids"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -106,5 +106,5 @@ figure
 ```
 
 ```{r}
-ggsave("./figures/s_figure_X_KPC_copy_number_across_phylogeny.png",plot=figure, units='in',height=9.5,width=11.08333,dpi=900,bg='white')
+ggsave("./figures/s_figure_6_KPC_copy_number_across_phylogeny.png",plot=figure, units='in',height=9.5,width=11.08333,dpi=900,bg='white')
 ```
