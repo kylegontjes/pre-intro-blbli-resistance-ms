@@ -1,5 +1,5 @@
 ---
-title: "Results section 7: Patient characteristics and antibiotic exposures distinguish episodes of non-carbapenemase resistance  from plasmid-based resistance"
+title: "Results section 8: Patient characteristics and antibiotic exposures distinguish episodes of non-carbapenemase resistance from plasmid-based resistance"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document

@@ -1,5 +1,5 @@
 ---
-title: "Non-carbapenemase mechanisms of carbapenem resistance explain BL/BLI resistance in a clade-specific manner"
+title: "Results Section 3: Non-carbapenemase mechanisms of carbapenem resistance explain BL/BLI resistance in a clade-specific manner"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document

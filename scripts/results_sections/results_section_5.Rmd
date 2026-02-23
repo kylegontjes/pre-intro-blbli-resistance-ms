@@ -1,5 +1,5 @@
 ---
-title: "Interaction between carbapenemase copy number and loop 3 insertions in ompK36"
+title: "Results Section 5: Interaction between carbapenemase copy number and loop 3 insertions in ompK36"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document

@@ -1,5 +1,5 @@
 ---
-title: "results_section_X_MVB_rates"
+title: "Results Section 6: MVB Selection experiment"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
