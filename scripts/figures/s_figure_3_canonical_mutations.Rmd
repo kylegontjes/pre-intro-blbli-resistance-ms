@@ -43,6 +43,19 @@ df <- left_join(df,tn4401)
 # load the kleborate
 kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame
 df <- left_join(df,kleborate)
+
+# Load blast data 
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+df$`KPC-10` <- ifelse(df$KPC_allele=="KPC-10",1,0)
+
+## Edit KPC type with KPC-10 data
+df$KPC_type <- ifelse(df$`KPC-10`==1,"KPC-10",df$KPC_type)
 ```
 
 ```{r}
@@ -59,7 +72,7 @@ drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
 target_modification <- c('PBP2',"PBP4")
 
 carbapenem <- c(drug_entry,drug_exit,target_modification)
-```
+``` 
 
 # FA - phylogeny 
 ```{r ,fig.height=15,fig.width=15,echo=F,message=F,error=F,warning=F} 

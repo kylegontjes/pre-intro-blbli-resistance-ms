@@ -37,6 +37,16 @@ df <- left_join(df,tn4401)
 # load the kleborate
 kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS") %>% as.data.frame
 df <- left_join(df,kleborate)
+
+# Load blast data 
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+df$`KPC-10` <- ifelse(df$KPC_allele=="KPC-10",1,0)
 ```
 
 ```{r}
@@ -52,7 +62,7 @@ bla_mat$`SHV-11` <- ifelse(bla_mat$`SHV-11`==1 | bla_mat$`SHV-11^`,1,0)
 bla_mat$`SHV-12` <- ifelse(bla_mat$`SHV-12`==1 ,1,0)
 bla_mat$`TEM-1D.v1` <- ifelse(bla_mat$`TEM-1D.v1^` ==1 | bla_mat$`TEM-1D.v1`==1,1,0)
 
-bla_genes <- colnames(bla_mat %>% select(-isolate_no)) %>% sort %>% subset(!.%in% c("KPC-3^","SHV-11^","SHV-12^","TEM-1D.v1^"))
+bla_genes <- c(colnames(bla_mat %>% select(-isolate_no)),"KPC-10") %>% sort %>% subset(!.%in% c("KPC-3^","SHV-11^","SHV-12^","TEM-1D.v1^"))
 df <- left_join(df,bla_mat)
 ```
 
