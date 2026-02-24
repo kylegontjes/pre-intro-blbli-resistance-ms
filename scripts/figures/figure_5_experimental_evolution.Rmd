@@ -57,11 +57,11 @@ MVB_evolution_data <- read_csv("./data/evolution_experiment/curated_MVB_evolutio
 ```{r}
   MVB_evolution_data <- MVB_evolution_data %>% left_join(.,df %>% select(isolate_no,MVB,clade_I,PBP_any,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_truncation_kleborate,OmpK36_non_syn,OmpK36_promoter_IS,tn4401_allele,KPC_present,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC))
 MVB_evolution_data$category <- MVB_evolution_data %>% select(clade_I,KPC_type,OmpK36_L3_mutations,AA018_KPC,AA552_non_KPC) %>% apply(.,1,FUN=function(x){paste0(c(x["clade_I"],x["KPC_type"],names(x %>% subset(. %in% c(1)))),collapse=" + ")}) %>% gsub("OmpK36_L3_mutations",'Loop 3 insertion',.) %>% gsub("AA552_non_KPC","AA552 non-KPC plasmid",.) %>% gsub("AA018_KPC","AA018 KPC plasmid",.)  %>% gsub("+ No KPC +","",.) %>% gsub("\\+\\+","\\+",.)
-MVB_evolution_data$category_simple <- ifelse(MVB_evolution_data$clade_I == "Clade II","Clade II without ompK36 mutation",ifelse(MVB_evolution_data$clade_I == "Clade I" & MVB_evolution_data$OmpK36_L3_mutations==1,"Clade I with Loop 3 insertion","Clade I without Loop 3 insertion" ))
+MVB_evolution_data$category_simple <- ifelse(MVB_evolution_data$clade_I == "Clade II","Clade II without OmpK36 mutation",ifelse(MVB_evolution_data$clade_I == "Clade I" & MVB_evolution_data$OmpK36_L3_mutations==1,"Clade I with Loop 3 insertion","Clade I without Loop 3 insertion" ))
 ```
 
 
-# E = Isolate specific
+# Isolate specific
 ```{r}  
 MVB_evolution_data$category <- factor(MVB_evolution_data$category,levels = sort(MVB_evolution_data$category) %>% unique())
 MVB_evolution_data <- MVB_evolution_data %>% arrange(clade_I,category) 
@@ -70,12 +70,13 @@ MVB_evolution_data$plasmid_type <- ifelse(MVB_evolution_data$AA018_KPC==1 & MVB_
                                           ifelse(MVB_evolution_data$AA018_KPC==1 ,"AA018 with blaKPC",ifelse(MVB_evolution_data$AA552_non_KPC==1,"AA552 without blaKPC","Other blaKPC plasmid")))
 
 categories <- c("#7684C0","maroon","lightgray",'black')
+plasmid_type <- unique(MVB_evolution_data$plasmid_type) %>% sort
 
-A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + scale_color_manual(values = categories,name = "Plasmid type",guide=guide_legend(ncol=1)) + scale_fill_manual(values = c("#FC4E07","pink","blue"),guide= guide_legend(ncol=1),name = "Porin") + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
+A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + scale_color_manual(values = categories,breaks = plasmid_type, labels =gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", plasmid_type),name = "Plasmid type",guide=guide_legend(ncol=1)) + scale_fill_manual(values = c("#FC4E07","pink","blue"),guide = guide_legend(ncol=1),name = "Porin") + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
     scale_x_log10(
         limits = c(5e-13, 2e-6),
         breaks = c(1e-12, 1e-10, 1e-8,1e-6)
-    )  + scale_color_manual(breaks = c(T,F),values = c("black","#A9A9A9"),labels = c("Over","Under"),name = "Limit of detection",guide=guide_legend(ncol=1)) + theme(legend.position='bottom',legend.title.position = 'top',axis.text.x = element_text(size=12),legend.title = element_text(size=12),legend.text = element_text(size=10),axis.text.y = element_text(size=14),axis.title.x = element_text(size=14))
+    )  + scale_color_manual(breaks = c(T,F),values = c("black","#A9A9A9"),labels = c("Over","Under"),name = "Limit of detection",guide=guide_legend(ncol=1)) + theme(legend.position='bottom',legend.title.position = 'top',axis.text.x = element_text(size=12),legend.title = element_text(size=12),legend.text = element_markdown(size=10),axis.text.y = element_text(size=14),axis.title.x = element_text(size=14))
 A
 ```
 
@@ -91,7 +92,7 @@ info_matrix <- info_matrix %>% mutate(clade_I = recode(clade_I,"Clade I" = "I",
                                                 `1`="Present"),
                               AA552_non_KPC = recode(AA552_non_KPC,`0`='',
                                                 `1`="Present")) 
-colnames(info_matrix) <- c("Isolate","Clade","GD insertion\nin ompK36","blaKPC\nallele","blaKPC\nplasmid","AA018 blaKPC\nplasmid","AA552 non-blaKPC\nplasmid")
+colnames(info_matrix) <- c("Isolate","Clade","GD insertion\nin OmpK36","blaKPC\nallele","blaKPC\nplasmid","AA018 blaKPC\nplasmid","AA552 non-blaKPC\nplasmid")
 
 mytheme <- ttheme_minimal(core = list(fg_params = list(hjust=0, vjust = 0.5 ,x=0.1, fontsize=8.75),padding = unit(c(4.75, 2.5), "mm")),
                           colhead = list(fg_params = list(hjust=0, vjust = 0.5, x=0.1, fontsize=8.75, fontface="bold"),padding = unit(c(2.5, 2.5), "mm")),
@@ -110,14 +111,13 @@ info_matrix_bin$KPC3 <- ifelse(info_matrix_bin$KPC_type=="KPC-3",1,0)
 info_matrix_bin$KPC2 <- ifelse(info_matrix_bin$KPC_type=="KPC-2",1,0)
 info_matrix_bin$AA018 <- ifelse(info_matrix_bin$KPC_plasmid=="AA018_KPC",1,0)
 info_matrix_bin$AA275 <- ifelse(info_matrix_bin$KPC_plasmid=="AA275_KPC",1,0) 
-info_matrix_bin$Other_KPC <- ifelse(info_matrix_bin$KPC_plasmid %in% c('AA356_KPC','AD548_KPC','AA274_KPC','AA357_KPC',"AA275_KPC"),1,0) 
- 
+info_matrix_bin$Other_KPC <- ifelse(info_matrix_bin$KPC_plasmid %in% c('AA356_KPC','AD548_KPC','AA274_KPC','AA357_KPC',"AA275_KPC"),1,0)
 
 info_matrix_bin_mat <- info_matrix_bin %>% select(isolate_no,clade_I_bin,KPC2,OmpK36GD,AA018,AA552_non_KPC,Other_KPC,KPC3)
 info_matrix_bin_mat <- as.data.frame(info_matrix_bin_mat)
 rownames(info_matrix_bin_mat) <- info_matrix_bin_mat$isolate_no
 info_matrix_bin_mat <- info_matrix_bin_mat %>% select(-isolate_no)
-colnames(info_matrix_bin_mat) <- c("Clade I","blaKPC-2","GD insertion in ompK36","AA018 blaKPC plasmid","AA552 non-blaKPC plasmid","Other blaKPC plasmid","blaKPC-3")
+colnames(info_matrix_bin_mat) <- c("Clade I","KPC-2","GD insertion in OmpK36","AA018 KPC plasmid","AA552 non-KPC plasmid","Other KPC plasmid","KPC-3")
 matrix_viz <- ComplexHeatmap::Heatmap(info_matrix_bin_mat,cluster_rows = F,cluster_columns = F,col = c(`1`='black',`0`='white'),column_names_side ='bottom',show_row_names = T,row_names_side = 'left',
         heatmap_legend_param = list(
             title = "Presence",      
