@@ -46,16 +46,16 @@ df <- left_join(df,kleborate)
 
 # Load blast data 
 KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
-KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
-                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
-                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
-                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"blaKPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"blaKPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"blaKPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No blaKPC"))))
 df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
-df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
-df$`KPC-10` <- ifelse(df$KPC_allele=="KPC-10",1,0)
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele)
+df$`KPC-10` <- ifelse(df$KPC_allele=="blaKPC-10",1,0)
 
 ## Edit KPC type with KPC-10 data
-df$KPC_type <- ifelse(df$`KPC-10`==1,"KPC-10",df$KPC_type)
+df$KPC_allele <- ifelse(df$`KPC-10`==1,"blaKPC-10",df$KPC_allele)
 ```
 
 ```{r}
@@ -99,7 +99,7 @@ rownames(df) <- df$isolate_no
 
 # KPC allele
   p8.1 <- p8 + new_scale_fill()
-  p9 <-  gheatmap(p8.1,df %>% select(KPC_type) %>% mutate_all(as.factor)  %>% `colnames<-`("blaKPC allele"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000075)  +kpc_scale + consistent_theme_sfigure_3 + ylim(NA,480)
+  p9 <-  gheatmap(p8.1,df %>% select(KPC_allele) %>% mutate_all(as.factor)  %>% `colnames<-`("blaKPC allele"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000075)  +kpc_scale + consistent_theme_sfigure_3 + ylim(NA,480)
 0
 # relevant alleles
   p9.1 <- p9 + new_scale_fill()
@@ -147,7 +147,7 @@ levels(nn_data_melt$locus_tag) <- gsub("ramA","<i>ramA</i>",levels(nn_data_melt$
 s_figure_3_C <- nn_plot(nn_data_melt)   + s_figure_3_descriptive_plot_theme
 ```
 
-```{r,fig.height=12.5,fig.width=18.75}
+```{r,fig.height=12.667,fig.width=19}
 s_figure_3BC <- plot_grid(s_figure_3_B,s_figure_3_C ,nrow = 2,labels = c("B","C"),label_size = 24,align = "hv",label_x = -0.0355)
 
 s_figure_3 <- plot_grid(s_figure_3_A,s_figure_3BC,labels = c("A",""),label_size = 24,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.69)) 
@@ -156,6 +156,6 @@ s_figure_3
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.height=12.5,fig.width=18} 
-ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.5, width = 18.75,  limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.667, width = 19, limitsize=FALSE, bg='white', dpi=900)
 ```
  

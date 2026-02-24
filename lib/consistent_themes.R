@@ -62,14 +62,33 @@ ompK36_scale <- scale_fill_manual(values=ompK36_colors,name="Status of <i>ompK36
 ompK36_color_scale <- scale_color_manual(values=ompK36_colors,name = "Status of <i>ompK36</i> porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Tn4401 allele
-tn4401_scale <- scale_fill_manual(breaks=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),values = c(8,9,10,11,12,13),labels=c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126"),name = "Tn4401 isoform",guide = guide_legend(order=5,title.position = "top", label.position = "right",ncol=1))
+tn4401_alleles <- c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126")
+tn4401_alleles_md <- gsub("Tn4401","<i>tn4401</i>",tn4401_alleles)
+tn4401_scale <- scale_fill_manual(breaks=tn4401_alleles,labels = tn4401_alleles_md,values = c(8,9,10,11,12,13),name = "<i>tn4401</i> isoform",guide = guide_legend(order=5,title.position = "top", label.position = "right",ncol=1))
 
 #KPC Scale
-kpc_scale <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),values = c(5,6,7,4,"white"),labels=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),name = "KPC",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
-kpc_scale_h <- scale_fill_manual(breaks=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),values = c(5,6,7,4,"white"),labels=c("KPC-2","KPC-3","KPC-5","KPC-10","No KPC"),name = "KPC",guide = guide_legend(order=6,title.position = "top", label.position = "right",nrow=1))
+KPC_values <- c("blaKPC-2","blaKPC-3","blaKPC-5","blaKPC-10","No blaKPC")
 
+format_blaKPC_md <- function(gene) {
+  if(grepl("^blaKPC-", gene)){
+    allele <- sub("blaKPC-", "", gene)
+    paste0("<i>bla</i><sub>KPC-", allele, "</sub>")
+  }  else {
+    if(grepl("No blaKPC",gene) == T){
+      gsub("blaKPC","<i>bla</i><sub>KPC</sub>",gene)
+    } else {
+      gene
+    }
+  } 
+}
+
+KPC_values_md <- sapply(KPC_values,format_blaKPC_md) 
+
+kpc_scale <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values = c(5,6,7,4,"white"),name = "<i>bla</i><sub>KPC</sub> allele",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
+kpc_scale_h <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values = c(5,6,7,4,"white"),name = "<i>bla</i><sub>KPC</sub> allele",guide = guide_legend(order=6,title.position = "top", label.position = "right",nrow=1))
+ 
 # AA552
-AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 blaKPC plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 <i>bla</i><sub>KPC</sub> plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Variant type
 variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","gray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
@@ -105,7 +124,7 @@ consistent_theme_sfigure_3 <- theme(legend.position = 'bottom',legend.direction=
                                legend.justification = "center", legend.key = element_rect(colour = c('black')),
                                legend.box.spacing = unit(.000005, "cm"),
                                legend.key.size = unit(0.15, "cm"),legend.key.width = unit(0.15, "cm") ,
-                               legend.title = element_text(size=12),legend.text = element_text(size=10),
+                               legend.title = element_markdown(size=12),legend.text = element_markdown(size=10),
                                legend.title.align=0.5,legend.text.align = 0,
                                legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 

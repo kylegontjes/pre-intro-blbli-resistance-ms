@@ -67,12 +67,12 @@ df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))
 
 # KPC data
 KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
-KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
-                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
-                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
-                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"blaKPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"blaKPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"blaKPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"blaKPC-10","No blaKPC"))))
 df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
-df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele)
 mobtyper <- left_join(mobtyper,df %>% select(isolate_no,KPC_allele,clade_I))
 ```
 
@@ -81,11 +81,11 @@ mobtyper <- left_join(mobtyper,df %>% select(isolate_no,KPC_allele,clade_I))
 mobtyper_sum <- mobtyper %>% group_by(primary_cluster_id) %>% summarise(n=n(),KPC_plasmid = sum(KPC_plasmid),Non_KPC_plasmid = n-KPC_plasmid)  
 KPC_plasmids <- subset(mobtyper_sum,KPC_plasmid>0) %>% arrange(-KPC_plasmid) %>%  .$primary_cluster_id
  
-KPC_plasmid_scale <-  scale_fill_manual(breaks = c(T,F),values=c("red","gray"),name = "blaKPC-containing",guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+KPC_plasmid_scale <-  scale_fill_manual(breaks = c(T,F),values=c("red","gray"),name = "<i>bla</i><sub>KPC</sub>-containing",guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 A <- ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid)) + geom_bar(stat='count')  + KPC_plasmid_scale  + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
-  labs(x="Primary MOB-cluster",y="Isolates",fill="blaKPC-containing plasmid") +
+  labs(x="Primary MOB-cluster",y="Isolates",fill="<i>bla</i><sub>KPC</sub>-containing plasmid") +
   geom_text(stat = "count", 
   position = position_stack(vjust = 0.5),
   aes(
@@ -93,7 +93,7 @@ A <- ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x
     y = after_stat(count) + ifelse(after_stat(count) < 3, 7.5, ifelse(after_stat(count)<6,10, ifelse(after_stat(count) <7,15,ifelse(after_stat(count)<13,15,0))))
   ),
   size = 3
-) + facet_grid(~clade_I)
+) + facet_grid(~clade_I) + theme(legend.text = element_markdown(),legend.title = element_markdown())
 A
 ```
  
@@ -101,7 +101,7 @@ A
 ```{r}
 B <- ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids) %>% subset(KPC_plasmid==T),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_allele)) + geom_bar(stat='count')  + kpc_scale_h + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
-  labs(x="Primary MOB-cluster",y="Isolates",fill="blaKPC allele")   + facet_grid(~clade_I)
+  labs(x="Primary MOB-cluster",y="Isolates",fill="blaKPC allele")   + facet_grid(~clade_I)  + theme(legend.text = element_markdown(),legend.title = element_markdown())
 
 B
 ```
@@ -110,7 +110,7 @@ B
 ```{r}
 C <-  ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid),y=num_contigs) + geom_boxplot(aes(y=num_contigs)) + KPC_plasmid_scale + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
-  labs(x="",y="Number of contigs",fill="blaKPC-containing plasmid")  
+  labs(x="",y="Number of contigs",fill="blaKPC-containing plasmid")   + theme(legend.text = element_markdown(),legend.title = element_markdown())
 
 C
 ```
@@ -119,7 +119,7 @@ C
 ```{r}
 D <-  ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid),y=size) + geom_boxplot(aes(y=size))  + KPC_plasmid_scale + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
-  labs(x="",y="Size of plasmid (bp)",fill="blaKPC-containing plasmid")  + scale_y_continuous(breaks = c(0,10000,25000,50000,75000,100000,150000,200000,250000,300000))
+  labs(x="",y="Size of plasmid (bp)",fill="blaKPC-containing plasmid")  + scale_y_continuous(breaks = c(0,10000,25000,50000,75000,100000,150000,200000,250000,300000)) + theme(legend.text = element_markdown(),legend.title = element_markdown())
 
 D
 ```
@@ -139,7 +139,7 @@ KPC_contig_data <- lapply(KPC_containing_isolates,get_isolates_KPC_plasmids_df,m
 
 E <-  ggplot(data=KPC_contig_data  ,aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_contig),y=size) + geom_boxplot(aes(y=size))  + KPC_plasmid_scale + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1)) + 
-  labs(x="",y="Contig size (bp)",fill="blaKPC-containing plasmid")  + geom_hline(yintercept = 10000,linetype = 2)  + scale_y_continuous(breaks = c(0,10000,25000,50000,75000,100000,120000))
+  labs(x="",y="Contig size (bp)",fill="blaKPC-containing plasmid")  + geom_hline(yintercept = 10000,linetype = 2)  + scale_y_continuous(breaks = c(0,10000,25000,50000,75000,100000,120000)) + theme(legend.text = element_markdown(),legend.title = element_markdown())
 
 E
 ```
@@ -149,10 +149,10 @@ E
 mobility_scale <- scale_fill_manual(values = c("brown","blue","#C0C0C0"),breaks = c("conjugative",'mobilizable','non-mobilizable'),labels = c("Conjugative","Mobilizable","Non-Mobilizable"),name="Predicted mobility",guide = guide_legend(nrow=2, title.position = "top", label.position = "right"))
 
 ## Predicted mobility 
-mobtyper$KPC_plasmid_name <- ifelse(mobtyper$KPC_plasmid ==T,"blaKPC-containing plasmid","Non-blaKPC plasmid")
+mobtyper$KPC_plasmid_name <- ifelse(mobtyper$KPC_plasmid ==T,"<i>bla</i><sub>KPC</sub>-containing plasmid","Non-<i>bla</i><sub>KPC</sub> plasmid")
 f <- ggplot(data=mobtyper%>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=primary_cluster_id,fill=predicted_mobility))  + geom_bar()+ facet_wrap(~KPC_plasmid_name,)  +   labs(x="",y="Isolates",fill="Predicted mobility") + theme_bw_me + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1),
-                      strip.background = element_rect(color = 'black',linewidth = 1)) + mobility_scale
+                      strip.background = element_rect(color = 'black',linewidth = 1)) + mobility_scale + theme(strip.text = element_markdown())
   
 f
 ```
@@ -166,14 +166,13 @@ host_range_scale <- scale_fill_manual(values = c("darkgray", color_range ),break
 
 G <-    ggplot(data=mobtyper%>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=primary_cluster_id,fill=observed_host_range_ncbi_name))  + geom_bar()+ facet_wrap(~KPC_plasmid_name)    +  labs(x="",y="Isolates",fill="Observed host range")+ theme_bw_me + 
   theme_bw_me + theme(axis.text.x = element_text(angle=45,hjust=1),
-                      strip.background = element_rect(color = 'black',linewidth = 1)) + host_range_scale
+                      strip.background = element_rect(color = 'black',linewidth = 1)) + host_range_scale+ theme(strip.text = element_markdown())
 
 G
 ```
 
 # H. Replicon type
 ```{r}
-heatmap
 rep_type_matrix <- mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids) %>% select(isolate_no,primary_cluster_id,rep_types)%>%
   separate_rows(rep_types,sep=",") %>%
   group_by(primary_cluster_id,rep_types) %>%
