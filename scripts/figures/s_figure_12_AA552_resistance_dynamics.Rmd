@@ -54,8 +54,11 @@ KPC_clusters <- colnames(KPC_containing_clusters)
 Non_KPC_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_non_KPC")) %>% {ifelse(.=="Non-KPC plasmid",1,0)} %>% as.data.frame %>% select_if(colSums(.)>0)
 df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.))) %>% left_join(Non_KPC_clusters %>% mutate(isolate_no = rownames(.)))
     
+ 
+df$AA525_status_md <- ifelse(df$AA552_KPC ==1, "AA552 <i>bla</i><sub>KPC</sub> plasmid",ifelse(df$AA552_non_KPC ==1,"AA552 Non-<i>bla</i><sub>KPC</sub> plasmid","Other")) %>% factor(.,levels = c("AA552 <i>bla</i><sub>KPC</sub> plasmid","AA552 Non-<i>bla</i><sub>KPC</sub> plasmid","Other"))
 
-df$AA525_status <- ifelse(df$AA552_KPC ==1, "AA552 blaKPC",ifelse(df$AA552_non_KPC ==1,"AA552 Non-blaKPC","Other")) %>% factor(.,levels = c("AA552 blaKPC","AA552 Non-blaKPC","Other"))
+df$AA525_status <- gsub("<i>bla</i><sub>KPC</sub>","blaKPC",df$AA525_status_md)
+   
 df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No feature"="Susceptible" )
 ``` 
 
@@ -65,10 +68,10 @@ df$date <- lubridate::as_date(df$Cx_date)
 # Number of weeks using date data
 number_of_weeks <- as.numeric(round(difftime(max(df$Cx_date),min(df$Cx_date),units = 'weeks')) + 1)
  
-AA552_scale <- scale_fill_manual(values = c("blue",'lightblue','lightgray'), breaks = c("AA552 blaKPC","AA552 Non-blaKPC","Other"),name="AA552 Status")
-AA552_scale_color <- scale_color_manual(values = c("blue",'lightblue','lightgray'), breaks = c("AA552 blaKPC","AA552 Non-blaKPC","Other"),name="AA552 Status")
+AA552_scale <- scale_fill_manual(values = c("blue",'lightblue','lightgray'), breaks = c("AA552 <i>bla</i><sub>KPC</sub> plasmid","AA552 Non-<i>bla</i><sub>KPC</sub> plasmid","Other"),name="AA552 Status")
+AA552_scale_color <- scale_color_manual(values = c("blue",'lightblue','lightgray'), breaks = c("AA552 <i>bla</i><sub>KPC</sub> plasmid","AA552 Non-<i>bla</i><sub>KPC</sub> plasmid","Other"),name="AA552 Status")
 
-A <- ggplot(data=df,aes(x=Cx_date,fill=AA525_status)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + AA552_scale
+A <- ggplot(data=df,aes(x=Cx_date,fill=AA525_status_md)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + AA552_scale
 
 A
 
@@ -76,7 +79,7 @@ A
 
 # Temporal distribution
 ```{r}
-B <-   ggplot(data=df,aes(x=Cx_date,fill=AA525_status,y=as.factor(AA525_status))) + geom_boxplot(alpha=0.75,outliers=F) + geom_jitter(mapping = aes(color=as.factor(blbli_asr_cluster_renamed_simple)),alpha=1,width = 0,height = 0.25) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + cluster_scale_gray_color
+B <-   ggplot(data=df,aes(x=Cx_date,fill=AA525_status_md,y=AA525_status_md)) + geom_boxplot(alpha=0.75,outliers=F) + geom_jitter(mapping = aes(color=as.factor(blbli_asr_cluster_renamed_simple)),alpha=1,width = 0,height = 0.25) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + cluster_scale_gray_color + theme(axis.text.y = element_markdown())
 
 B
 ```
@@ -84,7 +87,6 @@ B
 # Temporal distribution of 
 ```{r}
 C <-   ggplot(data=df,aes(x=Cx_date,fill=blbli_asr_cluster_renamed_simple)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + cluster_scale_gray
- 
 
 D <-   ggplot(data=df,aes(x=Cx_date,y=as.factor(blbli_asr_cluster_renamed_simple),fill=blbli_asr_cluster_renamed_simple)) + geom_boxplot(alpha=.75,outliers=F) + geom_jitter(mapping = aes(color=as.factor(AA525_status)),alpha=1,width = 0,height = 0.25) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  cluster_scale_gray + AA552_scale_color 
 
@@ -198,7 +200,7 @@ f
 ```
 # Temporal distribution facilities
 ```{r}
-G <- ggplot(data=df,aes(x=Cx_date,y=as.factor(blbli_asr_cluster_renamed_simple))) + geom_boxplot(alpha=0.5,outliers=F) + geom_jitter(mapping = aes(color=as.factor(AA525_status)),alpha=1,width = 0,height = .25,size=1.2) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + AA552_scale_color + facet_wrap(~LTACH_Recode,ncol=4)
+G <- ggplot(data=df,aes(x=Cx_date,y=as.factor(blbli_asr_cluster_renamed_simple))) + geom_boxplot(alpha=0.5,outliers=F) + geom_jitter(mapping = aes(color=AA525_status_md),alpha=1,width = 0,height = .25,size=1.2) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + AA552_scale_color + facet_wrap(~LTACH_Recode,ncol=4)
 
 G
 ```
