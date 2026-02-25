@@ -68,7 +68,7 @@ tn4401_scale <- scale_fill_manual(breaks=tn4401_alleles,labels = tn4401_alleles_
 
 #KPC Scale
 KPC_values <- c("blaKPC-2","blaKPC-3","blaKPC-5","blaKPC-10","No blaKPC")
-
+KPC_gene_values <- gsub("bla","",KPC_values)
 format_blaKPC_md <- function(gene) {
   if(grepl("^blaKPC-", gene)){
     allele <- sub("blaKPC-", "", gene)
@@ -83,6 +83,8 @@ format_blaKPC_md <- function(gene) {
 }
 
 KPC_values_md <- sapply(KPC_values,format_blaKPC_md) 
+
+kpc_gene_scale <- scale_fill_manual(breaks=KPC_gene_values,labels = KPC_gene_values,values = c(5,6,7,4,"white"),name = "KPC gene",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
 
 kpc_scale <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values = c(5,6,7,4,"white"),name = "<i>bla</i><sub>KPC</sub> allele",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
 kpc_scale_h <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values = c(5,6,7,4,"white"),name = "<i>bla</i><sub>KPC</sub> allele",guide = guide_legend(order=6,title.position = "top", label.position = "right",nrow=1))

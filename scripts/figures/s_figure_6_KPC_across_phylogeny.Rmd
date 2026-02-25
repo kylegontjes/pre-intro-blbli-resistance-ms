@@ -61,12 +61,12 @@ df <- left_join(df,KPC_plasmid_copy_number)
 
 # KPC gene
 KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
-KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"blaKPC-3",
-                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"blaKPC-5",
-                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"blaKPC-2",
-                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"blaKPC-10","No blaKPC"))))
+KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
+                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
+                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
+                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
 df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
-df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele)
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
 ```
 
 # Plot on the tree
@@ -74,7 +74,7 @@ df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele)
 df$KPC_copy_number_log2 <- log2(df$KPC_copy_number)
 df$KPC_plasmid_copy_number_log2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
 
-consistent_theme_phylo <-  theme(legend.position = 'bottom',legend.title.position = 'top',legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(.35, "cm"),legend.key.width = unit(.35, "cm"),legend.spacing.x=unit(.0001, "cm"), legend.title = element_markdown(size=12,hjust=0.5),legend.text = element_markdown(size=10,hjust=0))
+consistent_theme_phylo <-  theme(legend.position = 'bottom',legend.title.position = 'top',legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(.35, "cm"),legend.key.width = unit(.35, "cm"),legend.spacing.x=unit(.0001, "cm"), legend.title = element_text(size=12,hjust=0.5),legend.text = element_text(size=10,hjust=0))
  
 rownames(df) <- df$isolate_no
 
@@ -98,7 +98,7 @@ p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.fac
 
 p2.1 <- p2+ggnewscale::new_scale_fill()
 
-p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC allele")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.00005) + kpc_scale + consistent_theme_phylo
+p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("KPC gene")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.00005) + kpc_gene_scale + consistent_theme_phylo
 
 p3.1 <- p3+ggnewscale::new_scale_fill()
 
