@@ -29,10 +29,12 @@ MVB_IR_scale <- scale_fill_manual(breaks = c("IR_num_log_2_diff","MVB_num_log_2_
 # Non-Susceptibility
 resistance_prop_scale <- scale_fill_manual(breaks = c("blbli_res_prop","blbli_sus_prop"),values=c("black","gray"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) 
 resistance_scale <- scale_fill_manual(breaks = c("Non-Susceptible","Susceptible"),values=c("black","white"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(order=3,title.position = "top", label.position = "right",nrow=2),drop = FALSE )
- 
+resistance_scale_order_2 <- scale_fill_manual(breaks = c("Non-Susceptible","Susceptible"),values=c("black","white"),labels = c("Resistant","Susceptible"),name="Resistance",guide = guide_legend(order=2,title.position = "top", label.position = "right",nrow=2),drop = FALSE )
+
 # MIC Numeric
 colfunc <- colorRampPalette(c("white", "red")) 
 Log2_scale <-scale_fill_manual(breaks = c(-2,-1,0,1,2,3,4,5),values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=4),drop = FALSE ,limits=force)
+Log2_scale_3_order <-scale_fill_manual(breaks = c(-2,-1,0,1,2,3,4,5),values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=3),drop = FALSE ,limits=force)
 
 # Clade 
 clade_colors <- c("Clade I" = "red","Clade II"="blue")
@@ -47,6 +49,7 @@ cluster_labels <- names(cluster_colors)
 cluster_colors_gray <- c("No feature" = "gray","Singleton" = "black","Cluster 1" = "green","Cluster 2" = "orange","Cluster 3" = "purple","Cluster 4" = "blue","Cluster 5" = "red","Cluster 6" = 'pink',"Cluster 7" = "#F0E442","Cluster 8" = '#00CED1')
 cluster_labels_gray <- names(cluster_colors) 
 cluster_scale <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
+cluster_scale_1_order <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=1,ncol=3, title.position = "top", label.position = "right"))
 cluster_scale_4 <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,nrow=4, title.position = "top", label.position = "right"))
 cluster_scale_2_col <- scale_fill_manual(values=cluster_colors,breaks = cluster_labels,labels = cluster_labels  %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=2, title.position = "top", label.position = "right"))
 cluster_scale_gray <- scale_fill_manual(values=cluster_colors_gray,breaks = cluster_labels_gray,labels = cluster_labels_gray %>% recode(.,"No feature" = "Susceptible"),name="Phylogenetics of resistance", guide = guide_legend(order=2,ncol=3, title.position = "top", label.position = "right"))
@@ -84,7 +87,7 @@ format_blaKPC_md <- function(gene) {
 
 KPC_values_md <- sapply(KPC_values,format_blaKPC_md) 
 
-kpc_gene_scale <- scale_fill_manual(breaks=KPC_gene_values,labels = KPC_gene_values,values = c(5,6,7,4,"white"),name = "KPC gene",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
+kpc_gene_scale <- scale_fill_manual(breaks=KPC_gene_values,labels = KPC_gene_values,values = c(5,6,7,4,"white"),name = "KPC gene",guide = guide_legend(order=4,title.position = "top", label.position = "right",ncol=1))
 
 kpc_scale <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values = c(5,6,7,4,"white"),name = "<i>bla</i><sub>KPC</sub> allele",guide = guide_legend(order=6,title.position = "top", label.position = "right",ncol=1))
 kpc_scale_h <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values = c(5,6,7,4,"white"),name = "<i>bla</i><sub>KPC</sub> allele",guide = guide_legend(order=6,title.position = "top", label.position = "right",nrow=1))
