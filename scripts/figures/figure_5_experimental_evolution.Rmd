@@ -57,7 +57,7 @@ MVB_evolution_data <- read_csv("./data/evolution_experiment/curated_MVB_evolutio
 ```{r}
   MVB_evolution_data <- MVB_evolution_data %>% left_join(.,df %>% select(isolate_no,MVB,clade_I,PBP_any,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_truncation_kleborate,OmpK36_non_syn,OmpK36_promoter_IS,tn4401_allele,KPC_present,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC))
 MVB_evolution_data$category <- MVB_evolution_data %>% select(clade_I,KPC_type,OmpK36_L3_mutations,AA018_KPC,AA552_non_KPC) %>% apply(.,1,FUN=function(x){paste0(c(x["clade_I"],x["KPC_type"],names(x %>% subset(. %in% c(1)))),collapse=" + ")}) %>% gsub("OmpK36_L3_mutations",'Loop 3 insertion',.) %>% gsub("AA552_non_KPC","AA552 non-KPC plasmid",.) %>% gsub("AA018_KPC","AA018 KPC plasmid",.)  %>% gsub("+ No KPC +","",.) %>% gsub("\\+\\+","\\+",.)
-MVB_evolution_data$category_simple <- ifelse(MVB_evolution_data$clade_I == "Clade II","Clade II without OmpK36 mutation",ifelse(MVB_evolution_data$clade_I == "Clade I" & MVB_evolution_data$OmpK36_L3_mutations==1,"Clade I with Loop 3 insertion","Clade I without Loop 3 insertion" ))
+MVB_evolution_data$category_simple <- ifelse(MVB_evolution_data$clade_I == "Clade II","Clade II without  mutation",ifelse(MVB_evolution_data$clade_I == "Clade I" & MVB_evolution_data$OmpK36_L3_mutations==1,"Clade I with Loop 3 insertion","Clade I without Loop 3 insertion" ))
 ```
 
 
@@ -72,7 +72,7 @@ MVB_evolution_data$plasmid_type <- ifelse(MVB_evolution_data$AA018_KPC==1 & MVB_
 categories <- c("#7684C0","maroon","lightgray",'black')
 plasmid_type <- unique(MVB_evolution_data$plasmid_type) %>% sort
 
-A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + scale_color_manual(values = categories,breaks = plasmid_type, labels =gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", plasmid_type),name = "Plasmid type",guide=guide_legend(ncol=1)) + scale_fill_manual(values = c("#FC4E07","pink","blue"),guide = guide_legend(ncol=1),name = "Porin") + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
+A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + scale_color_manual(values = categories,breaks = plasmid_type, labels =gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", plasmid_type),name = "Plasmid type",guide=guide_legend(ncol=1)) + scale_fill_manual(values = c("#FC4E07","pink","blue"),guide = guide_legend(ncol=1),name = "Status of the OmpK36 porin") + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
     scale_x_log10(
         limits = c(5e-13, 2e-6),
         breaks = c(1e-12, 1e-10, 1e-8,1e-6)
