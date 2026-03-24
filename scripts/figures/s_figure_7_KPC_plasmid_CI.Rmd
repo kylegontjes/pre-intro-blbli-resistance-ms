@@ -107,16 +107,32 @@ df_CI_relevant_plasmids <- left_join(df_CI_KPC_plasmid_mat %>% mutate(isolate_no
    
  p.8 <- p.7 + new_scale_fill() 
 A <-  gheatmap(p.8,df_CI_relevant_plasmids  %>% select(AA018_KPC,AA018_non_KPC,AA552_KPC,AA552_non_KPC,Other_KPC_cluster) %>% mutate_all(as.factor) %>% `colnames<-`(c("AA018 KPC plasmid","AA018 non-KPC plasmid","AA552 KPC plasmid","AA552 non-KPC plasmid","Other KPC plasmids")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 6.5, width = 0.375,offset =.0000875) + feature_scale_v   + ylim(NA,230) + theme(legend.position = 'bottom') + consistent_theme_sfigure_5
+
+A
 ```
 
 # B KPC copy number
-```{r} 
+```{r,fig.height= 4,fig.width = 5} 
 df_CI$KPC_plasmid_simplified <- ifelse(df_CI$AA018_KPC == 1, "AA018",ifelse(df_CI$AA552_KPC == 1,"AA552","Other"))
-B <- ggplot(data= df_CI %>% subset(KPNIH1_RS28775_chr_median_norm>0)) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.55))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("<i>bla</i><sub>KPC</sub> copy number") + xlab("<i>bla</i><sub>KPC</sub> plasmid cluster")+ theme_bw_me + s_figure_5_descriptive_plot_format + theme(legend.position='none') + ylim(NA,10.01)
+
+paste0("Median values: ")
+paste0("AA018: ")
+df_CI %>% subset(KPNIH1_RS28775_chr_median_norm>0 & KPC_plasmid_simplified =='AA018') %>% .$KPNIH1_RS28775_chr_median_norm %>% median
+
+paste0("AA552: ")
+df_CI %>% subset(KPNIH1_RS28775_chr_median_norm>0 & KPC_plasmid_simplified =='AA552') %>% .$KPNIH1_RS28775_chr_median_norm %>% median
+
+paste0("Other: ")
+df_CI %>% subset(KPNIH1_RS28775_chr_median_norm>0 & KPC_plasmid_simplified =='Other') %>% .$KPNIH1_RS28775_chr_median_norm %>% median
+
+
+B <- ggplot(data= df_CI %>% subset(KPNIH1_RS28775_chr_median_norm>0)) + geom_boxplot(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified,alpha=0.55))  + geom_jitter(aes(y=KPNIH1_RS28775_chr_median_norm, x=KPC_plasmid_simplified),width = .25,size=2,alpha=0.6) + ylab("<i>bla</i><sub>KPC</sub> copy number") + xlab("<i>bla</i><sub>KPC</sub> plasmid cluster")+ theme_bw_me + s_figure_5_descriptive_plot_format + theme(legend.position='none') + ylim(NA,10.01)   
+
+B
 ```
 
 # C membership in clusters
-```{r} 
+```{r,fig.height= 5,fig.width = 6.25} 
 df_CI$AA552_like <- ifelse(df_CI$AA552_KPC==1,"Present","Absent")
 df_CI$blbli_cluster_simplified <- ifelse(grepl("Cluster",df_CI$blbli_asr_cluster_renamed),"Cluster",ifelse(grepl("Singleton",df_CI$blbli_asr_cluster_renamed),"Singleton","Susceptible") )
 
@@ -124,7 +140,8 @@ blbli_plasmid_prop <- df_CI %>% group_by(blbli_cluster_simplified,AA552_like)  %
   dplyr::summarise(n = n()) %>%
   mutate(freq = n / sum(n)) %>% `colnames<-`(c("clustering_simple","AA552_like","n","freq")) %>% as.data.frame
  
-C <-  ggplot(data=blbli_plasmid_prop,aes(x=clustering_simple,fill=AA552_like,y=n))+geom_bar(position="stack",stat="identity",width = .75)  +ylab("Isolates") +xlab("Phylogenetics of resistance")   + theme_bw_me + s_figure_5_descriptive_plot_format  +ylim(NA,115) + AA552_fill + theme(legend.title = element_markdown(),legend.text=element_markdown())
+C <-  ggplot(data=blbli_plasmid_prop,aes(x=clustering_simple,fill=AA552_like,y=n))+geom_bar(position="stack",stat="identity",width = .75)  +ylab("Isolates") +xlab("Phylogenetics of resistance")   + theme_bw_me + s_figure_5_descriptive_plot_format  +ylim(NA,115) + AA552_fill + theme(legend.title = element_markdown(),legend.text=element_markdown()) + scale_y_continuous(breaks = scales::pretty_breaks(n=5))
+C
 ```
 
 ```{r ,fig.height = 10, fig.width = 10,echo=F,message=F,error=F,warning=F}

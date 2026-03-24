@@ -1,0 +1,30 @@
+#!/bin/sh
+# Job name
+#SBATCH --job-name=copy_panISa_KPC_evolved
+# User info
+#SBATCH --mail-user=kgontjes@umich.edu
+#SBATCH --mail-type=BEGIN,END
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --output=copy_panISa_KPC_evolved.out
+#SBATCH --nodes=1  --ntasks=1 --cpus-per-task=1 --mem=20g --time=0:30:00 
+
+# Scripts
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/panISa_evolved
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/config .
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/*.smk . 
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/*.sbat . 
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/README.md .
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/*sh .
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/wrapper_functions .
+
+# Results
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/panISa_evolved
+cp /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/results/ISScreener_evolved_KPNIH1_pretrimmed/*/panISa/* .
+
+# Logs
+cd /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/slurm_out/evolution_experiment/panISa_evolved
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/slurm_out  .
+cp -r /scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/logs/ .
+ 

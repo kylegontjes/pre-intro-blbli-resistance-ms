@@ -1,0 +1,14 @@
+# General information
+## Sample list
+samples: config/sample_PCMP_H226.tsv
+## Results output folder's name
+prefix: MVB_evolved_PCMP_H226
+
+# Input fastq directory
+input_reads: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Sequence_data/illumina_fastq/clean_fastq_qc_pass_samples
+
+# Bwa parameters
+num_cores: 8
+
+## Reference genome
+reference_genome: /nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/database/PCMP_H226.fasta

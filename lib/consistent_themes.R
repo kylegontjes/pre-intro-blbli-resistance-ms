@@ -60,9 +60,9 @@ panel_scale <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GW
 panel_scale_v <- scale_fill_manual(breaks = c("known","novel_GWAS","known_ST258_GWAS"),values=hues::iwanthue(5),labels = c("Non-carbapenemase genotypes","Novel GWAS hits","Non-carbapenemase + novel GWAS"),name="Genotype panel",guide = guide_legend(ncol=1,title.position = "top", label.position = "right",order = 1)) 
 
 # OmpK36 scale
-ompK36_colors <- rev(c("No loop 3 insertion or PFAV" = "black","Loop 3 insertion"="#FC4E07","Putative function-altering variant (PFAV)"="#00AFBB"))
-ompK36_scale <- scale_fill_manual(values=ompK36_colors,name="Status of <i>ompK36</i> porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
-ompK36_color_scale <- scale_color_manual(values=ompK36_colors,name = "Status of <i>ompK36</i> porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+ompK36_colors <- c("No loop 3 insertion or PFAV" = "black","Putative function-altering variant (PFAV)"="#00AFBB","Loop 3 insertion"="#FC4E07")
+ompK36_scale <- scale_fill_manual(breaks = names(ompK36_colors),values=ompK36_colors,name="Status of the OmpK36 porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+ompK36_color_scale <- scale_color_manual(breaks = names(ompK36_colors),values=ompK36_colors,name = "Status of the OmpK36 porin", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Tn4401 allele
 tn4401_alleles <- c("Tn4401a","Tn4401b","Tn4401d","Tn4401 del 1-3391 6920-7126","Tn4401 del 1-554 7008-7075","Tn4401 del 6920-7126")
