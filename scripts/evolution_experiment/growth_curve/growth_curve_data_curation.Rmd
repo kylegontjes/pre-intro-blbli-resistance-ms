@@ -1,0 +1,197 @@
+---
+title: "growth_curve_data_generation"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Tasks:
+ 
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms')
+```
+
+# Environment
+```{r}
+#Packages
+packages <- c("tidyverse","data.table",'lubridate','readxl','growthcurver','aplot','pracma','splines','scales') 
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()  
+
+# Source themes
+source("./lib/consistent_themes.R")
+```
+
+# Load
+## Specify the parameters before running script
+```{r, echo = TRUE}
+# Growth curve directory where all the biological triplicates are located
+gc_dir <- "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/growth_curve/"
+pm_dir <- gc_dir
+ 
+# Growth curve plate range
+growth_curve_range <- "A1:CT82" # gc range from the excel file
+
+# Plate map range
+plate_map_range <- "A1:F289" # plate map range from the excel file
+
+# Time point cutoff for growth curve analysis
+cutoff <- 20 # time point cutoff
+```
+ 
+# Growth curve data 
+## Load data
+```{r}
+# File names
+gc_file_names <- paste0("plate_",1:3,".xlsx")
+gc_file_names
+
+# Load the growth curves
+growth_curve_plates <- lapply(gc_file_names, function(names){  
+  # Load file
+  df <-  read_xlsx(paste0(gc_dir,names), sheet = "growth_curve", range = growth_curve_range)
+  # Reformat time variable
+  df <- df %>% mutate(time = as.POSIXct(Time, format = "%Y-%m-%d %H:%M:%S"), # reformat the Time variable
+         time = format(time, "%H:%M:%S")) 
+  ## Make time variable a numeric variable representing hours
+  df$time <- as.numeric(strptime(df$time , format="%H:%M:%S") - as.POSIXct(format(Sys.Date())), units="hours")
+  # Drop variables (old time & temperature variable)
+  df <- df %>% select(-Time,-`T° 600`) 
+  # Mutate as dataframe
+  df <- as.data.frame(df) 
+  return(df) 
+}
+)
+
+# Add names
+names(growth_curve_plates) <- gsub(".xlsx","",gc_file_names)
+``` 
+
+## Make long form growth curve
+```{r}
+growth_curve_plates_long <- lapply(growth_curve_plates, function(gc){ 
+  gc <- gc %>%
+    mutate(across(-time, as.numeric))
+  gc_long <- gc %>%
+    pivot_longer(-time) %>%
+    rename(well = name, OD=value)
+  return(gc_long)
+})
+
+# Merge this ad add plate number
+growth_curve_plates_long <- lapply(names(growth_curve_plates_long),function(name){
+  growth_curve_plates_long[[name]] %>% as.data.frame %>%  mutate(Plate_ID = gsub("plate_","",name) %>% as.numeric())
+}) %>% do.call(rbind,.)
+```
+
+# Plate map data  
+```{r}
+# Plate map file name
+pm_file_name <- c("plate_layout.xlsx")
+pm_file_name
+
+# Plate map
+platemap <-  read_xlsx(paste0(pm_dir,pm_file_name), sheet = "Sheet1",range = plate_map_range)
+colnames(platemap) <- c("Plate_ID", "well", "isolate", "isolate_type", "bio_rep", "tech_rep") 
+```
+
+# Create master GC dataset: Merge growth curve data with plate map
+```{r}
+growth_curve_metadata <- growth_curve_plates_long %>% left_join(platemap)
+
+# Add strain and isolate number info
+growth_curve_metadata$strain <- gsub("[ABC]","",growth_curve_metadata$isolate)
+growth_curve_metadata$isolate_no <- ifelse(grepl("H",growth_curve_metadata$isolate),paste0("PCMP_",growth_curve_metadata$isolate), growth_curve_metadata$isolate)
+growth_curve_metadata$isolate_type <- ifelse(growth_curve_metadata$isolate=='blank',"blank",growth_curve_metadata$isolate_type)
+                                             
+growth_curve_metadata$parent_category <- ifelse(growth_curve_metadata$isolate_no %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
+                                                ifelse(growth_curve_metadata$isolate_no %in% c("PCMP_H19","PCMP_H261","PCMP_H414"),"Clade I without Loop 3 insertion",ifelse(growth_curve_metadata$isolate_no!= "blank","Clade II",'blank')))
+growth_curve_metadata$identity <- paste0(growth_curve_metadata$isolate_type,"-",growth_curve_metadata$Plate_ID) %>% gsub("resistant","Resistant",.) %>% gsub("parent","Parent",.)
+```
+
+## Save dataset 
+```{r}
+saveRDS(growth_curve_metadata,"./data/evolution_experiment/growth_curve/growth_curve_OD_dataset.RDS")
+```
+ 
+# Area under the curve (AUC)
+## Function to calculate AUC data
+```{r}
+# Calculate
+AUC_plate_data<- lapply(growth_curve_plates, function(gc){
+
+  # Convert time column to numeric hours once 
+  time_vec <- as.numeric(gc$time)
+
+  # Apply trapz to all columns except time
+  auc <- apply(gc %>% select(-time), 2, function(col){
+    col <- as.numeric(col)
+    pracma::trapz(time_vec, col)
+  })
+
+  # Return as data.frame
+  df <- data.frame(
+    well = setdiff(colnames(gc), "time"), 
+    AUC = auc
+  )
+
+  return(df)
+})
+```
+
+## Calculate AUC data
+```{r}
+plates <- names(AUC_plate_data)
+
+# Extract dataset
+AUC_metadata <- lapply(plates,function(name){
+  dataset <- AUC_plate_data[[name]]
+  dataset$Plate_ID <- gsub("plate_","",name) %>% as.numeric()
+  dataset 
+}) %>% do.call(rbind,.)
+
+# Merge with platemap
+AUC_metadata <- left_join(AUC_metadata,platemap)
+AUC_metadata$strain <- gsub("[ABC]","",AUC_metadata$isolate)
+AUC_metadata$isolate_no <- ifelse(grepl("H",AUC_metadata$isolate),paste0("PCMP_",AUC_metadata$isolate), AUC_metadata$isolate)
+
+AUC_metadata$parent_category <- ifelse(AUC_metadata$isolate_no %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
+                                                ifelse(AUC_metadata$isolate_no %in% c("PCMP_H19","PCMP_H261","PCMP_H414"),"Clade I without Loop 3 insertion",ifelse(AUC_metadata$isolate_no!= "blank","Clade II",'blank')))
+```
+
+## Save 
+```{r}
+saveRDS(AUC_metadata,"./data/evolution_experiment/growth_curve/growth_curve_AUC_dataset.RDS")
+```
+
+# Calculate maximum OD (carrying capacity)
+```{r}
+# Maximum OD measurement
+max_od_plate <- growth_curve_metadata %>%
+    group_by(isolate, Plate_ID, isolate_type,tech_rep) %>% # Should this be 
+    summarise(max_OD_replicate = max(OD, na.rm = TRUE), .groups = "drop") %>%
+   group_by(isolate, Plate_ID, isolate_type) %>%
+   summarise(max_OD_plate = mean(max_OD_replicate, na.rm = TRUE), .groups = "drop")  
+
+max_od_plate$strain <- gsub("[ABC]","",max_od_plate$isolate)
+max_od_plate$isolate_no <- ifelse(grepl("H",max_od_plate$isolate),paste0("PCMP_",max_od_plate$isolate), max_od_plate$isolate)
+
+max_od_plate$isolate_type <- ifelse(max_od_plate$isolate=='blank',"blank",max_od_plate$isolate_type)
+                                             
+max_od_plate$parent_category <- ifelse(max_od_plate$isolate_no %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
+                                                ifelse(max_od_plate$isolate_no %in% c("PCMP_H19","PCMP_H261","PCMP_H414"),"Clade I without Loop 3 insertion",ifelse(max_od_plate$isolate_no!= "blank","Clade II",'blank')))
+```
+
+## Save
+```{r}  
+saveRDS(max_od_plate,"./data/evolution_experiment/growth_curve/growth_curve_max_OD_dataset.RDS")
+``` 

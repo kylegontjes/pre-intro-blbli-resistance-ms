@@ -12,6 +12,7 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
 ```{r}
 packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
 
@@ -25,14 +26,23 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 set_null_device("png")
 ```
 
+# Isolate order
+```{r}
+isolate_order <- readRDS("./data/evolution_experiment/median_log10_MVB_ratio_isolate_ranking.RDS")
+
+paste0("Isolate order: ")
+isolate_order
+```
+
 # KPC data
 
 ```{r}
 coverage_stats <- readRDS("./data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS")
 coverage_stats <- coverage_stats %>% arrange(parent) %>% distinct
 
+plasmid_copy_numer_data <- coverage_stats %>% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)
 
-plasmid_copy_numer_data <- coverage_stats %>% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)# %>% `colnames<-`(c("Parent","blaKPC allele","Parental blaKPC plasmid","Parental blaKPC CN","Parental blaKPC plasmid CN","Evolved blaKPC CN","Evolved blaKPC plasmid CN","blaKPC CN fold change","blaKPC plasmid CN fold change"))
+# %>% `colnames<-`(c("Parent","blaKPC allele","Parental blaKPC plasmid","Parental blaKPC CN","Parental blaKPC plasmid CN","Evolved blaKPC CN","Evolved blaKPC plasmid CN","blaKPC CN fold change","blaKPC plasmid CN fold change"))
 ```
 
 # Mobsuite data
@@ -134,16 +144,21 @@ INDEL_differences$INDEL_canonical <- INDEL_differences$evolved_unique_str
 INDEL_differences_hits <- INDEL_differences %>% select(parent,INDEL_canonical)
 ```
 
+# MIC data
+```{r}
+MIC_data <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated.RDS")
+MIC_data$resistant_median_MIC_sign_aware <- ifelse(MIC_data$resistant_median_MIC == 256 & MIC_data$resistant_all_growth == 2, ">=256",
+                                                   ifelse(MIC_data$resistant_median_MIC==0 & MIC_data$resistant_all_no_growth==2,"<=0",MIC_data$resistant_median_MIC))
+```
+
 # Merge
 ```{r}
-final_dataset <- left_join(plasmid_copy_numer_data,df_hits) %>% left_join(.,INDEL_differences_hits) %>% left_join(.,SNP_differences_hits) %>% left_join(.,is_finder_data_goi_data) %>% left_join(.,kleb_diffs_hits_sub) %>% left_join(.,mobsuite_differences_tbl)
+final_dataset <- left_join(plasmid_copy_numer_data,df_hits) %>% left_join(.,INDEL_differences_hits) %>% left_join(.,SNP_differences_hits) %>% left_join(.,is_finder_data_goi_data) %>% left_join(.,kleb_diffs_hits_sub) %>% left_join(.,mobsuite_differences_tbl) %>% left_join(.,MIC_data)
 
 final_dataset$INDEL_canonical_rename <- recode(final_dataset$INDEL_canonical,
                                                "Coding Indel at 3713046 > A functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;A|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.967_1014delGTTGGCGCGACCTACTACTTCAACAAAAACATGTCCACCTATGTTGAC|p.Val323_Asp338del|1014/1110|323/369|null or hypothetical protein|porin OmpC;" = 'ompK36 (p.Val323_Asp338del); 3713046',
                                                "Coding Indel at 3713864 > TGGGTTTC functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;TGGGTTTC|frameshift_variant|HIGH|KPNIH1_RS18665|c.190_196dupGAAACCC|p.Gln66fs|196/1110|66/369|null or hypothetical protein|porin OmpC;" = 'ompK36 (c.190_196dupGAAACCC); 3713864',
-                                               "Coding Indel at 3713649 > T functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null or hypothetical protein|porin OmpC;" = "ompK36 (p.Gly136_Asp137del); 3713649"
-                                               
-                                               )
+                                               "Coding Indel at 3713649 > T functional=NULL_NULL_NULL locus_tag=KPNIH1_RS18665 Strand Information: KPNIH1_RS18665=-;T|conservative_inframe_deletion|MODERATE|KPNIH1_RS18665|c.406_411delGGCGAC|p.Gly136_Asp137del|411/1110|136/369|null or hypothetical protein|porin OmpC;" = "ompK36 (p.Gly136_Asp137del); 3713649" )
 
 final_dataset$canonical_mutant <- lapply(final_dataset$parent,FUN=function(x){
   isolate_df <- subset(final_dataset,parent ==x)
@@ -154,7 +169,7 @@ final_dataset$canonical_mutant <- lapply(final_dataset$parent,FUN=function(x){
   paste0(variants, collapse = " & ") 
 })  %>% unlist
 
-final_dataset_sum <- final_dataset %>% select(parent,clade_I,ompK36_parental,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
+final_dataset_sum <- final_dataset %>% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,median_MIC_log2_fc,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
 
 final_dataset_sum <- final_dataset_sum %>% mutate(across(where(is.numeric), ~ round(.,2)))
 
@@ -162,13 +177,22 @@ final_dataset_sum$kpc_plasmid_size_difference <- ifelse(final_dataset_sum$kpc_pl
 
 final_dataset_sum <- final_dataset_sum %>% arrange(desc(clade_I), ompK36_parental)
 final_dataset_sum$clade_I <- gsub("Clade ","",final_dataset_sum$clade_I)
-table_2 <- final_dataset_sum
-colnames(table_2) <- c("Parent","Clade","Parental ompK36 status","Evolved canonical mutation (gene [mutation]; position)",'blaKPC',"Parental blaKPC plasmid","Parental blaKPC CN","Parental blaKPC plasmid CN",
+
+final_dataset_sum$parent <- factor(final_dataset_sum$parent,levels = isolate_order)
+
+table_2 <- final_dataset_sum %>% arrange(parent)
+
+colnames(table_2) <- c("Parent","Clade","Parental ompK36 status","Resistant MIC value","Resisatnt log2 MIC fold change","Evolved canonical mutation (gene [mutation]; position)",'blaKPC',"Parental blaKPC plasmid","Parental blaKPC CN","Parental blaKPC plasmid CN",
                                  "Evolved blaKPC plasmid","Evolved blaKPC CN","Evolved blaKPC plasmid CN","blaKPC CN fold change","blaKPC plasmid CN fold change","Plasmid size change (bp)")
 
 favorite_kable(table_2)
+```
 
+# Save the table
+
+```{r}
 write_csv(table_2,"./tables/table_2_evolved_changes.csv")
 
 saveRDS(table_2,"./tables/table_2_evolved_changes.RDS")
 ```
+

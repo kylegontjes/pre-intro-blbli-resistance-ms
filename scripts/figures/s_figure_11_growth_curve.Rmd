@@ -1,0 +1,175 @@
+---
+title: "Supplemental Figure 11: Growth curve data"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms')
+```
+
+# Environment
+```{r}
+#Packages
+packages <- c("tidyverse","data.table",'lubridate','readxl','growthcurver','aplot','pracma','splines','scales') 
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()  
+
+# Source themes
+source("./lib/consistent_themes.R")
+```
+
+# Load data
+```{r}
+# AUC data
+AUC_metadata <- readRDS("./data/evolution_experiment/growth_curve/growth_curve_AUC_dataset.RDS")
+## Average data
+AUC_metadata_average <- AUC_metadata %>% group_by(isolate_no,isolate_type,parent_category,Plate_ID) %>% summarise(AUC_average = mean(AUC)) %>% subset(isolate_no !='blank')
+
+## Ranking isolates by AUC
+AUC_mean_diff_data_ranking <- AUC_metadata_average %>% pivot_wider(names_from = isolate_type,id_cols = c(isolate_no,Plate_ID,parent_category),values_from = AUC_average) %>% mutate(diff = parent-resistant) %>% summarise(mean_diff = mean(diff)) %>% arrange(parent_category,-mean_diff) %>% subset(isolate_no!='blank')
+isolate_ranking <- AUC_mean_diff_data_ranking$isolate_no 
+## Save for figure
+saveRDS(isolate_ranking,"./data/evolution_experiment/growth_curve/mean_AUC_isolate_ranking.RDS")
+
+# Ranking isolates by resistance frequency
+isolate_ranking_frequency <- readRDS("./data/evolution_experiment/median_log10_MVB_ratio_isolate_ranking.RDS")
+
+
+# Growth curve data
+growth_curve_metadata <- readRDS("./data/evolution_experiment/growth_curve/growth_curve_OD_dataset.RDS") %>% subset(isolate_type != 'blank')
+
+# OD Data
+max_od_plate <- readRDS("./data/evolution_experiment/growth_curve/growth_curve_max_OD_dataset.RDS") %>% subset(isolate_type != 'blank') 
+```   
+
+# Curation functions
+```{r}
+get_category <-  function(isolates_str){
+  ifelse(isolates_str %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
+         ifelse(isolates_str %in% c("PCMP_H19","PCMP_H261","PCMP_H414"),"Clade I without Loop 3 insertion",ifelse(isolates_str!= "blank","Clade II",'blank')))
+}  
+```
+
+# A. Growth curve
+## Curate data
+```{r}
+## Average by plate
+growth_curve_metadata_plate_average <- growth_curve_metadata %>% group_by(isolate_no,isolate_type,parent_category,Plate_ID,time) %>% summarise(OD_average = mean(OD,na.rm=T))
+
+# Annotate data
+growth_curve_metadata_plate_average$parent_category <- get_category(growth_curve_metadata_plate_average$isolate_no)
+growth_curve_metadata_plate_average$isolate_no <- factor(growth_curve_metadata_plate_average$isolate_no,levels = isolate_ranking_frequency)
+growth_curve_metadata_plate_average$identity <- paste0(growth_curve_metadata_plate_average$isolate_type," - Plate ",growth_curve_metadata_plate_average$Plate_ID) %>% gsub("resistant","Resistant",.) %>% gsub("parent","Parent",.)
+growth_curve_metadata_plate_average <- growth_curve_metadata_plate_average %>% arrange(isolate_no)
+
+# Isolate info
+isolate_info <-  growth_curve_metadata_plate_average  %>% subset(isolate_type != 'blank') %>% ungroup %>%  
+    select(isolate_no, parent_category) %>% distinct
+```
+
+## Figure
+```{r}
+A <- ggplot(
+    data = subset(growth_curve_metadata_plate_average, isolate_type != "blank"),
+    aes(x = time, y = OD_average, color = identity, group = interaction(isolate_no, identity, Plate_ID)))  +
+  geom_rect(aes(fill = parent_category), data = isolate_info, inherit.aes = FALSE,
+            xmin=-Inf, xmax=Inf, ymin = -Inf, ymax=Inf, alpha = 0.5) +
+    geom_line() +
+    facet_wrap(~isolate_no) +
+    theme_bw() +
+    xlab("Time (hours)") +
+    ylab("Optical density (OD)")  + theme_bw_me     + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(growth_curve_metadata_plate_average$OD_average*10))/10))  + parent_colors + status_fill + theme(legend.title.position = 'top',legend.title = element_text(size=16),legend.text = element_text(size=14),axis.text.x = element_text(size = 12),axis.text.y=element_text(size=12),axis.title = element_text(size=14))
+
+A  
+```
+
+# B & C: AUC Data
+## B. AUC plots
+```{r}
+AUC_metadata_average$isolate_no <- factor(AUC_metadata_average$isolate_no,levels = c(isolate_ranking_frequency,'blank'))
+
+B <- ggplot(data=AUC_metadata_average %>% subset(isolate_type!='blank'),aes(y=AUC_average,x=isolate_no,fill=isolate_type)) +
+  facet_grid(  ~ parent_category, scales = "free_x", space  = "free_x" ) + 
+  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8)) + 
+  theme_bw_me + xlab(NULL) + ylab("Area under the curve (AUC)") + labs(legend = "Isolate type") +   theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),axis.text.y=element_text(size=12),axis.title.y=element_text(size=14),legend.title.position = 'top',legend.title = element_text(size=16),legend.text = element_text(size=14)) + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(AUC_metadata_average$AUC_average)))) + parent_color_group
+
+B
+```
+
+## C. AUC Difference 
+```{r}
+paired_AUC_data_by_plate <- AUC_metadata_average%>% subset(isolate_no != 'blank')  %>%
+    select(isolate_no, isolate_type, parent_category,Plate_ID, AUC_average) %>%
+    pivot_wider(
+        names_from = isolate_type,
+        values_from = AUC_average
+    ) %>%  mutate(AUC_difference = resistant - parent) 
+
+
+C <- ggplot(data = paired_AUC_data_by_plate,aes(x=isolate_no,y=AUC_difference,fill=parent_category))  +
+  facet_grid(   ~ parent_category,scales = "free_x",space  = "free_x") + 
+  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + 
+  theme_bw_me + xlab(NULL) + ylab("Change in AUC") +   theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),axis.text.y=element_text(size=12),axis.title.y=element_text(size=14),legend.title = element_text(size=16),legend.text = element_text(size=14))   + status_fill + geom_hline(yintercept = 0,linetype = 2) +  scale_y_continuous(breaks = pretty_breaks(3)) 
+
+C
+```  
+
+# D & E: Max optical density (OD) data 
+## D: Max OD
+```{r} 
+max_od_plate$isolate_no <- factor(max_od_plate$isolate_no,levels = c(isolate_ranking_frequency,'blank'))
+
+D <-  ggplot(data = max_od_plate,aes(x=isolate_no,y=max_OD_plate,fill=isolate_type))  +
+  facet_grid(    ~ parent_category,    scales = "free_x", space  = "free_x"  ) + 
+  geom_boxplot( position = position_dodge(width = 0.8),   outlier.shape = NA) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + theme_bw_me + xlab(NULL) + ylab("Maximum optical density (OD<sub>max</sub>)") +    theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),axis.text.y=element_text(size=12),legend.title.position = 'top',axis.title.y = element_markdown(size=14),legend.title = element_text(size=16),legend.text = element_text(size=14))   + parent_color_group + scale_y_continuous(breaks = pretty_breaks(9),limits = c(0,round(10*max(max_od_plate$max_OD_plate))/10))  
+
+D
+```
+
+## E: CHange in OD max
+```{r}
+paired_max_OD_data_by_plate <- max_od_plate%>% subset(isolate != 'blank')  %>%
+    select(isolate_no, isolate_type, parent_category,Plate_ID, max_OD_plate) %>%
+    pivot_wider(
+        names_from = isolate_type,
+        values_from = max_OD_plate
+    ) %>%  mutate(max_OD_difference = resistant - parent) 
+
+E <- ggplot(data = paired_max_OD_data_by_plate,aes(x=isolate_no,y=max_OD_difference,fill=parent_category))  +
+  facet_grid(  ~ parent_category,     scales = "free_x",   space  = "free_x" ) + 
+  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + 
+  theme_bw_me + xlab(NULL) + ylab("Change in OD<sub>max</sub>") +   theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),axis.text.y=element_text(size=12),legend.title.position = 'top',axis.title.y = element_markdown(size=14),legend.title = element_text(size=16),legend.text = element_text(size=14))   + status_fill + geom_hline(yintercept = 0,linetype = 2) +  scale_y_continuous(breaks = pretty_breaks(3))
+
+E
+```
+ 
+# Master figure
+```{r,fig.width=18.5,fig.height=10.57143}  
+isolate_type_legend <- cowplot::get_legend(B)
+merged_summary_stat_plots <- cowplot::plot_grid(B+ theme(legend.position='none'),C+ theme(legend.position='none'),D + theme(legend.position='none') , E + theme(legend.position='none'),ncol=2,labels = c("B","C","D","E"),label_size = 18)
+merged_summary_stat_plots_w_legend <- cowplot::plot_grid(merged_summary_stat_plots,isolate_type_legend,ncol=1,rel_heights = c(1,0.15))
+
+figure <- cowplot::plot_grid(A,merged_summary_stat_plots_w_legend,ncol=2,rel_widths = c(0.65,1),labels = c("A",""),label_size = 18)
+
+figure 
+```
+
+# Save figure
+```{r}
+ggsave(plot = figure,filename = "./figures/s_figure_11_growth_curve_data.png",width = 18.5,height = 10.57143,units = 'in',dpi=900)
+``` 

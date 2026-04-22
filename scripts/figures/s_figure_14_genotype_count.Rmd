@@ -1,12 +1,11 @@
 ---
-title: "Supplemental Figure 13: Proportion of isolates with a core genome variant"
+title: "Supplemental Figure 14: Proportion of isolates with a core genome variant"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 ---
 
-
-# Combination Therapy Manuscript
+# Combination Therapy Manuscript 
 ```{r setup, include=FALSE}
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
@@ -69,13 +68,13 @@ paste0("Number and percentage of variants under 1%: ")
 table(all_variants_annots$genotype_freq_under_1)
 grepl(pattern = "yes",all_variants_annots$genotype_freq_under_1) %>% sum / nrow(all_variants_annots) 
 
-s_figure_12_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_12_format + ylim(NA,4050)
-s_figure_12_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
+s_figure_14_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_14_format + ylim(NA,4050)
+s_figure_14_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
 
-s_figure_12 <- s_figure_12_main +  annotation_custom(ggplotGrob(s_figure_12_inlet), xmin = 40, xmax = 100, ymin = 500, ymax = 4250)
-s_figure_12 
+s_figure_14 <- s_figure_14_main +  annotation_custom(ggplotGrob(s_figure_14_inlet), xmin = 40, xmax = 100, ymin = 500, ymax = 4250)
+s_figure_14 
 ```
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=4.5,fig.height=3.6} 
-ggsave(plot = s_figure_12, filename = './figures/s_figure_13_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = s_figure_14, filename = './figures/s_figure_14_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
 ```

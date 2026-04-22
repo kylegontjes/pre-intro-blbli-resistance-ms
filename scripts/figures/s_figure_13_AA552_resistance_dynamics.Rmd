@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 12: AA552 dynamics and BL/BLI dynamics"
+title: "Supplemental Figure 13: AA552 dynamics and BL/BLI dynamics"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -214,7 +214,7 @@ figure
 
 # Save figure
 ```{r,fig.height=20,fig.width=10}
-ggsave("./figures/s_figure_12_spatiotemporal_distribution_BLBLI_AA552.png",plot=figure, units='in',height=16,width=12.8,dpi=900,bg='white')
+ggsave("./figures/s_figure_13_spatiotemporal_distribution_BLBLI_AA552.png", plot = figure, units='in', height=16, width=12.8, dpi=900, bg='white')
 ```
 
 # Patient summaries

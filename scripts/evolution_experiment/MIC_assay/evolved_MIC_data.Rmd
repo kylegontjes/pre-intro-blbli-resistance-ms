@@ -1,0 +1,180 @@
+---
+title: "BL/BLI Evolution Experiment MIC data"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms')
+```
+
+# Environment
+
+```{r environment, echo=F, message=FALSE, include=T, results=T}
+#Packages
+packages <- c("tidyverse","tidyr") 
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()  
+
+
+source("./lib/consistent_themes.R")
+```
+
+```{r}
+MIC_assay_layout <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'plate_layout')%>% as.data.frame
+
+MIC_assay_layout$plate <- ifelse(MIC_assay_layout$VB_concentration==0,
+                                 paste0("M_",MIC_assay_layout$plate),
+                                 paste0("MVB_",MIC_assay_layout$plate)) 
+
+MIC_assay_MVB <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'MVB_data',col_names = F) %>% as.data.frame 
+MIC_assay_M <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'M_data',col_names = F )%>% as.data.frame  
+ 
+process_plate <- function(start, end,plate) {
+  
+  # plate name
+  plate_name <- plate[[1]][start]
+  
+  # extract block (rows A–H + maybe header row)
+  block <- plate[(start + 1):end, ]
+  
+  # If your first row is column headers (1–12), keep this:
+  colnames(block) <- c("row", as.character(1:12))
+  
+  # remove any accidental header row 
+  block <- block %>%  filter(!is.na(row))
+  
+  # reshape
+  block_long <- block %>%
+    pivot_longer(
+      cols = -row,
+      names_to = "col",
+      values_to = "value"
+    ) %>%
+    mutate(
+      plate = plate_name %>% gsub('plate_',"",.) %>% as.numeric,
+      col = as.integer(col),
+      well = paste0(row, col)
+    )
+  
+  return(block_long)
+}
+
+process_dataframe <- function(plate){
+  plate_starts <- c(which(grepl("^plate_", MIC_assay_MVB[[1]])))
+  plate_ends <- c(plate_starts[-1] - 1, nrow(MIC_assay_MVB))
+  
+  plate_data <- map2_dfr(
+    plate_starts,
+    plate_ends,
+    process_plate,
+    plate = plate
+  )
+  plate_data
+}
+
+MIC_MVB_data <- process_dataframe(MIC_assay_MVB)
+MIC_M_data <- process_dataframe(MIC_assay_M) 
+MIC_MVB_data$plate <- paste0("MVB_",MIC_MVB_data$plate)
+MIC_M_data$plate <- recode(MIC_M_data$plate %>% as.character,
+                           '5'='1',
+                           '6'='2',
+                           '7'='3',
+                           '8'='4') %>% paste0("M_",.)
+
+
+# 
+MIC_MVB_data <- left_join(MIC_MVB_data,MIC_assay_layout)
+MIC_M_data <- left_join(MIC_M_data,MIC_assay_layout)
+
+```
+
+```{r}
+media_alone <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'media_alone')  %>% as.data.frame
+
+media_alone_control_value <- media_alone %>% select(-media_alone) %>% unlist
+max_control_value_in_test_cell <- max(media_alone_control_value)*2
+ 
+MIC_MVB_data$growth <- MIC_MVB_data$value > max_control_value_in_test_cell
+MIC_M_data$growth <- MIC_M_data$value > max_control_value_in_test_cell
+
+MIC_MVB_data$isolate_no <- paste0("PCMP_",MIC_MVB_data$isolate)
+MIC_M_data$isolate_no <- paste0("PCMP_",MIC_M_data$isolate)
+```
+
+```{r}
+entry = 'PCMP_H19'
+get_MIC_value <- function(entry){
+  print(entry)
+  isolate_df <- MIC_MVB_data %>% subset(isolate_no == entry)
+  
+  first_no_growth <- isolate_df %>% group_by(isolate_no,isolate_type,bio_rep) %>% arrange(M_concentration) %>% subset(growth == F) %>% filter(row_number() == 1)
+  replicate_summary <-  isolate_df %>% group_by(isolate_no,isolate_type,bio_rep) %>% summarise(wells = length(growth), growth_ct = sum(growth) , no_growth_ct = sum(growth==F)) 
+  replicate_summary$all_growth <- replicate_summary$wells == replicate_summary$growth_ct
+  replicate_summary$all_no_growth <- replicate_summary$wells == replicate_summary$no_growth_ct 
+  replicate_datas <- left_join(replicate_summary,first_no_growth)
+  replicate_datas$MIC <- ifelse(replicate_datas$all_growth, ">=256",
+                                ifelse(replicate_datas$all_no_growth, "<=0.25",
+                                replicate_datas$M_concentration)) %>% as.character()
+  replicate_datas$MIC_num <-  gsub("<=|>=", "", replicate_datas$MIC) %>%  as.numeric()
+  replicate_datas                              
+}
+
+isolates <- MIC_MVB_data$isolate_no %>% unique %>% sort()
+
+MIC_data <- lapply(isolates,get_MIC_value) %>% do.call(rbind,.)
+
+MIC_data_summary <- MIC_data %>% group_by(isolate_no,isolate_type) %>% summarise(median_MIC = median(MIC_num),max_MIC=max(MIC_num),min_MIC = min(MIC_num),unique_values = n_distinct(MIC_num),all_growth = sum(all_growth) , all_no_growth = sum(all_no_growth)) %>% group_by(isolate_no)  
+ 
+MIC_fold_change_values <- lapply(isolates,FUN=function(x){
+  isolate_MIC_data_parent <- subset(MIC_data_summary,isolate_type=="parent" & isolate_no ==x) %>% ungroup %>% select(-isolate_type)
+  colnames(isolate_MIC_data_parent) <- c('isolate_no',paste0("parent_",colnames(isolate_MIC_data_parent %>% select(-isolate_no,))))
+  
+  isolate_MIC_data_resistant <- subset(MIC_data_summary,isolate_type!="parent"& isolate_no ==x) %>% ungroup %>% select(-isolate_type)
+  colnames(isolate_MIC_data_resistant) <- c('isolate_no',paste0("resistant_",colnames(isolate_MIC_data_resistant %>% select(-isolate_no,))))  
+  MIC_data <- left_join(isolate_MIC_data_parent,isolate_MIC_data_resistant) %>% mutate(
+    median_MIC_fc = resistant_median_MIC / parent_median_MIC,
+    max_MIC_fc = resistant_max_MIC / parent_max_MIC,
+    min_MIC_fc = resistant_min_MIC / parent_min_MIC)
+  MIC_data <- MIC_data %>% mutate( 
+    median_MIC_log2_fc = log2(median_MIC_fc),
+    max_MIC_log2_fc = log2(max_MIC_fc),
+    min_MIC_log2_fc =log2(min_MIC_fc))  
+MIC_data
+}) %>% do.call(rbind,.)
+```
+
+```{r}
+MIC_fold_change_values %>% as.data.frame
+```
+
+# Data viz
+## Generate category data
+```{r}
+MIC_fold_change_values$parent_category <- ifelse(MIC_fold_change_values$isolate_no %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
+                                                ifelse(MIC_fold_change_values$isolate_no %in% c("PCMP_H19","PCMP_H261","PCMP_H414"),"Clade I without Loop 3 insertion",ifelse(MIC_fold_change_values$isolate_no!= "blank","Clade II",'blank')))
+MIC_fold_change_values$mutation_category <- ifelse(MIC_fold_change_values$parent_category %in% c("Clade I with Loop 3 insertion"),"blaKPC copy number variation","Modification to OmpK36")
+
+# Fix values assuming platemap was wrong...
+MIC_fold_change_values_w_mod <- MIC_fold_change_values
+MIC_fold_change_values_w_mod$median_MIC_log2_fc_recode <- ifelse(MIC_fold_change_values_w_mod$median_MIC_log2_fc <0,log2(MIC_fold_change_values_w_mod$parent_median_MIC / MIC_fold_change_values_w_mod$resistant_median_MIC),MIC_fold_change_values_w_mod$median_MIC_log2_fc)
+
+MIC_fold_change_values_w_mod$resistant_median_MIC_recode <- ifelse(MIC_fold_change_values_w_mod$median_MIC_log2_fc <0,  MIC_fold_change_values_w_mod$parent_median_MIC,MIC_fold_change_values_w_mod$resistant_median_MIC)
+```
+
+# Save files
+
+```{r}
+saveRDS(MIC_fold_change_values,"./data/evolution_experiment/MIC_assay/MIC_data_curated.RDS")
+write.csv(MIC_fold_change_values,"./data/evolution_experiment/MIC_assay/MIC_data_curated.csv")
+```
