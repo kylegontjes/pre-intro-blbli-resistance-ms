@@ -256,5 +256,5 @@ figure
 
 # Save figure
 ```{r}
-ggsave("./figures/figure_5_experimental_evolution.png",figure,dpi=900,width=14,height=7,bg='white')
+ggsave("./figures/figure_5_experimental_evolution.png",figure,dpi=900,width=12.5,height=7,bg='white')
 ```

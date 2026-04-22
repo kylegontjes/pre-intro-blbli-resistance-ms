@@ -96,8 +96,25 @@ kpc_scale_h <- scale_fill_manual(breaks=KPC_values,labels = KPC_values_md,values
 AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown","gray"),name="AA552 <i>bla</i><sub>KPC</sub> plasmid", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
 # Variant type
-variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","gray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
+variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("blue","red","darkgray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
  
+# Evolution experiment themes
+parent_colors <- scale_color_manual(values = c(hues::iwanthue(3,hmin=5,hmax=25,plot=F),hues::iwanthue(3,hmin=230,hmax=240,plot=F)),breaks = c("Parent - Plate 1","Parent - Plate 2","Parent - Plate 3","Resistant - Plate 1","Resistant - Plate 2","Resistant - Plate 3"),name = c("Isolate replicate"),guide = guide_legend(ncol=2))
+
+parent_color_group <- scale_fill_manual(values = c("red","purple"),labels = c("Parent","Resistant"),breaks = c("parent","resistant"),name = "Isolate type",guide=guide_legend(nrow=3)) 
+
+status_fill <-  scale_fill_manual(values = c("#FC4E07","pink","blue"),guide = guide_legend(ncol=1),name = "Status of the OmpK36 porin") 
+
+Limit_scale <- scale_color_manual(breaks = c(T,F),values = c("black","#A9A9A9"),labels = c("Over","Under"),name = "Limit of detection",guide=guide_legend(ncol=1))
+
+categories <- c("#7684C0","maroon","lightgray",'black')
+plasmid_type <- c("AA018 with blaKPC", "AA018 with blaKPC + AA552 without blaKPC", "AA552 without blaKPC", "Other blaKPC plasmid"   )
+plasmid_fill <- scale_color_manual(values = categories,breaks = plasmid_type, labels =gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", plasmid_type),name = "Plasmid type",guide=guide_legend(ncol=1)) 
+
+plasmid_type_other <- c("AA018", "AA552", "Other plasmid")
+plasmid_fill_other <- scale_fill_manual(values =  c("#7684C0","maroon","black"),breaks = plasmid_type_other,name = "Plasmid cluster",guide=guide_legend(ncol=1),na.translate=TRUE,na.value='white') 
+
+
 # Sfigure2 format
 format <-   theme(legend.position = "bottom",
                   axis.text =   element_text(size=18,color="black"),
@@ -240,8 +257,8 @@ s_figure_7_format <-  theme(legend.position = "bottom",
 )
 
 
-# Supplemental Figure 12: count genotype
-s_figure_12_format <-  theme(legend.position = "bottom",
+# Supplemental Figure 14: Genotype count 
+s_figure_14_format <-  theme(legend.position = "bottom",
                        axis.text =   element_text(size=12,color="black"),
                        axis.title = element_text(size = 14,color="black"),
                        legend.text =   element_text(size=12,color="black"),

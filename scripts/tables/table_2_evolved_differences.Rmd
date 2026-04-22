@@ -1,5 +1,5 @@
 ---
-title: "Table 2: Comparative changes"
+title: "Table 2: Comparison of parent to evolved strains from MVB evolution experiment"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -195,4 +195,3 @@ write_csv(table_2,"./tables/table_2_evolved_changes.csv")
 
 saveRDS(table_2,"./tables/table_2_evolved_changes.RDS")
 ```
-
