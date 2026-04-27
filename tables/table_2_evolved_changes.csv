@@ -1,4 +1,4 @@
-Parent,Clade,Parental ompK36 status,Resistant MIC value,Resisatnt log2 MIC fold change,Evolved canonical mutation (gene [mutation]; position),blaKPC,Parental blaKPC plasmid,Parental blaKPC CN,Parental blaKPC plasmid CN,Evolved blaKPC plasmid,Evolved blaKPC CN,Evolved blaKPC plasmid CN,blaKPC CN fold change,blaKPC plasmid CN fold change,Plasmid size change (bp)
+Parent,Clade,Parental ompK36 status,Resistant MIC value,Resistant log2 MIC fold change,Evolved canonical mutation (gene [mutation]; position),blaKPC,Parental blaKPC plasmid,Parental blaKPC CN,Parental blaKPC plasmid CN,Evolved blaKPC plasmid,Evolved blaKPC CN,Evolved blaKPC plasmid CN,blaKPC CN fold change,blaKPC plasmid CN fold change,Plasmid size change (bp)
 PCMP_H323,I,25 C>T transition & GD insertion in loop 3,48,3,,blaKPC-2,AA018,0.93,0.96,AA018,2.18,2.84,2.34,2.96,-247
 PCMP_H318,I,25 C>T transition & GD insertion in loop 3,>=256,5.42,,blaKPC-2,AA018,0.65,0.79,AA552,4.55,3.49,7.04,4.43,NA
 PCMP_H464,I,25 C>T transition & GD insertion in loop 3,6,-4.74,,blaKPC-2,AA018,0.42,0.53,AA018,1.07,1.1,2.58,2.08,-11368
