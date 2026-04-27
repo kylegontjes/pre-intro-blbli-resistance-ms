@@ -1,16 +1,17 @@
 ---
-title: "Figure 4. Interaction of loop 3 insertions in ompK36 porin with blaKPC copy number "
+title: "Figure 4. Interaction of loop 3 insertions in ompK36 porin with blaKPC copy number"
 output: html_document
-date: "2024-10-06"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
 ---
 
 ```{r setup, include=FALSE}
 require(knitr)
-opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
-rm(list = ls())
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA)  
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
 packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext")
@@ -97,17 +98,17 @@ fig4f <- KPC_copy_number_ompk_hist_facet(df_w_KPC, y="MVB_log_2", x="KPNIH1_RS28
 ```
 
 ```{r,fig.width=9,fig.height=9}
-fig4.data <- cowplot::plot_grid(fig4a + theme(legend.position = "none"), fig4b + theme(legend.position = "none"), fig4c + theme(legend.position = "none"),fig4d + theme(legend.position = "none"), ncol=2, rel_widths = c(1,.7,1,.7), labels = "AUTO", label_size = 18)
+fig4.data <- cowplot::plot_grid(fig4a + theme(legend.position = "none"), fig4b + theme(legend.position = "none"), fig4c + theme(legend.position = "none"),fig4d + theme(legend.position = "none"), ncol=2, rel_widths = c(1,.7,1,.7), labels = "AUTO", label_size = 16)
 
-fig4.data.2 <- cowplot::plot_grid(fig4e + theme(legend.position = "none"), fig4f+ theme(legend.position = "none"), ncol=2, labels = c("E","F"), label_size=18)
+fig4.data.2 <- cowplot::plot_grid(fig4e + theme(legend.position = "none"), fig4f+ theme(legend.position = "none"), ncol=2, labels = c("E","F"), label_size=16)
 
 fig4.data.all <- cowplot::plot_grid(fig4.data, fig4.data.2, ncol=1, rel_heights = c(1,.7))
 
-ompk36_legend <- cowplot::get_legend(fig4b )
+ompk36_legend <- cowplot::get_legend(fig4b)
 
 figure_4_legends <- cowplot::plot_grid(ompk36_legend) + theme(plot.margin = unit(c(t=-1 , 3, b=0,0 ), "cm"))
 
-figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,rel_heights = c(1,0.125),rel_widths=c(1,0.75),ncol=1 )+ theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
+figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,rel_heights = c(1,0.125),rel_widths=c(1,0.75),ncol=1) + theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
 
 figure_4
 ```

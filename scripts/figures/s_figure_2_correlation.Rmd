@@ -1,5 +1,6 @@
 ---
 title: "Supplemental Figure 2 - Spearman’s rank correlation coefficients between the minimum inhibitory concentration of last-line and novel agents"
+author: "Kyle Gontjes"
 output: html_document
 date: "`r Sys.Date()`"
 ---

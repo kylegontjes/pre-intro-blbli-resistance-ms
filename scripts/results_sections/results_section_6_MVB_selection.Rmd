@@ -5,7 +5,6 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-
 ```{r setup, include=FALSE}
 require(knitr)
 opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
@@ -63,11 +62,13 @@ df <- left_join(df,KPC_gene_depth)
 ```
 
 ## MVB experiment
+
 ```{r}
 MVB_evolution_data <- read_csv("./data/evolution_experiment/curated_MVB_evolution_experiment_data.csv")
 ```
 
 # Create annotated evolution dataset
+
 ```{r}
 MVB_evolution_data <- MVB_evolution_data %>% left_join(.,df %>% select(isolate_no,MVB,KPNIH1_RS28775_chr_median_norm,clade_I,clade_I_num,PBP_any,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_truncation_kleborate,OmpK36_non_syn,OmpK36_promoter_IS,tn4401_allele,KPC_present,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC))
 MVB_evolution_data$category <- MVB_evolution_data %>% select(clade_I,KPC_type,OmpK36_L3_mutations,AA018_KPC,AA552_non_KPC) %>% apply(.,1,FUN=function(x){paste0(c(x["clade_I"],x["KPC_type"],names(x %>% subset(. %in% c(1)))),collapse=" + ")}) %>% gsub("OmpK36_L3_mutations",'Loop 3 insertion',.) %>% gsub("AA552_non_KPC","AA552 non-KPC plasmid",.) %>% gsub("AA018_KPC","AA018 KPC plasmid",.)  %>% gsub("+ No KPC +","",.) %>% gsub("\\+\\+","\\+",.)
@@ -77,13 +78,12 @@ MVB_evolution_data$cens <- ifelse(MVB_evolution_data$over_LoD, "none", "left")
 MVB_evolution_data$cens <- factor(MVB_evolution_data$cens, levels = c("none", "left"))
 ```
 
-
-# Across
+# Average across plates for replicates with LoD data
 ```{r}
 MVB_evolution_data_avg <- MVB_evolution_data %>% subset(over_LoD==T) %>% group_by(isolate_no) %>% mutate(ratio_avg = mean(MVB_ratio))  %>% distinct
 ```
 
-# Question A - Differences across isolates  
+# Question A - Differences across isolates?
 ```{r}
 paste0("Overall modeling")
 lm(MVB_ratio_log10~isolate_no ,data=MVB_evolution_data) %>% anova
@@ -145,7 +145,6 @@ paste0("Overall modeling LOD")
 lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T) ) %>% tab_model()
 paste0("Overall modeling LOD in clade I")
 lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T & clade_I=="Clade I") ) %>% tab_model()
-
 ```
 
 # Question G: Plasmid interaction with loop 3
@@ -198,7 +197,6 @@ lmer(MVB_ratio_log10~OmpK36GD*KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),
 
 # Full model
 ```{r}
-
 paste0("Overall modeling")
 lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC+ KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data) %>% tab_model()
 paste0("Overall modeling in clade I")
@@ -209,8 +207,7 @@ paste0("Modeling > LOD in clade I")
 lmer(MVB_ratio_log10~OmpK36GD+AA018_KPC_AA552_nonKPC+KPNIH1_RS28775_chr_median_norm + (1 | isolate_no),data=MVB_evolution_data%>% subset(over_LoD==T &clade_I=="Clade I"))  %>% tab_model()
 ```
 
-
-# TLDR:
+# Summary:
 
 1. Positive association with clade
 

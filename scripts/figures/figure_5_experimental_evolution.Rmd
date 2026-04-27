@@ -7,11 +7,11 @@ output: html_document
 
 ```{r setup, include=FALSE}
 require(knitr)
-opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA) 
-rm(list = ls())
+opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA)  
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
 packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext","grid",'reshape2')
@@ -99,39 +99,7 @@ A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_s
         labels = c("10<sup>-12</sup>","10<sup>-10</sup>","10<sup>-8</sup>","10<sup>-6</sup>")
     )  + Limit_scale + theme(legend.position='bottom',legend.title.position = 'top',axis.text.x = element_markdown(size=12),legend.title = element_text(size=12),legend.text = element_markdown(size=10),axis.text.y = element_text(size=14),axis.title.x = element_text(size=14),axis.line.y = element_blank())
 A
-```
-
-# B. Binary heatmap
-```{r}
-info_matrix_bin <- MVB_evolution_data %>% select(isolate_no,clade_I,OmpK36GD,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC) %>% arrange(rev(isolate_no))  %>% distinct
-info_matrix_bin <- info_matrix_bin %>% arrange(rev(isolate_no))
-info_matrix_bin$clade_I_bin <- ifelse(info_matrix_bin$clade_I=="Clade I",1,0)
-info_matrix_bin$clade_I_bin <- ifelse(info_matrix_bin$clade_I=="Clade I",1,0)
-info_matrix_bin$KPC3 <- ifelse(info_matrix_bin$KPC_type=="KPC-3",1,0)
-info_matrix_bin$KPC2 <- ifelse(info_matrix_bin$KPC_type=="KPC-2",1,0)
-info_matrix_bin$AA018 <- ifelse(info_matrix_bin$KPC_plasmid=="AA018_KPC",1,0)
-info_matrix_bin$AA275 <- ifelse(info_matrix_bin$KPC_plasmid=="AA275_KPC",1,0) 
-info_matrix_bin$Other_KPC <- ifelse(info_matrix_bin$KPC_plasmid %in% c('AA356_KPC','AD548_KPC','AA274_KPC','AA357_KPC',"AA275_KPC"),1,0)
-
-info_matrix_bin_mat <- info_matrix_bin %>% select(isolate_no,clade_I_bin,KPC2,OmpK36GD,AA018,AA552_non_KPC,Other_KPC,KPC3)
-info_matrix_bin_mat <- as.data.frame(info_matrix_bin_mat)
-rownames(info_matrix_bin_mat) <- info_matrix_bin_mat$isolate_no
-info_matrix_bin_mat <- info_matrix_bin_mat  
-colnames(info_matrix_bin_mat) <- c("Isolate","Clade I","<i>bla</i><sub>KPC</sub>-2","GD insertion in OmpK36","AA018 <i>bla</i><sub>KPC</sub> plasmid","AA552 non-<i>bla</i><sub>KPC</sub> plasmid","Other <i>bla</i><sub>KPC</sub> plasmid","<i>bla</i><sub>KPC</sub>-3")
-info_matrix_bin_mat$Isolate <- factor(info_matrix_bin_mat$Isolate,levels = rev(level))
-
-matrix_idea <- reshape2::melt(info_matrix_bin_mat,id.vars = 'Isolate')
-matrix_idea$variable <- factor(matrix_idea$variable,levels = c(c("Isolate","Clade I","<i>bla</i><sub>KPC</sub>-2","GD insertion in OmpK36","AA018 <i>bla</i><sub>KPC</sub> plasmid","AA552 non-<i>bla</i><sub>KPC</sub> plasmid","Other <i>bla</i><sub>KPC</sub> plasmid","<i>bla</i><sub>KPC</sub>-3")))
-matrix_idea$value <- factor(matrix_idea$value,levels = c(1,0),labels = c("Yes","No"))
- 
-matrix_idea$variable_pad <- str_pad(matrix_idea$variable,34,side = 'right')
-
-B_initial <- ggplot(matrix_idea, aes(x = variable_pad, y = Isolate, fill = value)) +
-    geom_tile(colour = 'white',linewidth = 0.25)  + scale_fill_manual(values = c('black','white'),name = "Feature") + theme(axis.text.x = element_markdown(angle=270,hjust = 0,vjust = 0.5),panel.border  = element_blank(),panel.grid = element_blank())  + ylab(NULL) + xlab(NULL) +
-    scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) + theme(axis.text = element_markdown(size=12))  
-
-```
+``` 
 
 # C. Evolution genotypic data results
 ```{r}
@@ -207,13 +175,15 @@ melted_dataset$variable <- recode(melted_dataset$variable,
                                   "evolved_blaKPC_plasmid" = "Evolved <i>bla</i><sub>KPC</sub> plasmid",
                                   "blaKPC CN fold change" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
                                   "blaKPC plasmid CN fold change" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
-                                  "OmpK36_mutation" = "Evolved OmpK36 mutation",
-                                  "OmpK36_intergenic_mutation" = "Evolved intergenic <br>OmpK36 mutation")
+                                  "OmpK36_mutation" = "Evolved mutation in <i>ompK36</i>",
+                                  "OmpK36_intergenic_mutation" = "Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")
+
+no_sequencing <- melted_dataset %>% subset(value=="No" & variable == "Sequenced" ) %>% .$Parent %>% unique() %>% as.character
 
 C_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) + 
   # Sequenced
-             geom_tile(data = subset(melted_dataset, variable %in% c("Sequenced")),
-            aes(fill = value),colour = 'white',linewidth = 0.25) +  scale_fill_manual(breaks = c("Yes","No"),values = c('black','white'),name = "Sequenced",na.translate = FALSE,guide = guide_legend(order=1),na.value='white')     +  ggnewscale::new_scale_fill()   +
+   #          geom_tile(data = subset(melted_dataset, variable %in% c("Sequenced")),
+ #           aes(fill = value),colour = 'white',linewidth = 0.25) +  scale_fill_manual(breaks = c("Yes","No"),values = c('black','white'),name = "Sequenced",na.translate = FALSE,guide = guide_legend(order=1),na.value='white')     +  ggnewscale::new_scale_fill()   +
   # Parental KPC plasmid status
   geom_tile(data = subset(melted_dataset, variable %in% c("Evolved <i>bla</i><sub>KPC</sub> plasmid","Parental <i>bla</i><sub>KPC</sub> plasmid")) %>% arrange(desc(variable)),
             aes(fill = value,x=variable,y=Parent),colour = 'white',linewidth = 0.25,inherit.aes = F) +  plasmid_fill_other +   ggnewscale::new_scale_fill() + 
@@ -221,23 +191,28 @@ C_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) +
   geom_tile(data = subset(melted_dataset, variable %in% c('<i>bla</i><sub>KPC</sub> gene <br>copy number change','<i>bla</i><sub>KPC</sub> plasmid <br>copy number change')),
             aes(fill = as.numeric(value)),colour = 'white',linewidth = 0.25) +  scale_fill_gradient2(low = "blue", mid = "white" ,high = "red",name = "Fold change",midpoint=1,na.value = 'white',guide = guide_colorbar(order=3),limits=c(0,8)) + ggnewscale::new_scale_fill() + 
   # Mutation data
-  geom_tile(data = subset(melted_dataset, variable %in% c("Evolved OmpK36 mutation","Evolved intergenic <br>OmpK36 mutation")),
-            aes(fill=value),colour = 'white',linewidth = 0.25) + theme(axis.text.x = element_markdown(angle=270,hjust = 0,vjust = 0.5),panel.border  = element_blank(),panel.grid = element_blank())  + scale_fill_manual(values = c("darkred",'brown','darkgray',"white"),breaks = c("Deletion","Duplication","Insertion sequence","None"),name = "Mutation type",na.value = 'white',na.translate = T,guide = guide_legend(order=4)) +  
+  geom_tile(data = subset(melted_dataset, variable %in% c("Evolved mutation in <i>ompK36</i>","Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")),
+            aes(fill=value),colour = 'white',linewidth = 0.25) + theme(axis.text.x = element_markdown(angle=270,hjust = 0,vjust = 0.5),panel.border  = element_blank(),panel.grid = element_blank())  + mutation_scale +  
   # Remaining themes
   ylab(NULL) + xlab(NULL) +
     scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) + theme(axis.text = element_markdown(size=12),plot.background = element_rect(color = 'white')) 
+    scale_y_discrete(expand = c(0, 0)) + theme(axis.text = element_markdown(size=12),plot.background = element_rect(color = 'white'))  + geom_text(
+        data = subset(
+            melted_dataset,
+            variable != "Sequenced" &
+                Parent %in% no_sequencing
+        ),
+        aes(x = variable, y = Parent),
+        label = "X",
+        size = 3
+    )  
 ```
 
 # Combined figure
 
 ```{r,fig.width=10.5,fig.height=5.25}
 A + theme(legend.position = 'right')
-```
-
-```{r,fig.width=11,fig.height=7.3333}
-B_initial
-```
+``` 
 
 ```{r,fig.width=11,fig.height=7.3333}
 C_initial
@@ -246,11 +221,12 @@ C_initial
 ```{r,fig.width=12.5,fig.height=7.5}
 A_fig <-  cowplot::plot_grid(NULL,A + theme(axis.ticks.y = element_blank(),axis.text.y = element_text(size=0)),NULL,ncol=1,rel_heights = c(0.03,1,0.055))
 
-legend_BC <- cowplot::get_legend(C_initial)
+legend_C <- cowplot::get_legend(C_initial)
+ 
+C <- cowplot::plot_grid(NULL,C_initial  + theme(legend.position = 'none'),NULL,ncol=1,rel_heights = c(0.034,1,0.0375))
 
-#B <- cowplot::plot_grid(NULL,B_initial + theme(legend.position = 'none'),NULL,ncol=1,rel_heights = c(0.034,1,0.068))
-C <- cowplot::plot_grid(NULL,C_initial  + theme(legend.position = 'none'),NULL,ncol=1,rel_heights = c(0.034,1,0.075))
-figure <- cowplot::plot_grid(A_fig,C,legend_BC,ncol=3,labels = c("A","B",""),rel_widths = c(1,0.55,0.19),rel_heights = c(1,1,1),label_size = 16)
+figure <- cowplot::plot_grid(A_fig,C,legend_C,ncol=3,labels = c("A","B",""),rel_widths = c(1,0.55,0.19),rel_heights = c(1,1,1),label_size = 16)
+
 figure 
 ```
 

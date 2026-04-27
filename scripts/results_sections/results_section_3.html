@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-22" />
+<meta name="date" content="2026-04-27" />
 
 <title>Results Section 3: Non-carbapenemase mechanisms of carbapenem resistance explain BL/BLI resistance in a clade-specific manner</title>
 
@@ -354,11 +354,13 @@ display: none;
 mechanisms of carbapenem resistance explain BL/BLI resistance in a
 clade-specific manner</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-22</h4>
+<h4 class="date">2026-04-27</h4>
 
 </div>
 
 
+<div id="environment" class="section level1">
+<h1>Environment</h1>
 <pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;tableone&quot;,&quot;kableExtra&quot;)
 
 #Load Packages
@@ -385,26 +387,26 @@ source(&quot;./lib/common_functions.R&quot;)
 
 # Print environment
 Sys.info()</code></pre>
-<pre><code>##                                                                                            sysname 
-##                                                                                           &quot;Darwin&quot; 
-##                                                                                            release 
-##                                                                                           &quot;25.3.0&quot; 
-##                                                                                            version 
-## &quot;Darwin Kernel Version 25.3.0: Wed Jan 28 20:53:14 PST 2026; root:xnu-12377.81.4~5/RELEASE_X86_64&quot; 
-##                                                                                           nodename 
-##                                                                         &quot;0587665045.vpn.umich.net&quot; 
-##                                                                                            machine 
-##                                                                                           &quot;x86_64&quot; 
-##                                                                                              login 
-##                                                                                             &quot;root&quot; 
-##                                                                                               user 
-##                                                                                         &quot;kgontjes&quot; 
-##                                                                                     effective_user 
-##                                                                                         &quot;kgontjes&quot;</code></pre>
+<pre><code>##                                                                                              sysname 
+##                                                                                             &quot;Darwin&quot; 
+##                                                                                              release 
+##                                                                                             &quot;25.4.0&quot; 
+##                                                                                              version 
+## &quot;Darwin Kernel Version 25.4.0: Thu Mar 19 19:27:54 PDT 2026; root:xnu-12377.101.15~1/RELEASE_X86_64&quot; 
+##                                                                                             nodename 
+##                                                                                     &quot;msla0572.local&quot; 
+##                                                                                              machine 
+##                                                                                             &quot;x86_64&quot; 
+##                                                                                                login 
+##                                                                                               &quot;root&quot; 
+##                                                                                                 user 
+##                                                                                           &quot;kgontjes&quot; 
+##                                                                                       effective_user 
+##                                                                                           &quot;kgontjes&quot;</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.5.2 (2025-10-31)
 ## Platform: x86_64-apple-darwin20
-## Running under: macOS Tahoe 26.3
+## Running under: macOS Tahoe 26.4.1
 ## 
 ## Matrix products: default
 ## BLAS:   /Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib 
@@ -439,6 +441,7 @@ Sys.info()</code></pre>
 ## [41] xfun_0.53          tidyselect_1.2.1   rstudioapi_0.17.1  farver_2.1.2      
 ## [45] htmltools_0.5.8.1  survey_4.4-8       rmarkdown_2.29     svglite_2.2.1     
 ## [49] compiler_4.5.2</code></pre>
+</div>
 <div id="data" class="section level1">
 <h1>Data</h1>
 <pre class="r"><code>df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)  

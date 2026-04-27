@@ -89,7 +89,7 @@ A <- ggplot(
     facet_wrap(~isolate_no) +
     theme_bw() +
     xlab("Time (hours)") +
-    ylab("Optical density (OD)")  + theme_bw_me     + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(growth_curve_metadata_plate_average$OD_average*10))/10))  + parent_colors + status_fill + theme(legend.title.position = 'top',legend.title = element_text(size=16),legend.text = element_text(size=14),axis.text.x = element_text(size = 12),axis.text.y=element_text(size=12),axis.title = element_text(size=14))
+    ylab("Optical density (OD)")  + theme_bw_me + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(growth_curve_metadata_plate_average$OD_average*10))/10))  + parent_colors + status_fill + theme(legend.title.position = 'top',legend.title = element_text(size=16),legend.text = element_text(size=14),axis.text.x = element_text(size = 12),axis.text.y=element_text(size=12),axis.title = element_text(size=14))
 
 A  
 ```

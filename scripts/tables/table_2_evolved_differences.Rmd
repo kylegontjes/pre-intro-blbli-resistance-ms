@@ -13,6 +13,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ```
 
 # Environment
+
 ```{r}
 packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
 
@@ -27,6 +28,7 @@ set_null_device("png")
 ```
 
 # Isolate order
+
 ```{r}
 isolate_order <- readRDS("./data/evolution_experiment/median_log10_MVB_ratio_isolate_ranking.RDS")
 
@@ -41,20 +43,18 @@ coverage_stats <- readRDS("./data/evolution_experiment/coverage_statistics/KPC_c
 coverage_stats <- coverage_stats %>% arrange(parent) %>% distinct
 
 plasmid_copy_numer_data <- coverage_stats %>% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)
-
-# %>% `colnames<-`(c("Parent","blaKPC allele","Parental blaKPC plasmid","Parental blaKPC CN","Parental blaKPC plasmid CN","Evolved blaKPC CN","Evolved blaKPC plasmid CN","blaKPC CN fold change","blaKPC plasmid CN fold change"))
 ```
 
 # Mobsuite data
+
 ```{r}
 mobsuite_differences <- readRDS("./data/evolution_experiment/mobsuite_evolved/mobsuite_evolved_differences.RDS")
 
 mobsuite_differences_tbl <- mobsuite_differences %>% select(parent,evolved_kpc_plasmid,kpc_plasmid_size_difference)
-
-#colnames(mobsuite_differences_tbl) <- c("Parent","Evolved blaKPC plasmid","blaKPC plasmid size difference (bp)")
 ```
 
 # Dataframe
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
 
@@ -63,6 +63,7 @@ df_hits$parent <- df_hits$isolate_no
 ```
 
 # Kleborate data
+
 ```{r}
 kleb_diffs <- readRDS("./data/evolution_experiment/kleborate_evolved/kleborate_evolved_differences.RDS")
 
@@ -75,6 +76,7 @@ kleb_diffs_hits_sub <- kleb_diffs_hits %>% select(parent,ompK36_parental)
 ```
 
 # IS element data
+
 ```{r}
 is_finder_data_goi <- readRDS("./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS")
 
@@ -107,10 +109,7 @@ is_finder_location_data <-   lapply(is_finder_data_goi$evolved_only_IS,FUN=funct
     locus_tag <- paste0(upstream_gene,"-",downstream_genes)   
   }
   evolved_only_IS=hit
-  
-  
-  
-  }
+    }
   cbind.data.frame(evolved_only_IS=evolved_only_IS,is_element,locus_tag,Start_Position,Stop_Position)
 })  %>% do.call(rbind,.)
 
@@ -125,7 +124,9 @@ is_finder_data_goi_data <- is_finder_data_goi %>% select(parent,canonical_IS)
 ```
 
 # SNP/INDEL data
+
 ## No evolved SNPs
+
 ```{r}
 SNP_differences <- readRDS( "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS")
 
@@ -135,7 +136,9 @@ SNP_differences_hits <- SNP_differences %>% select(parent,SNP_canonical)
 ```
 
 # INDELs
+
 ## Evolved several in ompK36
+
 ```{r}
 INDEL_differences <-  readRDS( "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS") 
 
@@ -145,13 +148,15 @@ INDEL_differences_hits <- INDEL_differences %>% select(parent,INDEL_canonical)
 ```
 
 # MIC data
+
 ```{r}
 MIC_data <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated.RDS")
 MIC_data$resistant_median_MIC_sign_aware <- ifelse(MIC_data$resistant_median_MIC == 256 & MIC_data$resistant_all_growth == 2, ">=256",
                                                    ifelse(MIC_data$resistant_median_MIC==0 & MIC_data$resistant_all_no_growth==2,"<=0",MIC_data$resistant_median_MIC))
 ```
 
-# Merge
+# Merge data
+
 ```{r}
 final_dataset <- left_join(plasmid_copy_numer_data,df_hits) %>% left_join(.,INDEL_differences_hits) %>% left_join(.,SNP_differences_hits) %>% left_join(.,is_finder_data_goi_data) %>% left_join(.,kleb_diffs_hits_sub) %>% left_join(.,mobsuite_differences_tbl) %>% left_join(.,MIC_data)
 

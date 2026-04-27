@@ -157,14 +157,14 @@ variant_stats$KPC_copy_number_change <- ifelse(variant_stats$KPC_copy_number_dif
 
 ## H. Change in copy number by plasmid type
 ```{r}
-H <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=KPC_copy_number_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1) + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in <i>bla</i><sub>KPC</sub> copy number")  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())    + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+H <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=KPC_copy_number_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5) + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in <i>bla</i><sub>KPC</sub> copy number")  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())    + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
 
 H
 ```
 
 ## I. Directional change in KPC copy number
 ```{r}
-I <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=KPC_copy_number_change)) + geom_bar() + xlab("") + ylab("Isolates") + theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(breaks = c("increase","decrease"),values = c("maroon","gray"),name = 'Change in <i>bla</i><sub>KPC</sub> copy number',labels = c("Increase","Decrease"), guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+I <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=KPC_copy_number_change)) + geom_bar() + xlab("") + ylab("Isolates") + theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(breaks = c("increase","decrease"),values = c("maroon","gray"),name = 'Change in <i>bla</i><sub>KPC</sub> gene copy number',labels = c("Increase","Decrease"), guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
  
 I_legend <- cowplot::get_legend(I) %>% cowplot::plot_grid()
 
@@ -173,14 +173,14 @@ I
 
 ## J. MVB change
 ```{r}
-J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub>-containing plasmid",guide = guide_legend(nrow=2,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub>-containing plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
 
 J
 ```
 
 ## K. IR Change
 ```{r}
-K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=2,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=0.5)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
 
 K_legend <- cowplot::get_legend(K) %>% cowplot::plot_grid()
 
@@ -189,7 +189,7 @@ K
 
 ## L. BL/BLI change
 ```{r}  
-L <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=blbli_dich_num_binary_diff)) + geom_bar() + xlab("") + ylab("Isolates")+ theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(values = c("black","gray","green4"),breaks = c("gain","same",'loss'),labels = c("Acquisition","Same","Reversion"),name = "Change in BL/BLI resistance",guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())
+L <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=blbli_dich_num_binary_diff)) + geom_bar() + xlab("") + ylab("Isolates")+ theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(values = c("black","gray","green4"),breaks = c("gain","same",'loss'),labels = c("Acquisition","Same","Reversion"),name = "Change in BL/BLI resistance status",guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())
 
 L_legend <- cowplot::get_legend(L) %>% cowplot::plot_grid()
 
@@ -197,7 +197,7 @@ L
 ```
 
 ```{r,fig.height=13.75,fig.width=11}
-legends <- cowplot::plot_grid(I_legend,K_legend,L_legend,ncol=3)
+legends <- cowplot::plot_grid(I_legend,K_legend,L_legend,ncol=3,axis = 't')
 figure <- cowplot::plot_grid(A + theme(legend.position = 'none'),B,C,D,E ,f + theme(legend.position = 'none'),G+ theme(legend.position = 'none'),H + theme(legend.position = 'none'),I+ theme(legend.position = 'none'),J+ theme(legend.position = 'none'),K+ theme(legend.position = 'none'),L+ theme(legend.position = 'none'),ncol=3,labels = "AUTO")
 figure_w_legends <- cowplot::plot_grid(figure,legends,ncol=1,rel_heights = c(1,0.1))
 figure_w_legends

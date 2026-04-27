@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-22" />
+<meta name="date" content="2026-04-27" />
 
 <title>Results Section 6: MVB Selection experiment</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Results Section 6: MVB Selection
 experiment</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-22</h4>
+<h4 class="date">2026-04-27</h4>
 
 </div>
 
@@ -423,12 +423,12 @@ MVB_evolution_data$AA018_KPC_AA552_nonKPC &lt;- ifelse(MVB_evolution_data$AA018_
 MVB_evolution_data$cens &lt;- ifelse(MVB_evolution_data$over_LoD, &quot;none&quot;, &quot;left&quot;)
 MVB_evolution_data$cens &lt;- factor(MVB_evolution_data$cens, levels = c(&quot;none&quot;, &quot;left&quot;))</code></pre>
 </div>
-<div id="across" class="section level1">
-<h1>Across</h1>
+<div id="average-across-plates-for-replicates-with-lod-data" class="section level1">
+<h1>Average across plates for replicates with LoD data</h1>
 <pre class="r"><code>MVB_evolution_data_avg &lt;- MVB_evolution_data %&gt;% subset(over_LoD==T) %&gt;% group_by(isolate_no) %&gt;% mutate(ratio_avg = mean(MVB_ratio))  %&gt;% distinct</code></pre>
 </div>
 <div id="question-a---differences-across-isolates" class="section level1">
-<h1>Question A - Differences across isolates</h1>
+<h1>Question A - Differences across isolates?</h1>
 <pre class="r"><code>paste0(&quot;Overall modeling&quot;)</code></pre>
 <pre><code>## [1] &quot;Overall modeling&quot;</code></pre>
 <pre class="r"><code>lm(MVB_ratio_log10~isolate_no ,data=MVB_evolution_data) %&gt;% anova</code></pre>
@@ -4920,8 +4920,8 @@ Marginal R<sup>2</sup> / Conditional R<sup>2</sup>
 </tr>
 </table>
 </div>
-<div id="tldr" class="section level1">
-<h1>TLDR:</h1>
+<div id="summary" class="section level1">
+<h1>Summary:</h1>
 <ol style="list-style-type: decimal">
 <li><p>Positive association with clade</p></li>
 <li><p>Positive association with Loop 3</p></li>

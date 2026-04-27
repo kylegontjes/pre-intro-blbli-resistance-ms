@@ -1,5 +1,6 @@
 ---
 title: "Results section 1: Detection of resistance to β-lactam/β-lactamase inhibitor combinations before their clinical deployment"
+author: "Kyle Gontjes"
 output: html_document
 date: "`r Sys.Date()`"
 ---

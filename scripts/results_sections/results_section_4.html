@@ -9,8 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-22" />
+<meta name="date" content="2026-04-27" />
 
 <title>Results Setion 4: Convergence-based genome-wide association studies improved the explanation of BL/BLI resistance and illuminated distinct pathways to resistance across clades</title>
 
@@ -577,11 +578,17 @@ display: none;
 genome-wide association studies improved the explanation of BL/BLI
 resistance and illuminated distinct pathways to resistance across
 clades</h1>
-<h4 class="date">2026-02-22</h4>
+<h4 class="author">Kyle Gontjes</h4>
+<h4 class="date">2026-04-27</h4>
 
 </div>
 
 
+<div id="environment" class="section level1">
+<h1>Environment</h1>
+</div>
+<div id="load-data" class="section level1">
+<h1>Load data</h1>
 <pre class="r"><code># Standard data
 df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
 tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)
@@ -631,6 +638,7 @@ df &lt;- left_join(df,depth %&gt;% mutate(isolate_no = rownames(.)))
 
 # Easy variable for blaKPC copy numebr
 df$KPC_log_2 &lt;- log2(df$KPNIH1_RS28775_chr_median_norm)</code></pre>
+</div>
 <div id="overview" class="section level1">
 <h1>Overview</h1>
 <pre class="r"><code>paste0(&quot;Number of gwas hits: &quot;, nrow(gwas_table))</code></pre>
@@ -648,8 +656,8 @@ df$KPC_log_2 &lt;- log2(df$KPNIH1_RS28775_chr_median_norm)</code></pre>
 Fail Pass 
    2    8 </code></pre>
 </div>
-<div id="four-modulators" class="section level1">
-<h1>Four modulators</h1>
+<div id="modulators" class="section level1">
+<h1>Modulators</h1>
 <pre class="r"><code>continuous &lt;- gwas_table %&gt;% subset(resistance_category == &quot;Modulator&quot;)
 
 paste0(&quot;Number of continuous hits: &quot;)</code></pre>
@@ -1377,6 +1385,9 @@ alternative hypothesis: true odds ratio is not equal to 1
 sample estimates:
 odds ratio 
   52.31661 </code></pre>
+</div>
+<div id="clade-i-data" class="section level2">
+<h2>Clade I data</h2>
 <pre class="r"><code>df_CI &lt;- subset(df,clade_I == &#39;Clade I&#39;)
 convert_tableone_into_df(df_CI,vars=c(&quot;AA018&quot;,&quot;AA552&quot;),factorVars = c(&quot;AA018&quot;,&quot;AA552&quot;))</code></pre>
 <pre><code>       Variable Overall (n=145)

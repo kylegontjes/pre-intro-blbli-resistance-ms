@@ -1,5 +1,6 @@
 ---
 title: "Figure 2: Differences in β-lactam/β-lactamase inhibitor combination resistance across clades of epidemic lineage sequence type 258"
+author: "Kyle Gontjes"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -55,7 +56,6 @@ fig2a <- create_MIC_histogram(df$IR_log_2,df$clade_I,"Imipenem-relebactam") + yl
 MVB_intercepts <-  add_clade_median_values(df, "MVB_log_2", "clade_I")
 
 fig2c <- create_MIC_histogram(df$MVB_log_2,df$clade_I,"Meropenem-vaborbactam")  + MIC_scale  + ylim(NA,250) +figure_2_format + clade_colors_scale_3_col + MVB_intercepts[[1]] + MVB_intercepts[[2]]
-   
 ```
 
 # Part 2 - Resistance categories
@@ -90,9 +90,9 @@ fig2e <- MIC_prop_hist_count(blbli_clade_phylo_prop) + cluster_scale + figure_2_
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5}
 fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),fig2b  + theme(legend.position = "none"),"",fig2c + theme(legend.position = "none"),fig2d + theme(legend.position = "none") , fig2e + theme(legend.position = "none"), ncol=3,rel_widths = c(1,0.45,0.45,1,0.45,0.45), labels = c("A","B","","C","D","E"),label_size = 18)
 
-clade_legend <- get_legend(fig2a)
-resistance_legend <- get_legend(fig2b)
-clade_phylo_legend <- get_legend(fig2e)
+clade_legend <- cowplot::get_legend(fig2a)
+resistance_legend <- cowplot::get_legend(fig2b)
+clade_phylo_legend <- cowplot::get_legend(fig2e)
 
 fig2.legends <- cowplot::plot_grid(clade_legend,"",resistance_legend,"",clade_phylo_legend,ncol=5,align = "hv",rel_widths = c(1,.0025,1,0.25,1)) + theme(plot.margin = unit(c(t=-2.5, 2, b=-1,0 ), "cm"))
  

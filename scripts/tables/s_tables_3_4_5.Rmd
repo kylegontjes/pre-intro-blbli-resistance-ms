@@ -12,6 +12,8 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
+
 ```{r}
 library(tidyverse)
 library(data.table)
@@ -20,11 +22,13 @@ library(kableExtra)
 source("./lib/consistent_themes.R")
 ```
 
+# Load data
 ```{r}
 descriptive_stats <- readRDS("./data/regression/descriptive_stats.RDS") 
 purposeful_results <- readRDS("./data/regression/purposeful_regression_results.RDS")
 ```
 
+# Raw data 
 
 ```{r}
 purposeful_results$univariable$present
@@ -35,6 +39,8 @@ purposeful_results$multivariable$present$final_model_table
 purposeful_results$multivariable$singleton$final_model_table
 purposeful_results$multivariable$cluster$final_model_table
 ```
+
+# Curate tables
 
 ```{r}
 table_curation <- function(stats,ulogr,mlogr){
@@ -66,13 +72,14 @@ s_table_4 <- table_curation(descriptive_stats$singleton,purposeful_results$univa
 s_table_5 <- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)
 ```
 
+# Print tables
 ```{r}
 s_table_3 %>% favorite_kable()
 s_table_4 %>% favorite_kable()
 s_table_5 %>% favorite_kable()
 ```
 
-
+# Save tables
 ```{r}
 write_csv(s_table_3,"./tables/s_table_3.csv")
 saveRDS(s_table_3,"./tables/s_table_3.RDS")

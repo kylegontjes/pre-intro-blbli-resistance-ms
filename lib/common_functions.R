@@ -18,10 +18,10 @@ get_presence_absence_matrix <- function(variable,df){
 
 # Functions for figure 1 & 2
 ## Create MIC histogram
-create_MIC_histogram <- function(phenotype_cont,phenotype_cat = NULL,phenotype_name){ 
-  data <- bind_cols(phenotype_cont,phenotype_cat,quiet = TRUE)
+create_MIC_histogram <- function(phenotype_cont, phenotype_cat = NULL, phenotype_name){ 
+  data <- bind_cols(phenotype_cont, phenotype_cat, quiet = TRUE)
   colnames(data) <- c("phenotype_cont","phenotype_cat")
-  histogram <-  ggplot(data) +geom_bar(aes(x=phenotype_cont,fill=phenotype_cat)) + ylab("Isolates") + labs(fill="Resistance profile") +xlab(paste0(phenotype_name," (µg/mL)"))  + theme_bw_me 
+  histogram <-  ggplot(data) +geom_bar(aes(x=phenotype_cont,fill=phenotype_cat)) + ylab("Isolates") + labs(fill="Resistance profile") + xlab(paste0(phenotype_name," (µg/mL)"))  + theme_bw_me
   return(histogram)
 }  
 

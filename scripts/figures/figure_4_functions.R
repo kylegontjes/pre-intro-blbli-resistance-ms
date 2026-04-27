@@ -1,7 +1,11 @@
 
 MIC_ompk36_prop_hist <- function(dataset){
+  # Add padding
+  padding <- max(nchar(dataset[['phenotype_cat']] %>% as.character))
+  dataset$phenotype_cat <- factor(dataset$phenotype_cat,labels = str_pad(levels(dataset$phenotype_cat),width = padding , side='both')) 
+  
   ## Color Scale 
-  histogram <-  ggplot(data=dataset,aes(x=phenotype_cat,fill=OmpK36_mutations,y=freq))+geom_bar(position="stack",stat="identity", width = 0.75)  +ylab("Proportion of Isolates") +xlab("Resistance Profile") 
+  histogram <-  ggplot(data=dataset,aes(x=phenotype_cat,fill=OmpK36_mutations,y=freq)) + geom_bar(position="stack",stat="identity", width = 0.55)  +ylab("Proportion of Isolates") +xlab("Resistance Profile") 
   return(histogram)
 }
 

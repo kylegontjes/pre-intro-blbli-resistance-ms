@@ -32,6 +32,7 @@ sessionInfo()
 set_null_device("png")
 ```
  
+# Load data
 
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
@@ -45,6 +46,7 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 ```
 
 # S Figure 4A - Table
+
 ```{r}
 s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,nn_qc) 
 s_figure_4.A_tb$locus_tag <- recode(s_figure_4.A_tb$locus_tag,"AA018"="AA018 blaKPC-containing plasmid","AA552"="AA552 blaKPC-containing plasmid","OmpK36_loop3_insertion"="Loop 3 insertion in OmpK36","OmpK36GD"="GD loop 3 insertion in OmpK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665" = "PFAV in ompK36")
@@ -82,6 +84,7 @@ webshot2::webshot("tab_kbl.html", "tab_kbl.png", vwidth = 3850, vheight = 700)
 ```
 
 # S Figure 4B - Phylogeny 
+
 ```{r ,fig.height=12.5,fig.width=12.5,echo=F,message=F,error=F,warning=F} 
 rownames(df) <- df$isolate_no
 s_figure_4.df_mat <- get_gwas_hit_matrix(gwas_table,df)  
@@ -104,6 +107,7 @@ s_figure_4.C <- freq_plot(gwas_nons_freq)  +s_figure_4_descriptive_plot_theme
 ```
 
 # S Figure 4D - Nearest neighbor Data
+
 ```{r,fig.height=7.5,fig.width=10} 
 nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.) 
 nn_data_melt$locus_tag <- recode(nn_data_melt$locus_tag,"AA018"="AA018 blaKPC-containing plasmid","AA552"="AA552 blaKPC-containing plasmid","OmpK36_loop3_insertion"="Loop 3 insertion in OmpK36","OmpK36GD"="GD loop 3 insertion in OmpK36",'OmpK36_c25t' = 'C25T SNP in ompK36','OmpK36_truncation_kleborate'='Truncation of ompK36',"KPNIH1_RS18665" = "PFAV in ompK36")
@@ -115,6 +119,7 @@ s_figure_4.D <- nn_plot(nn_data_melt) + s_figure_4_descriptive_plot_theme
 ```
 
 # Merge figure
+
 ```{r,fig.height=20,fig.width=25}
 s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","D"),label_size = 28,align = "hv",label_x = -0.02)
 s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 

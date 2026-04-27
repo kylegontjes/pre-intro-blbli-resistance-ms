@@ -1,5 +1,6 @@
 ---
 title: "Supplemental Figure 1 - Cross-resistance profile of carbapenem-resistant Klebsiella pneumoniae ST258 isolates"
+author: "Kyle Gontjes"
 output: html_document
 date: "`r Sys.Date()`"
 ---

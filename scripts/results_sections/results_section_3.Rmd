@@ -12,6 +12,8 @@ rm(list = ls())
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ``` 
 
+# Environment
+
 ```{r}
 packages <- c("tidyverse","tableone","kableExtra")
 
@@ -27,6 +29,7 @@ sessionInfo()
 ```
 
 # Data
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")  
 kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS")
@@ -34,6 +37,7 @@ df <- left_join(df,kleborate %>% select(isolate_no,KPC_type))
 ```
 
 # KPC frequency
+
 ```{r}
 table(df$KPC_type)
 convert_tableone_into_df(df,vars="KPC_type")

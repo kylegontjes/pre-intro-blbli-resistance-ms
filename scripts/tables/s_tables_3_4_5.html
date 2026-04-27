@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-22" />
+<meta name="date" content="2026-04-27" />
 
 <title>Supplemental Tables 3-5: Descriptive stats + regression modeling for BL/BLI resistance mechanism</title>
 
@@ -577,18 +577,26 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Tables 3-5: Descriptive stats
 + regression modeling for BL/BLI resistance mechanism</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-22</h4>
+<h4 class="date">2026-04-27</h4>
 
 </div>
 
 
+<div id="environment" class="section level1">
+<h1>Environment</h1>
 <pre class="r"><code>library(tidyverse)
 library(data.table)
 library(tableone)
 library(kableExtra)
 source(&quot;./lib/consistent_themes.R&quot;)</code></pre>
+</div>
+<div id="load-data" class="section level1">
+<h1>Load data</h1>
 <pre class="r"><code>descriptive_stats &lt;- readRDS(&quot;./data/regression/descriptive_stats.RDS&quot;) 
 purposeful_results &lt;- readRDS(&quot;./data/regression/purposeful_regression_results.RDS&quot;)</code></pre>
+</div>
+<div id="raw-data" class="section level1">
+<h1>Raw data</h1>
 <pre class="r"><code>purposeful_results$univariable$present</code></pre>
 <pre><code>             variable   OR 2.5%        97.5% p_value
 1                 age 1.04 1.02 1.070000e+00  0.0017
@@ -710,6 +718,9 @@ purposeful_results &lt;- readRDS(&quot;./data/regression/purposeful_regression_r
 1            lung_dz 3.23 1.11  8.94  0.0252
 2 third_plus_ceph_1d 2.62 0.91  7.25  0.0649
 3                age 1.04 1.00  1.08  0.0774</code></pre>
+</div>
+<div id="curate-tables" class="section level1">
+<h1>Curate tables</h1>
 <pre class="r"><code>table_curation &lt;- function(stats,ulogr,mlogr){
   stats &lt;- stats[,c(6,2,4,3)] 
   # Format the tables
@@ -734,6 +745,9 @@ purposeful_results &lt;- readRDS(&quot;./data/regression/purposeful_regression_r
 <pre class="r"><code>s_table_3 &lt;- table_curation(descriptive_stats$present,purposeful_results$univariable$present,purposeful_results$multivariable$present$final_model_table)
 s_table_4 &lt;- table_curation(descriptive_stats$singleton,purposeful_results$univariable$singleton,purposeful_results$multivariable$singleton$final_model_table)
 s_table_5 &lt;- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)</code></pre>
+</div>
+<div id="print-tables" class="section level1">
+<h1>Print tables</h1>
 <pre class="r"><code>s_table_3 %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
@@ -3329,6 +3343,9 @@ NA
 </tr>
 </tbody>
 </table>
+</div>
+<div id="save-tables" class="section level1">
+<h1>Save tables</h1>
 <pre class="r"><code>write_csv(s_table_3,&quot;./tables/s_table_3.csv&quot;)
 saveRDS(s_table_3,&quot;./tables/s_table_3.RDS&quot;)
 
@@ -3337,6 +3354,7 @@ saveRDS(s_table_4,&quot;./tables/s_table_4.RDS&quot;)
 
 write_csv(s_table_5,&quot;./tables/s_table_5.csv&quot;)
 saveRDS(s_table_5,&quot;./tables/s_table_5.RDS&quot;)</code></pre>
+</div>
 
 
 

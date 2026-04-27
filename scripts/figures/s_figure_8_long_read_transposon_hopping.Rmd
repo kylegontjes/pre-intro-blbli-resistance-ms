@@ -1,6 +1,7 @@
 ---
 title: "Supplemental Figure 8: tn4401 hopping"
 output: html_document
+author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 ---
 
@@ -10,6 +11,8 @@ opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
+
+# Environment
 
 ```{r , echo=F, message=FALSE, include=F, results=F}
 #Packages
@@ -25,6 +28,10 @@ source("./lib/consistent_themes.R")
 # Set null device
 set_null_device("png")
 ```
+
+# Load data
+
+## Datasets
 
 ```{r}
 # Standard data
@@ -72,7 +79,7 @@ df$KPC_plasmid <- KPC_type %>% gsub("_KPC","",.) %>% as.factor
 df$KPC_plasmid <- relevel(df$KPC_plasmid,ref = "No KPC Plasmid")
 ```
 
-# Long read data
+## Long-read data
 
 ```{r}
 blast_lr <- read.delim("./data/KPC_blast_hybrid/KPC_blast_master_hybrid.txt",sep = ' ')
@@ -91,7 +98,9 @@ lr_isolates <- subset(df,reason_for_interest != "Not Interested")
 lr_isolates <- left_join(lr_isolates,lr_KPC_cluster)
 ```
 
-# Read in data
+# Curate data
+
+## Contig data 
 
 ```{r}
 kpc_contigs <- blast_lr %>% subset(element_symbol  %in% c("KPC-2","KPC-3","KPC-5"))%>% select(isolate_no,contig,element_symbol) %>% distinct
@@ -102,7 +111,7 @@ contig_data$primary_cluster_id <- ifelse(contig_data$primary_cluster_id == "-","
 contig_data$contig_name <- paste0(contig_data$contig," ",contig_data$primary_cluster_id,"-",contig_data$mash_nearest_neighbor," ",contig_data$element_symbol," ",contig_data$size,"bp") %>% gsub("---","",.) %>% gsub("NA","",.) %>% trimws(.,"right","-") %>% gsub("--","-",.) %>% gsub("Chromosome-","Chromosome",.)
 ```
 
-# tn4401 data
+## tn4401 data
 
 ```{r}
 tn4401_blast <- read.delim("./data/tn4401_blast_hybrid/tn4401_blast_hybrid_master.txt",sep = "")
@@ -179,7 +188,7 @@ make_plots <- function(filename,contig_data,blast_data){
 }
 ```
 
-# Get nearest neighbor of KPC-containing strains
+# Get nearest neighbor of KPC-containing strains 
 
 ```{r}
 lr_isolates <- unique(blast_lr$isolate_no) %>% sort
@@ -202,8 +211,9 @@ variant_dist <- readRDS("./data/nearest_neighbor_comparisons/pairwise_snp_dist_m
 phyloAMR::nearest_neighbor_algorithm("PCMP_H276",phylogenetic_distance = phylo_dist,tip_name_variable = 'isolate_no',variant_distance = variant_dist,metadata = df %>% subset(isolate_no %in% c(lr_isolates)),annotate = F,comparison = T,comparison_feature = 'AA018_KPC')
 
 phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_dist,tip_name_variable = 'isolate_no',variant_distance = variant_dist,metadata = df %>% subset(isolate_no %in% c(lr_isolates)),annotate = F,comparison = T,comparison_feature = 'AA018_KPC')
- 
 ```
+
+# Save data
 
 ```{r,fig.width=14,fig.height=10.5}
 setwd("./data/mummer_hybrid/")

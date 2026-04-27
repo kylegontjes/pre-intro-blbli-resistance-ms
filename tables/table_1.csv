@@ -8,7 +8,7 @@ ompK36 non-synonymous mutation,22 (5.3),10 (17.2),12 (3.4),<0.001,Pass,Pass
 ompK36 putative function-altering mutations,20 (4.9),10 (17.2),10 (2.8),<0.001,Pass,Pass
 ompK36 truncation,8 (1.9),6 (10.3),2 (0.6),<0.001,Pass,Pass
 ompK36 intergenic region,31 (7.5),8 (13.8),23 (6.5),0.061,Fail,Pass
-Insertion seqeunce at ompK36 promoter,24 (5.8),6 (10.3),18 (5.1),0.128,Pass,Pass
+Insertion seqeunce near ompK36 promoter,24 (5.8),6 (10.3),18 (5.1),0.128,Pass,Pass
 acrAB-tolC efflux pump mutant,2 (0.5),0 (0.0),2 (0.6),1.000,Fail,Pass
 ramR efflux pump regulator PFAV,27 (6.6),7 (12.1),20 (5.6),0.083,Fail,Pass
 ramA efflux pump activator PFAV,10 (2.4),6 (10.3),4 (1.1),0.001,Pass,Pass

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-22" />
+<meta name="date" content="2026-04-27" />
 
 <title>Results section 7: Resistance-associated genotypes showed different propensities for spread</title>
 
@@ -353,11 +353,16 @@ display: none;
 <h1 class="title toc-ignore">Results section 7: Resistance-associated
 genotypes showed different propensities for spread</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-22</h4>
+<h4 class="date">2026-04-27</h4>
 
 </div>
 
 
+<div id="environment" class="section level1">
+<h1>Environment</h1>
+</div>
+<div id="load-data" class="section level1">
+<h1>Load data</h1>
 <pre class="r"><code># Standard data
 df &lt;- readRDS(&quot;./data/dataset/df.RDS&quot;)
 tr &lt;- read.tree(&quot;./data/tree/tree.treefile&quot;)
@@ -393,6 +398,7 @@ df &lt;- left_join_matrix(model2.2_burden,df,&quot;_2.2&quot;)
 df &lt;- left_join_matrix(model3_burden,df,&quot;_3&quot;)
 df &lt;- left_join_matrix(model3.2_burden,df,&quot;_3.2&quot;)
 df &lt;- left_join(df,canonical %&gt;% mutate(isolate_no = rownames(.))) </code></pre>
+</div>
 <div id="aa552-plasmid-analyses" class="section level1">
 <h1>AA552 plasmid analyses</h1>
 <pre class="r"><code>df$ompk36_lof_or_pbp &lt;- ifelse(df$PBP_any ==1 | df$OmpK36_putative_function_altering == 1 ,1,0) 

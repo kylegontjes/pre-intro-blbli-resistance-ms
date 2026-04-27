@@ -12,6 +12,8 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
+
 ```{r}
 packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
 
@@ -24,6 +26,8 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 # Set null device
 set_null_device("png")
 ```
+
+# Load data
 
 ```{r} 
 # Standard data
@@ -63,6 +67,7 @@ df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No f
 ``` 
 
 # Status over time
+
 ```{r}
 df$date <- lubridate::as_date(df$Cx_date) 
 # Number of weeks using date data
@@ -78,13 +83,14 @@ A
 ```
 
 # Temporal distribution
+
 ```{r}
 B <-   ggplot(data=df,aes(x=Cx_date,fill=AA525_status_md,y=AA525_status_md)) + geom_boxplot(alpha=0.75,outliers=F) + geom_jitter(mapping = aes(color=as.factor(blbli_asr_cluster_renamed_simple)),alpha=1,width = 0,height = 0.25) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + cluster_scale_gray_color + theme(axis.text.y = element_markdown())
 
 B
 ```
 
-# Temporal distribution of 
+# Temporal distribution of BL/BLI resistant clusters
 ```{r}
 C <-   ggplot(data=df,aes(x=Cx_date,fill=blbli_asr_cluster_renamed_simple)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + cluster_scale_gray
 
@@ -198,13 +204,16 @@ f <- cowplot::plot_grid(heatmap_for_cowplot)
 
 f
 ```
+
 # Temporal distribution facilities
+
 ```{r}
 G <- ggplot(data=df,aes(x=Cx_date,y=as.factor(blbli_asr_cluster_renamed_simple))) + geom_boxplot(alpha=0.5,outliers=F) + geom_jitter(mapping = aes(color=AA525_status_md),alpha=1,width = 0,height = .25,size=1.2) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + AA552_scale_color + facet_wrap(~LTACH_Recode,ncol=4)
 
 G
 ```
 
+# Curate figure
 ```{r,fig.height=16,fig.width=12.8}
 AB <- cowplot::plot_grid(A,B,labels = c("A",'B'),ncol=2)
 CD <- cowplot::plot_grid(C,D,labels = c("C",'D'),ncol=2)

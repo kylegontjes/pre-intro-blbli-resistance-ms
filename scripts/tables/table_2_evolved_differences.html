@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-04-21" />
+<meta name="date" content="2026-04-27" />
 
 <title>Table 2: Comparison of parent to evolved strains from MVB evolution experiment</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Table 2: Comparison of parent to evolved
 strains from MVB evolution experiment</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-04-21</h4>
+<h4 class="date">2026-04-27</h4>
 
 </div>
 
@@ -610,17 +610,13 @@ paste0(&quot;Isolate order: &quot;)</code></pre>
 <pre class="r"><code>coverage_stats &lt;- readRDS(&quot;./data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS&quot;)
 coverage_stats &lt;- coverage_stats %&gt;% arrange(parent) %&gt;% distinct
 
-plasmid_copy_numer_data &lt;- coverage_stats %&gt;% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)
-
-# %&gt;% `colnames&lt;-`(c(&quot;Parent&quot;,&quot;blaKPC allele&quot;,&quot;Parental blaKPC plasmid&quot;,&quot;Parental blaKPC CN&quot;,&quot;Parental blaKPC plasmid CN&quot;,&quot;Evolved blaKPC CN&quot;,&quot;Evolved blaKPC plasmid CN&quot;,&quot;blaKPC CN fold change&quot;,&quot;blaKPC plasmid CN fold change&quot;))</code></pre>
+plasmid_copy_numer_data &lt;- coverage_stats %&gt;% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)</code></pre>
 </div>
 <div id="mobsuite-data" class="section level1">
 <h1>Mobsuite data</h1>
 <pre class="r"><code>mobsuite_differences &lt;- readRDS(&quot;./data/evolution_experiment/mobsuite_evolved/mobsuite_evolved_differences.RDS&quot;)
 
-mobsuite_differences_tbl &lt;- mobsuite_differences %&gt;% select(parent,evolved_kpc_plasmid,kpc_plasmid_size_difference)
-
-#colnames(mobsuite_differences_tbl) &lt;- c(&quot;Parent&quot;,&quot;Evolved blaKPC plasmid&quot;,&quot;blaKPC plasmid size difference (bp)&quot;)</code></pre>
+mobsuite_differences_tbl &lt;- mobsuite_differences %&gt;% select(parent,evolved_kpc_plasmid,kpc_plasmid_size_difference)</code></pre>
 </div>
 <div id="dataframe" class="section level1">
 <h1>Dataframe</h1>
@@ -673,10 +669,7 @@ is_finder_location_data &lt;-   lapply(is_finder_data_goi$evolved_only_IS,FUN=fu
     locus_tag &lt;- paste0(upstream_gene,&quot;-&quot;,downstream_genes)   
   }
   evolved_only_IS=hit
-  
-  
-  
-  }
+    }
   cbind.data.frame(evolved_only_IS=evolved_only_IS,is_element,locus_tag,Start_Position,Stop_Position)
 })  %&gt;% do.call(rbind,.)
 
@@ -1227,8 +1220,8 @@ INDEL_differences_hits &lt;- INDEL_differences %&gt;% select(parent,INDEL_canoni
 MIC_data$resistant_median_MIC_sign_aware &lt;- ifelse(MIC_data$resistant_median_MIC == 256 &amp; MIC_data$resistant_all_growth == 2, &quot;&gt;=256&quot;,
                                                    ifelse(MIC_data$resistant_median_MIC==0 &amp; MIC_data$resistant_all_no_growth==2,&quot;&lt;=0&quot;,MIC_data$resistant_median_MIC))</code></pre>
 </div>
-<div id="merge" class="section level1">
-<h1>Merge</h1>
+<div id="merge-data" class="section level1">
+<h1>Merge data</h1>
 <pre class="r"><code>final_dataset &lt;- left_join(plasmid_copy_numer_data,df_hits) %&gt;% left_join(.,INDEL_differences_hits) %&gt;% left_join(.,SNP_differences_hits) %&gt;% left_join(.,is_finder_data_goi_data) %&gt;% left_join(.,kleb_diffs_hits_sub) %&gt;% left_join(.,mobsuite_differences_tbl) %&gt;% left_join(.,MIC_data)
 
 final_dataset$INDEL_canonical_rename &lt;- recode(final_dataset$INDEL_canonical,
