@@ -1251,11 +1251,11 @@ final_dataset_sum$parent &lt;- factor(final_dataset_sum$parent,levels = isolate_
 
 table_2 &lt;- final_dataset_sum %&gt;% arrange(parent)
 
-colnames(table_2) &lt;- c(&quot;Parent&quot;,&quot;Clade&quot;,&quot;Parental ompK36 status&quot;,
-                       &quot;Resistant MIC value&quot;,&quot;Resistant log2 MIC fold change&quot;,
-                       &quot;Evolved canonical mutation (gene [mutation]; position)&quot;,&#39;blaKPC&#39;,
-                       &quot;Parental blaKPC plasmid&quot;,&quot;Parental blaKPC CN&quot;,&quot;Parental blaKPC plasmid CN&quot;,
-                                 &quot;Evolved blaKPC plasmid&quot;,&quot;Evolved blaKPC CN&quot;,&quot;Evolved blaKPC plasmid CN&quot;,&quot;blaKPC CN fold change&quot;,&quot;blaKPC plasmid CN fold change&quot;,&quot;Plasmid size change (bp)&quot;)
+colnames(table_2) &lt;- c(&quot;Parent&quot;,&quot;Clade&quot;,&quot;Parental OmpK36 status&quot;,
+                       &quot;Evolved MIC value&quot;,&quot;Evolved log2 MIC fold change&quot;,
+                       &quot;Evolved canonical mutation (gene [mutation]; position)&quot;,&#39;blaKPC gene&#39;,
+                       &quot;Parental blaKPC plasmid&quot;,&quot;Parental blaKPC gene CN&quot;,&quot;Parental blaKPC plasmid CN&quot;,
+                                 &quot;Evolved blaKPC plasmid&quot;,&quot;Evolved blaKPC gene CN&quot;,&quot;Evolved blaKPC plasmid CN&quot;,&quot;blaKPC gene CN log2 fold change&quot;,&quot;blaKPC plasmid CN log2 fold change&quot;,&quot;Plasmid size change (bp)&quot;)
 
 favorite_kable(table_2)</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
@@ -1268,25 +1268,25 @@ Parent
 Clade
 </th>
 <th style="text-align:left;">
-Parental ompK36 status
+Parental OmpK36 status
 </th>
 <th style="text-align:left;">
-Resistant MIC value
+Evolved MIC value
 </th>
 <th style="text-align:right;">
-Resistant log2 MIC fold change
+Evolved log2 MIC fold change
 </th>
 <th style="text-align:left;">
 Evolved canonical mutation (gene [mutation]; position)
 </th>
 <th style="text-align:left;">
-blaKPC
+blaKPC gene
 </th>
 <th style="text-align:left;">
 Parental blaKPC plasmid
 </th>
 <th style="text-align:right;">
-Parental blaKPC CN
+Parental blaKPC gene CN
 </th>
 <th style="text-align:right;">
 Parental blaKPC plasmid CN
@@ -1295,16 +1295,16 @@ Parental blaKPC plasmid CN
 Evolved blaKPC plasmid
 </th>
 <th style="text-align:right;">
-Evolved blaKPC CN
+Evolved blaKPC gene CN
 </th>
 <th style="text-align:right;">
 Evolved blaKPC plasmid CN
 </th>
 <th style="text-align:right;">
-blaKPC CN fold change
+blaKPC gene CN log2 fold change
 </th>
 <th style="text-align:right;">
-blaKPC plasmid CN fold change
+blaKPC plasmid CN log2 fold change
 </th>
 <th style="text-align:left;">
 Plasmid size change (bp)
