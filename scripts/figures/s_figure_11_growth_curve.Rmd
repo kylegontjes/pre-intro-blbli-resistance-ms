@@ -45,7 +45,6 @@ saveRDS(isolate_ranking,"./data/evolution_experiment/growth_curve/mean_AUC_isola
 # Ranking isolates by resistance frequency
 isolate_ranking_frequency <- readRDS("./data/evolution_experiment/median_log10_MVB_ratio_isolate_ranking.RDS")
 
-
 # Growth curve data
 growth_curve_metadata <- readRDS("./data/evolution_experiment/growth_curve/growth_curve_OD_dataset.RDS") %>% subset(isolate_type != 'blank')
 
@@ -159,6 +158,7 @@ E
 ```
  
 # Master figure
+
 ```{r,fig.width=18.5,fig.height=10.57143}  
 isolate_type_legend <- cowplot::get_legend(B)
 merged_summary_stat_plots <- cowplot::plot_grid(B+ theme(legend.position='none'),C+ theme(legend.position='none'),D + theme(legend.position='none') , E + theme(legend.position='none'),ncol=2,labels = c("B","C","D","E"),label_size = 18)
@@ -170,6 +170,7 @@ figure
 ```
 
 # Save figure
+
 ```{r}
-ggsave(plot = figure,filename = "./figures/s_figure_11_growth_curve_data.png",width = 18.5,height = 10.57143,units = 'in',dpi=900)
+ggsave(plot = figure,filename = "./figures/s_figure_11_growth_curve_data.png",width = 18.5,height = 10.57143,units = 'in',dpi=900,bg='white')
 ``` 

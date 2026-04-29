@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-04-27" />
+<meta name="date" content="2026-04-28" />
 
 <title>Supplemental Figure 11: Growth curve data</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Figure 11: Growth curve
 data</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-04-27</h4>
+<h4 class="date">2026-04-28</h4>
 
 </div>
 
@@ -441,7 +441,6 @@ saveRDS(isolate_ranking,&quot;./data/evolution_experiment/growth_curve/mean_AUC_
 
 # Ranking isolates by resistance frequency
 isolate_ranking_frequency &lt;- readRDS(&quot;./data/evolution_experiment/median_log10_MVB_ratio_isolate_ranking.RDS&quot;)
-
 
 # Growth curve data
 growth_curve_metadata &lt;- readRDS(&quot;./data/evolution_experiment/growth_curve/growth_curve_OD_dataset.RDS&quot;) %&gt;% subset(isolate_type != &#39;blank&#39;)
@@ -571,7 +570,7 @@ figure </code></pre>
 </div>
 <div id="save-figure" class="section level1">
 <h1>Save figure</h1>
-<pre class="r"><code>ggsave(plot = figure,filename = &quot;./figures/s_figure_11_growth_curve_data.png&quot;,width = 18.5,height = 10.57143,units = &#39;in&#39;,dpi=900)</code></pre>
+<pre class="r"><code>ggsave(plot = figure,filename = &quot;./figures/s_figure_11_growth_curve_data.png&quot;,width = 18.5,height = 10.57143,units = &#39;in&#39;,dpi=900,bg=&#39;white&#39;)</code></pre>
 </div>
 
 

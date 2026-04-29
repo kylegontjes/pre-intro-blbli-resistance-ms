@@ -114,7 +114,7 @@ Limit_scale <- scale_color_manual(breaks = c(T,F),values = c("black","#A9A9A9"),
 # Plasmid categories
 categories <- c("#7684C0","maroon","lightgray",'black')
 plasmid_type <- c("AA018 with blaKPC", "AA018 with blaKPC + AA552 without blaKPC", "AA552 without blaKPC", "Other blaKPC plasmid")
-plasmid_fill <- scale_color_manual(values = categories,breaks = plasmid_type, labels =gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", plasmid_type),name = "Plasmid type",guide=guide_legend(ncol=1)) 
+plasmid_fill <- scale_color_manual(values = categories,breaks = plasmid_type, labels =gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", plasmid_type),name = "Plasmid configuration",guide=guide_legend(ncol=1)) 
 
 plasmid_type_other <- c("AA018", "AA552", "Other plasmid")
 plasmid_fill_other <- scale_fill_manual(values =  c("#7684C0","brown","black"),breaks = plasmid_type_other,name = "Plasmid cluster",guide=guide_legend(ncol=1),na.translate=TRUE,na.value='white') 

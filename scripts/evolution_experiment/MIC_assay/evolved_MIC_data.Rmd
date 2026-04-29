@@ -104,6 +104,8 @@ media_alone <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 
 
 media_alone_control_value <- media_alone %>% select(-media_alone) %>% unlist
 max_control_value_in_test_cell <- max(media_alone_control_value)*2
+
+paste0("Threshold to determine growth (max control value *2): ",max_control_value_in_test_cell)
  
 MIC_MVB_data$growth <- MIC_MVB_data$value > max_control_value_in_test_cell
 MIC_M_data$growth <- MIC_M_data$value > max_control_value_in_test_cell
