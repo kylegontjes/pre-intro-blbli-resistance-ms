@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-21" />
+<meta name="date" content="2026-05-11" />
 
 <title>SNP_INDEL_differences</title>
 
@@ -576,19 +576,27 @@ display: none;
 
 <h1 class="title toc-ignore">SNP_INDEL_differences</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-21</h4>
+<h4 class="date">2026-05-11</h4>
 
 </div>
 
 
-<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;cowplot&quot;,&quot;ggtree&quot;,&quot;ape&quot;,&quot;phytools&quot;,&quot;gridExtra&quot;,&quot;kableExtra&quot;,&quot;colorRamp2&quot;,&quot;RColorBrewer&quot;,&quot;ComplexHeatmap&quot;,&#39;phyloAMR&#39;,&#39;snitkitr&#39;,&#39;gontjesr&#39;)
+<div id="environment" class="section level1">
+<h1>Environment</h1>
+<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;cowplot&quot;,&#39;snitkitr&#39;,&quot;kableExtra&quot;,&#39;data.table&#39;)
 
 # Load packages
-invisible(lapply(packages,library,character.only=T,quietly=T))  
+invisible(lapply(packages,library,character.only=T,quietly=T))    </code></pre>
+</div>
+<div id="functions" class="section level1">
+<h1>Functions</h1>
+<pre class="r"><code>favorite_kable &lt;- function (x){
+  x %&gt;% kable(., format = &quot;html&quot;, table.attr = &quot;style=&#39;width:100%;&#39;&quot;,
+              row.names = F) %&gt;% kable_styling(bootstrap_options = c(&quot;striped&quot;,
+                                                                    &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;))
+}
 
-# Set null device
-set_null_device(&quot;png&quot;)</code></pre>
-<pre class="r"><code>return_grouped_matrix &lt;- function(mat_list,annots_list){
+return_grouped_matrix &lt;- function(mat_list,annots_list){
   merged_matrix &lt;- bind_cols(lapply(mat_list,get)) %&gt;% t %&gt;% as.matrix()
   merged_annots &lt;-  bind_rows(lapply(annots_list,get))
   merged_gene_list &lt;- select(merged_annots,locus_tag) %&gt;% as.vector() %&gt;% unlist %&gt;%  as.character()
@@ -636,32 +644,37 @@ clean_snpkit_output_INDEL_evol &lt;- function(code,allele,conf){
   Indel_parsed_post_processing &lt;- remove_rows_with_no_variants_in_subset(Indel_parsed)
   return(Indel_parsed_post_processing)
 }</code></pre>
-<pre class="r"><code>SNP_matrix_code &lt;- data.table::fread(&quot;~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/SNP_matrix_code.tsv&quot;)
-SNP_matrix_allele &lt;-data.table::fread(&quot;~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/SNP_matrix_allele_new.tsv&quot;)
+</div>
+<div id="load-variant-calling-data" class="section level1">
+<h1>Load variant calling data</h1>
+<pre class="r"><code>SNP_matrix_code &lt;- data.table::fread(&quot;../../../Sequence_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/snpkit_rfmt_results/variant_matrices/SNP_matrix_code.tsv&quot;)
+SNP_matrix_allele &lt;- data.table::fread(&quot;../../../Sequence_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/snpkit_rfmt_results/variant_matrices/SNP_matrix_allele_new.tsv&quot;)
   
-INDEL_matrix_code &lt;- data.table::fread(&quot;~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/Indel_matrix_code.tsv&quot;)
-INDEL_matrix_allele &lt;-data.table::fread(&quot;~/Desktop/scratch/Project_Penn_KPC/Sequencing_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/output_files/2026_02_18_15_23_55_core_results/data_matrix/matrices/Indel_matrix_allele.tsv&quot;)
-
-
-## SNP parse
+INDEL_matrix_code &lt;- data.table::fread(&quot;../../../Sequence_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/snpkit_rfmt_results/variant_matrices/Indel_matrix_code.tsv&quot;)
+INDEL_matrix_allele &lt;-data.table::fread(&quot;../../../Sequence_data/variant_calling/2026-02-18_snpkit_MVB_evolved_KPNIH1/snpkit_rfmt_results/variant_matrices/Indel_matrix_allele.tsv&quot;)</code></pre>
+</div>
+<div id="parse-the-data" class="section level1">
+<h1>Parse the data</h1>
+<pre class="r"><code>## SNP parse
 SNP_parsed &lt;- clean_snpkit_output_SNP_evol(SNP_matrix_code,SNP_matrix_allele,conf=F) 
 SNP_parsed_bin &lt;- SNP_parsed$bin 
 rownames(SNP_parsed_bin) &lt;- gsub(&quot;H019&quot;,&quot;H19&quot;,rownames(SNP_parsed_bin))
 
-saveRDS(SNP_parsed_bin,&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_parsed.RDS&quot;)
+saveRDS(SNP_parsed_bin,&quot;./data/evolution_experiment/SNPKIT/SNP_parsed.RDS&quot;)
 
-## INDEL
+## INDEL parse
 INDEL_parsed &lt;- clean_snpkit_output_INDEL_evol(INDEL_matrix_code,INDEL_matrix_allele,conf=F) 
 INDEL_parsed_bin &lt;- INDEL_parsed$bin 
 rownames(INDEL_parsed_bin) &lt;- gsub(&quot;H019&quot;,&quot;H19&quot;,rownames(INDEL_parsed_bin))
 
-saveRDS(INDEL_parsed,&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_parsed.RDS&quot;)</code></pre>
+saveRDS(INDEL_parsed,&quot;./data/evolution_experiment/SNPKIT/INDEL_parsed.RDS&quot;)</code></pre>
 <pre class="r"><code>kleborate_short &lt;- read_delim(&quot;./data/evolution_experiment/kleborate_short/klebsiella_pneumo_complex_output.txt&quot;)
 kleborate_short$isolate_no &lt;- gsub(&quot;_contigs_l1000&quot;,&quot;&quot;,kleborate_short$strain)  %&gt;% gsub(&quot;PCMP_H019&quot;,&quot;PCMP_H19&quot;,.)
 kleborate_short$parent &lt;- gsub(&quot;_MVB_R&quot;,&quot;&quot;,kleborate_short$isolate_no)
 kleborate_short$type &lt;- &quot;short&quot;
 
 parents &lt;- unique(kleborate_short$parent ) %&gt;% sort</code></pre>
+</div>
 <div id="snp-diffs" class="section level1">
 <h1>SNP diffs</h1>
 <pre class="r"><code>get_difference_vc &lt;- function(x,SNP_parsed_bin){
@@ -18652,7 +18665,7 @@ or hypothetical protein|capsule assembly Wzi family protein;
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>saveRDS(SNP_differences, &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_overall.RDS&quot;)</code></pre>
+<pre class="r"><code>saveRDS(SNP_differences, &quot;./data/evolution_experiment/SNPKIT/SNP_differences_overall.RDS&quot;)</code></pre>
 </div>
 <div id="canonical-mutations" class="section level2">
 <h2>Canonical mutations</h2>
@@ -18954,7 +18967,7 @@ or hypothetical protein|porin OmpC;
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>saveRDS(SNP_differences_canonical, &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS&quot;)</code></pre>
+<pre class="r"><code>saveRDS(SNP_differences_canonical, &quot;./data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS&quot;)</code></pre>
 </div>
 </div>
 <div id="indel-diffs" class="section level1">
@@ -20104,7 +20117,7 @@ protein;
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>saveRDS(INDEL_diff_overall, &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_overall.RDS&quot;)</code></pre>
+<pre class="r"><code>saveRDS(INDEL_diff_overall, &quot;./data/evolution_experiment/SNPKIT/INDEL_differences_overall.RDS&quot;)</code></pre>
 </div>
 <div id="canonical" class="section level2">
 <h2>Canonical</h2>
@@ -20338,7 +20351,7 @@ PCMP_H464
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>saveRDS(INDEL_differences_canonical, &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS&quot;)</code></pre>
+<pre class="r"><code>saveRDS(INDEL_differences_canonical, &quot;./data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS&quot;)</code></pre>
 </div>
 </div>
 

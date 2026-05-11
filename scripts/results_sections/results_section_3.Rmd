@@ -45,4 +45,4 @@ convert_tableone_into_df(df,vars="KPC_type")
 
 # See frequency data in table 1 for frequency and criterion
 # Frequency across clades found in supplemental table 1
-# Diagnostic statistics for genotypic panel found in final supplemental panel  behavior found in overall supplemental panel figure
+# Diagnostic statistics for genotypic panel found in supplemental figure 10

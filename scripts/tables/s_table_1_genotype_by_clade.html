@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-04-27" />
+<meta name="date" content="2026-05-11" />
 
 <title>Supplemental Table 1: Clade-specific trends in the prevalence of carbapenem resistance-associated genotypes</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Table 1: Clade-specific trends
 in the prevalence of carbapenem resistance-associated genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-04-27</h4>
+<h4 class="date">2026-05-11</h4>
 
 </div>
 
@@ -609,6 +609,9 @@ KPC_data$KPC_allele &lt;- ifelse(grepl(&quot;KPC-3&quot;,KPC_data$sseqid) ==T,&q
 df &lt;- left_join(df,KPC_data %&gt;% select(isolate_no,KPC_allele))
 df$KPC_allele &lt;- ifelse(is.na(df$KPC_allele),&quot;No KPC&quot;,df$KPC_allele)
 df$`KPC-10` &lt;- ifelse(df$KPC_allele==&quot;KPC-10&quot;,1,0)</code></pre>
+</div>
+<div id="blactamase-gene-curation" class="section level1">
+<h1>Blactamase gene curation</h1>
 <pre class="r"><code># B-lactamase genes  
 bla_variables &lt;- c(&quot;Bla_acquired&quot;,&quot;Bla_ESBL_acquired&quot;,&quot;Bla_Carb_acquired&quot;,&quot;Bla_chr&quot;)
 rownames(kleborate) &lt;- kleborate$isolate_no
@@ -623,6 +626,9 @@ bla_mat$`TEM-1D.v1` &lt;- ifelse(bla_mat$`TEM-1D.v1^` ==1 | bla_mat$`TEM-1D.v1`=
 
 bla_genes &lt;- c(colnames(bla_mat %&gt;% select(-isolate_no)),&quot;KPC-10&quot;) %&gt;% sort %&gt;% subset(!.%in% c(&quot;KPC-3^&quot;,&quot;SHV-11^&quot;,&quot;SHV-12^&quot;,&quot;TEM-1D.v1^&quot;))
 df &lt;- left_join(df,bla_mat)</code></pre>
+</div>
+<div id="variable-curation" class="section level1">
+<h1>Variable curation</h1>
 <pre class="r"><code>drug_entry &lt;- c(&#39;OmpK35-25%&#39;,&#39;OmpK36_c25t&#39;,&#39;OmpK36_L3_mutations&#39;,&#39;OmpK36GD&#39;,&#39;OmpK36TD&#39;,&#39;OmpK36_non_syn&#39;,&#39;OmpK36_putative_function_altering&#39;,&quot;OmpK36_truncation_kleborate&quot;,&#39;OmpK36_intergenic&#39;,&#39;OmpK36_promoter_IS&#39;)
 drug_exit &lt;- c(&quot;AcrAB_TolC_any&quot;,&#39;RamR&#39;,&quot;RamA&quot;)
 target_modification &lt;- c(&#39;PBP_any&#39;,&#39;PBP2&#39;,&quot;PBP4&quot;)
@@ -630,6 +636,9 @@ target_modification &lt;- c(&#39;PBP_any&#39;,&#39;PBP2&#39;,&quot;PBP4&quot;)
 carbapenem &lt;- c(drug_entry,drug_exit,target_modification)
 
 tn4401 &lt;- c(&quot;Tn4401a&quot;,&quot;Tn4401b&quot;,&quot;Tn4401d&quot;,&quot;Tn4401_del_6920_7126&quot;,&quot;Tn4401_del_1_554_7008_7075&quot;,&quot;Tn4401_del_1_3391_6920_7126&quot;)</code></pre>
+</div>
+<div id="table-curation" class="section level1">
+<h1>Table curation</h1>
 <pre class="r"><code>exact &lt;- c(&quot;OmpK36TD&quot;,&#39;OmpK36_truncation_kleborate&#39;,&quot;OmpK36_putative_function_altering&quot;,&quot;OmpK36_intergenic&quot;,&quot;OmpK36_promoter_IS&quot;,&quot;AcrAB_TolC_any&quot;,&quot;RamR&quot;,&quot;RamA&quot;,&quot;PBP_any&quot;,&quot;PBP2&quot;,&quot;PBP4&quot;,&#39;Tn4401_del_1_3391_6920_7126&#39;,&#39;CMY-2.v2&#39;,&#39;CTX-M-14&#39;,&#39;CTX-M-15&#39;,&quot;KPC-5&quot;,&quot;LAP-2&quot;,&quot;OXA-1&quot;,&quot;TEM-1&quot;,&#39;TEM-104?&#39;,&#39;TEM-104*?&#39;,&#39;TEM-150*?&#39;)
 
 s_table_1 &lt;- convert_tableone_into_df(dataset = df,vars=c(carbapenem,bla_genes,tn4401),factorVars = c(carbapenem,bla_genes,tn4401),strata=&quot;clade_I&quot;,outcome_names = c(&quot;Clade I&quot;,&quot;Clade II&quot;),exact=exact)
@@ -640,7 +649,7 @@ s_table_1$Variable &lt;- recode(s_table_1$Variable,&#39;OmpK35-25&#39;=&#39;ompK
 s_table_1 &lt;-  s_table_1 %&gt;% as.data.frame
 
 favorite_kable(s_table_1)</code></pre>
-<table style="width:100%; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
 <th style="text-align:left;">
@@ -1309,6 +1318,9 @@ Tn4401_del_1_3391_6920_7126
 </tr>
 </tbody>
 </table>
+</div>
+<div id="save-the-table" class="section level1">
+<h1>Save the table</h1>
 <pre class="r"><code>write_csv(s_table_1,&quot;./tables/s_table_1.csv&quot;)
 saveRDS(s_table_1,&quot;./tables/s_table_1.RDS&quot;)</code></pre>
 </div>

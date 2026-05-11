@@ -23,6 +23,7 @@ source("./lib/consistent_themes.R")
 ```
 
 # Load data
+
 ```{r}
 descriptive_stats <- readRDS("./data/regression/descriptive_stats.RDS") 
 purposeful_results <- readRDS("./data/regression/purposeful_regression_results.RDS")
@@ -73,6 +74,7 @@ s_table_5 <- table_curation(descriptive_stats$cluster,purposeful_results$univari
 ```
 
 # Print tables
+
 ```{r}
 s_table_3 %>% favorite_kable()
 s_table_4 %>% favorite_kable()
@@ -80,6 +82,7 @@ s_table_5 %>% favorite_kable()
 ```
 
 # Save tables
+
 ```{r}
 write_csv(s_table_3,"./tables/s_table_3.csv")
 saveRDS(s_table_3,"./tables/s_table_3.RDS")

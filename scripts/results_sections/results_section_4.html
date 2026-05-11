@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-04-27" />
+<meta name="date" content="2026-05-11" />
 
 <title>Results Setion 4: Convergence-based genome-wide association studies improved the explanation of BL/BLI resistance and illuminated distinct pathways to resistance across clades</title>
 
@@ -579,7 +579,7 @@ genome-wide association studies improved the explanation of BL/BLI
 resistance and illuminated distinct pathways to resistance across
 clades</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-04-27</h4>
+<h4 class="date">2026-05-11</h4>
 
 </div>
 
@@ -1399,13 +1399,13 @@ Effect size (r)    AA552               3 (2)             0 (2)
                 MVB_t_test_estimate MVB_t_test_p IR_median_IQR_with
 Effect size (r)           0.5681087  0.004183148              0 (1)
                 IR_median_IQR_wo IR_t_test_estimate  IR_t_test_p
-Effect size (r)           -1 (1)          0.3883682 1.889693e-14</code></pre>
+Effect size (r)           -1 (1)          0.3883682 1.887379e-14</code></pre>
 <pre class="r"><code>wilcox.test(df_CI[,&quot;AA552&quot;],df_CI[,&quot;KPC_log_2&quot;],alternative=&#39;two.sided&#39;)</code></pre>
 <pre><code>
     Wilcoxon rank sum test with continuity correction
 
 data:  df_CI[, &quot;AA552&quot;] and df_CI[, &quot;KPC_log_2&quot;]
-W = 15631, p-value = 9.671e-14
+W = 15631, p-value = 9.681e-14
 alternative hypothesis: true location shift is not equal to 0</code></pre>
 <pre class="r"><code>table(df_CI$AA018_KPC,df_CI$AA552_non_KPC)</code></pre>
 <pre><code>   

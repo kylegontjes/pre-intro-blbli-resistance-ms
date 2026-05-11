@@ -12,6 +12,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ```
 
 # Environment
+
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
 packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext","grid",'reshape2')
@@ -23,6 +24,7 @@ source("./lib/common_functions.R")
 ```
 
 # Load data
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
 
@@ -52,11 +54,14 @@ df$KPC_plasmid <- lapply(df$isolate_no,FUN=function(x){
 isolate_ranking <- readRDS("./data/evolution_experiment/growth_curve/mean_AUC_isolate_ranking.RDS")
 ```
 
-## MVB experiment
+## MVB selection experiment data
+
 ```{r}
 MVB_evolution_data <- read_csv("./data/evolution_experiment/curated_MVB_evolution_experiment_data.csv")
 ```
+
 # Create annotated evolution dataset
+
 ```{r}
 MVB_evolution_data <- MVB_evolution_data %>% left_join(.,df %>% select(isolate_no,MVB,clade_I,PBP_any,OmpK36_L3_mutations,OmpK36GD,OmpK36TD,OmpK36_truncation_kleborate,OmpK36_non_syn,OmpK36_promoter_IS,tn4401_allele,KPC_present,KPC_type,KPC_plasmid,AA018_KPC,AA552_non_KPC))
 
@@ -65,7 +70,8 @@ MVB_evolution_data$category <- MVB_evolution_data %>% select(clade_I,KPC_type,Om
 MVB_evolution_data$category_simple <- ifelse(MVB_evolution_data$clade_I == "Clade II","Clade II without mutation",ifelse(MVB_evolution_data$clade_I == "Clade I" & MVB_evolution_data$OmpK36_L3_mutations==1,"Clade I with Loop 3 insertion","Clade I without Loop 3 insertion" ))
 ```
 
-# Ranking isolates
+# Ranking isolates 
+
 ```{r}  
 MVB_evolution_data$category <- factor(MVB_evolution_data$category,levels = sort(MVB_evolution_data$category) %>% unique())
 MVB_evolution_data <- MVB_evolution_data %>% arrange(clade_I,category) 
@@ -91,6 +97,7 @@ MVB_evolution_data$MVB_ratio_log_10 <- log10(MVB_evolution_data$MVB_ratio)
 ```
 
 # A. Frequency data
+
 ```{r}  
 A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + plasmid_fill +  status_fill + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
     scale_x_log10(
@@ -101,7 +108,7 @@ A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_s
 A
 ``` 
 
-# C. Evolution genotypic data results
+# B. Evolution genotypic data results
 ```{r}
 table_2 <- readRDS("./tables/table_2_evolved_changes.RDS")
 
@@ -135,8 +142,8 @@ table_2$OmpK36_mutation <-  sapply(table_2$`Evolved canonical mutation (gene [mu
 table_2$OmpK36_intergenic_mutation <-  sapply(table_2$`Evolved canonical mutation (gene [mutation]; position)` ,FUN=function(name){
   canonical_mutations <- name %>% unlist %>% unique %>% str_split(.,"&") %>% unlist %>% trimws %>% subset(.!='')
   if(sum(canonical_mutations %in% intergenic_OmpK36_mutations)>0){
-      intergenic_ompK36_mutation <- subset(canonical_mutations,canonical_mutations %in% intergenic_OmpK36_mutations)
-      result <- intergenic_OmpK36_mutations %>% subset(intergenic_OmpK36_mutations %in% intergenic_ompK36_mutation) %>% names %>% paste0(collapse=" & ")
+      intergeniB_ompK36_mutation <- subset(canonical_mutations,canonical_mutations %in% intergenic_OmpK36_mutations)
+      result <- intergenic_OmpK36_mutations %>% subset(intergenic_OmpK36_mutations %in% intergeniB_ompK36_mutation) %>% names %>% paste0(collapse=" & ")
     } else {
     result <- "None"
   }
@@ -165,25 +172,20 @@ table_2$evolved_blaKPC_plasmid <- ifelse(table_2$`Evolved blaKPC plasmid` %in% c
 table_2$parent_blaKPC_plasmid <- ifelse(table_2$`Parental blaKPC plasmid` %in% c("AA018","AA552"), table_2$`Parental blaKPC plasmid`,
                                          ifelse(table_2$Sequenced =="Yes", "Other plasmid",NA))
 melted_dataset <- reshape2::melt(table_2,id.vars = 'Parent') 
-melted_dataset <- subset(melted_dataset,variable %in% c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','blaKPC CN fold change','blaKPC plasmid CN fold change','OmpK36_mutation',"OmpK36_intergenic_mutation"))
-melted_dataset$variable <- factor(melted_dataset$variable,levels = c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','blaKPC CN fold change','blaKPC plasmid CN fold change','OmpK36_mutation',"OmpK36_intergenic_mutation"))
+melted_dataset <- subset(melted_dataset,variable %in% c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','blaKPC gene CN log2 fold change','blaKPC plasmid CN log2 fold change','OmpK36_mutation',"OmpK36_intergenic_mutation"))
+melted_dataset$variable <- factor(melted_dataset$variable,levels = c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','blaKPC gene CN log2 fold change','blaKPC plasmid CN log2 fold change','OmpK36_mutation',"OmpK36_intergenic_mutation"))
 
 melted_dataset$variable <- recode(melted_dataset$variable,
-                                  "parent_blaKPC_plasmid" = "Parental <i>bla</i><sub>KPC</sub> plasmid",
-                                #  "Parental blaKPC plasmid" = "Parental <i>bla</i><sub>KPC</sub> plasmid",
-                                 # "Evolved blaKPC plasmid" = "Evolved <i>bla</i><sub>KPC</sub> plasmid",
+                                  "parent_blaKPC_plasmid" = "Parental <i>bla</i><sub>KPC</sub> plasmid", 
                                   "evolved_blaKPC_plasmid" = "Evolved <i>bla</i><sub>KPC</sub> plasmid",
-                                  "blaKPC CN fold change" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
-                                  "blaKPC plasmid CN fold change" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
+                                  "blaKPC gene CN log2 fold change" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
+                                  "blaKPC plasmid CN log2 fold change" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
                                   "OmpK36_mutation" = "Evolved mutation in <i>ompK36</i>",
                                   "OmpK36_intergenic_mutation" = "Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")
 
 no_sequencing <- melted_dataset %>% subset(value=="No" & variable == "Sequenced" ) %>% .$Parent %>% unique() %>% as.character
 
-C_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) + 
-  # Sequenced
-   #          geom_tile(data = subset(melted_dataset, variable %in% c("Sequenced")),
- #           aes(fill = value),colour = 'white',linewidth = 0.25) +  scale_fill_manual(breaks = c("Yes","No"),values = c('black','white'),name = "Sequenced",na.translate = FALSE,guide = guide_legend(order=1),na.value='white')     +  ggnewscale::new_scale_fill()   +
+B_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) +  
   # Parental KPC plasmid status
   geom_tile(data = subset(melted_dataset, variable %in% c("Evolved <i>bla</i><sub>KPC</sub> plasmid","Parental <i>bla</i><sub>KPC</sub> plasmid")) %>% arrange(desc(variable)),
             aes(fill = value,x=variable,y=Parent),colour = 'white',linewidth = 0.25,inherit.aes = F) +  plasmid_fill_other +   ggnewscale::new_scale_fill() + 
@@ -215,22 +217,30 @@ A + theme(legend.position = 'right')
 ``` 
 
 ```{r,fig.width=11,fig.height=7.3333}
-C_initial
+B_initial
 ```
 
 ```{r,fig.width=12.5,fig.height=7.5}
 A_fig <-  cowplot::plot_grid(NULL,A + theme(axis.ticks.y = element_blank(),axis.text.y = element_text(size=0)),NULL,ncol=1,rel_heights = c(0.03,1,0.055))
-
-legend_C <- cowplot::get_legend(C_initial)
  
-C <- cowplot::plot_grid(NULL,C_initial  + theme(legend.position = 'none'),NULL,ncol=1,rel_heights = c(0.034,1,0.0375))
+B <- cowplot::plot_grid(NULL,B_initial  + theme(legend.position = 'none'),NULL,ncol=1,rel_heights = c(0.034,1,0.0375))
 
-figure <- cowplot::plot_grid(A_fig,C,legend_C,ncol=3,labels = c("A","B",""),rel_widths = c(1,0.55,0.19),rel_heights = c(1,1,1),label_size = 16)
+legend_B <- cowplot::get_legend(B_initial) 
+
+figure <- cowplot::plot_grid(A_fig,
+                             B,
+                             legend_B,
+                             ncol=3,
+                             labels = c("A","B",""),
+                             rel_widths = c(1,0.55,0.19),
+                             rel_heights = c(1,1,1),
+                             label_size = 16)
 
 figure 
 ```
 
 # Save figure
+
 ```{r}
 ggsave("./figures/figure_5_experimental_evolution.png",figure,dpi=900,width=12.5,height=7,bg='white')
 ```

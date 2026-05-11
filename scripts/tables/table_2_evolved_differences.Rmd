@@ -15,7 +15,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 # Environment
 
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+packages <- c("tidyverse","gridExtra","kableExtra",'cowplot')
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -76,6 +76,7 @@ kleb_diffs_hits_sub <- kleb_diffs_hits %>% select(parent,ompK36_parental)
 ```
 
 # IS element data
+## A few IS elements detected
 
 ```{r}
 is_finder_data_goi <- readRDS("./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS")
@@ -117,15 +118,18 @@ is_finder_data_goi <- left_join(is_finder_data_goi,is_finder_location_data)
 is_finder_data_goi$gene <- recode(is_finder_data_goi$locus_tag,
                                   "KPNIH1_RS18665" = 'ompK36',
                                   "KPNIH1_RS18665-KPNIH1_RS18675" = 'upstream ompK36')
+
 is_finder_data_goi$canonical_IS <- ifelse(is_finder_data_goi$evolved_only_IS== "","",
                                            paste0(is_finder_data_goi$gene," [",is_finder_data_goi$is_element,"]; " ,is_finder_data_goi$Start_Position) ) 
 
 is_finder_data_goi_data <- is_finder_data_goi %>% select(parent,canonical_IS)
+
+is_finder_data_goi_data %>% favorite_kable()
 ```
 
 # SNP/INDEL data
 
-## No evolved SNPs
+## No unique SNPs
 
 ```{r}
 SNP_differences <- readRDS( "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS")
@@ -137,7 +141,7 @@ SNP_differences_hits <- SNP_differences %>% select(parent,SNP_canonical)
 
 # INDELs
 
-## Evolved several in ompK36
+## Several INDELs found in ompK36
 
 ```{r}
 INDEL_differences <-  readRDS( "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS") 

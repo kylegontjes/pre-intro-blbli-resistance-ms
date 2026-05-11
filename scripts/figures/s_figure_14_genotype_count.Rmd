@@ -13,16 +13,22 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
+
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","cowplot","gridExtra","gontjesr","tableone")
+packages <- c("tidyverse","cowplot","gridExtra","tableone")
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Functions
 source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
 ```
 
 # Data
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
 all_variants_mat <- readRDS("./data/variant_matrices/all_variants/all_variant_mat.RDS")
@@ -32,6 +38,7 @@ df <- left_join(df,all_variants_mat %>% mutate(isolate_no = rownames(.)))
 ```
 
 # Get genotype count
+
 ```{r}
 genotype_count <- function(dataframe,annots){
   variants <- annots$raw_rownames
@@ -51,12 +58,14 @@ all_variants_annots$var_cat <- ifelse(all_variants_annots$label %in% c("Non-Codi
 ```
 
 # Note for methods section about frequency of rare variants
+
 ```{r}
 paste0("Proportion of variants that were with frequency under 1%: ")
 convert_tableone_into_df(genotype_data,vars="genotype_freq_under_1") 
 ```
 
-# Supplemental figure 10
+# Supplemental figure
+
 ```{r,fig.width=4.5,fig.height=3.6}
 # Overall
 variant_freq_histogram <- function(annots_df,bins=NULL){
@@ -75,6 +84,7 @@ s_figure_14 <- s_figure_14_main +  annotation_custom(ggplotGrob(s_figure_14_inle
 s_figure_14 
 ```
 
+## Save figure 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=4.5,fig.height=3.6} 
 ggsave(plot = s_figure_14, filename = './figures/s_figure_14_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
 ```

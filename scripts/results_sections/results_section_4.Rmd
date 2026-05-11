@@ -145,6 +145,7 @@ continuous_pass %>% select(locus_tag,product,MVB_num_log_2_diff_increase_prop,MV
 ```
 
 # Synchronous hits
+
 ```{r}
 synchronous <- gwas_table %>% subset(resistance_category != "Modulator")
 
@@ -180,6 +181,7 @@ convert_tableone_into_df(dataset = AA552, vars = c('size','gc','rep_types','rela
 ```
 
 ## Overall data
+
 ```{r} 
 plasmid_table <- table(df$AA552_KPC,df$blbli_dich_num) 
 plasmid_table
@@ -189,6 +191,7 @@ fisher.test( plasmid_table)
 ```
 
 ## Clade I data
+
 ```{r}
 df_CI <- subset(df,clade_I == 'Clade I')
 convert_tableone_into_df(df_CI,vars=c("AA018","AA552"),factorVars = c("AA018","AA552"))

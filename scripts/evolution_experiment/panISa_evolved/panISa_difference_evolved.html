@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-21" />
+<meta name="date" content="2026-05-11" />
 
-<title>panISa_differences</title>
+<title>Evolution experiment panisa differences</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -574,28 +574,41 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">panISa_differences</h1>
+<h1 class="title toc-ignore">Evolution experiment panisa
+differences</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-21</h4>
+<h4 class="date">2026-05-11</h4>
 
 </div>
 
 
-<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;cowplot&quot;,&quot;ggtree&quot;,&quot;ape&quot;,&quot;phytools&quot;,&quot;gridExtra&quot;,&quot;kableExtra&quot;,&quot;colorRamp2&quot;,&quot;RColorBrewer&quot;,&quot;ComplexHeatmap&quot;,&#39;phyloAMR&#39;,&#39;gontjesr&#39;)
+<div id="environment" class="section level1">
+<h1>Environment</h1>
+<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&#39;cowplot&#39;)
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T)) 
 
+# Load functions
+source(&quot;./lib/consistent_themes.R&quot;)
+source(&quot;./lib/common_functions.R&quot;)
+
 # Set null device
 set_null_device(&quot;png&quot;)</code></pre>
-<pre class="r"><code>sr_data &lt;- read.delim(&quot;../../../Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt&quot;,header = F) %&gt;% unlist
+</div>
+<div id="load-data" class="section level1">
+<h1>Load data</h1>
+<pre class="r"><code>sr_data &lt;- read.delim(&quot;./scripts/evolution_experiment/evolution_experiment_sr_strains.txt&quot;,header = F) %&gt;% unlist
 parents &lt;- unique(sr_data %&gt;% gsub(&quot;_MVB_R&quot;,&quot;&quot;,.) %&gt;% gsub(&quot;PCMP_H019&quot;,&quot;PCMP_H19&quot;,.)) %&gt;% sort</code></pre>
-<pre class="r"><code>isfinder_results &lt;- read.delim(&quot;~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/results/ISScreener_evolved_KPNIH1_pretrimmed/ISScreener_evolved_KPNIH1_pretrimmed_master.txt&quot;)
+</div>
+<div id="load-is-data" class="section level1">
+<h1>Load IS data</h1>
+<pre class="r"><code>isfinder_results &lt;- read.delim(&quot;./data/evolution_experiment/panISa_evolved/ISScreener_evolved_KPNIH1_pretrimmed_master.txt&quot;)
 isfinder_results$isolate_no &lt;- isfinder_results$Sample %&gt;% gsub(&quot;_panISa&quot;,&quot;&quot;,.) %&gt;% gsub(&quot;PCMP_H019&quot;,&quot;PCMP_H19&quot;,.)
 isfinder_results$parent &lt;- isfinder_results$isolate_no  %&gt;% gsub(&quot;_MVB_R&quot;,&quot;&quot;,.) 
 isfinder_results$IS_id &lt;- paste0(isfinder_results$Potential_IS,&quot;_&quot;,isfinder_results$Start_Position,&quot;_&quot;,isfinder_results$Stop_Position)
 
-KPNIH1_features &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS&quot;)
+KPNIH1_features &lt;- readRDS(&quot;./data/references/KPNIH1/KPNIH1_features.RDS&quot;)
 
 isfinder_results$locus_tag &lt;- apply(isfinder_results,1,FUN=function(x){
   # Use Start_Position and Stop_Position to determine what gene the isfinder_results hit is in the KPNIH1 faetures dataset 
@@ -625,10 +638,10 @@ Sample
 <th style="text-align:left;">
 Chromosome
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 Start_Position
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 Stop_Position
 </th>
 <th style="text-align:left;">
@@ -662,10 +675,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 536737
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 536738
 </td>
 <td style="text-align:left;">
@@ -697,10 +710,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 590106
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 590110
 </td>
 <td style="text-align:left;">
@@ -732,10 +745,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 924162
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 924165
 </td>
 <td style="text-align:left;">
@@ -767,10 +780,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 937626
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 937625
 </td>
 <td style="text-align:left;">
@@ -802,10 +815,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 949407
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 949411
 </td>
 <td style="text-align:left;">
@@ -837,10 +850,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1293059
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1293064
 </td>
 <td style="text-align:left;">
@@ -871,10 +884,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1711268
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1711271
 </td>
 <td style="text-align:left;">
@@ -906,10 +919,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1954931
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1954935
 </td>
 <td style="text-align:left;">
@@ -941,10 +954,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270501
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270501
 </td>
 <td style="text-align:left;">
@@ -976,10 +989,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3057129
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3057133
 </td>
 <td style="text-align:left;">
@@ -1011,10 +1024,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3456733
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3456749
 </td>
 <td style="text-align:left;">
@@ -1045,10 +1058,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3471099
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3471102
 </td>
 <td style="text-align:left;">
@@ -1080,10 +1093,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3476957
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3476966
 </td>
 <td style="text-align:left;">
@@ -1115,10 +1128,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3954332
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3954331
 </td>
 <td style="text-align:left;">
@@ -1149,10 +1162,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5041740
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5041740
 </td>
 <td style="text-align:left;">
@@ -1184,10 +1197,10 @@ PCMP_H116_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5217305
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5217304
 </td>
 <td style="text-align:left;">
@@ -1219,10 +1232,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 141909
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 141911
 </td>
 <td style="text-align:left;">
@@ -1253,10 +1266,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 536737
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 536738
 </td>
 <td style="text-align:left;">
@@ -1288,10 +1301,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 590106
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 590110
 </td>
 <td style="text-align:left;">
@@ -1323,10 +1336,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 924162
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 924165
 </td>
 <td style="text-align:left;">
@@ -1358,10 +1371,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 937626
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 937625
 </td>
 <td style="text-align:left;">
@@ -1393,10 +1406,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 949407
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 949411
 </td>
 <td style="text-align:left;">
@@ -1428,10 +1441,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1293059
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1293064
 </td>
 <td style="text-align:left;">
@@ -1462,10 +1475,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1711268
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1711271
 </td>
 <td style="text-align:left;">
@@ -1497,10 +1510,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1954931
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1954935
 </td>
 <td style="text-align:left;">
@@ -1532,10 +1545,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270501
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270501
 </td>
 <td style="text-align:left;">
@@ -1567,10 +1580,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3057129
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3057133
 </td>
 <td style="text-align:left;">
@@ -1602,10 +1615,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3456733
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3456749
 </td>
 <td style="text-align:left;">
@@ -1636,10 +1649,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3471099
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3471102
 </td>
 <td style="text-align:left;">
@@ -1671,10 +1684,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3476957
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3476966
 </td>
 <td style="text-align:left;">
@@ -1706,10 +1719,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3714050
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3714053
 </td>
 <td style="text-align:left;">
@@ -1741,10 +1754,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3954332
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3954331
 </td>
 <td style="text-align:left;">
@@ -1775,10 +1788,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5041740
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5041740
 </td>
 <td style="text-align:left;">
@@ -1810,10 +1823,10 @@ PCMP_H116_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5217305
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5217304
 </td>
 <td style="text-align:left;">
@@ -1845,10 +1858,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 30578
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 30581
 </td>
 <td style="text-align:left;">
@@ -1880,10 +1893,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1326225
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1326229
 </td>
 <td style="text-align:left;">
@@ -1915,10 +1928,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266677
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266681
 </td>
 <td style="text-align:left;">
@@ -1949,10 +1962,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270776
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270775
 </td>
 <td style="text-align:left;">
@@ -1984,10 +1997,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2304492
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2304496
 </td>
 <td style="text-align:left;">
@@ -2019,10 +2032,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2734438
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2734439
 </td>
 <td style="text-align:left;">
@@ -2054,10 +2067,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3005264
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3005272
 </td>
 <td style="text-align:left;">
@@ -2089,10 +2102,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3059898
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3059902
 </td>
 <td style="text-align:left;">
@@ -2124,10 +2137,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3276292
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3276295
 </td>
 <td style="text-align:left;">
@@ -2159,10 +2172,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3503480
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3503483
 </td>
 <td style="text-align:left;">
@@ -2194,10 +2207,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3714091
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3714094
 </td>
 <td style="text-align:left;">
@@ -2229,10 +2242,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4131242
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4131245
 </td>
 <td style="text-align:left;">
@@ -2264,10 +2277,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4696958
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4696963
 </td>
 <td style="text-align:left;">
@@ -2298,10 +2311,10 @@ PCMP_H019_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5114918
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5114921
 </td>
 <td style="text-align:left;">
@@ -2333,10 +2346,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 30578
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 30581
 </td>
 <td style="text-align:left;">
@@ -2368,10 +2381,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1326225
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1326229
 </td>
 <td style="text-align:left;">
@@ -2403,10 +2416,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266677
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266681
 </td>
 <td style="text-align:left;">
@@ -2437,10 +2450,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270776
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270775
 </td>
 <td style="text-align:left;">
@@ -2472,10 +2485,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2304492
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2304496
 </td>
 <td style="text-align:left;">
@@ -2507,10 +2520,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2734438
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2734439
 </td>
 <td style="text-align:left;">
@@ -2542,10 +2555,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3005264
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3005272
 </td>
 <td style="text-align:left;">
@@ -2577,10 +2590,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3059898
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3059902
 </td>
 <td style="text-align:left;">
@@ -2612,10 +2625,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3276292
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3276295
 </td>
 <td style="text-align:left;">
@@ -2647,10 +2660,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3503480
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3503483
 </td>
 <td style="text-align:left;">
@@ -2682,10 +2695,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4131242
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4131245
 </td>
 <td style="text-align:left;">
@@ -2717,10 +2730,10 @@ PCMP_H19_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5114918
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5114921
 </td>
 <td style="text-align:left;">
@@ -2752,10 +2765,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1302
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1306
 </td>
 <td style="text-align:left;">
@@ -2787,10 +2800,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 424595
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 424599
 </td>
 <td style="text-align:left;">
@@ -2822,10 +2835,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1299480
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1299499
 </td>
 <td style="text-align:left;">
@@ -2856,10 +2869,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1437723
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1437722
 </td>
 <td style="text-align:left;">
@@ -2891,10 +2904,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266677
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266680
 </td>
 <td style="text-align:left;">
@@ -2925,10 +2938,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2921913
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2921912
 </td>
 <td style="text-align:left;">
@@ -2959,10 +2972,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3155785
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3155788
 </td>
 <td style="text-align:left;">
@@ -2994,10 +3007,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3651968
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3651968
 </td>
 <td style="text-align:left;">
@@ -3029,10 +3042,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5159670
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5159670
 </td>
 <td style="text-align:left;">
@@ -3063,10 +3076,10 @@ PCMP_H226_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5160766
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5160766
 </td>
 <td style="text-align:left;">
@@ -3097,10 +3110,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1302
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1306
 </td>
 <td style="text-align:left;">
@@ -3132,10 +3145,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 424595
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 424599
 </td>
 <td style="text-align:left;">
@@ -3167,10 +3180,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1437723
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1437722
 </td>
 <td style="text-align:left;">
@@ -3202,10 +3215,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266677
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2266680
 </td>
 <td style="text-align:left;">
@@ -3236,10 +3249,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2921913
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2921912
 </td>
 <td style="text-align:left;">
@@ -3270,10 +3283,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3155785
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3155788
 </td>
 <td style="text-align:left;">
@@ -3305,10 +3318,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3651968
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3651968
 </td>
 <td style="text-align:left;">
@@ -3340,10 +3353,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5159670
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5159670
 </td>
 <td style="text-align:left;">
@@ -3374,10 +3387,10 @@ PCMP_H226_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5160766
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 5160766
 </td>
 <td style="text-align:left;">
@@ -3408,10 +3421,10 @@ PCMP_H261_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -3443,10 +3456,10 @@ PCMP_H261_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -3478,10 +3491,10 @@ PCMP_H318_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -3513,10 +3526,10 @@ PCMP_H318_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2081929
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2081935
 </td>
 <td style="text-align:left;">
@@ -3548,10 +3561,10 @@ PCMP_H318_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270776
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270775
 </td>
 <td style="text-align:left;">
@@ -3583,10 +3596,10 @@ PCMP_H318_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3431633
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3431636
 </td>
 <td style="text-align:left;">
@@ -3618,10 +3631,10 @@ PCMP_H318_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449974
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449977
 </td>
 <td style="text-align:left;">
@@ -3653,10 +3666,10 @@ PCMP_H318_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4585122
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4585125
 </td>
 <td style="text-align:left;">
@@ -3688,10 +3701,10 @@ PCMP_H318_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -3723,10 +3736,10 @@ PCMP_H318_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2081929
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2081935
 </td>
 <td style="text-align:left;">
@@ -3758,10 +3771,10 @@ PCMP_H318_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270776
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2270775
 </td>
 <td style="text-align:left;">
@@ -3793,10 +3806,10 @@ PCMP_H318_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3431633
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3431636
 </td>
 <td style="text-align:left;">
@@ -3828,10 +3841,10 @@ PCMP_H318_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449974
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449977
 </td>
 <td style="text-align:left;">
@@ -3863,10 +3876,10 @@ PCMP_H318_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4585122
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4585125
 </td>
 <td style="text-align:left;">
@@ -3898,10 +3911,10 @@ PCMP_H323_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1419740
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1419743
 </td>
 <td style="text-align:left;">
@@ -3933,10 +3946,10 @@ PCMP_H323_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1419740
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1419743
 </td>
 <td style="text-align:left;">
@@ -3968,10 +3981,10 @@ PCMP_H414_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -4003,10 +4016,10 @@ PCMP_H414_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449974
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449977
 </td>
 <td style="text-align:left;">
@@ -4038,10 +4051,10 @@ PCMP_H414_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -4073,10 +4086,10 @@ PCMP_H414_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3714068
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 3714076
 </td>
 <td style="text-align:left;">
@@ -4108,10 +4121,10 @@ PCMP_H414_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449974
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449977
 </td>
 <td style="text-align:left;">
@@ -4143,10 +4156,10 @@ PCMP_H464_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -4178,10 +4191,10 @@ PCMP_H464_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449974
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449977
 </td>
 <td style="text-align:left;">
@@ -4213,10 +4226,10 @@ PCMP_H464_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421462
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 421465
 </td>
 <td style="text-align:left;">
@@ -4248,10 +4261,10 @@ PCMP_H464_MVB_R_panISa
 <td style="text-align:left;">
 gi|661922017|gb|CP008827.1|
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449974
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 4449977
 </td>
 <td style="text-align:left;">
@@ -4276,8 +4289,47 @@ ISKpn26_4449974_4449977
 KPNIH1_RS22400-KPNIH1_RS22405
 </td>
 </tr>
+<tr>
+<td style="text-align:left;">
+Sample
+</td>
+<td style="text-align:left;">
+Chromosome
+</td>
+<td style="text-align:left;">
+Start_Position
+</td>
+<td style="text-align:left;">
+Stop_Position
+</td>
+<td style="text-align:left;">
+Potential_sequence
+</td>
+<td style="text-align:left;">
+Potential_IS
+</td>
+<td style="text-align:left;">
+Alignment
+</td>
+<td style="text-align:left;">
+Sample
+</td>
+<td style="text-align:left;">
+Sample
+</td>
+<td style="text-align:left;">
+Potential_IS_Start_Position_Stop_Position
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
 </tbody>
-</table>
+</table></li>
+</ul>
+</div>
+<div id="get-differences" class="section level1">
+<h1>Get differences</h1>
 <pre class="r"><code>get_difference &lt;- function(isolate,isfinder){
   isfinder_sub &lt;- subset(isfinder,parent==isolate)
   isfinder_sub_parent &lt;- subset(isfinder_sub,isolate_no ==isolate)
@@ -4292,6 +4344,9 @@ KPNIH1_RS22400-KPNIH1_RS22405
   
   cbind.data.frame(parent,shared_IS  = paste0(shared_IS,collapse=&#39;;&#39;), parent_only_IS  = paste0(parent_only_IS,collapse=&#39;;&#39;), evolved_only_IS  = paste0(evolved_only_IS,collapse=&#39;;&#39;),different_IS_locations)
 }</code></pre>
+</div>
+<div id="overall-data" class="section level1">
+<h1>Overall data</h1>
 <pre class="r"><code>is_finder_data_overall &lt;-  lapply(parents,FUN=function(x){
   get_difference(isolate=x,isfinder=isfinder_results) 
   
@@ -4452,7 +4507,8 @@ FALSE
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>saveRDS(is_finder_data_overall,&quot;data/evolution_experiment/panISa_evolved/panISa_differences_overall.RDS&quot;)</code></pre>
+<pre class="r"><code>saveRDS(is_finder_data_overall,&quot;./data/evolution_experiment/panISa_evolved/panISa_differences_overall.RDS&quot;)</code></pre>
+</div>
 <div id="genes-of-interest" class="section level1">
 <h1>Genes of interest</h1>
 <pre class="r"><code>isfinder_results_goi &lt;- subset(isfinder_results,grepl(&quot;KPNIH1_RS18665|KPNIH1_RS07240|KPNIH1_RS07230|KPNIH1_RS06200|KPNIH1_RS07805|KPNIH1_RS24320&quot;,isfinder_results$locus_tag))

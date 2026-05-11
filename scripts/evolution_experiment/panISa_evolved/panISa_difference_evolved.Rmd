@@ -1,5 +1,5 @@
 ---
-title: "panISa_differences"
+title: "Evolution experiment panisa differences"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -13,28 +13,35 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','gontjesr')
+packages <- c("tidyverse",'cowplot')
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T)) 
+
+# Load functions
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
 
 # Set null device
 set_null_device("png")
 ```
 
+# Load data
 ```{r}
-sr_data <- read.delim("../../../Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/scripts/evolution_experiment/evolution_experiment_sr_strains.txt",header = F) %>% unlist
+sr_data <- read.delim("./scripts/evolution_experiment/evolution_experiment_sr_strains.txt",header = F) %>% unlist
 parents <- unique(sr_data %>% gsub("_MVB_R","",.) %>% gsub("PCMP_H019","PCMP_H19",.)) %>% sort
 ```
 
+# Load IS data
 ```{r}
-isfinder_results <- read.delim("~/Desktop/scratch/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/panISa_evolved/ISScreener/results/ISScreener_evolved_KPNIH1_pretrimmed/ISScreener_evolved_KPNIH1_pretrimmed_master.txt")
+isfinder_results <- read.delim("./data/evolution_experiment/panISa_evolved/ISScreener_evolved_KPNIH1_pretrimmed_master.txt")
 isfinder_results$isolate_no <- isfinder_results$Sample %>% gsub("_panISa","",.) %>% gsub("PCMP_H019","PCMP_H19",.)
 isfinder_results$parent <- isfinder_results$isolate_no  %>% gsub("_MVB_R","",.) 
 isfinder_results$IS_id <- paste0(isfinder_results$Potential_IS,"_",isfinder_results$Start_Position,"_",isfinder_results$Stop_Position)
 
-KPNIH1_features <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS")
+KPNIH1_features <- readRDS("./data/references/KPNIH1/KPNIH1_features.RDS")
 
 isfinder_results$locus_tag <- apply(isfinder_results,1,FUN=function(x){
   # Use Start_Position and Stop_Position to determine what gene the isfinder_results hit is in the KPNIH1 faetures dataset 
@@ -57,6 +64,7 @@ isfinder_results$locus_tag <- apply(isfinder_results,1,FUN=function(x){
 isfinder_results %>% arrange(parent) %>% favorite_kable()
 ```
 
+# Get differences
 ```{r}
 get_difference <- function(isolate,isfinder){
   isfinder_sub <- subset(isfinder,parent==isolate)
@@ -74,7 +82,7 @@ get_difference <- function(isolate,isfinder){
 }
 ```
 
-
+# Overall data
 ```{r}
 is_finder_data_overall <-  lapply(parents,FUN=function(x){
   get_difference(isolate=x,isfinder=isfinder_results) 
@@ -83,7 +91,7 @@ is_finder_data_overall <-  lapply(parents,FUN=function(x){
 
 favorite_kable(is_finder_data_overall)
 
-saveRDS(is_finder_data_overall,"data/evolution_experiment/panISa_evolved/panISa_differences_overall.RDS")
+saveRDS(is_finder_data_overall,"./data/evolution_experiment/panISa_evolved/panISa_differences_overall.RDS")
 ```
 
 # Genes of interest
@@ -99,5 +107,4 @@ favorite_kable(is_finder_data_goi)
 
 saveRDS(is_finder_data_goi,"./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS")
 ```
-
-
+ 

@@ -14,6 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ```
 
 # Environment
+
 ```{r}
 #Load Packages
 packages <- c("tidyverse","cowplot","ggtree","ggnewscale","ape","phytools","phyloAMR","gridExtra")
@@ -103,7 +104,7 @@ gwas_nons_freq$`Significant Hit` <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",gwa
 gwas_nons_freq$`Significant Hit` <- gsub("ompK36","<i>ompK36</i>",gwas_nons_freq$`Significant Hit`)
 gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(gwas_nons_freq$`Significant Hit`)))  
 
-s_figure_4.C <- freq_plot(gwas_nons_freq)  +s_figure_4_descriptive_plot_theme
+s_figure_4.C <- freq_plot(gwas_nons_freq)  + s_figure_4_descriptive_plot_theme
 ```
 
 # S Figure 4D - Nearest neighbor Data

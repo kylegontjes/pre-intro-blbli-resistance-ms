@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 8: tn4401 hopping"
+title: "Supplemental Figure 8: Evidence for tn4401 hopping to other plasmid"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -215,9 +215,11 @@ phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_d
 
 # Save data
 
-```{r,fig.width=14,fig.height=10.5}
+```{r,fig.width=13.75,fig.height=10.31276}
 setwd("./data/mummer_hybrid/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
+
 tn4401_hopping
-ggsave("../../figures/s_figure_8_transposon_hopping.png", plot=tn4401_hopping, width = 14, height = 10.5, dpi=900)
+
+ggsave("../../figures/s_figure_8_transposon_hopping.png", plot=tn4401_hopping, width = 13.75, height = 10.31276, dpi=900)
 ```

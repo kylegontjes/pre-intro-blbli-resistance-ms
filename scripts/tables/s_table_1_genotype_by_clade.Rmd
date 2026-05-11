@@ -14,12 +14,13 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gontjesr","ggnewscale","tableone","kableExtra")
+packages <- c("tidyverse","ggnewscale","tableone","kableExtra")
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
 #Scripts
+source("./lib/consistent_themes.R")
 source("./lib/common_functions.R")
 ```
 
@@ -49,6 +50,7 @@ df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
 df$`KPC-10` <- ifelse(df$KPC_allele=="KPC-10",1,0)
 ```
 
+# Blactamase gene curation
 ```{r}
 # B-lactamase genes  
 bla_variables <- c("Bla_acquired","Bla_ESBL_acquired","Bla_Carb_acquired","Bla_chr")
@@ -66,6 +68,7 @@ bla_genes <- c(colnames(bla_mat %>% select(-isolate_no)),"KPC-10") %>% sort %>% 
 df <- left_join(df,bla_mat)
 ```
 
+# Variable curation
 ```{r}
 drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_non_syn','OmpK36_putative_function_altering',"OmpK36_truncation_kleborate",'OmpK36_intergenic','OmpK36_promoter_IS')
 drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
@@ -75,6 +78,8 @@ carbapenem <- c(drug_entry,drug_exit,target_modification)
 
 tn4401 <- c("Tn4401a","Tn4401b","Tn4401d","Tn4401_del_6920_7126","Tn4401_del_1_554_7008_7075","Tn4401_del_1_3391_6920_7126")
 ```
+
+# Table curation
 
 ```{r} 
 exact <- c("OmpK36TD",'OmpK36_truncation_kleborate',"OmpK36_putative_function_altering","OmpK36_intergenic","OmpK36_promoter_IS","AcrAB_TolC_any","RamR","RamA","PBP_any","PBP2","PBP4",'Tn4401_del_1_3391_6920_7126','CMY-2.v2','CTX-M-14','CTX-M-15',"KPC-5","LAP-2","OXA-1","TEM-1",'TEM-104?','TEM-104*?','TEM-150*?')
@@ -89,6 +94,7 @@ s_table_1 <-  s_table_1 %>% as.data.frame
 favorite_kable(s_table_1)
 ```
 
+# Save the table
 ```{r}
 write_csv(s_table_1,"./tables/s_table_1.csv")
 saveRDS(s_table_1,"./tables/s_table_1.RDS")

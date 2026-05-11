@@ -15,7 +15,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 ```{r , echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree','gontjesr')
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -34,4 +34,3 @@ coverage_stats <- coverage_stats %>% arrange(parent) %>% distinct
 
 favorite_kable(coverage_stats)
 ```
-

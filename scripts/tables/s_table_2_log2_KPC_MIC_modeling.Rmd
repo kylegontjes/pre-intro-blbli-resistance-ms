@@ -12,6 +12,8 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment 
+
 ```{r environment, echo=F, message=FALSE, include=F, results=F}
 #Packages
 packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree",'sjPlot','webshot2')
@@ -24,6 +26,7 @@ source("./lib/consistent_themes.R")
 source("./lib/common_functions.R")
 ```
 
+# Load the data
 ```{r} 
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
@@ -51,6 +54,7 @@ df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("N
 df$KPC_log_2 <- log2(df$KPNIH1_RS28775_chr_median_norm)
 ```
 
+# REgression modeling
 ```{r}
 df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
 df_w_KPC$OmpK36_mutations_simple <- relevel(df_w_KPC$OmpK36_mutations_simple,ref = "No loop 3 insertion or PFAV") 
@@ -67,10 +71,12 @@ IR_adjusted <- lm(IR_log_2 ~ KPC_log_2 + OmpK36_mutations_simple,data=df_w_KPC)
 IR_interaction <- lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KPC)   
 IR_summary <- tab_model(IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T)
 
+# Regression results
 regression_results <- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_interaction=MVB_interaction,IR_simple=IR_simple,IR_adjusted=IR_adjusted,IR_interaction=IR_interaction)
 
 saveRDS(object = regression_results,file = "./tables/s_table_2.RDS")
 
+# Create table model
 table_reg <- tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T,file = NULL)  
 table_reg
 
@@ -78,5 +84,6 @@ html_file <- "tables/s_table_2.html"
 
 writeLines(table_reg$page.complete, html_file)
 
+# Create html version of results
 webshot2::webshot("tables/s_table_2.html", "tables/s_table_2.png",vwidth = 1800)
 ```

@@ -15,6 +15,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ```
 
 # Environment
+
 ```{r}
 packages <- c("tidyverse","tableone","kableExtra")
 
@@ -31,6 +32,8 @@ Sys.info()
 sessionInfo() 
 ```
 
+# Load the data
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS")
 canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
@@ -38,6 +41,8 @@ nn <- readRDS("./data/nearest_neighbor_comparisons/nn_comparisons.RDS")
 
 df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.))) 
 ```
+
+# Variables of interest
 
 ```{r}
 drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_non_syn','OmpK36_putative_function_altering',"OmpK36_truncation_kleborate",'OmpK36_intergenic','OmpK36_promoter_IS')
@@ -49,6 +54,7 @@ carbapenem <- c(drug_entry,drug_exit,target_modification)
 exact <-  c("OmpK36TD",'OmpK36_truncation_kleborate',"OmpK36_putative_function_altering","OmpK36_intergenic","OmpK36_promoter_IS","AcrAB_TolC_any","RamR","RamA","PBP_any","PBP2","PBP4")
 ```
 
+# Curate the table
 ```{r}
 blbli_canonical <- convert_tableone_into_df(vars = carbapenem,strata = "blbli_dich",factorVars = carbapenem,dataset=df,outcome_names = c("BL/BLI Susceptible","BL/BLI Resistant"),exact=exact) %>% as.data.frame() 
 table_1 <- cbind(blbli_canonical[,c(1,2,4,3,5)]) %>% `rownames<-`(NULL) 
@@ -59,7 +65,8 @@ table_1$Variable <- recode(table_1$Variable,'OmpK35-25'='ompK35 porin truncation
 favorite_kable(table_1)  
 ``` 
 
-# Get NN passing data list
+# Get nearest neighbor passing data list
+
 ```{r}
 get_summary_statistics <- function(name,nn_list){
   obj <- nn_list[[name]]
@@ -72,6 +79,7 @@ get_nn_flag <- function(gwas_table){
 }
 ```
 
+# Curate the table
 ```{r}
 canonical_var <- canonical %>% select(-isolate_no,-`OmpK35-25%`) %>% colnames()
 nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) %>% mutate(variable = canonical_var)  

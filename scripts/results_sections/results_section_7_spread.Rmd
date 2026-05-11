@@ -82,7 +82,7 @@ table(nons_CI$AA552,nons_CI$blbli_cluster_singleton)
 table(nons_CI$AA552,nons_CI$blbli_cluster_singleton) %>% fisher.test()
 ```
  
-## Penicillin/ompk36 analyses
+## Penicillin-binding protein and ompk36 mutation analyses
 
 ```{r}
 table(df$ompk36_lof_or_pbp,df$blbli_asr_cluster_renamed)

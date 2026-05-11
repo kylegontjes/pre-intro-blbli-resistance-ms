@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-04-27" />
+<meta name="date" content="2026-05-11" />
 
 <title>Table 2: Comparison of parent to evolved strains from MVB evolution experiment</title>
 
@@ -577,14 +577,14 @@ display: none;
 <h1 class="title toc-ignore">Table 2: Comparison of parent to evolved
 strains from MVB evolution experiment</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-04-27</h4>
+<h4 class="date">2026-05-11</h4>
 
 </div>
 
 
 <div id="environment" class="section level1">
 <h1>Environment</h1>
-<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;cowplot&quot;,&quot;ggtree&quot;,&quot;ape&quot;,&quot;phytools&quot;,&quot;gridExtra&quot;,&quot;kableExtra&quot;,&quot;colorRamp2&quot;,&quot;RColorBrewer&quot;,&quot;ComplexHeatmap&quot;,&#39;phyloAMR&#39;)
+<pre class="r"><code>packages &lt;- c(&quot;tidyverse&quot;,&quot;gridExtra&quot;,&quot;kableExtra&quot;,&#39;cowplot&#39;)
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -638,6 +638,8 @@ kleb_diffs_hits_sub &lt;- kleb_diffs_hits %&gt;% select(parent,ompK36_parental)<
 </div>
 <div id="is-element-data" class="section level1">
 <h1>IS element data</h1>
+<div id="a-few-is-elements-detected" class="section level2">
+<h2>A few IS elements detected</h2>
 <pre class="r"><code>is_finder_data_goi &lt;- readRDS(&quot;./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS&quot;)
 
 KPNIH1_features &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS&quot;)
@@ -677,15 +679,92 @@ is_finder_data_goi &lt;- left_join(is_finder_data_goi,is_finder_location_data)
 is_finder_data_goi$gene &lt;- recode(is_finder_data_goi$locus_tag,
                                   &quot;KPNIH1_RS18665&quot; = &#39;ompK36&#39;,
                                   &quot;KPNIH1_RS18665-KPNIH1_RS18675&quot; = &#39;upstream ompK36&#39;)
+
 is_finder_data_goi$canonical_IS &lt;- ifelse(is_finder_data_goi$evolved_only_IS== &quot;&quot;,&quot;&quot;,
                                            paste0(is_finder_data_goi$gene,&quot; [&quot;,is_finder_data_goi$is_element,&quot;]; &quot; ,is_finder_data_goi$Start_Position) ) 
 
-is_finder_data_goi_data &lt;- is_finder_data_goi %&gt;% select(parent,canonical_IS)</code></pre>
+is_finder_data_goi_data &lt;- is_finder_data_goi %&gt;% select(parent,canonical_IS)
+
+is_finder_data_goi_data %&gt;% favorite_kable()</code></pre>
+<table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
+<thead>
+<tr>
+<th style="text-align:left;">
+parent
+</th>
+<th style="text-align:left;">
+canonical_IS
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PCMP_H116
+</td>
+<td style="text-align:left;">
+ompK36 [ISKpn26]; 3714050
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H19
+</td>
+<td style="text-align:left;">
+upstream ompK36 [ISKpn26]; 3714091
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H226
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H261
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H318
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H323
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H414
+</td>
+<td style="text-align:left;">
+upstream ompK36 [ISKpn14]; 3714068
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCMP_H464
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="snpindel-data" class="section level1">
 <h1>SNP/INDEL data</h1>
-<div id="no-evolved-snps" class="section level2">
-<h2>No evolved SNPs</h2>
+<div id="no-unique-snps" class="section level2">
+<h2>No unique SNPs</h2>
 <pre class="r"><code>SNP_differences &lt;- readRDS( &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS&quot;)
 
 SNP_differences %&gt;% favorite_kable()</code></pre>
@@ -984,8 +1063,8 @@ SNP_differences_hits &lt;- SNP_differences %&gt;% select(parent,SNP_canonical)</
 </div>
 <div id="indels" class="section level1">
 <h1>INDELs</h1>
-<div id="evolved-several-in-ompk36" class="section level2">
-<h2>Evolved several in ompK36</h2>
+<div id="several-indels-found-in-ompk36" class="section level2">
+<h2>Several INDELs found in ompK36</h2>
 <pre class="r"><code>INDEL_differences &lt;-  readRDS( &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS&quot;) 
 
 INDEL_differences %&gt;% favorite_kable()</code></pre>

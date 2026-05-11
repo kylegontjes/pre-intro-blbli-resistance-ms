@@ -11,6 +11,8 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
+# Environment
+
 ```{r}
 packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
 
@@ -24,6 +26,7 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 set_null_device("png")
 ```
 
+# Load data
 ```{r} 
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
@@ -63,6 +66,7 @@ df <- left_join(df,canonical %>% mutate(isolate_no = rownames(.)))
 ```
 
 # A - Heatmap for presence by resistance category
+
 ```{r,fig.height=7,fig.width=12}
 source("./scripts/figures/s_figure_11_functions.R")
 
@@ -87,7 +91,6 @@ row_names  <- gsub("ramR","<i>ramR</i>",row_names )
 row_names  <- gsub("ramA","<i>ramA</i>",row_names )   
 row_names <- row_names %>% paste0(.," (n=",total_genotype_ct,")") 
 prop_matrix <- prop_data %>% select(prop_columns) %>% `colnames<-`(gsub("_prop","",colnames(.))) %>% round(.,3) %>% as.matrix 
-
 
 fix_hyphens <- function(x) {
 gsub("-", "\u202F-\u202F", x)
@@ -150,6 +153,7 @@ dev.off()
 ```
 
 # B - Occurrence
+
 ```{r}
 traits_of_interest <- c("blbli_dich_num",rownames(prop_matrix))   
 trait_parent_child <- pbmcapply::pbmclapply(traits_of_interest,FUN=function(x){
@@ -171,6 +175,7 @@ genotypes <- synchronous_changes_w_blbli[genotypes_w_transitions_in_parental_nod
 ```
 
 ## Data
+
 ```{r}
 st258 <- ggtree(tr, size=0.25)
 genotypes_and_blbli <- c('blbli_dich_num',genotypes,"RamA")
@@ -188,7 +193,9 @@ tips <- hues::iwanthue(5,plot=T)
  
 tree_w_blbli <- st258 + geom_nodepoint(aes(subset=(node %in% gains$blbli_dich_num),fill="BL/BLI" ), shape=21, size= 4,show.legend = T) +  scale_fill_manual(name = "Phylogenetic occurrence", values ="red",breaks = "BL/BLI" )
 ```
+
 ## Create figure
+
 ```{r}
 blbli_name = "BL/BLI resistance"
 AA552_name = "AA552 <i>bla<sub>KPC</sub></i>-containing plasmid"
@@ -216,7 +223,7 @@ rownames(df) <- df$isolate_no
 
 B_1 <- B + ggnewscale::new_scale_fill()
 
-B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0) + cluster_scale_2_col + ylim(NA, 560) + theme(legend.position = 'bottom', legend.text = element_markdown())
+B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0)  + ylim(NA, 560) + theme(legend.position = 'bottom', legend.text = element_markdown()) + cluster_scale_2_col_key 
 ```
 
 # Cowplot supplemental figure
@@ -227,6 +234,7 @@ s_figure_12 <- cowplot::plot_grid(s_figure_12.A, B_w_tree, labels = "AUTO", ncol
 s_figure_12
 ``` 
 
+## Save figure
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=11,fig.height=6.5} 
 ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_clustering.png', width = 11, height = 6.5, limitsize=FALSE, bg='white', dpi=900)
 ```

@@ -13,9 +13,10 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 ```
 
 # Environment
+
 ```{r}
 #Packages
-packages <- c("tidyverse","data.table",'lubridate','readxl','growthcurver','aplot','pracma','splines','scales') 
+packages <- c("tidyverse","data.table",'lubridate','readxl','cowplot','scales') 
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -30,6 +31,7 @@ source("./lib/consistent_themes.R")
 ```
 
 # Load data
+
 ```{r}
 # AUC data
 AUC_metadata <- readRDS("./data/evolution_experiment/growth_curve/growth_curve_AUC_dataset.RDS")
@@ -53,6 +55,7 @@ max_od_plate <- readRDS("./data/evolution_experiment/growth_curve/growth_curve_m
 ```   
 
 # Curation functions
+
 ```{r}
 get_category <-  function(isolates_str){
   ifelse(isolates_str %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
@@ -134,7 +137,14 @@ max_od_plate$isolate_no <- factor(max_od_plate$isolate_no,levels = c(isolate_ran
 D <-  ggplot(data = max_od_plate,aes(x=isolate_no,y=max_OD_plate,fill=isolate_type))  +
   facet_grid(    ~ parent_category,    scales = "free_x", space  = "free_x"  ) + 
   geom_boxplot( position = position_dodge(width = 0.8),   outlier.shape = NA) + 
-  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + theme_bw_me + xlab(NULL) + ylab("Maximum optical density (OD<sub>max</sub>)") +    theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),axis.text.y=element_text(size=12),legend.title.position = 'top',axis.title.y = element_markdown(size=14),legend.title = element_text(size=16),legend.text = element_text(size=14))   + parent_color_group + scale_y_continuous(breaks = pretty_breaks(9),limits = c(0,round(10*max(max_od_plate$max_OD_plate))/10))  
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + theme_bw_me + xlab(NULL) + ylab("Maximum optical density (OD<sub>max</sub>)") + theme(
+    axis.text.x = element_text(angle = 45, hjust = 1,size = 12),
+    axis.text.y=element_text(size=12),
+    legend.title.position = 'top',
+    axis.title.y = element_markdown(size=14),
+    axis.title.x = element_markdown(size=14),
+    legend.title = element_text(size=16),
+    legend.text = element_text(size=14))   + parent_color_group + scale_y_continuous(breaks = pretty_breaks(9),limits = c(0,round(10*max(max_od_plate$max_OD_plate))/10))  
 
 D
 ```
@@ -152,7 +162,13 @@ E <- ggplot(data = paired_max_OD_data_by_plate,aes(x=isolate_no,y=max_OD_differe
   facet_grid(  ~ parent_category,     scales = "free_x",   space  = "free_x" ) + 
   geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
   geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + 
-  theme_bw_me + xlab(NULL) + ylab("Change in OD<sub>max</sub>") +   theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),axis.text.y=element_text(size=12),legend.title.position = 'top',axis.title.y = element_markdown(size=14),legend.title = element_text(size=16),legend.text = element_text(size=14))   + status_fill + geom_hline(yintercept = 0,linetype = 2) +  scale_y_continuous(breaks = pretty_breaks(3))
+  theme_bw_me + xlab(NULL) + ylab("Change in OD<sub>max</sub>") +   theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 12),
+                                                                          axis.text.y=element_text(size=12),
+                                                                          legend.title.position = 'top',
+                                                                          axis.title.y = element_markdown(size=14),
+                                                                          axis.title.x = element_markdown(size=14),
+                                                                          legend.title = element_text(size=16),
+                                                                          legend.text = element_text(size=14))   + status_fill + geom_hline(yintercept = 0,linetype = 2) +  scale_y_continuous(breaks = pretty_breaks(3))
 
 E
 ```

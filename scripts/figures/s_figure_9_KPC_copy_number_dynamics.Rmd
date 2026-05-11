@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','ggtext')
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -67,8 +67,13 @@ df$KPC_plasmid_copy_number_log_2 <- log2(df$KPC_plasmid_median_copy_chromosome_n
 
 ## A. KPC copy number distributoin
 ```{r}
-A <- ggplot(df, aes(x= KPC_copy_number_log_2)) + geom_histogram(fill='black')  + theme_bw_me  + xlab("Log<sub>2</sub>&nbsp;<i>bla</i><sub>KPC</sub> copy number") + ylab("Isolates")  + geom_vline(xintercept = 1,linetype = 2,colour = 'brown')  + geom_vline(xintercept = 0,linetype = 2,colour = 'darkgray') + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())   
- A 
+A <- ggplot(df, aes(x= KPC_copy_number_log_2)) + geom_histogram(fill='black')  + theme_bw_me  + xlab("Log<sub>2</sub>&nbsp;  <i>bla</i><sub>KPC</sub> copy number") + ylab("Isolates")  + geom_vline(xintercept = 1,linetype = 2,colour = 'brown')  + geom_vline(xintercept = 0,linetype = 2,colour = 'darkgray') + theme(
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
+
+A 
 ```
 
 ## B. blaKPC copy number
@@ -76,7 +81,11 @@ A <- ggplot(df, aes(x= KPC_copy_number_log_2)) + geom_histogram(fill='black')  +
 B <- ggplot(df, aes(x = KPC_allele, y = KPC_copy_number_log_2)) +
   geom_boxplot(outliers=F) +
   geom_jitter( height=0,
-              size = 1, alpha = 0.7)  + theme_bw_me  + xlab("<i>bla</i><sub>KPC</sub> allele") + ylab("Log<sub>2</sub>&nbsp;<i>bla</i><sub>KPC</sub> copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+              size = 1, alpha = 0.7)  + theme_bw_me  + xlab("<i>bla</i><sub>KPC</sub> allele") + ylab("Log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 B
 ```
@@ -86,7 +95,11 @@ B
 C <- ggplot(df, aes(x = KPC_plasmid, y = KPC_copy_number_log_2)) +
   geom_boxplot(outliers=F) +
   geom_jitter(height=0,
-              size = 1, alpha = 0.7)  + theme_bw_me  + xlab("<i>bla</i><sub>KPC</sub>-containing plasmid") + ylab("Log<sub>2</sub>&nbsp;<i>bla</i><sub>KPC</sub> copy number")  + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')   + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))  + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+              size = 1, alpha = 0.7)  + theme_bw_me  + xlab("<i>bla</i><sub>KPC</sub>-containing plasmid") + ylab("Log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number")  + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')   + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))  + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 C
 ```
@@ -96,14 +109,22 @@ C
 D <- ggplot(df, aes(x = KPC_plasmid, y = KPC_plasmid_copy_number_log_2)) +
   geom_boxplot(outliers=F) +
   geom_jitter( height=0, 
-              size = 1, alpha = 0.7)  + theme_bw_me  + xlab("") + ylab("Log<sub>2</sub> plasmid copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))  + theme(axis.title.x = element_blank())  + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+              size = 1, alpha = 0.7)  + theme_bw_me  + xlab("") + ylab("Log<sub>2</sub> plasmid copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black')  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))  + theme(axis.title.x = element_blank())  + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 D
 ```
 
 ## E. Association between KPC and plasmid copy number
 ```{r}
-E <-ggplot(df %>% subset(KPC_plasmid != "No Plasmid"), aes(x = KPC_plasmid_copy_number_log_2, y = KPC_copy_number_log_2)) + geom_point(size=1) + geom_abline(linetype = 2) +   theme_bw_me  + xlab("Log<sub>2</sub> plasmid copy number") + ylab("Log<sub>2</sub>&nbsp;<i>bla</i><sub>KPC</sub> copy number")  + geom_smooth(method = 'glm')  + ylim(-3,5)  + xlim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+E <-ggplot(df %>% subset(KPC_plasmid != "No Plasmid"), aes(x = KPC_plasmid_copy_number_log_2, y = KPC_copy_number_log_2)) + geom_point(size=1) + geom_abline(linetype = 2) +   theme_bw_me  + xlab("Log<sub>2</sub> plasmid copy number") + ylab("Log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number")  + geom_smooth(method = 'glm')  + ylim(-3,5)  + xlim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 E
 ```
@@ -113,7 +134,11 @@ E
 f <- ggplot(df, aes(x = clade_I, y = KPC_copy_number_log_2)) +
   geom_boxplot(aes(fill=clade_I),outliers = F ) +
   geom_jitter(aes(color=clade_I), height = 0,
-              size = 1, alpha = 0.7) + theme_bw_me  + xlab("") + ylab("Log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number")  + clade_colors_scale_point + clade_colors_scale+ geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'darkgray')   + theme(axis.title.x = element_blank()) + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+              size = 1, alpha = 0.7) + theme_bw_me  + xlab("") + ylab("Log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number")  + clade_colors_scale_point + clade_colors_scale+ geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'darkgray')   + theme(axis.title.x = element_blank()) + ylim(-3,5) + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 f
 ```
 
@@ -124,7 +149,11 @@ G<- ggplot(df, aes(x = KPC_plasmid, y = KPC_copy_number_log_2, fill = clade_I)) 
   geom_jitter( 
               position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8),
               size = 1, alpha = 0.7) +
-  ggpubr::stat_compare_means() + theme_bw_me  + xlab("") + ylab("Log<sub>2</sub>&nbsp;<i>bla</i><sub>KPC</sub> copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + clade_colors_scale   + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank()) + ylim(-3,5)  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+  ggpubr::stat_compare_means() + theme_bw_me  + xlab("") + ylab("Log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + clade_colors_scale   + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank()) + ylim(-3,5)  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 G
 ```
@@ -159,14 +188,22 @@ variant_stats$KPC_copy_number_change <- ifelse(variant_stats$KPC_copy_number_dif
 ```{r}
 H <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=KPC_copy_number_log_2_diff)) + geom_boxplot(outliers=F) + 
   geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1) + 
-  geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in <i>bla</i><sub>KPC</sub> copy number")  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())    + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+  geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in <i>bla</i><sub>KPC</sub> copy number")  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())    + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 H
 ```
 
 ## I. Directional change in KPC copy number
 ```{r}
-I <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=KPC_copy_number_change)) + geom_bar() + xlab("") + ylab("Isolates") + theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(breaks = c("increase","decrease"),values = c("maroon","gray"),name = 'Change in <i>bla</i><sub>KPC</sub> gene copy number',labels = c("Increase","Decrease"), guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+I <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=KPC_copy_number_change)) + geom_bar() + xlab("") + ylab("Isolates") + theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(breaks = c("increase","decrease"),values = c("maroon","gray"),name = 'Change in <i>bla</i><sub>KPC</sub> gene copy number',labels = c("Increase","Decrease"), guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
  
 I_legend <- cowplot::get_legend(I) %>% cowplot::plot_grid()
 
@@ -175,14 +212,22 @@ I
 
 ## J. MVB change
 ```{r}
-J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub>-containing plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub>-containing plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 J
 ```
 
 ## K. IR Change
 ```{r}
-K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),axis.text = element_markdown(),axis.title=element_markdown())
+K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+    axis.text.x  = element_markdown(),
+    axis.text.y  = element_markdown(),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown())
 
 K_legend <- cowplot::get_legend(K) %>% cowplot::plot_grid()
 
