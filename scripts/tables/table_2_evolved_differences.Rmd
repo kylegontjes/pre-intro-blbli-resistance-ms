@@ -120,7 +120,7 @@ is_finder_data_goi$gene <- recode(is_finder_data_goi$locus_tag,
                                   "KPNIH1_RS18665-KPNIH1_RS18675" = 'upstream ompK36')
 
 is_finder_data_goi$canonical_IS <- ifelse(is_finder_data_goi$evolved_only_IS== "","",
-                                           paste0(is_finder_data_goi$gene," [",is_finder_data_goi$is_element,"]; " ,is_finder_data_goi$Start_Position) ) 
+                                           paste0(is_finder_data_goi$gene," (",is_finder_data_goi$is_element,"); " ,is_finder_data_goi$Start_Position) ) 
 
 is_finder_data_goi_data <- is_finder_data_goi %>% select(parent,canonical_IS)
 

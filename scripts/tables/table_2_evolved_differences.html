@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-05-11" />
+<meta name="date" content="2026-05-12" />
 
 <title>Table 2: Comparison of parent to evolved strains from MVB evolution experiment</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Table 2: Comparison of parent to evolved
 strains from MVB evolution experiment</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-05-11</h4>
+<h4 class="date">2026-05-12</h4>
 
 </div>
 
@@ -681,7 +681,7 @@ is_finder_data_goi$gene &lt;- recode(is_finder_data_goi$locus_tag,
                                   &quot;KPNIH1_RS18665-KPNIH1_RS18675&quot; = &#39;upstream ompK36&#39;)
 
 is_finder_data_goi$canonical_IS &lt;- ifelse(is_finder_data_goi$evolved_only_IS== &quot;&quot;,&quot;&quot;,
-                                           paste0(is_finder_data_goi$gene,&quot; [&quot;,is_finder_data_goi$is_element,&quot;]; &quot; ,is_finder_data_goi$Start_Position) ) 
+                                           paste0(is_finder_data_goi$gene,&quot; (&quot;,is_finder_data_goi$is_element,&quot;); &quot; ,is_finder_data_goi$Start_Position) ) 
 
 is_finder_data_goi_data &lt;- is_finder_data_goi %&gt;% select(parent,canonical_IS)
 
@@ -703,7 +703,7 @@ canonical_IS
 PCMP_H116
 </td>
 <td style="text-align:left;">
-ompK36 [ISKpn26]; 3714050
+ompK36 (ISKpn26); 3714050
 </td>
 </tr>
 <tr>
@@ -711,7 +711,7 @@ ompK36 [ISKpn26]; 3714050
 PCMP_H19
 </td>
 <td style="text-align:left;">
-upstream ompK36 [ISKpn26]; 3714091
+upstream ompK36 (ISKpn26); 3714091
 </td>
 </tr>
 <tr>
@@ -747,7 +747,7 @@ PCMP_H323
 PCMP_H414
 </td>
 <td style="text-align:left;">
-upstream ompK36 [ISKpn14]; 3714068
+upstream ompK36 (ISKpn14); 3714068
 </td>
 </tr>
 <tr>
@@ -1604,7 +1604,7 @@ I
 6.42
 </td>
 <td style="text-align:left;">
-upstream ompK36 [ISKpn26]; 3714091
+upstream ompK36 (ISKpn26); 3714091
 </td>
 <td style="text-align:left;">
 blaKPC-2
@@ -1654,7 +1654,7 @@ I
 8.42
 </td>
 <td style="text-align:left;">
-ompK36 (p.Gly136_Asp137del); 3713649 &amp; upstream ompK36 [ISKpn14];
+ompK36 (p.Gly136_Asp137del); 3713649 &amp; upstream ompK36 (ISKpn14);
 3714068
 </td>
 <td style="text-align:left;">
@@ -1704,7 +1704,7 @@ II
 5.96
 </td>
 <td style="text-align:left;">
-ompK36 [ISKpn26]; 3714050
+ompK36 (ISKpn26); 3714050
 </td>
 <td style="text-align:left;">
 blaKPC-3
