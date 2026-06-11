@@ -39,7 +39,7 @@ colfunc <- colorRampPalette(c("white", "red"))
 log_breaks <- c(-2,-1,0,1,2,3,4,5)
 Log2_scale <-scale_fill_manual(breaks = log_breaks,values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=4),drop = FALSE ,limits=force)
 Log2_scale_key <-scale_fill_manual(breaks = log_breaks,values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=4,override.aes = list(colour = "black")),drop = FALSE ,limits=force)
-LLog2_scale_3_order <-scale_fill_manual(breaks = log_breaks,values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=3),drop = FALSE ,limits=force)
+Log2_scale_3_order <-scale_fill_manual(breaks = log_breaks,values = colfunc(8),labels = c("≤0.25/IN"," 0.5/IN"," 1/IN"," 2/IN"," 4/IN"," 8/IN"," 16/IN","≥32/IN"),name = "Minimum inhibitory concentration (MIC)",guide = guide_legend(title.position = "top",label.position = "bottom",nrow=1,keywidth=2,order=3),drop = FALSE ,limits=force)
 ## X-axis
 MIC_x_scale <- scale_x_continuous(breaks=log_breaks, labels=c("≤0.25","0.5", "1","2","4","8","16","≥32"))
 ## MIC Scales

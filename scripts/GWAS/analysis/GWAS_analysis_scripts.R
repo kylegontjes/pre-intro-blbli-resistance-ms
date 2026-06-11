@@ -420,7 +420,7 @@ gwas_figures <- function(df,tr,gwas_mat,sig_hits_name){
 
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
-  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = .1,offset =.0000375) + Log2_scale + consistent_theme_GWAS
+  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = .1,offset =.0000375) + Log2_scale + consistent_theme_GWAS
 
   # Step #7: Add
   p.7.1 <- p.7 + new_scale_fill()

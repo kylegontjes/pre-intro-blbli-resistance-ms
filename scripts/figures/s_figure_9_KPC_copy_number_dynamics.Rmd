@@ -210,26 +210,27 @@ I_legend <- cowplot::get_legend(I) %>% cowplot::plot_grid()
 I
 ```
 
-## J. MVB change
+
+## J. IR Change
 ```{r}
-J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub>-containing plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
     axis.text.x  = element_markdown(),
     axis.text.y  = element_markdown(),
     axis.title.x = element_markdown(),
     axis.title.y = element_markdown())
+
+J_legend <- cowplot::get_legend(J) %>% cowplot::plot_grid()
 
 J
 ```
 
-## K. IR Change
+## K. MVB change
 ```{r}
-K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1)) + theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
+K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub>-containing plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right")) + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + theme(axis.text.x = element_text(angle=45,hjust = 1,vjust=1))+ theme(axis.title.x = element_blank())  + theme(legend.title = element_markdown(),legend.text=element_markdown(),
     axis.text.x  = element_markdown(),
     axis.text.y  = element_markdown(),
     axis.title.x = element_markdown(),
     axis.title.y = element_markdown())
-
-K_legend <- cowplot::get_legend(K) %>% cowplot::plot_grid()
 
 K
 ```
@@ -244,7 +245,7 @@ L
 ```
 
 ```{r,fig.height=13.75,fig.width=11}
-legends <- cowplot::plot_grid(I_legend,K_legend,L_legend,ncol=3,axis = 't')
+legends <- cowplot::plot_grid(I_legend,J_legend,L_legend,ncol=3,axis = 't')
 figure <- cowplot::plot_grid(A + theme(legend.position = 'none'),B,C,D,E ,f + theme(legend.position = 'none'),G+ theme(legend.position = 'none'),H + theme(legend.position = 'none'),I+ theme(legend.position = 'none'),J+ theme(legend.position = 'none'),K+ theme(legend.position = 'none'),L+ theme(legend.position = 'none'),ncol=3,labels = "AUTO")
 figure_w_legends <- cowplot::plot_grid(figure,legends,ncol=1,rel_heights = c(1,0.1))
 figure_w_legends

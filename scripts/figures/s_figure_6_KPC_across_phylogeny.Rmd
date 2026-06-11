@@ -98,7 +98,7 @@ p1 <- gheatmap(p0.1,data=df %>% select(blbli_dich) %>% mutate_all(as.factor) %>%
 
 p1.1 <- p1+ggnewscale::new_scale_fill()
 
-p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("MVB MIC","IR MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.000025) + Log2_scale_3_order + ylim(NA,550) + consistent_theme_phylo
+p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.000025) + Log2_scale_3_order + ylim(NA,550) + consistent_theme_phylo
 
 p2.1 <- p2+ggnewscale::new_scale_fill()
 
