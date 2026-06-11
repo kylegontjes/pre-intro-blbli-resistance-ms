@@ -20,6 +20,9 @@ packages <- c("tidyverse","ComplexHeatmap","RColorBrewer",'circlize',"cowplot")
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
+# Functions
+source("./lib/common_functions.R")
+
 # Print environment
 Sys.info()
 sessionInfo()
@@ -42,22 +45,49 @@ data_matrix <- as.matrix(last_line_res_numeric)
 co_occurrence <- t(data_matrix) %*% data_matrix %>% as.matrix
 co_occurrence_percent <- co_occurrence / total_occurrences * 100 
 
+
+# Get clustering
+mat <- co_occurrence_percent
+
+drug_dist <- as.dist(
+  1 - cor(t(co_occurrence_percent), use = "pairwise.complete.obs")
+)
+
+drug_hc <- hclust(drug_dist, method = "average")
+order <- drug_hc$order
+final_variable_order <- colnames(co_occurrence_percent)[order]
+
+# Reorder these
+co_occurrence <- co_occurrence[order,order]
+co_occurrence_percent <- co_occurrence_percent[order,order]
+
+# Finish
 co_occurrence_merged <- list()
 for(i in 1:ncol(co_occurrence)){
 co_occurrence_merged[[i]] <- paste0(co_occurrence[,i]," (",round(co_occurrence_percent[,i],1),"%)")
 }
 
 co_occurrence_merged <- do.call(cbind,co_occurrence_merged) %>% as.data.frame %>% `colnames<-`(gsub("_dich_num","",colnames(co_occurrence))
-) %>% `rownames<-`(paste0(gsub("_dich_num","",rownames(co_occurrence))," Resistant (n = ",total_occurrences,")")) 
+) 
 
-# Complex heatmap
+rownames(co_occurrence_merged) <- sapply(rownames(co_occurrence),FUN=function(x){
+  total_count <- subset(total_occurrences,names(total_occurrences)==x)
+  paste0(recode_resistance_variables(x)," resistant (n = ",total_count,")")
+}) 
+ 
+# Names
+rownames(co_occurrence_percent) <- recode_resistance_variables(rownames(co_occurrence_percent)) 
+colnames(co_occurrence_percent) <- recode_resistance_variables(colnames(co_occurrence_percent))
+colnames(co_occurrence_merged) <- recode_resistance_variables(colnames(co_occurrence_merged))
 drugs <- gsub("_dich_num","",colnames(co_occurrence_merged))
+
+
 ## Heatmap
-co_occurrence_heatmap <- ComplexHeatmap::pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-r esistance",legend=F,fontsize = 12,
-    row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 18)),
-    column_names_max_height = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 18)),
+co_occurrence_heatmap <- ComplexHeatmap::pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-r esistance",legend=F,fontsize = 10,
+    row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 14)),
+    column_names_max_height = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 14)),
     legend_breaks = c(0, 25, 50, 75, 100),legend_labels = c("0%", "25%", "50%", "75%", "100%"),
-    cluster_rows=F,cluster_cols = F,display_numbers = as.matrix(co_occurrence_merged),labels_row = rownames(co_occurrence_merged),labels_col = drugs,number_color = "black")
+    cluster_rows=F,cluster_cols = F,display_numbers = as.matrix(co_occurrence_merged),labels_row = rownames(co_occurrence_merged),number_color = "black")
 
 ## Complex heatmap legend
 one_hundred_breaks <- c()
@@ -76,7 +106,7 @@ s_figure_1 <- cowplot::plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis=
 
 # Figure 
 
-```{r,message=F,error=F,warning=F,fig.width=9,fig.height=4,5}
+```{r,message=F,error=F,warning=F,fig.width=9,fig.height=4.5}
 s_figure_1
 ```
 

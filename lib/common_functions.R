@@ -130,3 +130,25 @@ get_pattern <- function(names,df){
   results <- cbind.data.frame(pattern,presence)
   return(results)
 }
+
+# Resistance related functions
+recode_resistance_variables <- function(variables){
+  recode(variables,
+         "AMK_dich_num"='Amikacin',
+         "CZA_dich_num"='Ceftazidime-avibactam',
+         "CST_dich_num"='Colistin', 
+         'MERO_dich_num'='Meropenem',
+         'IMI_dich_num'='Imipenem',
+         "blbli_dich_num"='KPC-inhibiting BL/BLIs',
+         "MVB_dich_num"='Meropenem-vaborbactam',
+         "IR_dich_num"='Imipenem-relebactam',
+         "PLZ_dich_num"='Plazomicin',
+         "TMP_SMX_dich_num"='Trimethoprim-Sulfamethoxazole',
+         "TGC_dich_num"='Tigecycline',
+         "OMC_dich_num" = "Omadacycline",
+         "DLX_dich_num" = "Delafloxacin",
+         "ERV_dich_num" = "Eravacycline",
+         "FOS_dich_num" = "Fosfomycin",
+         "CT_dich_num" = "Ceftolozane-tazobactam",
+         "FDC_dich_num"="Cefiderocol")
+}

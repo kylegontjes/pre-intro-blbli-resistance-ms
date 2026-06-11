@@ -21,6 +21,10 @@ packages <- c("tidyverse","ComplexHeatmap","RColorBrewer",'circlize',"cowplot")
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
+# Function
+source("./lib/consistent_themes.R")
+source("./lib/common_functions.R")
+
 # Print environment
 Sys.info()
 sessionInfo()
@@ -39,10 +43,13 @@ MIC_correlation <-  cor(df %>% select("MERO_log_2","MVB_log_2","IMI_log_2","IR_l
  
 drugs <-  rownames(MIC_correlation) %>% gsub("_log_2","",.)
 
+rownames(MIC_correlation) <- recode_resistance_variables(rownames(MIC_correlation) %>% gsub("_log_2","_dich_num",.)) 
+colnames(MIC_correlation) <- recode_resistance_variables(colnames(MIC_correlation) %>% gsub("_log_2","_dich_num",.))
+
 corr_heatmap <- ComplexHeatmap::pheatmap(MIC_correlation %>% as.matrix,border_color = "black",name ="Spearman's rank correlation coefficient",legend=F,fontsize = 12,
     row_names_max_width = max_text_width(rownames(MIC_correlation), gp = gpar(fontsize = 14)),
     column_names_max_height = max_text_width(rownames(MIC_correlation), gp = gpar(fontsize = 14)),
-    cluster_rows=T,cluster_cols = T,labels_row = drugs,labels_col=drugs,number_color = "black",breaks = c(-1,0,1),color=c("blue","white","red"),display_numbers = T)  
+    cluster_rows=T,cluster_cols = T,number_color = "black",breaks = c(-1,0,1),color=c("blue","white","red"),display_numbers = T)  
 
 ## Complex heatmap legend 
 fig_legend <- Legend(at = c(-1, -0.5, 0, 0.5, 1),labels = c("-1.00", "-0.50", "0.00", "0.50", "1.00"),title = "Spearman's rank correlation coefficient",direction = "horizontal",col_fun = colorRamp2(breaks = c(-1,  0,  1),colors = c("blue","white","red")), title_gp = gpar(fontsize = 14),labels_gp=gpar(fontsize=12),legend_width = unit(9, "cm"), title_position = 'topcenter')
@@ -55,11 +62,11 @@ s_figure_2 <- plot_grid(fig_heatmap_image,fig_legend_image,ncol=1,axis="l", alig
 ```
 
 # Figure
-```{r,message=F,error=F,warning=F,fig.width=5.3125,fig.height=4.25}
+```{r,message=F,error=F,warning=F,fig.width=5.75,fig.height=5.75}
 s_figure_2
 ```
 
 ## Save
 ```{r}
-ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 5.3125, height = 4.25,bg='white', dpi=900)
+ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 5.75, height = 5.75,bg='white', dpi=900)
 ```
