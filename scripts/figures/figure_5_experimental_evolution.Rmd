@@ -112,7 +112,7 @@ A
 ```{r}
 table_2 <- readRDS("./tables/table_2_evolved_changes.RDS")
 
-table_2_mutations <- table_2$`Evolved canonical mutation (gene [mutation]; position)` %>% unlist %>% unique %>% str_split(.,"&") %>% unlist %>% trimws %>% subset(.!='')
+table_2_mutations <- table_2$`Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position)` %>% unlist %>% unique %>% str_split(.,"&") %>% unlist %>% trimws %>% subset(.!='')
 OmpK36_mutations <- table_2_mutations %>% subset(grepl("ompK36",x = table_2_mutations) & !grepl("upstream",x=table_2_mutations))
 names(OmpK36_mutations) <- sapply(OmpK36_mutations,FUN=function(y){
   ifelse(grepl(pattern = "dup",x = y),"Duplication",
@@ -128,7 +128,7 @@ names(intergenic_OmpK36_mutations) <- sapply(intergenic_OmpK36_mutations,FUN=fun
 }) 
 other_mutations <- subset(table_2_mutations,!table_2_mutations %in% c(OmpK36_mutations,intergenic_OmpK36_mutations))
 
-table_2$OmpK36_mutation <-  sapply(table_2$`Evolved canonical mutation (gene [mutation]; position)` ,FUN=function(name){
+table_2$OmpK36_mutation <-  sapply(table_2$`Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position)` ,FUN=function(name){
   canonical_mutations <- name %>% unlist %>% unique %>% str_split(.,"&") %>% unlist %>% trimws %>% subset(.!='')
   if(sum(canonical_mutations %in% OmpK36_mutations)>0){
       in_ompK36_mutation <- subset(canonical_mutations,canonical_mutations %in% OmpK36_mutations)
@@ -139,7 +139,7 @@ table_2$OmpK36_mutation <-  sapply(table_2$`Evolved canonical mutation (gene [mu
   return(result)
 })
 
-table_2$OmpK36_intergenic_mutation <-  sapply(table_2$`Evolved canonical mutation (gene [mutation]; position)` ,FUN=function(name){
+table_2$OmpK36_intergenic_mutation <-  sapply(table_2$`Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position)` ,FUN=function(name){
   canonical_mutations <- name %>% unlist %>% unique %>% str_split(.,"&") %>% unlist %>% trimws %>% subset(.!='')
   if(sum(canonical_mutations %in% intergenic_OmpK36_mutations)>0){
       intergeniB_ompK36_mutation <- subset(canonical_mutations,canonical_mutations %in% intergenic_OmpK36_mutations)
@@ -150,7 +150,7 @@ table_2$OmpK36_intergenic_mutation <-  sapply(table_2$`Evolved canonical mutatio
   return(result)
 })
 
-table_2$other_canonical_mutations <-sapply(table_2$`Evolved canonical mutation (gene [mutation]; position)` ,FUN=function(name){
+table_2$other_canonical_mutations <-sapply(table_2$`Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position)` ,FUN=function(name){
   canonical_mutations <- name %>% unlist %>% unique %>% str_split(.,"&") %>% unlist %>% trimws %>% subset(.!='')
   if(sum(canonical_mutations %in% other_mutations)>0){
       other_found_mutations <- subset(canonical_mutations,canonical_mutations %in% other_mutations)
@@ -172,14 +172,14 @@ table_2$evolved_blaKPC_plasmid <- ifelse(table_2$`Evolved blaKPC plasmid` %in% c
 table_2$parent_blaKPC_plasmid <- ifelse(table_2$`Parental blaKPC plasmid` %in% c("AA018","AA552"), table_2$`Parental blaKPC plasmid`,
                                          ifelse(table_2$Sequenced =="Yes", "Other plasmid",NA))
 melted_dataset <- reshape2::melt(table_2,id.vars = 'Parent') 
-melted_dataset <- subset(melted_dataset,variable %in% c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','blaKPC gene CN log2 fold change','blaKPC plasmid CN log2 fold change','OmpK36_mutation',"OmpK36_intergenic_mutation"))
-melted_dataset$variable <- factor(melted_dataset$variable,levels = c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','blaKPC gene CN log2 fold change','blaKPC plasmid CN log2 fold change','OmpK36_mutation',"OmpK36_intergenic_mutation"))
+melted_dataset <- subset(melted_dataset,variable %in% c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','Log2 fold change in blaKPC gene CN','Log2 fold change in blaKPC plasmid CN','OmpK36_mutation',"OmpK36_intergenic_mutation"))
+melted_dataset$variable <- factor(melted_dataset$variable,levels = c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','Log2 fold change in blaKPC gene CN','Log2 fold change in blaKPC plasmid CN','OmpK36_mutation',"OmpK36_intergenic_mutation")) 
 
 melted_dataset$variable <- recode(melted_dataset$variable,
                                   "parent_blaKPC_plasmid" = "Parental <i>bla</i><sub>KPC</sub> plasmid", 
                                   "evolved_blaKPC_plasmid" = "Evolved <i>bla</i><sub>KPC</sub> plasmid",
-                                  "blaKPC gene CN log2 fold change" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
-                                  "blaKPC plasmid CN log2 fold change" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
+                                  "Log2 fold change in blaKPC gene CN" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
+                                  "Log2 fold change in blaKPC plasmid CN" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
                                   "OmpK36_mutation" = "Evolved mutation in <i>ompK36</i>",
                                   "OmpK36_intergenic_mutation" = "Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")
 
@@ -188,17 +188,17 @@ no_sequencing <- melted_dataset %>% subset(value=="No" & variable == "Sequenced"
 B_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) +  
   # Parental KPC plasmid status
   geom_tile(data = subset(melted_dataset, variable %in% c("Evolved <i>bla</i><sub>KPC</sub> plasmid","Parental <i>bla</i><sub>KPC</sub> plasmid")) %>% arrange(desc(variable)),
-            aes(fill = value,x=variable,y=Parent),colour = 'white',linewidth = 0.25,inherit.aes = F) +  plasmid_fill_other +   ggnewscale::new_scale_fill() + 
+            aes(fill = value,x=variable,y=Parent),colour = 'white',linewidth = 0.25,inherit.aes = F) +  plasmid_fill_other_key_border +   ggnewscale::new_scale_fill() + 
   # KPC copy number data
   geom_tile(data = subset(melted_dataset, variable %in% c('<i>bla</i><sub>KPC</sub> gene <br>copy number change','<i>bla</i><sub>KPC</sub> plasmid <br>copy number change')),
-            aes(fill = as.numeric(value)),colour = 'white',linewidth = 0.25) +  scale_fill_gradient2(low = "blue", mid = "white" ,high = "red",name = "Fold change",midpoint=1,na.value = 'white',guide = guide_colorbar(order=3),limits=c(0,8)) + ggnewscale::new_scale_fill() + 
+            aes(fill = as.numeric(value)),colour = 'white',linewidth = 0.25) +  scale_fill_gradient2(low = "blue", mid = "white" ,high = "red",name = expression(Log[2]~"fold change"),midpoint=1,na.value = 'white',guide = guide_colorbar(order=3),limits=c(0,8)) + ggnewscale::new_scale_fill() + 
   # Mutation data
   geom_tile(data = subset(melted_dataset, variable %in% c("Evolved mutation in <i>ompK36</i>","Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")),
             aes(fill=value),colour = 'white',linewidth = 0.25) + theme(axis.text.x = element_markdown(angle=270,hjust = 0,vjust = 0.5),panel.border  = element_blank(),panel.grid = element_blank())  + mutation_scale +  
   # Remaining themes
   ylab(NULL) + xlab(NULL) +
     scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) + theme(axis.text = element_markdown(size=12),plot.background = element_rect(color = 'white'))  + geom_text(
+    scale_y_discrete(expand = c(0, 0)) + theme(axis.text = element_markdown(size=12),plot.background = element_rect(color = 'white'),legend.key.spacing.y = unit(0.05,'cm'))  + geom_text(
         data = subset(
             melted_dataset,
             variable != "Sequenced" &

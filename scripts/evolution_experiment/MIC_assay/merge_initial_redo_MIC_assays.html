@@ -13,7 +13,7 @@
 
 <meta name="date" content="2026-06-16" />
 
-<title>BL/BLI Evolution Experiment MIC data</title>
+<title>Curate final MIC dataset</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -574,7 +574,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">BL/BLI Evolution Experiment MIC data</h1>
+<h1 class="title toc-ignore">Curate final MIC dataset</h1>
 <h4 class="author">Kyle Gontjes</h4>
 <h4 class="date">2026-06-16</h4>
 
@@ -617,73 +617,42 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] kableExtra_1.4.0 ggtext_0.1.2     gridExtra_2.3    lubridate_1.9.5 
- [5] forcats_1.0.1    stringr_1.6.0    dplyr_1.2.1      purrr_1.2.2     
- [9] readr_2.2.0      tidyr_1.3.2      tibble_3.3.1     ggplot2_4.0.3   
-[13] tidyverse_2.0.0  knitr_1.51      
+ [1] lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0   dplyr_1.2.1    
+ [5] purrr_1.2.2     readr_2.2.0     tidyr_1.3.2     tibble_3.3.1   
+ [9] ggplot2_4.0.3   tidyverse_2.0.0 knitr_1.51     
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10        generics_0.1.4     xml2_1.5.2         stringi_1.8.7     
- [5] hms_1.1.4          digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
- [9] grid_4.6.0         timechange_0.4.0   RColorBrewer_1.1-3 fastmap_1.2.0     
-[13] jsonlite_2.0.0     viridisLite_0.4.3  scales_1.4.0       textshaping_1.0.5 
-[17] jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0        withr_3.0.2       
-[21] cachem_1.1.0       yaml_2.3.12        otel_0.2.0         tools_4.6.0       
-[25] tzdb_0.5.0         hues_0.2.0         colorspace_2.1-2   vctrs_0.7.3       
-[29] R6_2.6.1           lifecycle_1.0.5    pkgconfig_2.0.3    pillar_1.11.1     
-[33] bslib_0.10.0       gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
-[37] systemfonts_1.3.2  xfun_0.57          tidyselect_1.2.1   rstudioapi_0.18.0 
-[41] farver_2.1.2       htmltools_0.5.9    rmarkdown_2.31     svglite_2.2.2     
-[45] compiler_4.6.0     S7_0.2.2           gridtext_0.1.6    </code></pre>
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.6.0     tidyselect_1.2.1  
+ [5] jquerylib_0.1.4    scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
+ [9] R6_2.6.1           generics_0.1.4     bslib_0.10.0       pillar_1.11.1     
+[13] RColorBrewer_1.1-3 tzdb_0.5.0         rlang_1.2.0        stringi_1.8.7     
+[17] cachem_1.1.0       xfun_0.57          sass_0.4.10        S7_0.2.2          
+[21] otel_0.2.0         timechange_0.4.0   cli_3.6.6          withr_3.0.2       
+[25] magrittr_2.0.5     digest_0.6.39      grid_4.6.0         rstudioapi_0.18.0 
+[29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.7.3        evaluate_1.0.5    
+[33] glue_1.8.1         farver_2.1.2       rmarkdown_2.31     tools_4.6.0       
+[37] pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
 </div>
-<div id="load-layout-and-real-assay-data" class="section level1">
-<h1>Load layout and real assay data</h1>
-<pre class="r"><code># Layout
-MIC_assay_layout &lt;- readxl::read_xlsx(&quot;./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx&quot;,sheet = &#39;plate_layout&#39;)%&gt;% as.data.frame
-
-MIC_assay_layout$plate &lt;- ifelse(MIC_assay_layout$VB_concentration==0,
-                                 paste0(&quot;M_&quot;,MIC_assay_layout$plate),
-                                 paste0(&quot;MVB_&quot;,MIC_assay_layout$plate)) 
-
-# Assay data
-MIC_assay_MVB &lt;- readxl::read_xlsx(&quot;./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx&quot;,sheet = &#39;MVB_data&#39;,col_names = F) %&gt;% as.data.frame  </code></pre>
-<div id="process-dataframe" class="section level2">
-<h2>Process dataframe</h2>
-<pre class="r"><code># Process dataframe
-MIC_MVB_data &lt;- process_dataframe(MIC_assay_MVB) 
-MIC_MVB_data$plate &lt;- paste0(&quot;MVB_&quot;,MIC_MVB_data$plate) 
-MIC_MVB_data &lt;- left_join(MIC_MVB_data,MIC_assay_layout) </code></pre>
+<div id="load-data" class="section level1">
+<h1>Load data</h1>
+<pre class="r"><code>MIC_fold_change_values &lt;- readRDS(&quot;./data/evolution_experiment/MIC_assay/MIC_data_curated.RDS&quot;)
+MIC_redo_fold_change_values &lt;- readRDS(&quot;./data/evolution_experiment/MIC_assay/MIC_data_PCMP_H464_redo_curated.RDS&quot;)</code></pre>
 </div>
-</div>
-<div id="load-control-data" class="section level1">
-<h1>Load control data</h1>
-<pre class="r"><code># Media alone
-media_alone &lt;- readxl::read_xlsx(&quot;./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx&quot;,sheet = &#39;media_alone&#39;)  %&gt;% as.data.frame
+<div id="drop-old-pcmp_h464-values" class="section level1">
+<h1>Drop old PCMP_H464 values</h1>
+<pre class="r"><code>MIC_fold_change_values_dropped_PCMP_H464 &lt;- MIC_fold_change_values %&gt;% subset(isolate_no != &#39;PCMP_H464&#39;)
 
-# Max control value * 2 = growth declaration
-media_alone_control_value &lt;- media_alone %&gt;% select(-media_alone) %&gt;% unlist
-max_control_value_in_test_cell &lt;- max(media_alone_control_value)*2
-
-paste0(&quot;Threshold to determine growth (max control value *2): &quot;,max_control_value_in_test_cell)</code></pre>
-<pre><code>[1] &quot;Threshold to determine growth (max control value *2): 0.0934&quot;</code></pre>
-<pre class="r"><code>MIC_MVB_data$growth &lt;- MIC_MVB_data$value &gt; max_control_value_in_test_cell 
-MIC_MVB_data$isolate_no &lt;- paste0(&quot;PCMP_&quot;,MIC_MVB_data$isolate) </code></pre>
+results &lt;- bind_rows(MIC_fold_change_values_dropped_PCMP_H464,MIC_redo_fold_change_values)</code></pre>
 </div>
-<div id="get-mic-data-and-summaries" class="section level1">
-<h1>Get MIC data and summaries</h1>
-<pre class="r"><code># Get MIC data
-isolates &lt;- MIC_MVB_data$isolate_no %&gt;% unique %&gt;% sort()
-MIC_data &lt;- lapply(isolates,get_MIC_value) %&gt;% do.call(rbind,.)
-
-# MIC summary data
-MIC_data_summary &lt;- MIC_data_summarize(MIC_data)  
- 
-# Fold change value analysis
-MIC_fold_change_values &lt;- lapply(isolates,MIC_fold_change_analysis,MIC_data_summary = MIC_data_summary) %&gt;% do.call(rbind,.)</code></pre>
+<div id="add-category-data" class="section level1">
+<h1>Add category data</h1>
+<pre class="r"><code>results$parent_category &lt;- ifelse(results$isolate_no %in% c(&quot;PCMP_H323&quot;,&quot;PCMP_H318&quot;,&quot;PCMP_H464&quot;),&quot;Clade I with Loop 3 insertion&quot;,
+                                                ifelse(results$isolate_no %in% c(&quot;PCMP_H19&quot;,&quot;PCMP_H261&quot;,&quot;PCMP_H414&quot;),&quot;Clade I without Loop 3 insertion&quot;,ifelse(results$isolate_no!= &quot;blank&quot;,&quot;Clade II&quot;,&#39;blank&#39;)))
+MIC_fold_change_values$mutation_category &lt;- ifelse(results$parent_category %in% c(&quot;Clade I with Loop 3 insertion&quot;),&quot;blaKPC copy number variation&quot;,&quot;Modification to OmpK36&quot;)</code></pre>
 </div>
-<div id="data" class="section level1">
-<h1>Data</h1>
-<pre class="r"><code>MIC_fold_change_values %&gt;% as.data.frame %&gt;% favorite_kable()</code></pre>
+<div id="updated-mic-results" class="section level1">
+<h1>Updated MIC results</h1>
+<pre class="r"><code>results %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
@@ -771,6 +740,9 @@ min_MIC_log_2_fc
 <th style="text-align:right;">
 change_min_log_2_MIC
 </th>
+<th style="text-align:left;">
+parent_category
+</th>
 </tr>
 </thead>
 <tbody>
@@ -842,7 +814,7 @@ PCMP_H116
 7.5
 </td>
 <td style="text-align:right;">
-32.00000
+32
 </td>
 <td style="text-align:right;">
 5
@@ -851,13 +823,16 @@ PCMP_H116
 5
 </td>
 <td style="text-align:right;">
-1024.0000
+1024
 </td>
 <td style="text-align:right;">
 10
 </td>
 <td style="text-align:right;">
 10
+</td>
+<td style="text-align:left;">
+Clade II
 </td>
 </tr>
 <tr>
@@ -928,7 +903,7 @@ PCMP_H19
 6.5
 </td>
 <td style="text-align:right;">
-64.00000
+64
 </td>
 <td style="text-align:right;">
 6
@@ -937,13 +912,16 @@ PCMP_H19
 6
 </td>
 <td style="text-align:right;">
-128.0000
+128
 </td>
 <td style="text-align:right;">
 7
 </td>
 <td style="text-align:right;">
 7
+</td>
+<td style="text-align:left;">
+Clade I without Loop 3 insertion
 </td>
 </tr>
 <tr>
@@ -1014,7 +992,7 @@ PCMP_H226
 6.5
 </td>
 <td style="text-align:right;">
-32.00000
+32
 </td>
 <td style="text-align:right;">
 5
@@ -1023,13 +1001,16 @@ PCMP_H226
 5
 </td>
 <td style="text-align:right;">
-256.0000
+256
 </td>
 <td style="text-align:right;">
 8
 </td>
 <td style="text-align:right;">
 8
+</td>
+<td style="text-align:left;">
+Clade II
 </td>
 </tr>
 <tr>
@@ -1100,7 +1081,7 @@ PCMP_H261
 7.5
 </td>
 <td style="text-align:right;">
-256.00000
+256
 </td>
 <td style="text-align:right;">
 8
@@ -1109,13 +1090,16 @@ PCMP_H261
 8
 </td>
 <td style="text-align:right;">
-128.0000
+128
 </td>
 <td style="text-align:right;">
 7
 </td>
 <td style="text-align:right;">
 7
+</td>
+<td style="text-align:left;">
+Clade I without Loop 3 insertion
 </td>
 </tr>
 <tr>
@@ -1186,7 +1170,7 @@ PCMP_H318
 5.5
 </td>
 <td style="text-align:right;">
-32.00000
+32
 </td>
 <td style="text-align:right;">
 5
@@ -1195,13 +1179,16 @@ PCMP_H318
 5
 </td>
 <td style="text-align:right;">
-64.0000
+64
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
 6
+</td>
+<td style="text-align:left;">
+Clade I with Loop 3 insertion
 </td>
 </tr>
 <tr>
@@ -1272,7 +1259,7 @@ PCMP_H323
 3.0
 </td>
 <td style="text-align:right;">
-8.00000
+8
 </td>
 <td style="text-align:right;">
 3
@@ -1281,13 +1268,16 @@ PCMP_H323
 3
 </td>
 <td style="text-align:right;">
-8.0000
+8
 </td>
 <td style="text-align:right;">
 3
 </td>
 <td style="text-align:right;">
 3
+</td>
+<td style="text-align:left;">
+Clade I with Loop 3 insertion
 </td>
 </tr>
 <tr>
@@ -1358,7 +1348,7 @@ PCMP_H414
 8.5
 </td>
 <td style="text-align:right;">
-256.00000
+256
 </td>
 <td style="text-align:right;">
 8
@@ -1367,13 +1357,16 @@ PCMP_H414
 8
 </td>
 <td style="text-align:right;">
-512.0000
+512
 </td>
 <td style="text-align:right;">
 9
 </td>
 <td style="text-align:right;">
 9
+</td>
+<td style="text-align:left;">
+Clade I without Loop 3 insertion
 </td>
 </tr>
 <tr>
@@ -1381,25 +1374,22 @@ PCMP_H414
 PCMP_H464
 </td>
 <td style="text-align:right;">
-7.0
+-1.0
 </td>
 <td style="text-align:right;">
-160.000
+0.500
 </td>
 <td style="text-align:right;">
-8
+-1
 </td>
 <td style="text-align:right;">
-256.00
+0.50
 </td>
 <td style="text-align:right;">
-6
+-1
 </td>
 <td style="text-align:right;">
-64.00
-</td>
-<td style="text-align:right;">
-2
+0.50
 </td>
 <td style="text-align:right;">
 1
@@ -1408,67 +1398,73 @@ PCMP_H464
 0
 </td>
 <td style="text-align:right;">
-2.5
+0
+</td>
+<td style="text-align:right;">
+5.0
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+64.00000
+</td>
+<td style="text-align:right;">
+6.000000
+</td>
+<td style="text-align:right;">
+6.0
+</td>
+<td style="text-align:right;">
+64
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-3
+6
 </td>
 <td style="text-align:right;">
-8
+64
 </td>
 <td style="text-align:right;">
-2
+6
 </td>
 <td style="text-align:right;">
-4
+6
 </td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.03750
-</td>
-<td style="text-align:right;">
--4.736966
-</td>
-<td style="text-align:right;">
--4.5
-</td>
-<td style="text-align:right;">
-0.03125
-</td>
-<td style="text-align:right;">
--5
-</td>
-<td style="text-align:right;">
--5
-</td>
-<td style="text-align:right;">
-0.0625
-</td>
-<td style="text-align:right;">
--4
-</td>
-<td style="text-align:right;">
--4
+<td style="text-align:left;">
+Clade I with Loop 3 insertion
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="save-files" class="section level1">
-<h1>Save files</h1>
-<pre class="r"><code>saveRDS(MIC_fold_change_values,&quot;./data/evolution_experiment/MIC_assay/MIC_data_curated.RDS&quot;)
-write.csv(MIC_fold_change_values,&quot;./data/evolution_experiment/MIC_assay/MIC_data_curated.csv&quot;)</code></pre>
+<div id="save-results" class="section level1">
+<h1>Save results</h1>
+<pre class="r"><code>saveRDS(results,&quot;./data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS&quot;)
+write.csv(results,&quot;./data/evolution_experiment/MIC_assay/MIC_data_curated_final.csv&quot;)</code></pre>
 </div>
 
 

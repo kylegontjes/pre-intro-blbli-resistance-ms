@@ -1,5 +1,5 @@
 ---
-title: "BL/BLI Evolution Experiment MIC data"
+title: "evolved_MIC_assay_PCMP_H464_redo"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -29,45 +29,48 @@ source("./scripts/evolution_experiment/MIC_assay/MIC_data_analysis_scripts.R")
 set.seed(45) 
 Sys.info()
 sessionInfo()  
-``` 
+```
 
-# Load layout and real assay data
+# Load and process data
 ```{r}
 # Layout
-MIC_assay_layout <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'plate_layout')%>% as.data.frame
+MIC_assay_layout <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/6-5-12 MIC repeat.xlsx",sheet = 'plate_layout')%>% as.data.frame
 
 MIC_assay_layout$plate <- ifelse(MIC_assay_layout$VB_concentration==0,
                                  paste0("M_",MIC_assay_layout$plate),
                                  paste0("MVB_",MIC_assay_layout$plate)) 
-
 # Assay data
-MIC_assay_MVB <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'MVB_data',col_names = F) %>% as.data.frame  
+MIC_assay_MVB <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/6-5-12 MIC repeat.xlsx",sheet = 'MVB_data',col_names = F) %>% as.data.frame
 ```
 
 ## Process dataframe
 ```{r}
-# Process dataframe
 MIC_MVB_data <- process_dataframe(MIC_assay_MVB) 
 MIC_MVB_data$plate <- paste0("MVB_",MIC_MVB_data$plate) 
-MIC_MVB_data <- left_join(MIC_MVB_data,MIC_assay_layout) 
+MIC_MVB_data <- left_join(MIC_MVB_data,MIC_assay_layout)  
+
+# MVB MIC data
+MIC_MVB_data <- left_join(MIC_MVB_data,MIC_assay_layout)
+# Isolate name
+MIC_MVB_data$isolate_no <- ifelse(MIC_MVB_data$isolate != "Blank"& is.na(MIC_MVB_data$isolate) ==F,paste0("PCMP_",MIC_MVB_data$isolate),MIC_MVB_data$isolate)
 ```
 
-# Load control data
-```{r}
-# Media alone
-media_alone <- readxl::read_xlsx("./data/evolution_experiment/MIC_assay/3-19-26 MIC assays for Kyle.xlsx",sheet = 'media_alone')  %>% as.data.frame
+# Get blank data
+```{r} 
+# Media alone measurement
+media_alone <- MIC_MVB_data %>% subset(isolate == "Blank")
 
-# Max control value * 2 = growth declaration
-media_alone_control_value <- media_alone %>% select(-media_alone) %>% unlist
+# Max control value * 2 = growth declaration threshold
+media_alone_control_value <- media_alone$value %>% unlist
 max_control_value_in_test_cell <- max(media_alone_control_value)*2
 
 paste0("Threshold to determine growth (max control value *2): ",max_control_value_in_test_cell)
  
+# Determine growth
 MIC_MVB_data$growth <- MIC_MVB_data$value > max_control_value_in_test_cell 
-MIC_MVB_data$isolate_no <- paste0("PCMP_",MIC_MVB_data$isolate) 
 ```
 
-# Get MIC data and summaries
+# Get MIC data
 ```{r} 
 # Get MIC data
 isolates <- MIC_MVB_data$isolate_no %>% unique %>% sort()
@@ -88,6 +91,6 @@ MIC_fold_change_values %>% as.data.frame %>% favorite_kable()
 # Save files
 
 ```{r}
-saveRDS(MIC_fold_change_values,"./data/evolution_experiment/MIC_assay/MIC_data_curated.RDS")
-write.csv(MIC_fold_change_values,"./data/evolution_experiment/MIC_assay/MIC_data_curated.csv")
+saveRDS(MIC_fold_change_values,"./data/evolution_experiment/MIC_assay/MIC_data_PCMP_H464_redo_curated.RDS")
+write.csv(MIC_fold_change_values,"./data/evolution_experiment/MIC_assay/MIC_data_PCMP_H464_redo_curated.csv")
 ```

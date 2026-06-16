@@ -115,7 +115,7 @@ AA552_fill <-  scale_fill_manual(breaks = c("Present","Absent"),values=c("brown"
 variant_type_scale <-  scale_fill_manual(breaks = c("SNP","INDEL","Insertion"),values = c("orange","purple","darkgray"), labels = c("SNP","INDEL","Insertion sequence"),name="Variant type", guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
  
 ## Mutation scale
-mutation_scale <- scale_fill_manual(values = c("#b3a2c7",'#5e3c99','darkgray',"white"),breaks = c("Deletion","Duplication","Insertion sequence","None"),name = "Mutation type",na.value = 'white',na.translate = T,guide = guide_legend(order=4)) 
+mutation_scale <- scale_fill_manual(values = c("#b3a2c7",'#5e3c99','darkgray',"white"),breaks = c("Deletion","Duplication","Insertion sequence","None"),name = "Mutation type",na.value = 'white',na.translate = T,guide = guide_legend(order=4,override.aes = list(colour = "black" ))) 
 
 # Evolution experiment themes
 parent_colors <- scale_color_manual(values = c(hues::iwanthue(3,hmin=5,hmax=25,plot=F),hues::iwanthue(3,hmin=230,hmax=240,plot=F)),breaks = c("Parent - Plate 1","Parent - Plate 2","Parent - Plate 3","Resistant - Plate 1","Resistant - Plate 2","Resistant - Plate 3"),name = c("Isolate - Replicate"),guide = guide_legend(ncol=2,order=2))
@@ -133,6 +133,7 @@ plasmid_fill <- scale_color_manual(values = categories,breaks = plasmid_type, la
 
 plasmid_type_other <- c("AA018", "AA552", "Other plasmid")
 plasmid_fill_other <- scale_fill_manual(values =  c("#7684C0","brown","black"),breaks = plasmid_type_other,name = "Plasmid cluster",guide=guide_legend(ncol=1),na.translate=TRUE,na.value='white') 
+plasmid_fill_other_key_border <- scale_fill_manual(values =  c("#7684C0","brown","black"),breaks = plasmid_type_other,name = "Plasmid cluster",guide=guide_legend(ncol=1,override.aes = list(colour = "black" )),na.translate=TRUE,na.value='white') 
 
 # Sfigure2 format
 format <-   theme(legend.position = "bottom",

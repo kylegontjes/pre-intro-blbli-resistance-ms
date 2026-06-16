@@ -1,0 +1,63 @@
+---
+title: "Curate final MIC dataset"
+author: "Kyle Gontjes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
+opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
+opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms')
+```
+
+# Environment
+
+```{r environment, echo=F, message=FALSE, include=T, results=T}
+#Packages
+packages <- c("tidyverse","tidyr") 
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()  
+
+
+source("./lib/consistent_themes.R")
+```
+
+# Load data
+```{r}
+MIC_fold_change_values <- readRDS("./data/evolution_experiment/MIC_assay/MIC_data_curated.RDS")
+MIC_redo_fold_change_values <- readRDS("./data/evolution_experiment/MIC_assay/MIC_data_PCMP_H464_redo_curated.RDS")
+```
+
+# Drop old PCMP_H464 values
+```{r}
+MIC_fold_change_values_dropped_PCMP_H464 <- MIC_fold_change_values %>% subset(isolate_no != 'PCMP_H464')
+
+results <- bind_rows(MIC_fold_change_values_dropped_PCMP_H464,MIC_redo_fold_change_values)
+```
+
+# Add category data 
+```{r}
+results$parent_category <- ifelse(results$isolate_no %in% c("PCMP_H323","PCMP_H318","PCMP_H464"),"Clade I with Loop 3 insertion",
+                                                ifelse(results$isolate_no %in% c("PCMP_H19","PCMP_H261","PCMP_H414"),"Clade I without Loop 3 insertion",ifelse(results$isolate_no!= "blank","Clade II",'blank')))
+MIC_fold_change_values$mutation_category <- ifelse(results$parent_category %in% c("Clade I with Loop 3 insertion"),"blaKPC copy number variation","Modification to OmpK36")
+```
+
+# Updated MIC results
+```{r}
+results %>% favorite_kable()
+```
+
+# Save results
+```{r}
+saveRDS(results,"./data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS")
+write.csv(results,"./data/evolution_experiment/MIC_assay/MIC_data_curated_final.csv")
+```
+ 
