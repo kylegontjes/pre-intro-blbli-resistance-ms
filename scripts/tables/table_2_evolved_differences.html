@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-05-12" />
+<meta name="date" content="2026-06-18" />
 
 <title>Table 2: Comparison of parent to evolved strains from MVB evolution experiment</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Table 2: Comparison of parent to evolved
 strains from MVB evolution experiment</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-05-12</h4>
+<h4 class="date">2026-06-18</h4>
 
 </div>
 
@@ -1295,9 +1295,9 @@ INDEL_differences_hits &lt;- INDEL_differences %&gt;% select(parent,INDEL_canoni
 </div>
 <div id="mic-data" class="section level1">
 <h1>MIC data</h1>
-<pre class="r"><code>MIC_data &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated.RDS&quot;)
-MIC_data$resistant_median_MIC_sign_aware &lt;- ifelse(MIC_data$resistant_median_MIC == 256 &amp; MIC_data$resistant_all_growth == 2, &quot;&gt;=256&quot;,
-                                                   ifelse(MIC_data$resistant_median_MIC==0 &amp; MIC_data$resistant_all_no_growth==2,&quot;&lt;=0&quot;,MIC_data$resistant_median_MIC))</code></pre>
+<pre class="r"><code>MIC_data &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS&quot;)
+MIC_data$resistant_median_MIC_sign_aware &lt;- ifelse(MIC_data$resistant_median_MIC == 256 &amp; MIC_data$resistant_all_growth == 2, &quot;&gt;256&quot;,
+                                                   ifelse(MIC_data$resistant_median_MIC==0.25 &amp; MIC_data$resistant_all_no_growth==2,&quot;&lt;=0.25&quot;,MIC_data$resistant_median_MIC))</code></pre>
 </div>
 <div id="merge-data" class="section level1">
 <h1>Merge data</h1>
@@ -1315,9 +1315,8 @@ final_dataset$canonical_mutant &lt;- lapply(final_dataset$parent,FUN=function(x)
          isolate_df$canonical_IS) %&gt;% subset(.!=&#39;&#39;)
   
   paste0(variants, collapse = &quot; &amp; &quot;) 
-})  %&gt;% unlist
-
-final_dataset_sum &lt;- final_dataset %&gt;% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,median_MIC_log2_fc,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
+})  %&gt;% unlist</code></pre>
+<pre class="r"><code>final_dataset_sum &lt;- final_dataset %&gt;% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,change_median_log_2_MIC,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
 
 final_dataset_sum &lt;- final_dataset_sum %&gt;% mutate(across(where(is.numeric), ~ round(.,2)))
 
@@ -1330,13 +1329,24 @@ final_dataset_sum$parent &lt;- factor(final_dataset_sum$parent,levels = isolate_
 
 table_2 &lt;- final_dataset_sum %&gt;% arrange(parent)
 
-colnames(table_2) &lt;- c(&quot;Parent&quot;,&quot;Clade&quot;,&quot;Parental OmpK36 status&quot;,
-                       &quot;Evolved MIC value&quot;,&quot;Evolved log2 MIC fold change&quot;,
-                       &quot;Evolved canonical mutation (gene [mutation]; position)&quot;,&#39;blaKPC gene&#39;,
-                       &quot;Parental blaKPC plasmid&quot;,&quot;Parental blaKPC gene CN&quot;,&quot;Parental blaKPC plasmid CN&quot;,
-                                 &quot;Evolved blaKPC plasmid&quot;,&quot;Evolved blaKPC gene CN&quot;,&quot;Evolved blaKPC plasmid CN&quot;,&quot;blaKPC gene CN log2 fold change&quot;,&quot;blaKPC plasmid CN log2 fold change&quot;,&quot;Plasmid size change (bp)&quot;)
-
-favorite_kable(table_2)</code></pre>
+colnames(table_2) &lt;- recode(colnames(table_2),
+                            &quot;parent&quot; = &quot;Parent&quot;,
+                            &quot;clade_I&quot; = &quot;Clade&quot;,
+                            &quot;ompK36_parental&quot; =  &quot;Parental OmpK36 status&quot;,
+                            &quot;resistant_median_MIC_sign_aware&quot; = &quot;Evolved MVB MIC&quot;,
+                            &quot;change_median_log_2_MIC&quot; = &quot;Change in median log2 MIC&quot;,
+                            &quot;canonical_mutant&quot; = &quot;Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position)&quot;,
+                            &quot;kpc_gene&quot; = &quot;blaKPC gene&quot;,
+                            &quot;kpc_plasmid&quot; = &quot;Parental blaKPC plasmid&quot;,
+                            &quot;parent_kpc_chr_norm&quot; = &quot;Parental blaKPC gene copy number (CN)&quot;,
+                            &quot;parent_kpc_plasmid_chr_norm&quot; = &quot;Parental blaKPC plasmid CN&quot;, 
+                            &quot;evolved_kpc_plasmid&quot; = &quot;Evolved blaKPC plasmid&quot;,
+                            &quot;evol_kpc_chr_norm&quot; = &quot;Evolved blaKPC gene CN&quot;,
+                            &quot;evol_kpc_plasmid_chr_norm&quot; = &quot;Evolved blaKPC plasmid CN&quot;,
+                            &quot;kpc_copy_change&quot; = &quot;Log2 fold change in blaKPC gene CN&quot;,
+                            &quot;kpc_plasmid_change&quot; = &quot;Log2 fold change in blaKPC plasmid CN&quot;,
+                            &quot;kpc_plasmid_size_difference&quot; = &quot;Change in plasmid size (bp)&quot;)</code></pre>
+<pre class="r"><code>favorite_kable(table_2)</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
@@ -1350,13 +1360,14 @@ Clade
 Parental OmpK36 status
 </th>
 <th style="text-align:left;">
-Evolved MIC value
+Evolved MVB MIC
 </th>
 <th style="text-align:right;">
-Evolved log2 MIC fold change
+Change in median log2 MIC
 </th>
 <th style="text-align:left;">
-Evolved canonical mutation (gene [mutation]; position)
+Evolved chromosomal carbapenem resistance mutation (gene [mutation];
+position)
 </th>
 <th style="text-align:left;">
 blaKPC gene
@@ -1365,7 +1376,7 @@ blaKPC gene
 Parental blaKPC plasmid
 </th>
 <th style="text-align:right;">
-Parental blaKPC gene CN
+Parental blaKPC gene copy number (CN)
 </th>
 <th style="text-align:right;">
 Parental blaKPC plasmid CN
@@ -1380,13 +1391,13 @@ Evolved blaKPC gene CN
 Evolved blaKPC plasmid CN
 </th>
 <th style="text-align:right;">
-blaKPC gene CN log2 fold change
+Log2 fold change in blaKPC gene CN
 </th>
 <th style="text-align:right;">
-blaKPC plasmid CN log2 fold change
+Log2 fold change in blaKPC plasmid CN
 </th>
 <th style="text-align:left;">
-Plasmid size change (bp)
+Change in plasmid size (bp)
 </th>
 </tr>
 </thead>
@@ -1405,7 +1416,7 @@ I
 48
 </td>
 <td style="text-align:right;">
-3.00
+3.0
 </td>
 <td style="text-align:left;">
 </td>
@@ -1451,10 +1462,10 @@ I
 25 C&gt;T transition &amp; GD insertion in loop 3
 </td>
 <td style="text-align:left;">
-&gt;=256
+&gt;256
 </td>
 <td style="text-align:right;">
-5.42
+5.5
 </td>
 <td style="text-align:left;">
 </td>
@@ -1500,10 +1511,10 @@ I
 25 C&gt;T transition &amp; GD insertion in loop 3
 </td>
 <td style="text-align:left;">
-6
+32
 </td>
 <td style="text-align:right;">
--4.74
+6.0
 </td>
 <td style="text-align:left;">
 </td>
@@ -1552,7 +1563,7 @@ I
 48
 </td>
 <td style="text-align:right;">
-7.58
+7.5
 </td>
 <td style="text-align:left;">
 ompK36 (c.190_196dupGAAACCC); 3713864
@@ -1601,7 +1612,7 @@ I
 32
 </td>
 <td style="text-align:right;">
-6.42
+6.5
 </td>
 <td style="text-align:left;">
 upstream ompK36 (ISKpn26); 3714091
@@ -1648,10 +1659,10 @@ I
 25 C&gt;T transition
 </td>
 <td style="text-align:left;">
-&gt;=256
+&gt;256
 </td>
 <td style="text-align:right;">
-8.42
+8.5
 </td>
 <td style="text-align:left;">
 ompK36 (p.Gly136_Asp137del); 3713649 &amp; upstream ompK36 (ISKpn14);
@@ -1698,10 +1709,10 @@ II
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
-&gt;=256
+&gt;256
 </td>
 <td style="text-align:right;">
-5.96
+7.5
 </td>
 <td style="text-align:left;">
 ompK36 (ISKpn26); 3714050
@@ -1747,10 +1758,10 @@ II
 <td style="text-align:left;">
 </td>
 <td style="text-align:left;">
-&gt;=256
+&gt;256
 </td>
 <td style="text-align:right;">
-5.83
+6.5
 </td>
 <td style="text-align:left;">
 ompK36 (p.Val323_Asp338del); 3713046

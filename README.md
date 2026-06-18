@@ -1,4 +1,4 @@
-# Genomic and Patient Features Associated with Non-Susceptibility to β-lactam/β-lactamase Inhibitor Combinations Before Their Market Introduction
+# Identifying drivers of β-lactam/β-lactamase inhibitor resistance emergence and spread before their clinical deployment
 
 Code, select data, and results for this manuscript
 

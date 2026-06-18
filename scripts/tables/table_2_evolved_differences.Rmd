@@ -154,9 +154,9 @@ INDEL_differences_hits <- INDEL_differences %>% select(parent,INDEL_canonical)
 # MIC data
 
 ```{r}
-MIC_data <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated.RDS")
-MIC_data$resistant_median_MIC_sign_aware <- ifelse(MIC_data$resistant_median_MIC == 256 & MIC_data$resistant_all_growth == 2, ">=256",
-                                                   ifelse(MIC_data$resistant_median_MIC==0 & MIC_data$resistant_all_no_growth==2,"<=0",MIC_data$resistant_median_MIC))
+MIC_data <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS")
+MIC_data$resistant_median_MIC_sign_aware <- ifelse(MIC_data$resistant_median_MIC == 256 & MIC_data$resistant_all_growth == 2, ">256",
+                                                   ifelse(MIC_data$resistant_median_MIC==0.25 & MIC_data$resistant_all_no_growth==2,"<=0.25",MIC_data$resistant_median_MIC))
 ```
 
 # Merge data
@@ -177,8 +177,10 @@ final_dataset$canonical_mutant <- lapply(final_dataset$parent,FUN=function(x){
   
   paste0(variants, collapse = " & ") 
 })  %>% unlist
+```
 
-final_dataset_sum <- final_dataset %>% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,median_MIC_log2_fc,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
+```{r}
+final_dataset_sum <- final_dataset %>% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,change_median_log_2_MIC,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
 
 final_dataset_sum <- final_dataset_sum %>% mutate(across(where(is.numeric), ~ round(.,2)))
 
@@ -191,12 +193,26 @@ final_dataset_sum$parent <- factor(final_dataset_sum$parent,levels = isolate_ord
 
 table_2 <- final_dataset_sum %>% arrange(parent)
 
-colnames(table_2) <- c("Parent","Clade","Parental OmpK36 status",
-                       "Evolved MIC value","Evolved log2 MIC fold change",
-                       "Evolved canonical mutation (gene [mutation]; position)",'blaKPC gene',
-                       "Parental blaKPC plasmid","Parental blaKPC gene CN","Parental blaKPC plasmid CN",
-                                 "Evolved blaKPC plasmid","Evolved blaKPC gene CN","Evolved blaKPC plasmid CN","blaKPC gene CN log2 fold change","blaKPC plasmid CN log2 fold change","Plasmid size change (bp)")
+colnames(table_2) <- recode(colnames(table_2),
+                            "parent" = "Parent",
+                            "clade_I" = "Clade",
+                            "ompK36_parental" =  "Parental OmpK36 status",
+                            "resistant_median_MIC_sign_aware" = "Evolved MVB MIC",
+                            "change_median_log_2_MIC" = "Change in median log2 MIC",
+                            "canonical_mutant" = "Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position)",
+                            "kpc_gene" = "blaKPC gene",
+                            "kpc_plasmid" = "Parental blaKPC plasmid",
+                            "parent_kpc_chr_norm" = "Parental blaKPC gene copy number (CN)",
+                            "parent_kpc_plasmid_chr_norm" = "Parental blaKPC plasmid CN", 
+                            "evolved_kpc_plasmid" = "Evolved blaKPC plasmid",
+                            "evol_kpc_chr_norm" = "Evolved blaKPC gene CN",
+                            "evol_kpc_plasmid_chr_norm" = "Evolved blaKPC plasmid CN",
+                            "kpc_copy_change" = "Log2 fold change in blaKPC gene CN",
+                            "kpc_plasmid_change" = "Log2 fold change in blaKPC plasmid CN",
+                            "kpc_plasmid_size_difference" = "Change in plasmid size (bp)")
+```
 
+```{r}
 favorite_kable(table_2)
 ```
 

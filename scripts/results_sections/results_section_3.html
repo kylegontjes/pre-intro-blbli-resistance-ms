@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-05-11" />
+<meta name="date" content="2026-06-18" />
 
-<title>Results Section 3: Non-carbapenemase mechanisms of carbapenem resistance explain BL/BLI resistance in a clade-specific manner</title>
+<title>Results Section 3: Chromosomal carbapenem resistance-associated mechanisms explain BL/BLI resistance in a clade-specific manner</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,11 +350,11 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Results Section 3: Non-carbapenemase
-mechanisms of carbapenem resistance explain BL/BLI resistance in a
+<h1 class="title toc-ignore">Results Section 3: Chromosomal carbapenem
+resistance-associated mechanisms explain BL/BLI resistance in a
 clade-specific manner</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-05-11</h4>
+<h4 class="date">2026-06-18</h4>
 
 </div>
 
@@ -387,26 +387,26 @@ source(&quot;./lib/common_functions.R&quot;)
 
 # Print environment
 Sys.info()</code></pre>
-<pre><code>##                                                                                              sysname 
-##                                                                                             &quot;Darwin&quot; 
-##                                                                                              release 
-##                                                                                             &quot;25.4.0&quot; 
-##                                                                                              version 
-## &quot;Darwin Kernel Version 25.4.0: Thu Mar 19 19:27:54 PDT 2026; root:xnu-12377.101.15~1/RELEASE_X86_64&quot; 
-##                                                                                             nodename 
-##                                                                                     &quot;msla0572.local&quot; 
-##                                                                                              machine 
-##                                                                                             &quot;x86_64&quot; 
-##                                                                                                login 
-##                                                                                               &quot;root&quot; 
-##                                                                                                 user 
-##                                                                                           &quot;kgontjes&quot; 
-##                                                                                       effective_user 
-##                                                                                           &quot;kgontjes&quot;</code></pre>
+<pre><code>##                                                                                             sysname 
+##                                                                                            &quot;Darwin&quot; 
+##                                                                                             release 
+##                                                                                            &quot;25.5.0&quot; 
+##                                                                                             version 
+## &quot;Darwin Kernel Version 25.5.0: Mon Apr 27 20:31:18 PDT 2026; root:xnu-12377.121.6~2/RELEASE_X86_64&quot; 
+##                                                                                            nodename 
+##                                                                                    &quot;msla0572.local&quot; 
+##                                                                                             machine 
+##                                                                                            &quot;x86_64&quot; 
+##                                                                                               login 
+##                                                                                              &quot;root&quot; 
+##                                                                                                user 
+##                                                                                          &quot;kgontjes&quot; 
+##                                                                                      effective_user 
+##                                                                                          &quot;kgontjes&quot;</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.6.0 (2026-04-24)
 ## Platform: x86_64-apple-darwin20
-## Running under: macOS Tahoe 26.4.1
+## Running under: macOS Tahoe 26.5.1
 ## 
 ## Matrix products: default
 ## BLAS:   /Library/Frameworks/R.framework/Versions/4.6-x86_64/Resources/lib/libRblas.0.dylib 
@@ -448,20 +448,27 @@ Sys.info()</code></pre>
 kleborate &lt;- readRDS(&quot;./data/kleborate/kleborate_curated.RDS&quot;)
 df &lt;- left_join(df,kleborate %&gt;% select(isolate_no,KPC_type)) </code></pre>
 <pre><code>## Joining with `by = join_by(isolate_no)`</code></pre>
+<pre class="r"><code># Load blast data 
+KPC_data &lt;- read.table(&quot;./data/KPC_blast/KPC_blast_master.txt&quot;,header = T)  
+KPC_data$KPC_allele &lt;- paste0(&quot;bla&quot;,str_split(KPC_data$sseqid,&quot;\\|&quot;,simplify = T) %&gt;% .[,ncol(.)])
+df &lt;- left_join(df,KPC_data %&gt;% select(isolate_no,KPC_allele))</code></pre>
+<pre><code>## Joining with `by = join_by(isolate_no)`</code></pre>
+<pre class="r"><code>df$KPC_allele &lt;- ifelse(is.na(df$KPC_allele),&quot;No blaKPC&quot;,df$KPC_allele) </code></pre>
 </div>
 <div id="kpc-frequency" class="section level1">
 <h1>KPC frequency</h1>
-<pre class="r"><code>table(df$KPC_type)</code></pre>
+<pre class="r"><code>table(df$KPC_allele)</code></pre>
 <pre><code>## 
-##  KPC-2  KPC-3  KPC-5 No KPC 
-##    136    269      3      4</code></pre>
-<pre class="r"><code>convert_tableone_into_df(df,vars=&quot;KPC_type&quot;)</code></pre>
-<pre><code>##       Variable Overall (n=412)
-## 2 KPC_type (%)                
-## 3        KPC-2      136 (33.0)
-## 4        KPC-3      269 (65.3)
-## 5        KPC-5         3 (0.7)
-## 6       No KPC         4 (1.0)</code></pre>
+## blaKPC-10  blaKPC-2  blaKPC-3  blaKPC-5 No blaKPC 
+##         1       136       269         3         3</code></pre>
+<pre class="r"><code>convert_tableone_into_df(df,vars=&quot;KPC_allele&quot;)</code></pre>
+<pre><code>##         Variable Overall (n=412)
+## 2 KPC_allele (%)                
+## 3      blaKPC-10         1 (0.2)
+## 4       blaKPC-2      136 (33.0)
+## 5       blaKPC-3      269 (65.3)
+## 6       blaKPC-5         3 (0.7)
+## 7      No blaKPC         3 (0.7)</code></pre>
 </div>
 <div id="see-frequency-data-in-table-1-for-frequency-and-criterion" class="section level1">
 <h1>See frequency data in table 1 for frequency and criterion</h1>

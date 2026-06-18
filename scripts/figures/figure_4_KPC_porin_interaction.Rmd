@@ -67,16 +67,20 @@ df$OmpK36_mutations_simple_strata <- factor(
 ## Part 1: MIC Histogram
 
 ```{r,fig.width=16,fig.height=14}
+# Max value
+max_value <- max(c(table(df$IR_log_2),table(df$MVB_log_2)))
+max_ylim_ceiling <- (ceiling(max_value /10) *10) + 10
+MIC_y_scale <- scale_y_continuous(breaks =  seq(0, max_ylim_ceiling, by = 50),limits = c(0,max_ylim_ceiling))
+
 # Median values
 add_group_median_values <- function(dataframe, variable, group_variable) {
   WT_median <- dataframe[dataframe[[group_variable]] == "No loop 3 insertion or PFAV", variable] %>% median(na.rm = TRUE)
   L3_median <- dataframe[dataframe[[group_variable]] == "Loop 3 insertion", variable] %>% median(na.rm = TRUE)
   PFAV_median <- dataframe[dataframe[[group_variable]] == "Putative function-altering variant (PFAV)", variable] %>% median(na.rm = TRUE)
-  list(
-    geom_vline(xintercept = WT_median, color = ompK36_colors[["No loop 3 insertion or PFAV"]], linetype = 3,size=1),
-    geom_vline(xintercept = L3_median, color = ompK36_colors[["Loop 3 insertion"]], linetype = 3,size=1),
-    geom_vline(xintercept = PFAV_median, color = ompK36_colors[["Putative function-altering variant (PFAV)"]], linetype = 3,size=1)
-  )
+  
+  list(WT = annotate(  "point",x = WT_median, y = max_ylim_ceiling,  fill =  ompK36_colors[["No loop 3 insertion or PFAV"]], color = ompK36_colors[["No loop 3 insertion or PFAV"]], shape = 25,  size = 2.5), 
+       L3 = annotate( 'point' ,x = L3_median, y = max_ylim_ceiling,  fill =  ompK36_colors[["Loop 3 insertion"]],color = ompK36_colors[["Loop 3 insertion"]], shape = 25,  size = 2.5), 
+       PFAV = annotate( 'point', x = PFAV_median, y = max_ylim_ceiling,  fill =  ompK36_colors[["Putative function-altering variant (PFAV)"]], color = ompK36_colors[["Putative function-altering variant (PFAV)"]], shape = 25,  size = 2.5))
 }
 
 MVB_intercepts <-  add_group_median_values(df, "MVB_log_2", "OmpK36_mutations_simple") 
@@ -84,10 +88,10 @@ IR_intercepts <-  add_group_median_values(df, "IR_log_2", "OmpK36_mutations_simp
 
 # Figures
 ## Imipenem-relebactam
-fig4a <- create_MIC_histogram(df$IR_log_2,df$OmpK36_mutations_simple,"Imipenem-relebactam")+ MIC_IR_x_scale  + labs(fill="ompK36 Status")  + theme_bw_me + ylim(NA,250) + figure_4_format_wo_element_markdown + ompK36_scale  + IR_intercepts[[1]] + IR_intercepts[[2]] + IR_intercepts[[3]]  
+fig4a <- create_MIC_histogram(df$IR_log_2,df$OmpK36_mutations_simple,"Imipenem-relebactam")+ MIC_IR_x_scale  + labs(fill="ompK36 Status")  + theme_bw_me +MIC_y_scale+ figure_4_format_wo_element_markdown + ompK36_scale  + IR_intercepts[['WT']] + IR_intercepts[['L3']] + IR_intercepts[['PFAV']]  
 
 ## Meropenem-vaborbactam
-fig4c <- create_MIC_histogram(df$MVB_log_2,df$OmpK36_mutations_simple,"Meropenem-vaborbactam") + MIC_MVB_x_scale + labs(fill="ompK36 Status") + theme_bw_me + ylim(NA,250) + figure_4_format_wo_element_markdown + ompK36_scale  + MVB_intercepts[[1]] + MVB_intercepts[[2]] + MVB_intercepts[[3]]
+fig4c <- create_MIC_histogram(df$MVB_log_2,df$OmpK36_mutations_simple,"Meropenem-vaborbactam") + MIC_MVB_x_scale + labs(fill="ompK36 Status") + theme_bw_me + MIC_y_scale + figure_4_format_wo_element_markdown + ompK36_scale  +  MVB_intercepts[['WT']] + MVB_intercepts[['L3']] + MVB_intercepts[['PFAV']]  
 ```
 
 # Part 2: Phenotype category data
@@ -113,21 +117,37 @@ fig4d <- MIC_ompk36_prop_hist(MVB_ompk36_prop) + theme_bw_me  + ompK36_scale + x
 # KPC Data 
 df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
 
+# Y axis ceiling
+min_MIC_log2 <- min(unlist(unique(c(df_w_KPC$IR_log_2,df_w_KPC$MVB_log_2))))
+max_MIC_log2 <- max(unlist(unique(c(df_w_KPC$IR_log_2,df_w_KPC$MVB_log_2))))
+MIC_continuous_pretty_scale <-  scale_y_continuous(breaks =  seq(min_MIC_log2, max_MIC_log2, by = 1),limits = c(min_MIC_log2,max_MIC_log2))
+
+# X axis
+x <- log2(df_w_KPC$KPNIH1_RS28775_chr_median_norm)
+KPC_continuous_pretty_scale <-  scale_x_continuous(
+  breaks = seq(floor(min(x)), ceiling(max(x)), 1),
+  limits = c(floor(min(x)), ceiling(max(x)))
+)
+
+min_KPC_log2 <- floor(min(unlist(unique(log2(df_w_KPC$KPNIH1_RS28775_chr_median_norm)))))
+max_KPC_log2 <- ceiling(max(unlist(unique(log2(df_w_KPC$KPNIH1_RS28775_chr_median_norm)))))
+KPC_continuous_pretty_scale <-  scale_x_continuous(breaks =  seq(min_KPC_log2, max_KPC_log2, by = 1),limits = c(min_KPC_log2,max_KPC_log2))
+
 # Imipenem-relebactam
-fig4e <- KPC_copy_number_ompk_hist_facet(df_w_KPC, y="IR_log_2", x="KPNIH1_RS28775_chr_median_norm", color = "OmpK36_mutations_simple_strata", title="", colors = ompK36_colors) + ylab("Log<sub>2</sub> Imipenem-relebactam MIC") + xlab("Log<sub>2</sub> <i> bla</i><sub>KPC</sub> copy number") + figure_4_format + ompK36_color_scale  
+fig4e <- KPC_copy_number_ompk_hist_facet(df_w_KPC, y="IR_log_2", x="KPNIH1_RS28775_chr_median_norm", color = "OmpK36_mutations_simple_strata", title="", colors = ompK36_colors) + ylab("log<sub>2</sub> Imipenem-relebactam MIC") + xlab("log<sub>2</sub> <i> bla</i><sub>KPC</sub> copy number") + figure_4_format + ompK36_color_scale + MIC_continuous_pretty_scale + KPC_continuous_pretty_scale
 
 # Meropenem-vaborbactam
-fig4f <- KPC_copy_number_ompk_hist_facet(df_w_KPC, y="MVB_log_2", x="KPNIH1_RS28775_chr_median_norm", color = "OmpK36_mutations_simple_strata", title="", colors = ompK36_colors) + ylab("Log<sub>2</sub> Meropenem-vaborbactam MIC") + xlab("Log<sub>2</sub> <i> bla</i><sub>KPC</sub> copy number") + figure_4_format + ompK36_color_scale  
+fig4f <- KPC_copy_number_ompk_hist_facet(df_w_KPC, y="MVB_log_2", x="KPNIH1_RS28775_chr_median_norm", color = "OmpK36_mutations_simple_strata", title="", colors = ompK36_colors) + ylab("log<sub>2</sub> Meropenem-vaborbactam MIC") + xlab("log<sub>2</sub> <i> bla</i><sub>KPC</sub> copy number") + figure_4_format + ompK36_color_scale  + MIC_continuous_pretty_scale + KPC_continuous_pretty_scale
 ```
 
 # Merge the figure together
-```{r,fig.width=9.25,fig.height=9.25}
+```{r,fig.width=9.5,fig.height=9.5}
 # Data plots
 fig4.data <- cowplot::plot_grid(fig4a + theme(legend.position = "none"), fig4b + theme(legend.position = "none"), fig4c + theme(legend.position = "none"),fig4d + theme(legend.position = "none"), ncol=2, rel_widths = c(1,.7,1,.7), labels = "AUTO", label_size = 16)
 
 fig4.data.2 <- cowplot::plot_grid(fig4e + theme(legend.position = "none"), fig4f+ theme(legend.position = "none"), ncol=2, labels = c("E","F"), label_size=16)
 
-fig4.data.all <- cowplot::plot_grid(fig4.data, fig4.data.2, ncol=1, rel_heights = c(1,.8))
+fig4.data.all <- cowplot::plot_grid(fig4.data, fig4.data.2, ncol=1, rel_heights = c(1,.75))
 
 # Get legend
 ompk36_legend <- cowplot::get_legend(fig4b)
@@ -135,7 +155,7 @@ ompk36_legend <- cowplot::get_legend(fig4b)
 figure_4_legends <- cowplot::plot_grid(ompk36_legend) + theme(plot.margin = unit(c(t=-1 , 2, b=0,0 ), "cm"))
 
 # Final figure
-figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,rel_heights = c(1,0.105),rel_widths=c(1,0.75),ncol=1) + theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
+figure_4 <-  cowplot::plot_grid(fig4.data.all,figure_4_legends,rel_heights = c(1,0.1),rel_widths=c(1,0.75),ncol=1) + theme(plot.margin = unit(c(t=0, 0, b=-1,0 ), "cm"))
 
 figure_4
 ```
@@ -143,5 +163,5 @@ figure_4
 ## Save figure
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=9,fig.height=9} 
-ggsave(plot = figure_4, filename = './figures/figure_4.png', width = 9.25, height = 9.25, limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = figure_4, filename = './figures/figure_4.png', width = 9.5, height = 9.5, limitsize=FALSE, bg='white', dpi=900)
 ```

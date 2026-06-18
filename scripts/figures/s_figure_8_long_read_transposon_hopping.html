@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-05-11" />
+<meta name="date" content="2026-06-18" />
 
 <title>Supplemental Figure 8: Evidence for tn4401 hopping to other plasmid</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Figure 8: Evidence for tn4401
 hopping to other plasmid</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-05-11</h4>
+<h4 class="date">2026-06-18</h4>
 
 </div>
 
@@ -500,7 +500,7 @@ make_plots &lt;- function(filename,contig_data,blast_data){
   contig_data$map2_chr &lt;- factor(contig_data$map2_chr,levels = c(isolate_2_contigs %&gt;% arrange(-size) %&gt;% .$contig_name)) 
   
     figure &lt;- ggplot(data=coords, aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`)) + geom_segment() +  geom_segment(data=tn4401_merge,aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`,color=&quot;red&quot;))  + geom_segment(data=contig_data,aes(x=`X`,xend=`X`,y=`Y`,yend=`Y`),color=&quot;white&quot;) +
-    facet_grid(map2_chr~map1_chr,scales = &#39;free&#39;,drop = F)   + xlab(paste0(unique(coords$map1_name),&quot; position (bp)&quot;)) + ylab(paste0(unique(coords$map2_name),&quot; position (bp)&quot;)) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = &quot;off&quot;) + ggplot2::theme_bw()  + scale_color_manual(values=&quot;red&quot;,labels=&quot;&lt;i&gt;bla&lt;/i&gt;&lt;sub&gt;KPC&lt;/sub&gt;-containing &lt;i&gt;tn4401&lt;/i&gt; transposon&quot;, name=&quot;&quot;, guide = guide_legend(nrow=1, title.position = &quot;top&quot;, label.position = &quot;right&quot;)) + s_figure_6_format
+    facet_grid(map2_chr~map1_chr,scales = &#39;free&#39;,drop = F)   + xlab(paste0(unique(coords$map1_name),&quot; position (bp)&quot;)) + ylab(paste0(unique(coords$map2_name),&quot; position (bp)&quot;)) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = &quot;off&quot;) + ggplot2::theme_bw()  + scale_color_manual(values=&quot;red&quot;,labels=&quot;&lt;i&gt;bla&lt;/i&gt;&lt;sub&gt;KPC&lt;/sub&gt;-containing &lt;i&gt;tn4401&lt;/i&gt; transposon&quot;, name=&quot;&quot;, guide = guide_legend(nrow=1, title.position = &quot;top&quot;, label.position = &quot;right&quot;)) + s_figure_8_format
  
   figure
 }</code></pre>

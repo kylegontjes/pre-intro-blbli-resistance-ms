@@ -27,32 +27,44 @@ sessionInfo()
 ``` 
 
 # Data
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS") 
 ```
 
 ## Figure Code
-```{r,message=F,error=F,warning=F,fig.width=15,fig.height=7.5}
-# Figure
-figure1A <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-relebactam")+ MIC_IR_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale 
 
-figure1B <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-vaborbactam") + MIC_MVB_x_scale + ylim(NA,250) + figure_1_format + resistance_cat_scale
+```{r,message=F,error=F,warning=F,fig.width=15,fig.height=7.5}
+# Max value
+max_value <- max(c(table(df$IR_log_2),table(df$MVB_log_2)))
+max_ylim_ceiling <- (ceiling(max_value /10) *10) + 10
+MIC_y_scale <- scale_y_continuous(breaks =  seq(0, max_ylim_ceiling, by = 50),limits = c(0,max_ylim_ceiling))
+
+# Figure
+figure1A <-  create_MIC_histogram(df$IR_log_2,df$IR_cat,"Imipenem-relebactam",add_text = T)+ MIC_IR_x_scale + MIC_y_scale + figure_1_format + resistance_cat_scale 
+
+figure1B <- create_MIC_histogram(df$MVB_log_2,df$MVB_cat,"Meropenem-vaborbactam",add_text = T) + MIC_MVB_x_scale + MIC_y_scale + figure_1_format + resistance_cat_scale
 
 # Legend
 MIC_legend <- cowplot::get_legend(figure1A)
 MIC_legend_plot <- plot_grid(MIC_legend) + theme(plot.margin = unit(c(t=0, 0, 0, b=0), "cm"))
 
 # Create cowplot Figure
-MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),figure1B + theme(legend.position = "none"), ncol = 2, labels = "AUTO", label_size = 18)
-figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,.13)) 
+MIC_histograms <- plot_grid(figure1A + theme(legend.position = "none"),
+                            figure1B + theme(legend.position = "none"),
+                            ncol = 2, labels = "AUTO", label_size = 18)  
+
+figure1 <- plot_grid(MIC_histograms,MIC_legend_plot, ncol=1,rel_heights = c(1,.12)) 
 ``` 
 
 # Figure
+
 ```{r,message=F,error=F,warning=F,fig.width=12,fig.height=6}
 figure1
 ```
 
 ## Save figure
+
 ```{r}
 ggsave(plot = figure1, filename = './figures/figure_1.png', width = 12, height = 6, bg = "white", dpi=900)
 ```

@@ -1,5 +1,5 @@
 ---
-title: "Results Section 3: Non-carbapenemase mechanisms of carbapenem resistance explain BL/BLI resistance in a clade-specific manner"
+title: "Results Section 3: Chromosomal carbapenem resistance-associated mechanisms explain BL/BLI resistance in a clade-specific manner"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -34,13 +34,19 @@ sessionInfo()
 df <- readRDS("./data/dataset/df.RDS")  
 kleborate <- readRDS("./data/kleborate/kleborate_curated.RDS")
 df <- left_join(df,kleborate %>% select(isolate_no,KPC_type)) 
+
+# Load blast data 
+KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
+KPC_data$KPC_allele <- paste0("bla",str_split(KPC_data$sseqid,"\\|",simplify = T) %>% .[,ncol(.)])
+df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele) 
 ```
 
 # KPC frequency
 
 ```{r}
-table(df$KPC_type)
-convert_tableone_into_df(df,vars="KPC_type")
+table(df$KPC_allele)
+convert_tableone_into_df(df,vars="KPC_allele")
 ```
 
 # See frequency data in table 1 for frequency and criterion

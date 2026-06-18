@@ -1,5 +1,5 @@
 ---
-title: "Qualifying significant genome-wide association study hits for beta-lactam/beta-lactamase inhibitor resistance"
+title: "Figure 3: Qualifying significant genome-wide association study hits for beta-lactam/beta-lactamase inhibitor resistance"
 output: html_document
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
@@ -76,10 +76,17 @@ figure_3.A_tb$product <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",figure_3.A_tb$
 figure_3.A_tb$locus_tag <-  gsub("associated","containing",figure_3.A_tb$locus_tag)
 figure_3.A_tb$product <-  gsub("associated","containing",figure_3.A_tb$product)
 figure_3.A_tb$sig_models_simple <- gsub("KPC-","<i>bla</i><sub>KPC</sub>-",figure_3.A_tb$sig_models_simple) %>% gsub("associated","containing",.)
-figure_3.A_tb$sig_models_simple <- gsub("High-risk variants","Putative function-altering variants",figure_3.A_tb$sig_models_simple)
+figure_3.A_tb$sig_models_simple <- gsub("High-risk variants","PFAV",figure_3.A_tb$sig_models_simple)
+
+# Recode PFAV at first mention
+idx <- which(grepl("PFAV", figure_3.A_tb$sig_models_simple))[1]
+figure_3.A_tb$sig_models_simple[idx] <- gsub(
+  "PFAV",
+  "Putative function-altering variants (PFAVs)",
+  figure_3.A_tb$sig_models_simple[idx])
 
 # Select relevant columns
-figure_3.A_tbl <- figure_3.A_tb %>% select(locus_tag,gene,product,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc) %>% `colnames<-`(c('Significant hit','Gene', 'Product','Significant tests','Significant models', 'Phenotypes',"Explanatory genotype")) 
+figure_3.A_tbl <- figure_3.A_tb %>% select(locus_tag,gene,product,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc) %>% `colnames<-`(c('Significant hit','Gene', 'Product','Significant test(s)','Significant model(s)', 'Phenotype(s)',"Explanatory genotype")) 
 
 tbl_html <- figure_3.A_tbl  %>%
   kable(format = "html", row.names = FALSE,escape = FALSE) %>%

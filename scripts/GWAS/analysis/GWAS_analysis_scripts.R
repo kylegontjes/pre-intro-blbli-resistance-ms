@@ -400,7 +400,7 @@ generate_nn_melt_data <- function(variable,nn_data){
 
 nn_plot <- function(nn_data_melt){
   nn_data_melt$variable <- factor(nn_data_melt$variable,levels = rev(unique(nn_data_melt$variable)))
-  figure <- ggplot(data=nn_data_melt,aes(fill=variable,y=locus_tag,x = value))  + geom_boxplot(outliers = T,color="black",linewidth = 0.5) +xlab("Log<sub>2</sub> fold change in MIC") + ylab("") + xlim(min(nn_data_melt$value)-1,max(nn_data_melt$value)+1) + MVB_IR_scale + theme_bw() + geom_vline(xintercept = 0,colour = "black") + geom_vline(xintercept = 1, color='red',linetype = 2) + geom_vline(xintercept = -1, color='red',linetype = 2)  
+  figure <- ggplot(data=nn_data_melt,aes(fill=variable,y=locus_tag,x = value))  + geom_boxplot(outliers = T,color="black",linewidth = 0.5) +xlab("log<sub>2</sub> fold change in MIC") + ylab("") + xlim(min(nn_data_melt$value)-1,max(nn_data_melt$value)+1) + MVB_IR_scale + theme_bw() + geom_vline(xintercept = 0,colour = "black") + geom_vline(xintercept = 1, color='red',linetype = 2) + geom_vline(xintercept = -1, color='red',linetype = 2)  
   return(figure)
 }
 

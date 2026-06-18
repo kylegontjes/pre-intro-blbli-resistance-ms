@@ -5,6 +5,7 @@ library(gridExtra)
 library(ggtext)
 library(kableExtra)
 library(knitr)
+library(hues)
 
 # Manuscript Background theme
 theme_bw_me <- theme(panel.background = element_rect(fill = "white",colour = NA), panel.grid = element_blank(),
@@ -135,19 +136,70 @@ plasmid_type_other <- c("AA018", "AA552", "Other plasmid")
 plasmid_fill_other <- scale_fill_manual(values =  c("#7684C0","brown","black"),breaks = plasmid_type_other,name = "Plasmid cluster",guide=guide_legend(ncol=1),na.translate=TRUE,na.value='white') 
 plasmid_fill_other_key_border <- scale_fill_manual(values =  c("#7684C0","brown","black"),breaks = plasmid_type_other,name = "Plasmid cluster",guide=guide_legend(ncol=1,override.aes = list(colour = "black" )),na.translate=TRUE,na.value='white') 
 
-# Sfigure2 format
-format <-   theme(legend.position = "bottom",
-                  axis.text =   element_text(size=18,color="black"),
-                  axis.title = element_text(size = 22,color="black"),
-                  legend.text =   element_text(size=20,color="black"),
-                  legend.title = element_text(size = 22,color="black"),
-                  plot.title = element_text(size = 24,color="black")
+# Log 10 frequency scale
+log_10_experimental_evolution_scale <-  scale_x_log10(
+  limits = c(5e-13, 3e-6),
+  breaks = c(1e-12, 1e-10, 1e-8,1e-6),
+  labels = c("10<sup>-12</sup>","10<sup>-10</sup>","10<sup>-8</sup>","10<sup>-6</sup>")
 )
 
-# Figure 1 tree theme
-consistent_theme <- theme(legend.position = 'bottom',legend.direction="horizontal", legend.justification = "center", legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.0001, "cm"),legend.key.size = unit(.75, "cm"),legend.key.width = unit(.75, "cm"),legend.spacing.x=unit(.75, "cm"), legend.title = element_text(size=18,hjust=0.5),legend.text = element_text(size=16,hjust=0))
+# KPC experimental evolution copy number scale
+KPC_copy_number_change_scale <- scale_fill_gradient2(low = "blue", mid = "white" ,high = "red",
+                                                     name = expression(log[2]~"fold change"),
+                                                     midpoint=1,
+                                                     na.value = 'white',
+                                                     guide = guide_colorbar(order=3),
+                                                     limits=c(0,8))
 
-# Figure 1 table
+# Mobility scale
+mobility_scale <- scale_fill_manual(
+  values = c("brown", "blue", "#C0C0C0", "transparent"),
+  breaks = c("conjugative", "mobilizable", "non-mobilizable", "dummy"),
+  labels = c("Conjugative", "Mobilizable", "Non-mobilizable", ""),
+  name = "Predicted mobility",
+  drop = FALSE,
+  guide = guide_legend(nrow = 2, ncol = 3, byrow = TRUE, title.position = "top", label.position = "right",
+    override.aes = list(
+      fill = c("brown", "blue", "#C0C0C0", "transparent"),
+      color = c("transparent", "transparent", "transparent", "transparent")
+    )
+  )
+)
+ 
+# Host range scale
+color_range <- hues::iwanthue(n = 4,hmin = 0,hmax = 75,plot = F)
+host_range_scale <- scale_fill_manual(values = c("darkgray", color_range ),
+                                      breaks = c("Actinomycetota,Bacillota,Pseudomonadota","Gammaproteobacteria","Enterobacterales","Enterobacteriaceae","Klebsiella"),
+                                      labels =  c("Actinomycetota, Bacillota, Pseudomonadota","Gammaproteobacteria","Enterobacterales","Enterobacteriaceae","Klebsiella"),
+                                      name="Observed host range",
+                                      guide = guide_legend(nrow=2, title.position = "top", label.position = "right"))
+
+# Log2 continuous scale for supplemental phylogeny
+log2_cont_scale <-  scale_fill_gradient2(
+  low = "blue",
+  mid = "white",
+  high = "red",
+  midpoint = 0,
+  na.value = "lightgrey",
+  name = "Copy Number",
+  guide = guide_colorbar(direction = 'vertical',order=5,
+    barwidth = unit(0.5, "cm"),
+    barheight = unit(3, "cm"))) 
+
+# Epidemiology of AA552 plasmid scale
+AA552_scale <- scale_fill_manual(values = c("blue",'lightblue','lightgray'), breaks = c("AA552 <i>bla</i><sub>KPC</sub> plasmid","AA552 Non-<i>bla</i><sub>KPC</sub> plasmid","Other"),name="AA552 Status")
+AA552_scale_color <- scale_color_manual(values = c("blue",'lightblue','lightgray'), breaks = c("AA552 <i>bla</i><sub>KPC</sub> plasmid","AA552 Non-<i>bla</i><sub>KPC</sub> plasmid","Other"),name="AA552 Status")
+
+# Favorite kable
+favorite_kable <- function (x){
+  x %>% kable(., format = "html", table.attr = "style='width:100%;'",
+              row.names = F) %>% kable_styling(bootstrap_options = c("striped",
+                                                                     "hover", "condensed", "responsive"))
+}
+
+# Table themes
+## Main text
+### Figure 3 Table. 
 mytheme <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.01,
                                                        fontsize=18),
                                       padding=unit(c(5,2.5), "mm")),
@@ -155,13 +207,50 @@ mytheme <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.01,
                                                           fontface="bold")),
                           rowhead=list(fg_params=list(hjust=0, x=0)))
 
-# Figure 3 table
-mytheme_GWAS <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.05, 
-                                                       fontsize=18)),
-                          colhead = list(fg_params = list(hjust=0, x=0.05,fontsize=20, 
-                                                          fontface="bold")),
-                          padding=unit(c(5,5), "mm"))
 
+# Figure themes
+## Main text figur
+### 1. Figure 1 (Histogram)
+figure_1_format <-   theme(legend.position = "bottom",
+                           axis.ticks.length=unit(.2, "cm"),
+                           axis.text.x =   element_text(size=14,color="black",hjust=0.5),
+                           axis.text.y =   element_text(size=14,color="black",vjust=0.5),
+                           axis.title = element_text(size = 16,color="black"),
+                           legend.text =   element_text(size=14,color="black"),
+                           legend.title = element_text(size = 16,color="black")
+                           ) 
+
+### 2. Figure 2 (Histogram)
+figure_2_format <- theme(legend.position = "bottom",
+                         axis.text.x =   element_text(size=12,color="black",hjust=0.5),
+                         axis.text.y =   element_text(size=12,color="black",vjust=0.5),
+                         axis.title = element_text(size = 14,color="black"),
+                         legend.text =   element_text(size=12,color="black"),
+                         legend.title = element_text(size = 14,color="black")
+                         ) 
+
+### 3. Figure 3 GWAS
+#### Table
+mytheme_GWAS <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.05, 
+                                                            fontsize=18)),
+                               colhead = list(fg_params = list(hjust=0, x=0.05,fontsize=20, 
+                                                               fontface="bold")),
+                               padding=unit(c(5,5), "mm"))
+
+#### Descriptive plot theme
+figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",
+                                          axis.text.x = element_markdown(size=18,color="black",hjust=0.5),
+                                          axis.text.y = element_markdown(size=18,color="black",vjust=0.5), 
+                                          axis.title.y = element_markdown(size=20,colour = "black"),
+                                          axis.title.x = element_markdown(size=20,colour = "black"),
+                                          legend.title = element_text(size=22,colour = "black"),
+                                          legend.text = element_text(size=20,colour = "black"),
+                                          legend.title.align=0.5,
+                                          legend.key.size = unit(0.75, "cm"),
+                                          legend.key.width = unit(0.75, "cm")) 
+
+#### Tree themes
+#consistent_theme <- theme(legend.position = 'bottom',legend.direction="horizontal", legend.justification = "center", legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.0001, "cm"),legend.key.size = unit(.75, "cm"),legend.key.width = unit(.75, "cm"),legend.spacing.x=unit(.75, "cm"), legend.title = element_text(size=18,hjust=0.5),legend.text = element_text(size=16,hjust=0))
 consistent_theme_GWAS <- theme(legend.position = 'bottom',
                                legend.direction="horizontal",  
                                legend.title.position = 'top',
@@ -175,39 +264,130 @@ consistent_theme_GWAS <- theme(legend.position = 'bottom',
                                legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),
                                legend.spacing.x=unit(0.2, "cm"))
 
-## Figure 3 GWAS
-figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",
-                                          axis.text.y  = element_markdown(size=18,colour = "black"),
-                                          axis.text.x  = element_markdown(size=18,colour = "black"),
-                                          axis.title.y =  element_markdown(size=20,colour = "black"),
-                                          axis.title.x =  element_markdown(size=20,colour = "black"),
-                                          legend.title = element_text(size=22,colour = "black"),
-                                          legend.text = element_text(size=20,colour = "black"),
-                                          legend.title.align=0.5,
-                                          legend.key.size = unit(0.75, "cm"),
-                                          legend.key.width = unit(0.75, "cm")) 
+### 4. Figure 4 Format
+#### Overall figure theme
+figure_4_format <-   theme(legend.position = "bottom",
+                           axis.text.x =   element_text(size=12,color="black",hjust=0.5),
+                           axis.text.y =   element_text(size=12,color="black",vjust=0.5),
+                           axis.title.x = element_markdown(size = 14,color="black"),
+                           axis.title.y = element_markdown(size = 14,color="black"),
+                           legend.text =   element_text(size=12,color="black"),
+                           legend.title = element_markdown(size = 14,color="black"),
+                           plot.title = element_text(size = 16,color="black"),
+                           strip.text = element_blank())
 
-s_figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",
-                                          axis.text.y  = element_markdown(size=12,colour = "black"),
-                                          axis.text.x  = element_markdown(size=12,colour = "black"),
-                                          axis.title.y =  element_markdown(size=14,colour = "black"),
-                                          axis.title.x =  element_markdown(size=14,colour = "black"),
-                                          legend.title = element_text(size=14,colour = "black"),
-                                          legend.text = element_text(size=12,colour = "black"),
-                                          legend.title.align=0.5,
-                                          legend.key.size = unit(0.75, "cm"),
-                                          legend.key.width = unit(0.75, "cm")) 
+#### Theme without markdown
+figure_4_format_wo_element_markdown <-   theme(legend.position = "bottom",
+                                               axis.text.x =   element_text(size=12,color="black",hjust=0.5),
+                                               axis.text.y =   element_text(size=12,color="black",vjust=0.5),
+                                               axis.title = element_text(size = 14,color="black"),
+                                               legend.text =   element_text(size=12,color="black"),
+                                               legend.title = element_text(size = 14,color="black"),
+                                               plot.title = element_text(size = 16,color="black"))  
+
+### 5. Figure 5 Format
+## Figure A
+figure_5_frequency_format <- theme(legend.position='bottom',
+                         legend.title.position = 'top',
+                         axis.text.x = element_markdown(size=12),
+                         legend.title = element_text(size=12),
+                         legend.text = element_markdown(size=10),
+                         axis.text.y = element_text(size=14),
+                         axis.title.x = element_text(size=14),
+                         axis.line.y = element_blank())
+## Panel B
+figure_5_grid <- theme(axis.text = element_markdown(size=12),plot.background = element_rect(color = 'white'),legend.key.spacing.y = unit(0.05,'cm'),axis.text.x = element_markdown(angle=270,hjust = 0,vjust = 0.5),
+      panel.border  = element_blank(),panel.grid = element_blank()) 
+
+## Supplemental Figures
+
+### 2. Supplemental Figure 2: 
+format <-   theme(legend.position = "bottom",
+                  axis.text =   element_text(size=18,color="black"),
+                  axis.title = element_text(size = 22,color="black"),
+                  legend.text =   element_text(size=20,color="black"),
+                  legend.title = element_text(size = 22,color="black"),
+                  plot.title = element_text(size = 24,color="black")
+)
 
 
-# Figure 3 Tree
+
+### 3. Supplemental Figure 3 - Phylogeny
+#### Phylogeny
 consistent_theme_sfigure_3 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
-                               legend.justification = "center", legend.key = element_rect(colour = c('black')),
-                               legend.box.spacing = unit(.000005, "cm"),
-                               legend.key.size = unit(0.15, "cm"),legend.key.width = unit(0.15, "cm") ,
-                               legend.title = element_markdown(size=12),legend.text = element_markdown(size=10),
-                               legend.title.align=0.5,legend.text.align = 0,
-                               legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
+                                    legend.justification = "center", legend.key = element_rect(colour = c('black')),
+                                    legend.box.spacing = unit(.000005, "cm"),
+                                    legend.key.size = unit(0.15, "cm"),legend.key.width = unit(0.15, "cm") ,
+                                    legend.title = element_markdown(size=12),legend.text = element_markdown(size=10),
+                                    legend.title.align=0.5,legend.text.align = 0,
+                                    legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
+#### Descriptive plots
+s_figure_3_descriptive_plot_theme <-  theme(legend.position="bottom",
+                                            axis.text.x =   element_markdown(size=12,color="black",hjust=0.5),
+                                            axis.text.y =   element_markdown(size=12,color="black",vjust=0.5), 
+                                            axis.title.y =  element_markdown(size=14,colour = "black"),
+                                            axis.title.x =  element_markdown(size=14,colour = "black"),
+                                            legend.title = element_text(size=14,colour = "black"),
+                                            legend.text = element_text(size=12,colour = "black"),
+                                            legend.title.align=0.5,
+                                            legend.key.size = unit(0.75, "cm"),
+                                            legend.key.width = unit(0.75, "cm")
+                                            ) 
+
+### 4. Supplemental Figure - GWAS hits
+#### Descriptive plots
+s_figure_4_descriptive_plot_theme <-  theme(legend.position="bottom",
+                                            axis.text.x = element_markdown(size=19,colour = "black",hjust=0.5),
+                                            axis.text.y = element_markdown(size=19,colour = "black",vjust=0.5),
+                                            axis.title.x = element_markdown(size=21,colour = "black"),
+                                            axis.title.y = element_markdown(size=21,colour = "black"),
+                                            legend.title = element_text(size=21,colour = "black"),
+                                            legend.text = element_text(size=19,colour = "black"),
+                                            legend.title.align=0.5 ,
+                                            legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
+
+### 5. Supplemental Figure Plasmid
+### Most descriptive plots
+s_figure_5_format <- theme(legend.text = element_markdown(),
+                           legend.title = element_markdown(),
+                           axis.text.x = element_text(colour = "black",angle=45,hjust=1),
+                           axis.text.y = element_text(colour = "black",vjust=0.5) 
+                           )
+
+#### Panel F and G figure
+s_figure_5_FG_format <- theme(legend.text = element_markdown(),
+                              legend.title = element_markdown(),
+                              axis.text.x = element_text(colour = "black",angle=45,hjust=1),
+                              axis.text.y = element_text(colour = "black",vjust=0.5), 
+                              strip.background = element_rect(color = 'black',linewidth = 1),
+                              strip.text = element_markdown()
+)
+
+### 6. Supplemental Figure 6
+consistent_theme_s_figure_6_wo_md <-  theme(legend.position = 'bottom',
+                                            legend.title.position = 'top',
+                                      legend.key = element_rect(colour = c('black')),
+                                      legend.box.spacing = unit(.00001, "cm"),
+                                      legend.key.size = unit(.35, "cm"),
+                                      legend.key.width = unit(.35, "cm"),
+                                      legend.spacing.x=unit(.0001, "cm"),
+                                      legend.title = element_text(size=12,hjust=0.5),
+                                      legend.text = element_text(size=10,hjust=0)) 
+
+
+### 7. Supplemental Figure 7
+#### Descriptive plot format
+s_figure_7_descriptive_plot_format <-  theme(legend.position = "bottom",
+                                             axis.text.x =   element_markdown(size=20,color="black"),
+                                             axis.text.y =   element_markdown(size=20,color="black"),
+                                             axis.title.y = element_markdown(size = 24,color="black"),
+                                             axis.title.x = element_markdown(size = 24,color="black"),
+                                             legend.text =   element_text(size=22,color="black"),
+                                             legend.title = element_text(size = 24,color="black"),
+                                             plot.title = element_text(size = 26,color="black"),
+)
+#### GWAS format
 consistent_theme_sfigure_7 <- theme(legend.position = 'bottom',legend.direction="horizontal", 
                                     legend.justification = "center", legend.key = element_rect(colour = c('white')),
                                     legend.box.spacing = unit(.000005, "cm"),
@@ -216,107 +396,67 @@ consistent_theme_sfigure_7 <- theme(legend.position = 'bottom',legend.direction=
                                     legend.title.align=0.5,legend.text.align = 0,
                                     legend.margin=margin(t=-0.5,r=0,b=0,l=0,unit="cm"),legend.spacing.x=unit(.125, "cm"))
 
-# Favorite kable
-favorite_kable <- function (x){
-  x %>% kable(., format = "html", table.attr = "style='width:100%;'",
-              row.names = F) %>% kable_styling(bootstrap_options = c("striped",
-                                                                    "hover", "condensed", "responsive"))
-}
 
-# Figure 1 (Histogram)
-figure_1_format <-   theme(legend.position = "bottom",
-                           axis.ticks.length=unit(.2, "cm"),
-                           axis.text =   element_text(size=14,color="black"),
-                           axis.title = element_text(size = 16,color="black"),
-                           legend.text =   element_text(size=14,color="black"),
-                           legend.title = element_text(size = 16,color="black") 
-) 
+### 6. Supplemental Figure
+s_figure_8_format <- theme(legend.position = "bottom",
+                           axis.text.x =   element_markdown(size=14,color="black",hjust=0.5),
+                           axis.text.y =   element_markdown(size=14,color="black",vjust=0.5),
+                           axis.title = element_markdown(size = 18,color="black"),
+                           legend.text =   element_markdown(size=18,color="black"),
+                           strip.background = element_rect(fill="lightgray",color="black")   , 
+                           legend.title = element_text(size = 0,color="black"),
+                           strip.text = element_text(size = 12),
+                           legend.margin = margin(t = -5, r = 0, b = 0, l = 0),
+                           strip.text.x = element_markdown(size=10,color='black'),
+                           strip.text.y = element_markdown(size=10,color='black'),
+                           panel.spacing = unit(0.3, "cm", data = NULL)) 
 
-### Figure 2 (Histogram)
-figure_2_format <- theme(legend.position = "bottom",
-                         axis.text =   element_text(size=12,color="black"),
-                         axis.title = element_text(size = 14,color="black"),
-                         legend.text =   element_text(size=12,color="black"),
-                         legend.title = element_text(size = 14,color="black")
-) 
+# Suppemental Figure 9.
+s_figure_9_format <- theme(legend.title = element_markdown(),
+                           legend.text=element_markdown(),
+                           axis.text.x  = element_markdown(hjust=0.5),
+                           axis.text.y  = element_markdown(vjust=0.5),
+                           axis.title.x = element_markdown(),
+                           axis.title.y = element_markdown())
+
+s_figure_9_format_plasmid_x <- theme(legend.title = element_markdown(),
+                           legend.text=element_markdown(),
+                           axis.text.x  = element_markdown(angle=45,hjust = 1,vjust=1),
+                           axis.text.y  = element_markdown(),
+                           axis.title.x = element_markdown(),
+                           axis.title.y = element_markdown())
 
 
-
-# Figure 4 Format
-figure_4_format <-   theme(legend.position = "bottom",
-                           axis.text.x =   element_text(size=12,color="black"),
-                           axis.text.y =   element_text(size=12,color="black"),
-                           axis.title.x = element_markdown(size = 14,color="black"),
-                           axis.title.y = element_markdown(size = 14,color="black"),
-                           legend.text =   element_text(size=12,color="black"),
-                           legend.title = element_markdown(size = 14,color="black"),
-                           plot.title = element_text(size = 16,color="black"),
-                           strip.text = element_blank())
-                           
-figure_4_format_wo_element_markdown <-   theme(legend.position = "bottom",
-                           axis.text =   element_text(size=12,color="black"),
-                           axis.title = element_text(size = 14,color="black"),
-                           legend.text =   element_text(size=12,color="black"),
-                           legend.title = element_text(size = 14,color="black"),
-                           plot.title = element_text(size = 16,color="black"))  
-# S figure 4
-s_figure_4_descriptive_plot_theme <-  theme(legend.position="bottom",
-                                            axis.text.y = element_markdown(size=19,colour = "black"),
-                                            axis.text.x = element_markdown(size=19,colour = "black"),
-                                            axis.title.y = element_markdown(size=21,colour = "black"),
-                                            axis.title.x = element_markdown(size=21,colour = "black"),
-                                            legend.title = element_text(size=21,colour = "black"),
-                                            legend.text = element_text(size=19,colour = "black"),
-                                            legend.title.align=0.5 ,
-                                            legend.key.size = unit(0.5, "cm"),legend.key.width = unit(0.5, "cm")) 
-
-# S figure 5
-s_figure_7_descriptive_plot_format <-  theme(legend.position = "bottom",
-                       axis.text.x =   element_markdown(size=20,color="black"),
-                       axis.text.y =   element_markdown(size=20,color="black"),
-                       axis.title.y = element_markdown(size = 24,color="black"),
-                       axis.title.x = element_markdown(size = 24,color="black"),
-                       legend.text =   element_text(size=22,color="black"),
-                       legend.title = element_text(size = 24,color="black"),
-                       plot.title = element_text(size = 26,color="black"),
-)
-
-# S figure 6
-s_figure_6_format <- theme(legend.position = "bottom",
-      axis.text =   element_markdown(size=14,color="black"),
-      axis.title = element_markdown(size = 18,color="black"),
-      legend.text =   element_markdown(size=18,color="black"),
-      strip.background = element_rect(fill="lightgray",color="black")   , 
-      legend.title = element_text(size = 0,color="black"),
-      strip.text = element_text(size = 12),
-      legend.margin = margin(t = -5, r = 0, b = 0, l = 0),
-      strip.text.x = element_markdown(size=10,color='black'),
-      strip.text.y = element_markdown(size=10,color='black'),
-      panel.spacing = unit(0.3, "cm", data = NULL)) 
-
-# S fig 7
-s_figure_7_format <-  theme(legend.position = "bottom",
-                       axis.text =   element_text(size=16,color="black"),
-                       axis.title = element_text(size = 18,color="black"),
-                       legend.text =   element_text(size=18,color="black"),
-                       legend.title = element_text(size = 20,color="black"),
-                       plot.title = element_text(size = 24,color="black"),
-                       legend.margin = margin(t=0,unit="cm")
-)
-
+### 10. Supplemental Figure 10
 s_figure_10_format <-  theme(legend.position = "bottom",
-                            axis.text =   element_text(size=12,color="black"),
-                            axis.title = element_text(size = 12,color="black"),
-                            plot.title = element_text(size = 18,color="black"),
-                            legend.margin = margin(t=0,unit="cm")
-)
+                             axis.text =   element_text(size=12,color="black"),
+                             axis.title = element_text(size = 12,color="black"),
+                             plot.title = element_text(size = 18,color="black"),
+                             legend.title = element_text(size = 14,color="black"),
+                             legend.text = element_text(size = 12,color="black"),
+                             legend.margin = margin(t=0,unit="cm")
+                             )
 
+### 11. Supplemental Figure 11
+s_figure_11_format_A <- theme(legend.title.position = 'top',
+                              legend.title = element_text(size=16),
+                              legend.text = element_text(size=14),
+                              axis.text.x = element_text(size = 12),
+                              axis.text.y=element_text(size=12),
+                              axis.title = element_text(size=14))
 
-# Supplemental Figure 14: Genotype count 
+s_figure_11_format_BCDE <- theme(axis.text.x = element_markdown(angle = 45, hjust = 1,size = 12),
+      axis.text.y=element_markdown(size=12),
+      axis.title.y=element_markdown(size=14),
+      legend.title.position = 'top',
+      legend.title = element_text(size=16),
+      legend.text = element_text(size=14)) 
+
+### 14. Supplemental Figure 14 - Genotype count 
 s_figure_14_format <-  theme(legend.position = "bottom",
-                       axis.text =   element_text(size=12,color="black"),
-                       axis.title = element_text(size = 14,color="black"),
-                       legend.text =   element_text(size=12,color="black"),
-                       legend.title = element_text(size = 14,color="black"),
-                       plot.title = element_text(size = 18,color="black"),
-)
+                             axis.text =   element_text(size=12,color="black"),
+                             axis.title = element_text(size = 14,color="black"),
+                             legend.text =   element_text(size=12,color="black"),
+                             legend.title = element_text(size = 14,color="black"),
+                             plot.title = element_text(size = 18,color="black")
+                             )

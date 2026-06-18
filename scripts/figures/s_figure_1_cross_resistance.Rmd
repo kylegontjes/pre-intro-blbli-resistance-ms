@@ -81,7 +81,6 @@ colnames(co_occurrence_percent) <- recode_resistance_variables(colnames(co_occur
 colnames(co_occurrence_merged) <- recode_resistance_variables(colnames(co_occurrence_merged))
 drugs <- gsub("_dich_num","",colnames(co_occurrence_merged))
 
-
 ## Heatmap
 co_occurrence_heatmap <- ComplexHeatmap::pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-r esistance",legend=F,fontsize = 10,
     row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 14)),

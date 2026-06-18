@@ -165,7 +165,7 @@ novel_synchronous <- synchronous_pass %>% subset(!locus_tag %in% c("KPNIH1_RS186
 ```{r}
 AA018 <- mobsuite_typer %>% subset(primary_cluster_id == "AA018") 
 
-convert_tableone_into_df(dataset = AA018, vars = c('size','gc','rep_types','relaxase_types','mpf_type','orit_type','predicted_mobility','predicted_host_range_overall_rank',"observed_host_range_ncbi_name"))
+convert_tableone_into_df(dataset = AA018, vars = c('size','gc','rep_types','relaxase_types','mpf_type','orit_type','predicted_mobility','predicted_host_range_overall_rank',"observed_host_range_ncbi_name")) %>% favorite_kable()
 
 table(AA018$predicted_mobility)
 ```
@@ -177,7 +177,7 @@ table(AA018$predicted_mobility)
 AA552 <- mobsuite_typer %>% subset(primary_cluster_id == "AA552")
 AA552$FJ223607 <- ifelse(AA552$mash_nearest_neighbor == "FJ223607",T,F)
 
-convert_tableone_into_df(dataset = AA552, vars = c('size','gc','rep_types','relaxase_types','mpf_type','orit_type','predicted_mobility','predicted_host_range_overall_rank',"observed_host_range_ncbi_name"),strata = 'FJ223607',outcome_names = c("Not F","FJ"))
+convert_tableone_into_df(dataset = AA552, vars = c('size','gc','rep_types','relaxase_types','mpf_type','orit_type','predicted_mobility','predicted_host_range_overall_rank',"observed_host_range_ncbi_name"),strata = 'FJ223607',outcome_names = c("Not F","FJ")) %>% favorite_kable()
 ```
 
 ## Overall data

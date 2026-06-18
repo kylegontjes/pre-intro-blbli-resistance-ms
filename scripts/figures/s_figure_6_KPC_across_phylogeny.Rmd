@@ -63,12 +63,9 @@ df <- left_join(df,KPC_plasmid_copy_number)
 
 # KPC gene
 KPC_data <- read.table("./data/KPC_blast/KPC_blast_master.txt",header = T)  
-KPC_data$KPC_allele <- ifelse(grepl("KPC-3",KPC_data$sseqid) ==T,"KPC-3",
-                                ifelse(grepl("KPC-5",KPC_data$sseqid) ==T,"KPC-5",
-                                ifelse(grepl("KPC-2",KPC_data$sseqid) ==T,"KPC-2",
-                                ifelse(grepl("KPC-10",KPC_data$sseqid) ==T,"KPC-10","No KPC"))))
+KPC_data$KPC_allele <- paste0("bla",str_split(KPC_data$sseqid,"\\|",simplify = T) %>% .[,ncol(.)])
 df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
-df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
+df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele)  
 ```
 
 # Plot on the tree
@@ -77,43 +74,39 @@ df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No KPC",df$KPC_allele)
 df$KPC_copy_number_log2 <- log2(df$KPC_copy_number)
 df$KPC_plasmid_copy_number_log2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
 
-consistent_theme_phylo <-  theme(legend.position = 'bottom',legend.title.position = 'top',legend.key = element_rect(colour = c('black')),legend.box.spacing = unit(.00001, "cm"),legend.key.size = unit(.35, "cm"),legend.key.width = unit(.35, "cm"),legend.spacing.x=unit(.0001, "cm"), legend.title = element_text(size=12,hjust=0.5),legend.text = element_text(size=10,hjust=0))
- 
 rownames(df) <- df$isolate_no
 
-log2_cont_scale <-  scale_fill_gradient2(
-    low = "blue",
-    mid = "white",
-    high = "red",
-    midpoint = 0,
-    na.value = "lightgrey",
-    name = "Copy Number",
-    guide = guide_colorbar(direction = 'vertical',order=5)) 
-
-p0 <- gheatmap(ggtree(tr),data=df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05) + cluster_scale_1_order_2_col  + ylim(NA,550) + consistent_theme_phylo
+p0 <- gheatmap(ggtree(tr),data=df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05) + cluster_scale_1_order_2_col  + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
 
 p0.1 <- p0+ggnewscale::new_scale_fill()
 
-p1 <- gheatmap(p0.1,data=df %>% select(blbli_dich) %>% mutate_all(as.factor) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.0000125) + resistance_scale_order_2 + ylim(NA,550) + consistent_theme_phylo
+p1 <- gheatmap(p0.1,data=df %>% select(blbli_dich) %>% mutate_all(as.factor) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.0000125) + resistance_scale_order_2 + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
 
 p1.1 <- p1+ggnewscale::new_scale_fill()
 
-p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.000025) + Log2_scale_3_order + ylim(NA,550) + consistent_theme_phylo
-
+p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.000025) + Log2_scale_3_order + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
+  
 p2.1 <- p2+ggnewscale::new_scale_fill()
 
-p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC gene")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.00005) + kpc_gene_scale + consistent_theme_phylo
+p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC allele")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.00005) + kpc_scale + consistent_theme_s_figure_6_wo_md   + guides(
+    fill = guide_legend(
+        title.position = "top",
+        label.position = "right",
+        order=4,
+        ncol = 1,theme = theme(legend.title=element_markdown(),legend.text=element_markdown())
+    )
+)
 
 p3.1 <- p3+ggnewscale::new_scale_fill()
 
-p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("Log2 blaKPC plasmid copy number","Log2 blaKPC gene copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.00006125) + log2_cont_scale + ylim(NA,550)  + consistent_theme_phylo
-   
-p4.1 <- p4+ggnewscale::new_scale_fill()
+p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("Log2 blaKPC plasmid copy number","Log2 blaKPC gene copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.00006125)    +consistent_theme_s_figure_6_wo_md   + log2_cont_scale + ylim(NA,550)  
+
+p4.1 <- p4 + ggnewscale::new_scale_fill()
   
-figure <- gheatmap(p4.1,data=KPC_containing_clusters %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.5,offset =.0000875) + plasmid_scale_v + ylim(NA,590)   + consistent_theme_phylo
+figure <- gheatmap(p4.1,data=KPC_containing_clusters %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.5,offset =.0000875) + plasmid_scale_v + ylim(NA,590)   + consistent_theme_s_figure_6_wo_md  
 
 figure
-```
+``` 
 
 ## Save the figure
 
