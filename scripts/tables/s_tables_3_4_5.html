@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-06-18" />
+<meta name="date" content="2026-06-26" />
 
 <title>Supplemental Tables 3-5: Descriptive stats + regression modeling for BL/BLI resistance mechanism</title>
 
@@ -577,7 +577,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Tables 3-5: Descriptive stats
 + regression modeling for BL/BLI resistance mechanism</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-06-18</h4>
+<h4 class="date">2026-06-26</h4>
 
 </div>
 
@@ -739,12 +739,73 @@ purposeful_results &lt;- readRDS(&quot;./data/regression/purposeful_regression_r
   ulogr$term &lt;- as.character(ulogr$term)
   mlogr &lt;- mlogr %&gt;% select(variable, `OR (95% CI)`, p_value) %&gt;% `colnames&lt;-`(c(&quot;term&quot;,&quot;aOR (95% CI)&quot;,&quot;aOR p-value&quot;))
   mlogr$term &lt;- as.character(mlogr$term)
-  results &lt;- left_join(stats,ulogr) %&gt;% left_join(mlogr)
+  results &lt;- left_join(stats,ulogr) %&gt;% left_join(mlogr) 
+  # Column names
+  colnames(results) &lt;- recode(colnames(results),
+                       &quot;term&quot; = &quot;Variable&quot;)
+  # Variable rename
+  results$Variable &lt;- recode(results$Variable,
+                              &quot;age&quot; = &quot;Age, 1 year unit&quot;,
+                              &quot;LOSbeforeCx&quot; = &quot;Length of stay before culture, 1-day unit&quot; ,
+                              &quot;sex.female&quot; = &quot;Female sex&quot;,
+                              &quot;trach&quot; = &quot;Tracheostomy tube&quot;,
+                              &quot;central_line&quot; = &quot;Central venous catheter&quot;,
+                              &quot;foley&quot; = &quot;Indwelling urinary catheter&quot;,
+                              &quot;gastro&quot; = &quot;Gastrostomy tube&quot;,
+                              &quot;AKI&quot; = &quot;Acute kidney injury&quot;,
+                              &quot;CKD&quot; = &quot;Chronic kidney disease&quot;,
+                              &quot;VDRF&quot; = &quot;Ventilator-dependent respiratory failure&quot;,
+                              &quot;underweight&quot; = &quot;Underweight or malnutrition&quot;,
+                              &quot;CHF&quot; = &quot;Congestive heart failure&quot;,
+                              &quot;decub&quot; = &quot;Decubitus ulcer stage 4+&quot;,
+                              &quot;lung_dz&quot; = &quot;Chronic bronchitis or chronic obstructive pulmonary disease&quot;,
+                              &quot;brain_injury&quot; = &quot;Brain injury&quot;,
+                              &quot;malignancy&quot; = &quot;Malignancy&quot;,
+                              &quot;obese&quot; = &quot;Obesity&quot;,
+                              &quot;carbapenem_1d&quot; = &quot;Carbapenem exposure&quot;,
+                              &quot;amikacin_1d&quot; = &quot;Amikacin exposure&quot;,
+                              &quot;gent_1d&quot; = &quot;Gentamicin exposure&quot;,
+                              &quot;tobra_1d&quot; = &quot;Tobramycin exposure&quot;,
+                              &quot;aztreonam_1d&quot; = &quot;Aztreonam exposure&quot;,
+                              &quot;bactrim_1d&quot; = &quot;Sulfamethoxazole-trimethoprim exposure&quot;,
+                              &quot;third_plus_ceph_1d&quot; = &quot;Cephalosporin exposure&quot;,
+                              &quot;FQ_1d&quot; = &quot;Fluoroquinolone exposure&quot;,
+                              &quot;dapto_1d&quot; = &quot;Daptomycin exposure&quot;,
+                              &quot;flagyl_1d&quot; = &quot;Metronidazole exposure&quot;,
+                              &quot;linezolid_1d&quot; = &quot;Linezolid exposure&quot;,
+                              &quot;poly_colistin_1d&quot; = &quot;Polymyxin and/or colistin exposure&quot;,
+                              &quot;tigecycline_1d&quot; = &quot;Tigecycline exposure&quot;,
+                              &quot;vanco_1d&quot; = &quot;Vancomycin exposure&quot;,
+                              &quot;zosyn_1d&quot;  = &quot;Piperacillin/tazobactam exposure&quot;) 
+  # Recode NAs
+  results$`OR (95% CI)` &lt;- gsub(&quot; NA&quot;,&quot;NA&quot;,results$`OR (95% CI)`)
+  results$`aOR (95% CI)` &lt;- gsub(&quot; NA&quot;,&quot;NA&quot;,results$`aOR (95% CI)`)
   return(results)
 }</code></pre>
 <pre class="r"><code>s_table_3 &lt;- table_curation(descriptive_stats$present,purposeful_results$univariable$present,purposeful_results$multivariable$present$final_model_table)
 s_table_4 &lt;- table_curation(descriptive_stats$singleton,purposeful_results$univariable$singleton,purposeful_results$multivariable$singleton$final_model_table)
 s_table_5 &lt;- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)</code></pre>
+</div>
+<div id="update-table-names" class="section level1">
+<h1>Update table names</h1>
+<pre class="r"><code>paste0(&quot;Raw column: &quot;)</code></pre>
+<pre><code>[1] &quot;Raw column: &quot;</code></pre>
+<pre class="r"><code>colnames</code></pre>
+<pre><code>function (x, do.NULL = TRUE, prefix = &quot;col&quot;) 
+{
+    if (is.data.frame(x) &amp;&amp; do.NULL) 
+        names(x)
+    else dimnames(x)[[2L]] %||% if (do.NULL) 
+        NULL
+    else {
+        nc &lt;- NCOL(x)
+        if (nc &gt; 0L) 
+            paste0(prefix, seq_len(nc))
+        else character()
+    }
+}
+&lt;bytecode: 0x7fd7c9b55a50&gt;
+&lt;environment: namespace:base&gt;</code></pre>
 </div>
 <div id="print-tables" class="section level1">
 <h1>Print tables</h1>
@@ -753,7 +814,7 @@ s_table_5 &lt;- table_curation(descriptive_stats$cluster,purposeful_results$univ
 <thead>
 <tr>
 <th style="text-align:left;">
-term
+Variable
 </th>
 <th style="text-align:left;">
 Overall (n=336)
@@ -781,7 +842,7 @@ aOR p-value
 <tbody>
 <tr>
 <td style="text-align:left;">
-age
+Age, 1 year unit
 </td>
 <td style="text-align:left;">
 71.07 (14.66)
@@ -807,7 +868,7 @@ age
 </tr>
 <tr>
 <td style="text-align:left;">
-LOSbeforeCx
+Length of stay before culture, 1-day unit
 </td>
 <td style="text-align:left;">
 40.48 (109.98)
@@ -833,7 +894,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-sex.female
+Female sex
 </td>
 <td style="text-align:left;">
 160 (47.6)
@@ -859,7 +920,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-trach
+Tracheostomy tube
 </td>
 <td style="text-align:left;">
 227 (67.6)
@@ -885,7 +946,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-central_line
+Central venous catheter
 </td>
 <td style="text-align:left;">
 187 (55.7)
@@ -911,7 +972,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-foley
+Indwelling urinary catheter
 </td>
 <td style="text-align:left;">
 183 (54.5)
@@ -937,7 +998,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-gastro
+Gastrostomy tube
 </td>
 <td style="text-align:left;">
 121 (36.0)
@@ -963,7 +1024,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-AKI
+Acute kidney injury
 </td>
 <td style="text-align:left;">
 154 (45.8)
@@ -989,7 +1050,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-CKD
+Chronic kidney disease
 </td>
 <td style="text-align:left;">
 110 (32.7)
@@ -1015,7 +1076,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-VDRF
+Ventilator-dependent respiratory failure
 </td>
 <td style="text-align:left;">
 99 (29.5)
@@ -1041,7 +1102,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-underweight
+Underweight or malnutrition
 </td>
 <td style="text-align:left;">
 84 (25.0)
@@ -1067,7 +1128,7 @@ underweight
 </tr>
 <tr>
 <td style="text-align:left;">
-CHF
+Congestive heart failure
 </td>
 <td style="text-align:left;">
 64 (19.0)
@@ -1093,7 +1154,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-decub
+Decubitus ulcer stage 4+
 </td>
 <td style="text-align:left;">
 67 (19.9)
@@ -1119,7 +1180,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-lung_dz
+Chronic bronchitis or chronic obstructive pulmonary disease
 </td>
 <td style="text-align:left;">
 60 (17.9)
@@ -1145,7 +1206,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-brain_injury
+Brain injury
 </td>
 <td style="text-align:left;">
 63 (18.8)
@@ -1171,7 +1232,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-malignancy
+Malignancy
 </td>
 <td style="text-align:left;">
 41 (12.2)
@@ -1197,7 +1258,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-obese
+Obesity
 </td>
 <td style="text-align:left;">
 19 (5.7)
@@ -1223,7 +1284,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-carbapenem_1d
+Carbapenem exposure
 </td>
 <td style="text-align:left;">
 106 (31.5)
@@ -1249,7 +1310,7 @@ carbapenem_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-amikacin_1d
+Amikacin exposure
 </td>
 <td style="text-align:left;">
 41 (12.2)
@@ -1275,7 +1336,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-gent_1d
+Gentamicin exposure
 </td>
 <td style="text-align:left;">
 12 (3.6)
@@ -1301,7 +1362,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-tobra_1d
+Tobramycin exposure
 </td>
 <td style="text-align:left;">
 21 (6.2)
@@ -1327,7 +1388,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-aztreonam_1d
+Aztreonam exposure
 </td>
 <td style="text-align:left;">
 10 (3.0)
@@ -1339,7 +1400,7 @@ aztreonam_1d
 10 (3.5)
 </td>
 <td style="text-align:left;">
-0.00 ( NA-7989898973059213312.00)
+0.00 (NA-7989898973059213312.00)
 </td>
 <td style="text-align:right;">
 0.9843
@@ -1353,7 +1414,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-bactrim_1d
+Sulfamethoxazole-trimethoprim exposure
 </td>
 <td style="text-align:left;">
 11 (3.3)
@@ -1379,7 +1440,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-third_plus_ceph_1d
+Cephalosporin exposure
 </td>
 <td style="text-align:left;">
 84 (25.0)
@@ -1405,7 +1466,7 @@ third_plus_ceph_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-FQ_1d
+Fluoroquinolone exposure
 </td>
 <td style="text-align:left;">
 59 (17.6)
@@ -1431,7 +1492,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-dapto_1d
+Daptomycin exposure
 </td>
 <td style="text-align:left;">
 14 (4.2)
@@ -1457,7 +1518,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-flagyl_1d
+Metronidazole exposure
 </td>
 <td style="text-align:left;">
 63 (18.8)
@@ -1483,7 +1544,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-linezolid_1d
+Linezolid exposure
 </td>
 <td style="text-align:left;">
 48 (14.3)
@@ -1509,7 +1570,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-poly_colistin_1d
+Polymyxin and/or colistin exposure
 </td>
 <td style="text-align:left;">
 38 (11.3)
@@ -1535,7 +1596,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-tigecycline_1d
+Tigecycline exposure
 </td>
 <td style="text-align:left;">
 47 (14.0)
@@ -1561,7 +1622,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-vanco_1d
+Vancomycin exposure
 </td>
 <td style="text-align:left;">
 144 (42.9)
@@ -1587,7 +1648,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-zosyn_1d
+Piperacillin/tazobactam exposure
 </td>
 <td style="text-align:left;">
 45 (13.4)
@@ -1618,7 +1679,7 @@ NA
 <thead>
 <tr>
 <th style="text-align:left;">
-term
+Variable
 </th>
 <th style="text-align:left;">
 Overall (n=318)
@@ -1646,7 +1707,7 @@ aOR p-value
 <tbody>
 <tr>
 <td style="text-align:left;">
-age
+Age, 1 year unit
 </td>
 <td style="text-align:left;">
 70.75 (14.84)
@@ -1672,7 +1733,7 @@ age
 </tr>
 <tr>
 <td style="text-align:left;">
-LOSbeforeCx
+Length of stay before culture, 1-day unit
 </td>
 <td style="text-align:left;">
 39.92 (110.41)
@@ -1698,7 +1759,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-sex.female
+Female sex
 </td>
 <td style="text-align:left;">
 149 (46.9)
@@ -1724,7 +1785,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-trach
+Tracheostomy tube
 </td>
 <td style="text-align:left;">
 217 (68.2)
@@ -1750,7 +1811,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-central_line
+Central venous catheter
 </td>
 <td style="text-align:left;">
 178 (56.0)
@@ -1776,7 +1837,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-foley
+Indwelling urinary catheter
 </td>
 <td style="text-align:left;">
 170 (53.5)
@@ -1802,7 +1863,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-gastro
+Gastrostomy tube
 </td>
 <td style="text-align:left;">
 114 (35.8)
@@ -1828,7 +1889,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-AKI
+Acute kidney injury
 </td>
 <td style="text-align:left;">
 143 (45.0)
@@ -1854,7 +1915,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-CKD
+Chronic kidney disease
 </td>
 <td style="text-align:left;">
 103 (32.4)
@@ -1880,7 +1941,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-VDRF
+Ventilator-dependent respiratory failure
 </td>
 <td style="text-align:left;">
 93 (29.2)
@@ -1906,7 +1967,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-underweight
+Underweight or malnutrition
 </td>
 <td style="text-align:left;">
 81 (25.5)
@@ -1932,7 +1993,7 @@ underweight
 </tr>
 <tr>
 <td style="text-align:left;">
-CHF
+Congestive heart failure
 </td>
 <td style="text-align:left;">
 59 (18.6)
@@ -1958,7 +2019,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-decub
+Decubitus ulcer stage 4+
 </td>
 <td style="text-align:left;">
 64 (20.1)
@@ -1984,7 +2045,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-lung_dz
+Chronic bronchitis or chronic obstructive pulmonary disease
 </td>
 <td style="text-align:left;">
 53 (16.7)
@@ -2010,7 +2071,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-brain_injury
+Brain injury
 </td>
 <td style="text-align:left;">
 58 (18.2)
@@ -2036,7 +2097,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-malignancy
+Malignancy
 </td>
 <td style="text-align:left;">
 38 (11.9)
@@ -2062,7 +2123,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-obese
+Obesity
 </td>
 <td style="text-align:left;">
 18 (5.7)
@@ -2088,7 +2149,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-carbapenem_1d
+Carbapenem exposure
 </td>
 <td style="text-align:left;">
 100 (31.4)
@@ -2114,7 +2175,7 @@ carbapenem_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-amikacin_1d
+Amikacin exposure
 </td>
 <td style="text-align:left;">
 38 (11.9)
@@ -2140,7 +2201,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-gent_1d
+Gentamicin exposure
 </td>
 <td style="text-align:left;">
 12 (3.8)
@@ -2166,7 +2227,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-tobra_1d
+Tobramycin exposure
 </td>
 <td style="text-align:left;">
 20 (6.3)
@@ -2192,7 +2253,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-aztreonam_1d
+Aztreonam exposure
 </td>
 <td style="text-align:left;">
 10 (3.1)
@@ -2204,7 +2265,7 @@ aztreonam_1d
 10 (3.5)
 </td>
 <td style="text-align:left;">
-0.00 ( NA-119855256564924444274797409342586880.00)
+0.00 (NA-119855256564924444274797409342586880.00)
 </td>
 <td style="text-align:right;">
 0.9901
@@ -2218,7 +2279,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-bactrim_1d
+Sulfamethoxazole-trimethoprim exposure
 </td>
 <td style="text-align:left;">
 10 (3.1)
@@ -2244,7 +2305,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-third_plus_ceph_1d
+Cephalosporin exposure
 </td>
 <td style="text-align:left;">
 77 (24.2)
@@ -2270,7 +2331,7 @@ third_plus_ceph_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-FQ_1d
+Fluoroquinolone exposure
 </td>
 <td style="text-align:left;">
 57 (17.9)
@@ -2296,7 +2357,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-dapto_1d
+Daptomycin exposure
 </td>
 <td style="text-align:left;">
 12 (3.8)
@@ -2322,7 +2383,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-flagyl_1d
+Metronidazole exposure
 </td>
 <td style="text-align:left;">
 58 (18.2)
@@ -2348,7 +2409,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-linezolid_1d
+Linezolid exposure
 </td>
 <td style="text-align:left;">
 44 (13.8)
@@ -2374,7 +2435,7 @@ linezolid_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-poly_colistin_1d
+Polymyxin and/or colistin exposure
 </td>
 <td style="text-align:left;">
 37 (11.6)
@@ -2400,7 +2461,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-tigecycline_1d
+Tigecycline exposure
 </td>
 <td style="text-align:left;">
 45 (14.2)
@@ -2426,7 +2487,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-vanco_1d
+Vancomycin exposure
 </td>
 <td style="text-align:left;">
 136 (42.8)
@@ -2452,7 +2513,7 @@ vanco_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-zosyn_1d
+Piperacillin/tazobactam exposure
 </td>
 <td style="text-align:left;">
 43 (13.5)
@@ -2483,7 +2544,7 @@ NA
 <thead>
 <tr>
 <th style="text-align:left;">
-term
+Variable
 </th>
 <th style="text-align:left;">
 Overall (n=302)
@@ -2511,7 +2572,7 @@ aOR p-value
 <tbody>
 <tr>
 <td style="text-align:left;">
-age
+Age, 1 year unit
 </td>
 <td style="text-align:left;">
 70.38 (14.71)
@@ -2537,7 +2598,7 @@ age
 </tr>
 <tr>
 <td style="text-align:left;">
-LOSbeforeCx
+Length of stay before culture, 1-day unit
 </td>
 <td style="text-align:left;">
 40.84 (115.43)
@@ -2563,7 +2624,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-sex.female
+Female sex
 </td>
 <td style="text-align:left;">
 143 (47.4)
@@ -2589,7 +2650,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-trach
+Tracheostomy tube
 </td>
 <td style="text-align:left;">
 204 (67.5)
@@ -2615,7 +2676,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-central_line
+Central venous catheter
 </td>
 <td style="text-align:left;">
 171 (56.6)
@@ -2641,7 +2702,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-foley
+Indwelling urinary catheter
 </td>
 <td style="text-align:left;">
 167 (55.3)
@@ -2667,7 +2728,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-gastro
+Gastrostomy tube
 </td>
 <td style="text-align:left;">
 112 (37.1)
@@ -2693,7 +2754,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-AKI
+Acute kidney injury
 </td>
 <td style="text-align:left;">
 142 (47.0)
@@ -2719,7 +2780,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-CKD
+Chronic kidney disease
 </td>
 <td style="text-align:left;">
 99 (32.8)
@@ -2745,7 +2806,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-VDRF
+Ventilator-dependent respiratory failure
 </td>
 <td style="text-align:left;">
 91 (30.1)
@@ -2771,7 +2832,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-underweight
+Underweight or malnutrition
 </td>
 <td style="text-align:left;">
 80 (26.5)
@@ -2797,7 +2858,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-CHF
+Congestive heart failure
 </td>
 <td style="text-align:left;">
 60 (19.9)
@@ -2823,7 +2884,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-decub
+Decubitus ulcer stage 4+
 </td>
 <td style="text-align:left;">
 63 (20.9)
@@ -2849,7 +2910,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-lung_dz
+Chronic bronchitis or chronic obstructive pulmonary disease
 </td>
 <td style="text-align:left;">
 54 (17.9)
@@ -2875,7 +2936,7 @@ lung_dz
 </tr>
 <tr>
 <td style="text-align:left;">
-brain_injury
+Brain injury
 </td>
 <td style="text-align:left;">
 57 (18.9)
@@ -2901,7 +2962,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-malignancy
+Malignancy
 </td>
 <td style="text-align:left;">
 38 (12.6)
@@ -2927,7 +2988,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-obese
+Obesity
 </td>
 <td style="text-align:left;">
 18 (6.0)
@@ -2953,7 +3014,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-carbapenem_1d
+Carbapenem exposure
 </td>
 <td style="text-align:left;">
 89 (29.5)
@@ -2979,7 +3040,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-amikacin_1d
+Amikacin exposure
 </td>
 <td style="text-align:left;">
 36 (11.9)
@@ -3005,7 +3066,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-gent_1d
+Gentamicin exposure
 </td>
 <td style="text-align:left;">
 10 (3.3)
@@ -3017,7 +3078,7 @@ gent_1d
 10 (3.5)
 </td>
 <td style="text-align:left;">
-0.00 ( NA-166936566104494316543658203449131008.00)
+0.00 (NA-166936566104494316543658203449131008.00)
 </td>
 <td style="text-align:right;">
 0.9905
@@ -3031,7 +3092,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-tobra_1d
+Tobramycin exposure
 </td>
 <td style="text-align:left;">
 17 (5.6)
@@ -3057,7 +3118,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-aztreonam_1d
+Aztreonam exposure
 </td>
 <td style="text-align:left;">
 10 (3.3)
@@ -3069,7 +3130,7 @@ aztreonam_1d
 10 (3.5)
 </td>
 <td style="text-align:left;">
-0.00 ( NA-166936566108259186328637880676646912.00)
+0.00 (NA-166936566108259186328637880676646912.00)
 </td>
 <td style="text-align:right;">
 0.9905
@@ -3083,7 +3144,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-bactrim_1d
+Sulfamethoxazole-trimethoprim exposure
 </td>
 <td style="text-align:left;">
 10 (3.3)
@@ -3109,7 +3170,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-third_plus_ceph_1d
+Cephalosporin exposure
 </td>
 <td style="text-align:left;">
 71 (23.5)
@@ -3135,7 +3196,7 @@ third_plus_ceph_1d
 </tr>
 <tr>
 <td style="text-align:left;">
-FQ_1d
+Fluoroquinolone exposure
 </td>
 <td style="text-align:left;">
 54 (17.9)
@@ -3161,7 +3222,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-dapto_1d
+Daptomycin exposure
 </td>
 <td style="text-align:left;">
 11 (3.6)
@@ -3187,7 +3248,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-flagyl_1d
+Metronidazole exposure
 </td>
 <td style="text-align:left;">
 58 (19.2)
@@ -3213,7 +3274,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-linezolid_1d
+Linezolid exposure
 </td>
 <td style="text-align:left;">
 46 (15.2)
@@ -3239,7 +3300,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-poly_colistin_1d
+Polymyxin and/or colistin exposure
 </td>
 <td style="text-align:left;">
 33 (10.9)
@@ -3265,7 +3326,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-tigecycline_1d
+Tigecycline exposure
 </td>
 <td style="text-align:left;">
 38 (12.6)
@@ -3291,7 +3352,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-vanco_1d
+Vancomycin exposure
 </td>
 <td style="text-align:left;">
 131 (43.4)
@@ -3317,7 +3378,7 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-zosyn_1d
+Piperacillin/tazobactam exposure
 </td>
 <td style="text-align:left;">
 42 (13.9)

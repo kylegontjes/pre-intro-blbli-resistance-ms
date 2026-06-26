@@ -82,17 +82,95 @@ KPC_plasmids <- subset(mobtyper_sum,KPC_plasmid>0) %>% arrange(-KPC_plasmid) %>%
  
 KPC_plasmid_scale <-  scale_fill_manual(breaks = c(T,F),values=c("red","gray"),name = "<i>bla</i><sub>KPC</sub>-containing",guide = guide_legend(nrow=1, title.position = "top", label.position = "right"))
 
-A <- ggplot(data=mobtyper %>% subset(primary_cluster_id %in% KPC_plasmids),aes(x=forcats::fct_infreq(primary_cluster_id),fill=KPC_plasmid)) + geom_bar(stat='count')  + KPC_plasmid_scale  + 
-  theme_bw_me + 
-  labs(x="Primary MOB-cluster",y="Isolates",fill="<i>bla</i><sub>KPC</sub>-containing plasmid") +
-  geom_text(stat = "count", 
-  position = position_stack(vjust = 0.5),
+# Label
+min_sep <- 10       # Minimum vertical distance between labels
+small_seg <- 1.5     # Segments of size <= 1 get outside labels
+outside_offset <- 8.5
+
+dataset_for_label <- mobtyper %>%
+  filter(primary_cluster_id %in% KPC_plasmids) %>%
+  count(primary_cluster_id, clade_I, KPC_plasmid) %>%
+  # Pivot wider
+  pivot_wider(
+    names_from = KPC_plasmid,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  rename(
+    TRUE_n  = `TRUE`,
+    FALSE_n = `FALSE`
+  ) %>%
+  mutate(
+    total = TRUE_n + FALSE_n,
+
+    # Default positions
+    y_true  = TRUE_n / 2,
+    y_false = TRUE_n + FALSE_n / 2,
+
+    # Only bars with both segments need adjustment
+    two_segments = TRUE_n > 0 & FALSE_n > 0,
+
+    # Put tiny upper segments above the bar
+    y_false = if_else(
+      FALSE_n <= small_seg & two_segments,
+      total + outside_offset,
+      y_false
+    ),
+
+    # Otherwise ensure labels are separated
+    sep = y_false - y_true,
+
+    y_false = if_else(
+      two_segments &
+        FALSE_n > small_seg &
+        sep < min_sep,
+      y_false + (min_sep - sep),
+      y_false
+    )
+  )
+
+## Label dataset
+label_df <- dataset_for_label %>%
+  pivot_longer(
+    cols = c(TRUE_n, FALSE_n),
+    names_to = "group",
+    values_to = "n"
+  ) %>%
+  mutate(
+    KPC_plasmid = group == "TRUE_n",
+    y = if_else(KPC_plasmid, y_true, y_false)
+  ) %>%
+  filter(n > 0)
+
+
+# Figure
+A <-  ggplot(
+  mobtyper %>% filter(primary_cluster_id %in% KPC_plasmids),
   aes(
-    label = after_stat(count),
-    y = after_stat(count) + ifelse(after_stat(count) < 3, 7.5, ifelse(after_stat(count)<6,10, ifelse(after_stat(count) <7,15,ifelse(after_stat(count)<13,15,0))))
-  ),
-  size = 3
-) + facet_grid(~clade_I) + s_figure_5_format
+    x = forcats::fct_infreq(primary_cluster_id),
+    fill = KPC_plasmid
+  )
+) +
+  geom_bar() +
+  KPC_plasmid_scale +
+  theme_bw_me +
+  labs(
+    x = "Primary MOB-cluster",
+    y = "Isolates",
+    fill = "<i>bla</i><sub>KPC</sub>-containing plasmid"
+  ) +
+  geom_text(
+    data = label_df,
+    aes(
+      x = primary_cluster_id,
+      y = y,
+      label = n
+    ),
+    inherit.aes = FALSE,
+    size = 2.75
+  ) +
+  facet_grid(~clade_I) +
+  s_figure_5_format
 
 A
 ```

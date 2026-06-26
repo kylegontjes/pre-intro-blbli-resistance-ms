@@ -87,9 +87,20 @@ exact <- c("OmpK36TD",'OmpK36_truncation_kleborate',"OmpK36_putative_function_al
 s_table_1 <- convert_tableone_into_df(dataset = df,vars=c(carbapenem,bla_genes,tn4401),factorVars = c(carbapenem,bla_genes,tn4401),strata="clade_I",outcome_names = c("Clade I","Clade II"),exact=exact)
 s_table_1$Variable <- gsub(" \\= 1","",s_table_1$Variable) %>% gsub(" \\(|\\)|\\%","",.) 
 
-s_table_1$Variable <- recode(s_table_1$Variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+s_table_1$Variable <- recode_genotypes(s_table_1$Variable)
 
 s_table_1 <-  s_table_1 %>% as.data.frame
+
+# Recode blactamase genes
+s_table_1$Variable <- ifelse(s_table_1$Variable %in% bla_genes,
+                             paste0("bla",s_table_1$Variable),s_table_1$Variable)
+
+# Recode tn4401s
+s_table_1$Variable <- recode(s_table_1$Variable, 
+                             "Tn4401_del_6920_7126" = "Tn4401 del 6920-7126",
+                             "Tn4401_del_1_554_7008_7075" = "Tn4401 del 1-554 7008-7075",
+                             "Tn4401_del_1_3391_6920_7126" = "Tn4401 del 1-3391 6920-7126") %>% gsub("Tn4401","tn4401",.)
+
 
 favorite_kable(s_table_1)
 ```

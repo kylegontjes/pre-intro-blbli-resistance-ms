@@ -205,6 +205,7 @@ L_legend <- cowplot::get_legend(L) %>% cowplot::plot_grid()
 L
 ```
 
+# Curate full figure
 ```{r,fig.height=15,fig.width=12}
 legends <- cowplot::plot_grid(I_legend,J_legend,L_legend,ncol=3,axis = 't')
 figure <- cowplot::plot_grid(A + theme(legend.position = 'none'),B,C,D,E ,f + theme(legend.position = 'none'),G+ theme(legend.position = 'none'),H + theme(legend.position = 'none'),I+ theme(legend.position = 'none'),J+ theme(legend.position = 'none'),K+ theme(legend.position = 'none'),L+ theme(legend.position = 'none'),ncol=3,labels = "AUTO")
@@ -212,6 +213,7 @@ figure_w_legends <- cowplot::plot_grid(figure,legends,ncol=1,rel_heights = c(1,0
 figure_w_legends
 ```
 
+## Save figure
 ```{r}
 ggsave("./figures/s_figure_9_KPC_copy_number_dynamics.png",plot=figure_w_legends, units='in',height=15,width=12,dpi=900,bg='white')
 ```

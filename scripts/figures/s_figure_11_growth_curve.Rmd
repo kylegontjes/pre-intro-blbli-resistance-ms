@@ -85,8 +85,13 @@ isolate_info <-  growth_curve_metadata_plate_average  %>% subset(isolate_type !=
 A <- ggplot(
     data = subset(growth_curve_metadata_plate_average, isolate_type != "blank"),
     aes(x = time, y = OD_average, color = identity, group = interaction(isolate_no, identity, Plate_ID)))  +
-  geom_rect(aes(fill = parent_category), data = isolate_info, inherit.aes = FALSE,
-            xmin=-Inf, xmax=Inf, ymin = -Inf, ymax=Inf, alpha = 0.5) +
+  geom_rect(aes(fill = parent_category), data = isolate_info,
+            inherit.aes = FALSE,
+            xmin=-Inf, 
+            xmax=Inf, 
+            ymin = -Inf, 
+            ymax=Inf, 
+            alpha = 0.5) +
     geom_line() +
     facet_wrap(~isolate_no) +
     theme_bw() +
@@ -102,9 +107,13 @@ A
 AUC_metadata_average$isolate_no <- factor(AUC_metadata_average$isolate_no,levels = c(isolate_ranking_frequency,'blank'))
 
 B <- ggplot(data=AUC_metadata_average %>% subset(isolate_type!='blank'),aes(y=AUC_average,x=isolate_no,fill=isolate_type)) +
-  facet_grid(  ~ parent_category, scales = "free_x", space  = "free_x" ) + 
-  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
-  geom_point(inherit.aes = T,position = position_dodge(width = 0.8)) + 
+  facet_grid( ~ parent_category, 
+              scales = "free_x", 
+              space  = "free_x" ) + 
+  geom_boxplot(position = position_dodge(width = 0.8),
+               outlier.shape = NA) + 
+  geom_point(inherit.aes = T,
+             position = position_dodge(width = 0.8)) + 
   theme_bw_me + xlab(NULL) + ylab("Area under the curve (AUC)") + labs(legend = "Isolate type") + s_figure_11_format_BCDE + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(AUC_metadata_average$AUC_average)))) + parent_color_group
 
 B

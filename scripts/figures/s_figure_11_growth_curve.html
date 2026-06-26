@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-06-18" />
+<meta name="date" content="2026-06-26" />
 
 <title>Supplemental Figure 11: Growth curve data</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Supplemental Figure 11: Growth curve
 data</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-06-18</h4>
+<h4 class="date">2026-06-26</h4>
 
 </div>
 
@@ -474,8 +474,13 @@ isolate_info &lt;-  growth_curve_metadata_plate_average  %&gt;% subset(isolate_t
 <pre class="r"><code>A &lt;- ggplot(
     data = subset(growth_curve_metadata_plate_average, isolate_type != &quot;blank&quot;),
     aes(x = time, y = OD_average, color = identity, group = interaction(isolate_no, identity, Plate_ID)))  +
-  geom_rect(aes(fill = parent_category), data = isolate_info, inherit.aes = FALSE,
-            xmin=-Inf, xmax=Inf, ymin = -Inf, ymax=Inf, alpha = 0.5) +
+  geom_rect(aes(fill = parent_category), data = isolate_info,
+            inherit.aes = FALSE,
+            xmin=-Inf, 
+            xmax=Inf, 
+            ymin = -Inf, 
+            ymax=Inf, 
+            alpha = 0.5) +
     geom_line() +
     facet_wrap(~isolate_no) +
     theme_bw() +
@@ -493,9 +498,13 @@ A  </code></pre>
 <pre class="r"><code>AUC_metadata_average$isolate_no &lt;- factor(AUC_metadata_average$isolate_no,levels = c(isolate_ranking_frequency,&#39;blank&#39;))
 
 B &lt;- ggplot(data=AUC_metadata_average %&gt;% subset(isolate_type!=&#39;blank&#39;),aes(y=AUC_average,x=isolate_no,fill=isolate_type)) +
-  facet_grid(  ~ parent_category, scales = &quot;free_x&quot;, space  = &quot;free_x&quot; ) + 
-  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
-  geom_point(inherit.aes = T,position = position_dodge(width = 0.8)) + 
+  facet_grid( ~ parent_category, 
+              scales = &quot;free_x&quot;, 
+              space  = &quot;free_x&quot; ) + 
+  geom_boxplot(position = position_dodge(width = 0.8),
+               outlier.shape = NA) + 
+  geom_point(inherit.aes = T,
+             position = position_dodge(width = 0.8)) + 
   theme_bw_me + xlab(NULL) + ylab(&quot;Area under the curve (AUC)&quot;) + labs(legend = &quot;Isolate type&quot;) + s_figure_11_format_BCDE + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(AUC_metadata_average$AUC_average)))) + parent_color_group
 
 B</code></pre>

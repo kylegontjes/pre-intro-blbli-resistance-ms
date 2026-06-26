@@ -99,7 +99,7 @@ p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC al
 
 p3.1 <- p3+ggnewscale::new_scale_fill()
 
-p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("Log2 blaKPC plasmid copy number","Log2 blaKPC gene copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.00006125)    +consistent_theme_s_figure_6_wo_md   + log2_cont_scale + ylim(NA,550)  
+p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("log2 blaKPC plasmid copy number","log2 blaKPC gene copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.00006125)    +consistent_theme_s_figure_6_wo_md   + log2_cont_scale + ylim(NA,550)  
 
 p4.1 <- p4 + ggnewscale::new_scale_fill()
   

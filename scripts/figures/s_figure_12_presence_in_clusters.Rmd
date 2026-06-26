@@ -31,25 +31,33 @@ set_null_device("png")
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
 tr <- read.tree("./data/tree/tree.treefile")
+
 # GWAS table
 gwas_table <- readRDS("./data/GWAS/hits/gwas_hits_table.RDS") %>% subset(nn_qc=="Pass")
 gwas_mat <- readRDS("./data/GWAS/hits/gwas_mat.RDS")  
+
 # Matrices
 ## Kleborate matrix
 kleborate <- readRDS("./data/GWAS/matrices/kleborate_mat.RDS") %>% as.data.frame 
+
 ## KPC Plasmids 
 KPC_containing_clusters <- readRDS("./data/GWAS/matrices/KPC_containing_cluster_mat.RDS") %>% as.data.frame
+
 ## Core genome burden models
 models <- c("model1","model1.2","model2","model2.2","model3","model3.2")
+
 for(x in models){
   grouped_model <- paste0(x,"_burden.RDS")
   assign(gsub(".RDS","",grouped_model),readRDS(paste0("./data/GWAS/matrices/",grouped_model)) %>% as.data.frame)
 }
+
 ## BLBLI clustering
 pclustering <- readRDS("./data/asr_clustering/blbli_asr_clustering_df.RDS")
 blbli_asr <- readRDS("./data/asr_clustering/blbli_asr.RDS")
+
 ## Canonical
 canonical <- readRDS("./data/carbapenem_resistance_panel/carbapenem_resistance_panel_matrix.RDS")
+
 # Join
 df <- left_join(df,kleborate %>% mutate(isolate_no = rownames(.)))
 df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
@@ -82,7 +90,7 @@ total_ct <-  table(df %>% .$blbli_asr_cluster_renamed_simple)
 total_genotype_ct <- prop_data %>% select(ct_columns) %>% `colnames<-`(gsub("_ct","",colnames(.))) %>% rowSums()
 column_names <- prop_columns %>% gsub("_prop","",.) %>% paste0(.," (n=",total_ct,")")
 ct_matrix <-  prop_data %>% select(ct_columns) %>% `colnames<-`(gsub("_ct","",colnames(.)))  %>% round(.,0)  %>% as.matrix %>% {ifelse(. ==0,"",.)}
-row_names <- variables %>% gsub("_1.2|_1|_2.2|_2|_3|_3.2","",.)  %>% recode(.,'OmpK35-25'='Truncation in ompK35 porin at 25%','OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in OmpK36','OmpK36GD'='GD loop 3 insertion in OmpK36','OmpK36TD'='TD loop 3 insertion in OmpK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant',"AA018"= "AA018 blaKPC-containing plasmid","AA552"="AA552 blaKPC-containing plasmid","KPNIH1_RS18665" = "PFAV in ompK36")
+row_names <- variables %>% gsub("_1.2|_1|_2.2|_2|_3|_3.2","",.)  %>% recode_genotypes(.)
 row_names <- gsub("blaKPC","<i>bla<sub>KPC</sub></i>",row_names)
 row_names  <- gsub("ompK36","<i>ompK36</i>",row_names )  
 row_names  <- gsub("ompK35","<i>ompK35</i>",row_names )  
@@ -231,6 +239,7 @@ B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<
 s_figure_12.A <- ggdraw() + draw_image(tmpfile)
 unlink(tmpfile)
 s_figure_12 <- cowplot::plot_grid(s_figure_12.A, B_w_tree, labels = "AUTO", ncol=2, label_size = 20, rel_widths = c(1,0.65))
+
 s_figure_12
 ``` 
 

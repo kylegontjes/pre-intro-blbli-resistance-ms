@@ -62,7 +62,47 @@ table_curation <- function(stats,ulogr,mlogr){
   ulogr$term <- as.character(ulogr$term)
   mlogr <- mlogr %>% select(variable, `OR (95% CI)`, p_value) %>% `colnames<-`(c("term","aOR (95% CI)","aOR p-value"))
   mlogr$term <- as.character(mlogr$term)
-  results <- left_join(stats,ulogr) %>% left_join(mlogr)
+  results <- left_join(stats,ulogr) %>% left_join(mlogr) 
+  # Column names
+  colnames(results) <- recode(colnames(results),
+                       "term" = "Variable")
+  # Variable rename
+  results$Variable <- recode(results$Variable,
+                              "age" = "Age, 1 year unit",
+                              "LOSbeforeCx" = "Length of stay before culture, 1-day unit" ,
+                              "sex.female" = "Female sex",
+                              "trach" = "Tracheostomy tube",
+                              "central_line" = "Central venous catheter",
+                              "foley" = "Indwelling urinary catheter",
+                              "gastro" = "Gastrostomy tube",
+                              "AKI" = "Acute kidney injury",
+                              "CKD" = "Chronic kidney disease",
+                              "VDRF" = "Ventilator-dependent respiratory failure",
+                              "underweight" = "Underweight or malnutrition",
+                              "CHF" = "Congestive heart failure",
+                              "decub" = "Decubitus ulcer stage 4+",
+                              "lung_dz" = "Chronic bronchitis or chronic obstructive pulmonary disease",
+                              "brain_injury" = "Brain injury",
+                              "malignancy" = "Malignancy",
+                              "obese" = "Obesity",
+                              "carbapenem_1d" = "Carbapenem exposure",
+                              "amikacin_1d" = "Amikacin exposure",
+                              "gent_1d" = "Gentamicin exposure",
+                              "tobra_1d" = "Tobramycin exposure",
+                              "aztreonam_1d" = "Aztreonam exposure",
+                              "bactrim_1d" = "Sulfamethoxazole-trimethoprim exposure",
+                              "third_plus_ceph_1d" = "Cephalosporin exposure",
+                              "FQ_1d" = "Fluoroquinolone exposure",
+                              "dapto_1d" = "Daptomycin exposure",
+                              "flagyl_1d" = "Metronidazole exposure",
+                              "linezolid_1d" = "Linezolid exposure",
+                              "poly_colistin_1d" = "Polymyxin and/or colistin exposure",
+                              "tigecycline_1d" = "Tigecycline exposure",
+                              "vanco_1d" = "Vancomycin exposure",
+                              "zosyn_1d"  = "Piperacillin/tazobactam exposure") 
+  # Recode NAs
+  results$`OR (95% CI)` <- gsub(" NA","NA",results$`OR (95% CI)`)
+  results$`aOR (95% CI)` <- gsub(" NA","NA",results$`aOR (95% CI)`)
   return(results)
 }
 ```
@@ -72,6 +112,14 @@ s_table_3 <- table_curation(descriptive_stats$present,purposeful_results$univari
 s_table_4 <- table_curation(descriptive_stats$singleton,purposeful_results$univariable$singleton,purposeful_results$multivariable$singleton$final_model_table)
 s_table_5 <- table_curation(descriptive_stats$cluster,purposeful_results$univariable$cluster,purposeful_results$multivariable$cluster$final_model_table)
 ```
+
+# Update table names
+```{r}
+paste0("Raw column: ")
+colnames
+
+```
+
 
 # Print tables
 

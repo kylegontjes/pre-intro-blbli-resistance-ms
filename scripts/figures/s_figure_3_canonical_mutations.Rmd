@@ -101,7 +101,7 @@ rownames(df) <- df$isolate_no
 
 # relevant alleles
   p9.1 <- p9 + new_scale_fill()
-  s_figure_3_A <-  gheatmap(p9.1,df %>% select(any_of(carbapenem)) %>% mutate_all(as.factor) %>% `colnames<-`(recode(colnames(.,),'OmpK35-25'='Truncation in ompK35 porin at 25%','OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in OmpK36','OmpK36GD'='GD loop 3 insertion in OmpK36','OmpK36TD'='TD loop 3 insertion in OmpK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.7,offset =.0000875) + genotype_scale_v  + consistent_theme_sfigure_3 + ylim(NA,665)
+  s_figure_3_A <-  gheatmap(p9.1,df %>% select(any_of(carbapenem)) %>% mutate_all(as.factor) %>% `colnames<-`(recode_genotypes(colnames(.))), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.7,offset =.0000875) + genotype_scale_v  + consistent_theme_sfigure_3 + ylim(NA,665)
 ```
 
 # FB - Frequency in resistant isolates
@@ -111,7 +111,7 @@ variables_to_use <- carbapenem %>% subset(.!='OmpK35-25%')
 gwas_nons_freq <- variants_freq(variables_to_use,df)   
 gwas_nons_freq$locus_tag<- factor(gwas_nons_freq$locus_tag, levels=rev(unique(variables_to_use)))
                                   
-gwas_nons_freq$`Significant Hit` <- recode(gwas_nons_freq$locus_tag  ,'OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36GD'='GD loop 3 insertion in OmpK36','OmpK36TD'='TD loop 3 insertion in OmpK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')  
+gwas_nons_freq$`Significant Hit` <- recode_genotypes(gwas_nons_freq$locus_tag) 
 levels(gwas_nons_freq$`Significant Hit`)  <- gsub("ompK36","<i>ompK36</i>",levels(gwas_nons_freq$`Significant Hit` )  )
 levels(gwas_nons_freq$`Significant Hit`)  <- gsub("ompK35","<i>ompK35</i>",levels(gwas_nons_freq$`Significant Hit` )  )
 levels(gwas_nons_freq$`Significant Hit`)  <- gsub("acrAB-tolC","<i>acrAB-tolC</i>",levels(gwas_nons_freq$`Significant Hit` )  )
@@ -135,7 +135,7 @@ s_figure_3_B <- freq_plot(gwas_nons_freq) +  s_figure_3_descriptive_plot_theme
 nn_data_melt <- lapply(variables_to_use,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)  
 nn_data_melt$locus_tag<- factor(nn_data_melt$locus_tag, levels=rev(unique(variables_to_use)))
                                   
-nn_data_melt$locus_tag<- recode(nn_data_melt$locus_tag ,'OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion in OmpK36','OmpK36GD'='GD loop 3 insertion in OmpK36','OmpK36TD'='TD loop 3 insertion in OmpK36','OmpK36_truncation_kleborate'='Truncation in ompK36', 'OmpK36_non_syn'='Non-synonymous mutation in ompK36','OmpK36_putative_function_altering'='PFAV in ompK36','OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36','OmpK36_promoter_IS'='Insertion sequence near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='PFAV in ramR efflux pump regulator',"RamA"='PFAV in ramA efflux pump activator','PBP_any'='Non-synonymous mutations in penicillin-binding proteins','PBP2'='Penicillin-binding protein-2 mutant',"PBP4"='Penicillin-binding protein-4 mutant')  
+nn_data_melt$locus_tag<- recode_genotypes(nn_data_melt$locus_tag)
 levels(nn_data_melt$locus_tag) <- gsub("ompK36","<i>ompK36</i>",levels(nn_data_melt$locus_tag))  
 levels(nn_data_melt$locus_tag) <- gsub("ompK35","<i>ompK35</i>",levels(nn_data_melt$locus_tag))  
 levels(nn_data_melt$locus_tag) <- gsub("acrAB-tolC","<i>acrAB-tolC</i>",levels(nn_data_melt$locus_tag))  

@@ -60,7 +60,7 @@ blbli_canonical <- convert_tableone_into_df(vars = carbapenem,strata = "blbli_di
 table_1 <- cbind(blbli_canonical[,c(1,2,4,3,5)]) %>% `rownames<-`(NULL) 
 table_1$Variable <-gsub(" = 1","",table_1$Variable) %>% gsub(" \\(|\\)|\\%","",.) 
 
-table_1$Variable <- recode(table_1$Variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+table_1$Variable <- recode_genotypes(table_1$Variable)
 
 favorite_kable(table_1)  
 ``` 
@@ -85,7 +85,7 @@ canonical_var <- canonical %>% select(-isolate_no,-`OmpK35-25%`) %>% colnames()
 nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) %>% mutate(variable = canonical_var)  
 nn_data <- get_nn_flag(nn_data)  
 
-nn_data$Variable <-  recode(nn_data$variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+nn_data$Variable <-  recode_genotypes(nn_data$variable)
 nn_data$`Nearest-neighbor criterion` <- nn_data$nn_qc 
  
 nn_data %>% favorite_kable()
@@ -101,7 +101,7 @@ diagnostic_stats <- lapply(nn_data$variable , FUN=function(x){
 
 diagnostic_stats$Discriminatory <- get_diagnostic_flag(gwas_table_specificity = diagnostic_stats$spec, gwas_table_accuracy = diagnostic_stats$accuracy, specificity_threshold = 0.90,accuracy_threshold = 0.80)
    
-diagnostic_stats$Variable <-  recode(diagnostic_stats$Variable,'OmpK35-25'='ompK35 porin truncation at 25%','OmpK36_c25t'='C25T transition in ompK36','OmpK36_L3_mutations'='Loop 3 insertion','OmpK36GD'='GD insertion','OmpK36TD'='TD insertion','OmpK36_truncation_kleborate'='ompK36 truncation', 'OmpK36_non_syn'='ompK36 non-synonymous mutation','OmpK36_putative_function_altering'='ompK36 putative function-altering mutations','OmpK36_intergenic'='ompK36 intergenic region','OmpK36_promoter_IS'='Insertion seqeunce near ompK36 promoter',"AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant','RamR'='ramR efflux pump regulator PFAV',"RamA"='ramA efflux pump activator PFAV','PBP_any'='Non-synonymous mutations in penicillin-binding-proteins','PBP2'='Penicillin-binding protein-2',"PBP4"='Penicillin-binding protein-4')
+diagnostic_stats$Variable <-  recode_genotypes(diagnostic_stats$Variable)
 diagnostic_stats$`Discriminatory criterion` <- diagnostic_stats$Discriminatory 
 
 diagnostic_stats %>% favorite_kable()
