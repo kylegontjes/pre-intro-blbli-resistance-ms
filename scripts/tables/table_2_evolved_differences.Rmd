@@ -207,8 +207,8 @@ colnames(table_2) <- recode(colnames(table_2),
                             "evolved_kpc_plasmid" = "Evolved blaKPC plasmid",
                             "evol_kpc_chr_norm" = "Evolved blaKPC gene CN",
                             "evol_kpc_plasmid_chr_norm" = "Evolved blaKPC plasmid CN",
-                            "kpc_copy_change" = "Log2 fold change in blaKPC gene CN",
-                            "kpc_plasmid_change" = "Log2 fold change in blaKPC plasmid CN",
+                            "kpc_copy_change" = "log2 fold change in blaKPC gene CN",
+                            "kpc_plasmid_change" = "log2 fold change in blaKPC plasmid CN",
                             "kpc_plasmid_size_difference" = "Change in plasmid size (bp)")
 ```
 

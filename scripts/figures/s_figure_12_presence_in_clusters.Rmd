@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 # Environment
 
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','cowplot')
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -231,13 +231,14 @@ rownames(df) <- df$isolate_no
 
 B_1 <- B + ggnewscale::new_scale_fill()
 
-B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0)  + ylim(NA, 560) + theme(legend.position = 'bottom', legend.text = element_markdown()) + cluster_scale_2_col_key 
+B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0,font.size=3.75)  + ylim(NA, 535) + theme(legend.position = 'bottom', legend.text = element_markdown(),legend.box.margin = margin(t = -25)) + cluster_scale_2_col_key 
 ```
 
 # Cowplot supplemental figure
-```{r, fig.height=6.5, fig.width=11} 
+```{r, fig.height=6.285714, fig.width=11} 
 s_figure_12.A <- ggdraw() + draw_image(tmpfile)
-unlink(tmpfile)
+unlink(tmpfile) 
+
 s_figure_12 <- cowplot::plot_grid(s_figure_12.A, B_w_tree, labels = "AUTO", ncol=2, label_size = 20, rel_widths = c(1,0.65))
 
 s_figure_12
@@ -245,5 +246,5 @@ s_figure_12
 
 ## Save figure
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=11,fig.height=6.5} 
-ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_clustering.png', width = 11, height = 6.5, limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_clustering.png', width = 11, height = 6.285714, limitsize=FALSE, bg='white', dpi=900)
 ```

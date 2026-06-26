@@ -23,7 +23,7 @@ create_MIC_histogram <- function(phenotype_cont, phenotype_cat = NULL, phenotype
   colnames(data) <- c("phenotype_cont","phenotype_cat")
   histogram <-  ggplot(data) +geom_bar(aes(x=phenotype_cont,fill=phenotype_cat)) + ylab("Isolates") + labs(fill="Resistance profile") + xlab(paste0(phenotype_name," (µg/mL)"))  + theme_bw_me
   if(add_text==T){
-  histogram <- histogram + geom_text(stat='count',aes(x=phenotype_cont,label = after_stat(count),y=after_stat(count)+6),size=5)
+  histogram <- histogram + geom_text(stat='count',aes(x=phenotype_cont,label = after_stat(count),y=after_stat(count)+6),size=4)
   }
   return(histogram)
 }  
@@ -154,4 +154,30 @@ recode_resistance_variables <- function(variables){
          "FOS_dich_num" = "Fosfomycin",
          "CT_dich_num" = "Ceftolozane-tazobactam",
          "FDC_dich_num"="Cefiderocol")
+}
+
+# Recode genotypes
+recode_genotypes <- function(name){
+  recode(name,
+       'OmpK35-25'='Truncating mutation in ompK35 porin at 25%',
+       'OmpK36_c25t'='25 cytosine-to-thymine transition in ompK36',
+       'OmpK36_L3_mutations'='Loop 3 insertion in OmpK36',
+       'OmpK36GD'='GD loop 3 insertion in OmpK36',
+       'OmpK36TD'='TD loop 3 insertion in OmpK36',
+       'OmpK36_truncation_kleborate'='Truncating mutation in ompK36',
+       'OmpK36_non_syn'='Non-synonymous mutation in ompK36',
+       'OmpK36_putative_function_altering'='PFAV in ompK36',
+       'OmpK36_intergenic'='Mutation in 5\' intergenic region of ompK36',
+       'OmpK36_promoter_IS'='Insertion sequence near ompK36 promoter',
+       "AcrAB_TolC_any" = 'acrAB-tolC efflux pump mutant',
+       'RamR'='PFAV in ramR efflux pump regulator',
+       "RamA"='PFAV in ramA efflux pump activator',
+       'PBP_any'='Non-synonymous mutations in penicillin-binding-proteins',
+       'PBP2'='Penicillin-binding protein-2 mutant',
+       "PBP4"='Penicillin-binding protein-4 mutant',
+       "AA018"="AA018 blaKPC-containing plasmid",
+       "AA552"="AA552 blaKPC-containing plasmid",
+       "OmpK36_loop3_insertion"="Loop 3 insertion in OmpK36",
+       "OmpK36GD"="GD loop 3 insertion in OmpK36",
+       "KPNIH1_RS18665" = "PFAV in ompK36")
 }

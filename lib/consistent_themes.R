@@ -181,7 +181,7 @@ log2_cont_scale <-  scale_fill_gradient2(
   high = "red",
   midpoint = 0,
   na.value = "lightgrey",
-  name = "Copy Number",
+  name = "Copy number",
   guide = guide_colorbar(direction = 'vertical',order=5,
     barwidth = unit(0.5, "cm"),
     barheight = unit(3, "cm"))) 
@@ -213,11 +213,11 @@ mytheme <- ttheme_minimal(core = list(fg_params = list(hjust=0, x=0.01,
 ### 1. Figure 1 (Histogram)
 figure_1_format <-   theme(legend.position = "bottom",
                            axis.ticks.length=unit(.2, "cm"),
-                           axis.text.x =   element_text(size=14,color="black",hjust=0.5),
-                           axis.text.y =   element_text(size=14,color="black",vjust=0.5),
-                           axis.title = element_text(size = 16,color="black"),
-                           legend.text =   element_text(size=14,color="black"),
-                           legend.title = element_text(size = 16,color="black")
+                           axis.text.x =   element_text(size=12,color="black",hjust=0.5),
+                           axis.text.y =   element_text(size=12,color="black",vjust=0.5),
+                           axis.title = element_text(size = 14,color="black"),
+                           legend.text =   element_text(size=12,color="black"),
+                           legend.title = element_text(size = 14,color="black")
                            ) 
 
 ### 2. Figure 2 (Histogram)
