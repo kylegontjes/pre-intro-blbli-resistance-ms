@@ -1,4 +1,4 @@
-Variable,Overall (n=412),BL/BLI Resistant (n=58),BL/BLI Susceptible (n=354),p-value,Nearest-neighbor criterion,Discriminatory criterion
+Mechanism of interest,Overall (n=412),BL/BLI resistant (n=58),BL/BLI susceptible (n=354),p-value,Nearest neighbor criterion,Discriminatory criterion
 Truncating mutation in ompK35 porin at 25%,412 (100.0),58 (100.0),354 (100.0),NA,NA,NA
 25 cytosine-to-thymine transition in ompK36,131 (31.8),37 (63.8),94 (26.6),<0.001,Pass,Fail
 Loop 3 insertion in OmpK36,124 (30.1),37 (63.8),87 (24.6),<0.001,Pass,Fail

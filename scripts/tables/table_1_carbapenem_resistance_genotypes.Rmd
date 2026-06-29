@@ -56,7 +56,7 @@ exact <-  c("OmpK36TD",'OmpK36_truncation_kleborate',"OmpK36_putative_function_a
 
 # Curate the table
 ```{r}
-blbli_canonical <- convert_tableone_into_df(vars = carbapenem,strata = "blbli_dich",factorVars = carbapenem,dataset=df,outcome_names = c("BL/BLI Susceptible","BL/BLI Resistant"),exact=exact) %>% as.data.frame() 
+blbli_canonical <- convert_tableone_into_df(vars = carbapenem,strata = "blbli_dich",factorVars = carbapenem,dataset=df,outcome_names = c("BL/BLI susceptible","BL/BLI resistant"),exact=exact) %>% as.data.frame() 
 table_1 <- cbind(blbli_canonical[,c(1,2,4,3,5)]) %>% `rownames<-`(NULL) 
 table_1$Variable <-gsub(" = 1","",table_1$Variable) %>% gsub(" \\(|\\)|\\%","",.) 
 
@@ -86,11 +86,11 @@ nn_data <- lapply(canonical_var,get_summary_statistics,nn) %>% do.call(rbind,.) 
 nn_data <- get_nn_flag(nn_data)  
 
 nn_data$Variable <-  recode_genotypes(nn_data$variable)
-nn_data$`Nearest-neighbor criterion` <- nn_data$nn_qc 
+nn_data$`Nearest neighbor criterion` <- nn_data$nn_qc 
  
 nn_data %>% favorite_kable()
 
-table_1 <- left_join(table_1,nn_data %>% select(Variable,`Nearest-neighbor criterion`))
+table_1 <- left_join(table_1,nn_data %>% select(Variable,`Nearest neighbor criterion`))
 ```
 
 # Implement another marginal statistics thresholding approach to identify discriminatory genotypes
@@ -112,6 +112,9 @@ table_1 <- left_join(table_1,diagnostic_stats %>% select(Variable,`Discriminator
 # Final table
 
 ```{r}
+colnames(table_1) <- recode(colnames(table_1),
+                            'Variable' = "Mechanism of interest") 
+
 table_1 %>% favorite_kable()
 ```
 

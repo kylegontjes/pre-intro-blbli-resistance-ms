@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-06-26" />
+<meta name="date" content="2026-06-29" />
 
 <title>Table 1: Resistance by genotypes</title>
 
@@ -576,7 +576,7 @@ display: none;
 
 <h1 class="title toc-ignore">Table 1: Resistance by genotypes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-06-26</h4>
+<h4 class="date">2026-06-29</h4>
 
 </div>
 
@@ -674,7 +674,7 @@ exact &lt;-  c(&quot;OmpK36TD&quot;,&#39;OmpK36_truncation_kleborate&#39;,&quot;
 </div>
 <div id="curate-the-table" class="section level1">
 <h1>Curate the table</h1>
-<pre class="r"><code>blbli_canonical &lt;- convert_tableone_into_df(vars = carbapenem,strata = &quot;blbli_dich&quot;,factorVars = carbapenem,dataset=df,outcome_names = c(&quot;BL/BLI Susceptible&quot;,&quot;BL/BLI Resistant&quot;),exact=exact) %&gt;% as.data.frame() 
+<pre class="r"><code>blbli_canonical &lt;- convert_tableone_into_df(vars = carbapenem,strata = &quot;blbli_dich&quot;,factorVars = carbapenem,dataset=df,outcome_names = c(&quot;BL/BLI susceptible&quot;,&quot;BL/BLI resistant&quot;),exact=exact) %&gt;% as.data.frame() 
 table_1 &lt;- cbind(blbli_canonical[,c(1,2,4,3,5)]) %&gt;% `rownames&lt;-`(NULL) 
 table_1$Variable &lt;-gsub(&quot; = 1&quot;,&quot;&quot;,table_1$Variable) %&gt;% gsub(&quot; \\(|\\)|\\%&quot;,&quot;&quot;,.) 
 
@@ -691,10 +691,10 @@ Variable
 Overall (n=412)
 </th>
 <th style="text-align:left;">
-BL/BLI Resistant (n=58)
+BL/BLI resistant (n=58)
 </th>
 <th style="text-align:left;">
-BL/BLI Susceptible (n=354)
+BL/BLI susceptible (n=354)
 </th>
 <th style="text-align:left;">
 p-value
@@ -996,7 +996,7 @@ nn_data &lt;- lapply(canonical_var,get_summary_statistics,nn) %&gt;% do.call(rbi
 nn_data &lt;- get_nn_flag(nn_data)  
 
 nn_data$Variable &lt;-  recode_genotypes(nn_data$variable)
-nn_data$`Nearest-neighbor criterion` &lt;- nn_data$nn_qc 
+nn_data$`Nearest neighbor criterion` &lt;- nn_data$nn_qc 
  
 nn_data %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
@@ -1096,7 +1096,7 @@ nn_qc
 Variable
 </th>
 <th style="text-align:left;">
-Nearest-neighbor criterion
+Nearest neighbor criterion
 </th>
 </tr>
 </thead>
@@ -2573,7 +2573,7 @@ Pass
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>table_1 &lt;- left_join(table_1,nn_data %&gt;% select(Variable,`Nearest-neighbor criterion`))</code></pre>
+<pre class="r"><code>table_1 &lt;- left_join(table_1,nn_data %&gt;% select(Variable,`Nearest neighbor criterion`))</code></pre>
 </div>
 <div id="implement-another-marginal-statistics-thresholding-approach-to-identify-discriminatory-genotypes" class="section level1">
 <h1>Implement another marginal statistics thresholding approach to
@@ -3398,27 +3398,30 @@ Pass
 </div>
 <div id="final-table" class="section level1">
 <h1>Final table</h1>
-<pre class="r"><code>table_1 %&gt;% favorite_kable()</code></pre>
+<pre class="r"><code>colnames(table_1) &lt;- recode(colnames(table_1),
+                            &#39;Variable&#39; = &quot;Mechanism of interest&quot;) 
+
+table_1 %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
 <thead>
 <tr>
 <th style="text-align:left;">
-Variable
+Mechanism of interest
 </th>
 <th style="text-align:left;">
 Overall (n=412)
 </th>
 <th style="text-align:left;">
-BL/BLI Resistant (n=58)
+BL/BLI resistant (n=58)
 </th>
 <th style="text-align:left;">
-BL/BLI Susceptible (n=354)
+BL/BLI susceptible (n=354)
 </th>
 <th style="text-align:left;">
 p-value
 </th>
 <th style="text-align:left;">
-Nearest-neighbor criterion
+Nearest neighbor criterion
 </th>
 <th style="text-align:left;">
 Discriminatory criterion
