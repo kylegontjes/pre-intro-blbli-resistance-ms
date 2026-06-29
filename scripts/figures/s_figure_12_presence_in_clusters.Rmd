@@ -124,6 +124,7 @@ heatmap_legend_params <- list(
   at = c(0, 0.25, 0.5, 0.75, 1),
   labels = c("0%", "25%", "50%", "75%", "100%"),
   direction = "horizontal",
+  title_position = 'topcenter',
   title_gp = gpar(fontsize = 16),
   labels_gp = gpar(fontsize = 14),
   legend_width = unit(10, "cm")
@@ -148,7 +149,8 @@ clade_labels <- columnAnnotation(Clade = column_names_nnotated,col=  list(Clade 
 # Heatmap
 A_heatmap <- ComplexHeatmap::Heatmap(prop_matrix,show_heatmap_legend = T,show_row_names = T,col = c("white","red"),cluster_columns = T,cluster_rows=T,name = "Percentage",column_labels = column_names,row_labels = gt_render(row_names), cell_fun = function(j, i, x, y, width, height, fill) {
     grid.text(sprintf("%.3s", ct_matrix[i, j]), x, y, gp = gpar(fontsize = 11))
-},border_gp = gpar(col = "black", lty = 1), rect_gp = gpar(col = "white", lwd = 1),bottom_annotation = clade_labels,row_names_gp =  gpar(fontsize = 11),column_names_gp =  gpar(fontsize = 13),heatmap_legend_param = heatmap_legend_params, width = unit(10, "cm"),
+},border_gp = gpar(col = "black", lty = 1), rect_gp = gpar(col = "white", lwd = 1),bottom_annotation = clade_labels,row_names_gp =  gpar(fontsize = 11),column_names_gp =  gpar(fontsize = 13),heatmap_legend_param = heatmap_legend_params, 
+width = unit(10, "cm"),
  row_names_max_width = unit(8.759, "cm"))
  
 # Save heatmap to a temporary PNG file
