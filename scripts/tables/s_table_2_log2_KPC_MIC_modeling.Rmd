@@ -78,7 +78,8 @@ IR_interaction <- lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w_KP
 IR_summary <- tab_model(IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T)
 
 # Regression results
-regression_results <- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_interaction=MVB_interaction,IR_simple=IR_simple,IR_adjusted=IR_adjusted,IR_interaction=IR_interaction)
+regression_results <- list(IR_simple=IR_simple,IR_adjusted=IR_adjusted,IR_interaction=IR_interaction,
+                           MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_interaction=MVB_interaction)
 ```
 
 # Save html form of this table!
@@ -88,7 +89,8 @@ regression_results <- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_i
 saveRDS(object = regression_results,file = "./tables/s_table_2.RDS")
 
 # Create table model
-table_reg <- tab_model(MVB_simple,MVB_adjusted,MVB_interaction,IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T,file = NULL)  
+table_reg <- tab_model(IR_simple,IR_adjusted,IR_interaction,MVB_simple,MVB_adjusted,MVB_interaction,show.se = T,show.aic = T,file = NULL)  
+
 table_reg
 
 html_file <- "tables/s_table_2.html"
