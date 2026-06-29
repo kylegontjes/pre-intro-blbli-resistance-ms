@@ -6,6 +6,7 @@ date: "`r Sys.Date()`"
 ---
 
 # Combination Therapy Manuscript
+
 ```{r setup, include=FALSE}
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
@@ -145,6 +146,7 @@ s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,l
 s_figure_4
 ```
 
-```{r,message=F,echo=F,error=F,warning=F,fig.width=21.5,fig.height=18.5} 
+# Save figure 
+```{r}
 ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 22, height = 18.5,limitsize=FALSE,bg='white',dpi=900)
 ```

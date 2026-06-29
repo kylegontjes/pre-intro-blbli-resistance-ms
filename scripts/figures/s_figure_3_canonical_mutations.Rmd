@@ -16,7 +16,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment
 
-```{r environment, echo=F, message=FALSE, include=F, results=F}
+```{r environment}
 #Packages
 packages <- c("tidyverse","cowplot","phyloAMR","ggtree","ggnewscale",'gridExtra')
 
@@ -30,6 +30,10 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 
 # Set null device
 set_null_device("png")
+
+# Print
+Sys.info()
+sessionInfo() 
 ```
 
 # Data
@@ -99,7 +103,7 @@ rownames(df) <- df$isolate_no
   p8.1 <- p8 + new_scale_fill()
   p9 <-  gheatmap(p8.1,df %>% select(KPC_allele) %>% mutate_all(as.factor)  %>% `colnames<-`("blaKPC allele"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000075)  +kpc_scale + consistent_theme_sfigure_3 + ylim(NA,480)
 
-# relevant alleles
+# Relevant alleles
   p9.1 <- p9 + new_scale_fill()
   s_figure_3_A <-  gheatmap(p9.1,df %>% select(any_of(carbapenem)) %>% mutate_all(as.factor) %>% `colnames<-`(recode_genotypes(colnames(.))), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.7,offset =.0000875) + genotype_scale_v  + consistent_theme_sfigure_3 + ylim(NA,665)
 ```
@@ -146,6 +150,7 @@ s_figure_3_C <- nn_plot(nn_data_melt)   + s_figure_3_descriptive_plot_theme
 ```
 
 # Merged figure
+
 ```{r,fig.height=12.1667,fig.width=18.25}
 s_figure_3BC <- plot_grid(s_figure_3_B,s_figure_3_C ,nrow = 2,labels = c("B","C"),label_size = 22,align = "hv",label_x = -0.0355)
 
@@ -155,6 +160,7 @@ s_figure_3
 ```
 
 ## Save figure
+
 ```{r,message=F,echo=F,error=F,warning=F,fig.height=12.5,fig.width=18} 
 ggsave(plot = s_figure_3, filename = './figures/s_figure_3.png', height = 12.1667, width = 18.25, limitsize=FALSE, bg='white', dpi=900)
 ```

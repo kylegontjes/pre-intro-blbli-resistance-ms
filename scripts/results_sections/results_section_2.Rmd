@@ -12,6 +12,7 @@ knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistanc
 ```
 
 # Environment
+
 ```{r}
 packages <- c("tidyverse","kableExtra","tableone","cowplot","ape",'phyloAMR')
 lapply(packages,library,character.only=T)
@@ -26,6 +27,7 @@ sessionInfo()
 ```
  
 # Date
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS") 
 tr <- read.tree("./data/tree/tree.treefile") 
@@ -47,12 +49,14 @@ tr_CII <- keep.tip(tr,df_CII$isolate_no)
 ```
 
 # Clade frequency
+
 ```{r}
 convert_tableone_into_df(df,vars = "clade_I") %>% favorite_kable
 ```
 
 # Differences in prevalence and resistance across  clades
 ## Continuous
+
 ```{r}
 CI_MVB_MIC_dist <- median_IQR("MVB_log_2",df_CI)
 CII_MVB_MIC_dist <- median_IQR("MVB_log_2",df_CII)
@@ -66,21 +70,26 @@ cbind(pheno="MVB",CI_MVB_MIC_dist,CII_MVB_MIC_dist,Clade_MVB_comps) %>% rbind(.,
 ``` 
 
 ## Discrete
+
 ```{r}  
 convert_tableone_into_df(df,vars = c("blbli_dich","MVB_dich","IR_dich"),strata="clade_I",outcome_names = c("Clade I","Clade II"))  %>% favorite_kable()
 ```
 
 ## Phylogenetic clustering
 ### Overall count
+
 ```{r} 
 table(df$blbli_asr_cluster_renamed,df$clade_I)
 ```
+
 ### Overall data
+
 ```{r}
 phyloAMR::asr_cluster_analysis(asr_clustering_obj)
 ```
 
 ### Clustering data
+
 ```{r} 
 clustering_categories <- subset(df$blbli_asr_cluster_renamed,grepl("No Feature",df$blbli_asr_cluster_renamed)==F) %>% sort %>%  unique
 count <- c()
@@ -97,6 +106,7 @@ clustering_data %>% favorite_kable
 ```
 
 # Tip level data
+
 ```{r}
 ST258_phylo <- asr_cluster_analysis(asr_clustering_obj)   %>% mutate(population = "ST258")
 CI_phylo <- asr_cluster_analysis(asr_clustering_obj %>% subset(child_name %in% df_CI$isolate_no))  %>% mutate(population = "Clade I")
@@ -106,15 +116,19 @@ rbind(ST258_phylo,CI_phylo,CII_phylo) %>% favorite_kable()
 ```
 
 # Data from fitmultiMK modeling
+
 ```{r}
 fitmultiMK <- readRDS("./data/fitmultiMk_rate_differences/fitmultiMk_rate_differences_table.RDS")
 fitmultiMK %>% subset(phenotype == 'blbli_dich_num') %>% favorite_kable()
 ```
 
 # Statistical testing
+
 ```{r}
 paste0("Phylo occurrence diffence")
+c(20,15,106,248) %>% matrix(ncol=2,dimnames = list(c("Clade I","Clade II"),c("Events","Susceptible")))
 c(20,15,106,248) %>% matrix(ncol=2) %>% fisher.test()
 paste0("Clustering, no significant difference but still interesting")
+c(5,2,15,14) %>% matrix(ncol=2,dimnames = list(c("Clade I","Clade II"),c("Clusters","Singleton events")))
 c(5,2,15,14) %>% matrix(ncol=2) %>% fisher.test()
 ``` 

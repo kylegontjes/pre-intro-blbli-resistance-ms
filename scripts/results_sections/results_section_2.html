@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-06-18" />
+<meta name="date" content="2026-06-29" />
 
 <title>Results Section 2: Differences in resistance emergence and spread exist across clades of epidemic-lineage ST258</title>
 
@@ -578,7 +578,7 @@ display: none;
 resistance emergence and spread exist across clades of epidemic-lineage
 ST258</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-06-18</h4>
+<h4 class="date">2026-06-29</h4>
 
 </div>
 
@@ -1513,6 +1513,10 @@ blbli_dich_num
 <h1>Statistical testing</h1>
 <pre class="r"><code>paste0(&quot;Phylo occurrence diffence&quot;)</code></pre>
 <pre><code>## [1] &quot;Phylo occurrence diffence&quot;</code></pre>
+<pre class="r"><code>c(20,15,106,248) %&gt;% matrix(ncol=2,dimnames = list(c(&quot;Clade I&quot;,&quot;Clade II&quot;),c(&quot;Events&quot;,&quot;Susceptible&quot;)))</code></pre>
+<pre><code>##          Events Susceptible
+## Clade I      20         106
+## Clade II     15         248</code></pre>
 <pre class="r"><code>c(20,15,106,248) %&gt;% matrix(ncol=2) %&gt;% fisher.test()</code></pre>
 <pre><code>## 
 ##  Fisher&#39;s Exact Test for Count Data
@@ -1527,6 +1531,10 @@ blbli_dich_num
 ##   3.109152</code></pre>
 <pre class="r"><code>paste0(&quot;Clustering, no significant difference but still interesting&quot;)</code></pre>
 <pre><code>## [1] &quot;Clustering, no significant difference but still interesting&quot;</code></pre>
+<pre class="r"><code>c(5,2,15,14) %&gt;% matrix(ncol=2,dimnames = list(c(&quot;Clade I&quot;,&quot;Clade II&quot;),c(&quot;Clusters&quot;,&quot;Singleton events&quot;)))</code></pre>
+<pre><code>##          Clusters Singleton events
+## Clade I         5               15
+## Clade II        2               14</code></pre>
 <pre class="r"><code>c(5,2,15,14) %&gt;% matrix(ncol=2) %&gt;% fisher.test()</code></pre>
 <pre><code>## 
 ##  Fisher&#39;s Exact Test for Count Data

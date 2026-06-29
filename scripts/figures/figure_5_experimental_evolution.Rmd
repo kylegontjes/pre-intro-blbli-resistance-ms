@@ -13,7 +13,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment
 
-```{r environment, echo=F, message=FALSE, include=F, results=F}
+```{r environment}
 #Packages
 packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext","grid",'reshape2')
 

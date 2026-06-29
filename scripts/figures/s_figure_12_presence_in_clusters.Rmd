@@ -24,6 +24,10 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 
 # Set null device
 set_null_device("png")
+
+# Print
+Sys.info()
+sessionInfo()
 ```
 
 # Load data
@@ -234,7 +238,8 @@ B_1 <- B + ggnewscale::new_scale_fill()
 B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0,font.size=3.75)  + ylim(NA, 535) + theme(legend.position = 'bottom', legend.text = element_markdown(),legend.box.margin = margin(t = -25)) + cluster_scale_2_col_key 
 ```
 
-# Cowplot supplemental figure
+# Supplemental figure
+
 ```{r, fig.height=6.285714, fig.width=11} 
 s_figure_12.A <- ggdraw() + draw_image(tmpfile)
 unlink(tmpfile) 
@@ -245,6 +250,7 @@ s_figure_12
 ``` 
 
 ## Save figure
+
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=11,fig.height=6.5} 
 ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_clustering.png', width = 11, height = 6.285714, limitsize=FALSE, bg='white', dpi=900)
 ```

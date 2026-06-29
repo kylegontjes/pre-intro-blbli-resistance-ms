@@ -25,6 +25,11 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 # Functions
 source("./lib/consistent_themes.R")
 source("./lib/common_functions.R")
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()  
 ```
 
 # Data
@@ -74,17 +79,21 @@ variant_freq_histogram <- function(annots_df,bins=NULL){
 }
 
 paste0("Number and percentage of variants under 1%: ")
+
 table(all_variants_annots$genotype_freq_under_1)
 grepl(pattern = "yes",all_variants_annots$genotype_freq_under_1) %>% sum / nrow(all_variants_annots) 
 
 s_figure_14_main <- variant_freq_histogram(all_variants_annots,bins=100)   + s_figure_14_format + ylim(NA,4050)
+
 s_figure_14_inlet <- variant_freq_histogram(all_variants_annots %>% subset(genotype_freq<=0.05),bins=30) + theme(legend.position = "none") + xlab("") + ylab("")
 
 s_figure_14 <- s_figure_14_main +  annotation_custom(ggplotGrob(s_figure_14_inlet), xmin = 40, xmax = 100, ymin = 500, ymax = 4250)
+
 s_figure_14 
 ```
 
 ## Save figure 
+
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=4.5,fig.height=3.6} 
 ggsave(plot = s_figure_14, filename = './figures/s_figure_14_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
 ```

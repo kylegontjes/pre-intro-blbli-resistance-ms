@@ -24,6 +24,10 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 
 # Set null device
 set_null_device("png")
+
+# Print
+Sys.info()
+sessionInfo()
 ```
 
 # Load data
@@ -62,7 +66,8 @@ df$KPC_copy_number_log_2 <- log2(df$KPC_copy_number)
 df$KPC_plasmid_copy_number_log_2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
 ```
 
-## A. KPC copy number distributoin
+## A. KPC copy number distribution
+
 ```{r}
 A <- ggplot(df, aes(x= KPC_copy_number_log_2)) + geom_histogram(fill='black')  + theme_bw_me  + xlab("log<sub>2</sub>&nbsp;  <i>bla</i><sub>KPC</sub> copy number") + ylab("Isolates")  + geom_vline(xintercept = 1,linetype = 2,colour = 'brown')  + geom_vline(xintercept = 0,linetype = 2,colour = 'darkgray') + s_figure_9_format
 
@@ -70,6 +75,7 @@ A
 ```
 
 ## B. blaKPC copy number
+
 ```{r}
 df$KPC_allele <- factor(df$KPC_allele,levels = c(table(df$KPC_allele) %>% sort(decreasing = T) %>% names %>% subset(. != "No blaKPC") ,"No blaKPC"))
 
@@ -82,6 +88,7 @@ B
 ```
 
 ## C. KPC by copy number
+
 ```{r}
 KPC_order <- df %>% group_by(KPC_plasmid) %>% summarise(med_KPC_CN_log2 = median(KPC_copy_number_log_2)) %>% arrange(-med_KPC_CN_log2) %>% subset(KPC_plasmid!='No Plasmid') %>% .$KPC_plasmid
 df$KPC_plasmid <- factor(df$KPC_plasmid,levels = c(KPC_order,"No Plasmid"),labels = c(KPC_order,"No plasmid"))
@@ -95,6 +102,7 @@ C
 ```
 
 ## D. blaKPC plasmid copy number
+
 ```{r}
 D <- ggplot(df, aes(x = KPC_plasmid, y = KPC_plasmid_copy_number_log_2)) +
   geom_boxplot(outliers=F) +
@@ -105,6 +113,7 @@ D
 ```
 
 ## E. Association between KPC and plasmid copy number
+
 ```{r}
 E <-ggplot(df %>% subset(KPC_plasmid != "No Plasmid"), aes(x = KPC_plasmid_copy_number_log_2, y = KPC_copy_number_log_2)) + geom_point(size=1) + geom_abline(linetype = 2) +   theme_bw_me  + xlab("log<sub>2</sub> plasmid copy number") + ylab("log<sub>2</sub>&nbsp; <i>bla</i><sub>KPC</sub> copy number")  + geom_smooth(method = 'glm')  + ylim(-3,5)  + xlim(-3,5) + s_figure_9_format_plasmid_x
 
@@ -112,6 +121,7 @@ E
 ```
 
 ## F. KPC copy number by clade 
+
 ```{r}
 f <- ggplot(df, aes(x = clade_I, y = KPC_copy_number_log_2)) +
   geom_boxplot(aes(fill=clade_I),outliers = F ) +
@@ -121,6 +131,7 @@ f
 ```
 
 ## G. blaKPC copy number
+
 ```{r}
 G<- ggplot(df, aes(x = KPC_plasmid, y = KPC_copy_number_log_2, fill = clade_I)) +
   geom_boxplot(position = position_dodge(width = 0.8),outliers=F) +
@@ -133,6 +144,7 @@ G
 ```
 
 # Nearest neighbor analysis
+
 ```{r} 
 isolates_w_plasmid <- subset(df,KPC_plasmid!="No Plasmid") %>% .$isolate_no
 isolates_w_KPC <- subset(df,KPC_copy_number>0) %>% .$isolate_no
@@ -159,6 +171,7 @@ variant_stats$KPC_copy_number_change <- ifelse(variant_stats$KPC_copy_number_dif
 ``` 
 
 ## H. Change in copy number by plasmid type
+
 ```{r}
 variant_stats$isolate_comparison_value <- factor(variant_stats$isolate_comparison_value,levels = c(KPC_order,"No Plasmid"),labels = c(KPC_order,"No plasmid"))
 # Scale
@@ -171,6 +184,7 @@ H
 ```
 
 ## I. Directional change in KPC copy number
+
 ```{r}
 I <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,fill=KPC_copy_number_change)) + geom_bar() + xlab("") + ylab("Isolates") + theme(legend.position = 'bottom') + theme_bw_me + scale_fill_manual(breaks = c("increase","decrease"),values = c("maroon","gray"),name = 'Change in <i>bla</i><sub>KPC</sub> gene copy number',labels = c("Increase","Decrease"), guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))  +s_figure_9_format_plasmid_x
  
@@ -179,8 +193,8 @@ I_legend <- cowplot::get_legend(I) %>% cowplot::plot_grid()
 I
 ```
 
-
 ## J. IR Change
+
 ```{r}
 J <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=IR_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me + nearest_neighbor_scale + xlab("") + ylab("Change in log<sub>2</sub> IR MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  +s_figure_9_format_plasmid_x
 
@@ -190,6 +204,7 @@ J
 ```
 
 ## K. MVB change
+
 ```{r}
 K <- ggplot(data=variant_stats,aes(x=isolate_comparison_value,y=MVB_num_log_2_diff)) + geom_boxplot(outliers=F) + geom_jitter(height = 0,width = 0.25,alpha = 0.5,aes(color=nearest_neighbor_comparison_value),size=1)  + theme_bw_me +  nearest_neighbor_scale  + xlab("") + ylab("Change in log<sub>2</sub> MVB MIC") + geom_hline(yintercept = 1,linetype = 2,colour = 'brown')  + geom_hline(yintercept = 0,linetype = 2,colour = 'black') + ylim(-6,6)  + s_figure_9_format_plasmid_x
 
@@ -206,6 +221,7 @@ L
 ```
 
 # Curate full figure
+
 ```{r,fig.height=15,fig.width=12}
 legends <- cowplot::plot_grid(I_legend,J_legend,L_legend,ncol=3,axis = 't')
 figure <- cowplot::plot_grid(A + theme(legend.position = 'none'),B,C,D,E ,f + theme(legend.position = 'none'),G+ theme(legend.position = 'none'),H + theme(legend.position = 'none'),I+ theme(legend.position = 'none'),J+ theme(legend.position = 'none'),K+ theme(legend.position = 'none'),L+ theme(legend.position = 'none'),ncol=3,labels = "AUTO")
@@ -214,6 +230,7 @@ figure_w_legends
 ```
 
 ## Save figure
+
 ```{r}
 ggsave("./figures/s_figure_9_KPC_copy_number_dynamics.png",plot=figure_w_legends, units='in',height=15,width=12,dpi=900,bg='white')
 ```

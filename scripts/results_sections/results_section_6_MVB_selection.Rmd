@@ -22,6 +22,10 @@ packages <- c("tidyverse","cowplot","ggtree","cowplot","ggtext",'lme4','sjPlot')
 invisible(lapply(packages,library,character.only=T,quietly=T))
 source("./lib/consistent_themes.R")
 source("./lib/common_functions.R")
+
+# Print environment
+Sys.info()
+sessionInfo()
 ```
 
 # Load data

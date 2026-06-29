@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-06-26" />
+<meta name="date" content="2026-06-29" />
 
-<title>Supplemental Table 2: Log2 kpc regression modeling</title>
+<title>Supplemental Table 2: Log2 blaKPC regression modeling</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,16 +350,96 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Supplemental Table 2: Log2 kpc regression
-modeling</h1>
+<h1 class="title toc-ignore">Supplemental Table 2: Log2 blaKPC
+regression modeling</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-06-26</h4>
+<h4 class="date">2026-06-29</h4>
 
 </div>
 
 
 <div id="environment" class="section level1">
 <h1>Environment</h1>
+<pre class="r"><code>#Packages
+packages &lt;- c(&quot;tidyverse&quot;,&quot;gridExtra&quot;,&#39;kableExtra&#39;,&quot;tableone&quot;,&quot;ape&quot;,&quot;ggtree&quot;,&#39;sjPlot&#39;,&#39;webshot2&#39;)
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source(&quot;./lib/consistent_themes.R&quot;) 
+source(&quot;./lib/common_functions.R&quot;)
+
+# Print
+Sys.info()</code></pre>
+<pre><code>                                                                                            sysname 
+                                                                                           &quot;Darwin&quot; 
+                                                                                            release 
+                                                                                           &quot;25.5.0&quot; 
+                                                                                            version 
+&quot;Darwin Kernel Version 25.5.0: Mon Apr 27 20:31:18 PDT 2026; root:xnu-12377.121.6~2/RELEASE_X86_64&quot; 
+                                                                                           nodename 
+                                                                                   &quot;msla0572.local&quot; 
+                                                                                            machine 
+                                                                                           &quot;x86_64&quot; 
+                                                                                              login 
+                                                                                             &quot;root&quot; 
+                                                                                               user 
+                                                                                         &quot;kgontjes&quot; 
+                                                                                     effective_user 
+                                                                                         &quot;kgontjes&quot; </code></pre>
+<pre class="r"><code>sessionInfo() </code></pre>
+<pre><code>R version 4.6.0 (2026-04-24)
+Platform: x86_64-apple-darwin20
+Running under: macOS Tahoe 26.5.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.6-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] hues_0.2.0       ggtext_0.1.2     webshot2_0.1.2   sjPlot_2.9.0    
+ [5] ggtree_4.2.0     ape_5.8-1        tableone_0.13.2  kableExtra_1.4.0
+ [9] gridExtra_2.3    lubridate_1.9.5  forcats_1.0.1    stringr_1.6.0   
+[13] dplyr_1.2.1      purrr_1.2.2      readr_2.2.0      tidyr_1.3.2     
+[17] tibble_3.3.1     ggplot2_4.0.3    tidyverse_2.0.0  knitr_1.51      
+
+loaded via a namespace (and not attached):
+ [1] ggiraph_0.9.6           tidyselect_1.2.1        viridisLite_0.4.3      
+ [4] farver_2.1.2            S7_0.2.2                fastmap_1.2.0          
+ [7] lazyeval_0.2.3          fontquiver_0.2.1        promises_1.5.0         
+[10] digest_0.6.39           timechange_0.4.0        lifecycle_1.0.5        
+[13] processx_3.9.0          survival_3.8-6          tidytree_0.4.7         
+[16] magrittr_2.0.5          compiler_4.6.0          rlang_1.2.0            
+[19] sass_0.4.10             tools_4.6.0             yaml_2.3.12            
+[22] htmlwidgets_1.6.4       xml2_1.5.2              RColorBrewer_1.1-3     
+[25] websocket_1.4.4         aplot_0.2.9             withr_3.0.2            
+[28] grid_4.6.0              gdtools_0.5.0           colorspace_2.1-2       
+[31] scales_1.4.0            MASS_7.3-65             cli_3.6.6              
+[34] survey_4.5              rmarkdown_2.31          treeio_1.35.0          
+[37] generics_0.1.4          otel_0.2.0              rstudioapi_0.18.0      
+[40] tzdb_0.5.0              chromote_0.5.1          DBI_1.3.0              
+[43] cachem_1.1.0            splines_4.6.0           parallel_4.6.0         
+[46] ggplotify_0.1.3         mitools_2.4             yulab.utils_0.2.4      
+[49] vctrs_0.7.3             Matrix_1.7-5            jsonlite_2.0.0         
+[52] fontBitstreamVera_0.1.1 gridGraphics_0.5-1      hms_1.1.4              
+[55] patchwork_1.3.2         systemfonts_1.3.2       jquerylib_0.1.4        
+[58] glue_1.8.1              stringi_1.8.7           gtable_0.3.6           
+[61] later_1.4.8             pillar_1.11.1           rappdirs_0.3.4         
+[64] htmltools_0.5.9         R6_2.6.1                textshaping_1.0.5      
+[67] evaluate_1.0.5          lattice_0.22-9          gridtext_0.1.6         
+[70] ggfun_0.2.0             fontLiberation_0.1.0    bslib_0.10.0           
+[73] Rcpp_1.1.1-1.1          svglite_2.2.2           nlme_3.1-169           
+[76] xfun_0.57               fs_2.1.0                pkgconfig_2.0.3        </code></pre>
 </div>
 <div id="load-the-data" class="section level1">
 <h1>Load the data</h1>
@@ -394,7 +474,7 @@ df$OmpK36_mutations_simple &lt;- factor(df$OmpK36_mutations_simple, levels=rev(c
 df$KPC_log_2 &lt;- log2(df$KPNIH1_RS28775_chr_median_norm)</code></pre>
 </div>
 <div id="regression-modeling" class="section level1">
-<h1>REgression modeling</h1>
+<h1>Regression modeling</h1>
 <pre class="r"><code>df_w_KPC &lt;- df %&gt;% subset(KPNIH1_RS28775_chr_median_norm &gt;0)
 df_w_KPC$OmpK36_mutations_simple &lt;- relevel(df_w_KPC$OmpK36_mutations_simple,ref = &quot;No loop 3 insertion or PFAV&quot;) 
 
@@ -413,8 +493,11 @@ IR_interaction &lt;- lm(IR_log_2 ~ KPC_log_2 * OmpK36_mutations_simple,data=df_w
 IR_summary &lt;- tab_model(IR_simple,IR_adjusted,IR_interaction,show.se = T,show.aic = T)
 
 # Regression results
-regression_results &lt;- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_interaction=MVB_interaction,IR_simple=IR_simple,IR_adjusted=IR_adjusted,IR_interaction=IR_interaction)
-
+regression_results &lt;- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_interaction=MVB_interaction,IR_simple=IR_simple,IR_adjusted=IR_adjusted,IR_interaction=IR_interaction)</code></pre>
+</div>
+<div id="save-html-form-of-this-table" class="section level1">
+<h1>Save html form of this table!</h1>
+<pre class="r"><code># RDS
 saveRDS(object = regression_results,file = &quot;./tables/s_table_2.RDS&quot;)
 
 # Create table model

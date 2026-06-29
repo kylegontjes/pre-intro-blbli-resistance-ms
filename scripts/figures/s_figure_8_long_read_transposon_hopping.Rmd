@@ -27,6 +27,10 @@ source("./lib/consistent_themes.R")
 
 # Set null device
 set_null_device("png")
+
+# Print
+Sys.info()
+sessionInfo()
 ```
 
 # Load data

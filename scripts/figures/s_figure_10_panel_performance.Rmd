@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment
 
-```{r environment, echo=F, message=FALSE, include=F, results=F}
+```{r environment}
 #Packages
 packages <- c("tidyverse","gridExtra",'kableExtra',"tableone",'cowplot')
 
@@ -28,6 +28,10 @@ source("./lib/common_functions.R")
 
 # Set null device
 set_null_device("png")
+
+# Print
+Sys.info()
+sessionInfo()
 ```
 
 # Load data

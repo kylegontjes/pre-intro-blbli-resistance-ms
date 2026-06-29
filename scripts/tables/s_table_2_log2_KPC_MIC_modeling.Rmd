@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Table 2: Log2 kpc regression modeling"
+title: "Supplemental Table 2: Log2 blaKPC regression modeling"
 author: "Kyle Gontjes"
 date: "`r Sys.Date()`"
 output: html_document
@@ -14,7 +14,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment 
 
-```{r environment, echo=F, message=FALSE, include=F, results=F}
+```{r environment}
 #Packages
 packages <- c("tidyverse","gridExtra",'kableExtra',"tableone","ape","ggtree",'sjPlot','webshot2')
 
@@ -24,9 +24,14 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 #Scripts
 source("./lib/consistent_themes.R") 
 source("./lib/common_functions.R")
+
+# Print
+Sys.info()
+sessionInfo() 
 ```
 
 # Load the data
+
 ```{r} 
 # Standard data
 df <- readRDS("./data/dataset/df.RDS")
@@ -54,7 +59,8 @@ df$OmpK36_mutations_simple <- factor(df$OmpK36_mutations_simple, levels=rev(c("N
 df$KPC_log_2 <- log2(df$KPNIH1_RS28775_chr_median_norm)
 ```
 
-# REgression modeling
+# Regression modeling
+
 ```{r}
 df_w_KPC <- df %>% subset(KPNIH1_RS28775_chr_median_norm >0)
 df_w_KPC$OmpK36_mutations_simple <- relevel(df_w_KPC$OmpK36_mutations_simple,ref = "No loop 3 insertion or PFAV") 
@@ -73,7 +79,12 @@ IR_summary <- tab_model(IR_simple,IR_adjusted,IR_interaction,show.se = T,show.ai
 
 # Regression results
 regression_results <- list(MVB_simple=MVB_simple,MVB_adjusted=MVB_adjusted,MVB_interaction=MVB_interaction,IR_simple=IR_simple,IR_adjusted=IR_adjusted,IR_interaction=IR_interaction)
+```
 
+# Save html form of this table!
+
+```{r}
+# RDS
 saveRDS(object = regression_results,file = "./tables/s_table_2.RDS")
 
 # Create table model

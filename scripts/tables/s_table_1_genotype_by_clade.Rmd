@@ -12,7 +12,9 @@ opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
-```{r environment, echo=F, message=FALSE, include=F, results=F}
+# Environment 
+
+```{r environment}
 #Packages
 packages <- c("tidyverse","ggnewscale","tableone","kableExtra")
 
@@ -24,7 +26,8 @@ source("./lib/consistent_themes.R")
 source("./lib/common_functions.R")
 ```
 
-# Data
+# Load data
+
 ```{r}
 df <- readRDS("./data/dataset/df.RDS") 
 # Canonical
@@ -51,6 +54,7 @@ df$`KPC-10` <- ifelse(df$KPC_allele=="KPC-10",1,0)
 ```
 
 # Blactamase gene curation
+
 ```{r}
 # B-lactamase genes  
 bla_variables <- c("Bla_acquired","Bla_ESBL_acquired","Bla_Carb_acquired","Bla_chr")
@@ -69,9 +73,15 @@ df <- left_join(df,bla_mat)
 ```
 
 # Variable curation
+
 ```{r}
+# Carbapenem entry
 drug_entry <- c('OmpK35-25%','OmpK36_c25t','OmpK36_L3_mutations','OmpK36GD','OmpK36TD','OmpK36_non_syn','OmpK36_putative_function_altering',"OmpK36_truncation_kleborate",'OmpK36_intergenic','OmpK36_promoter_IS')
+
+# Carbapenem exit (efflux regulation)
 drug_exit <- c("AcrAB_TolC_any",'RamR',"RamA")
+
+# Target modification
 target_modification <- c('PBP_any','PBP2',"PBP4")
 
 carbapenem <- c(drug_entry,drug_exit,target_modification)

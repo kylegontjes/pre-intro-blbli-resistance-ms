@@ -16,7 +16,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 
 # Environment 
 
-```{r environment, echo=F, message=FALSE, include=F, results=F}
+```{r environment}
 #Packages
 packages <- c("tidyverse","ggtree","ape","ggnewscale","tableone","kableExtra","cowplot",'phyloAMR')
 
@@ -26,6 +26,10 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 #Scripts
 source("./lib/common_functions.R")
 source("./lib/consistent_themes.R")
+
+# Print
+Sys.info()
+sessionInfo()
 ```
 
 # Data
@@ -154,6 +158,7 @@ C
 ```
 
 # Curate the plot
+
 ```{r ,fig.height = 10, fig.width = 10,echo=F,message=F,error=F,warning=F}
 s_figure_7BC <- cowplot::plot_grid(B,C,NULL,ncol=1,labels = c("B","C",""),label_size = 24,rel_heights = c(1,1,0.25)) 
 ```
@@ -169,6 +174,6 @@ s_figure_7
  
 # Save the plot
 
-```{r,message=F,echo=T,error=F,warning=F,fig.width=21.5,fig.height=15} 
+```{r}
 ggsave(plot = s_figure_7, filename = './figures/s_figure_7_plasmids_clade_I.png', width = 20, height = 12, limitsize=FALSE, bg='white',  dpi=900)
 ```

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-06-26" />
+<meta name="date" content="2026-06-29" />
 
 <title>Figure 4. Interaction of loop 3 insertions in ompK36 porin with blaKPC copy number</title>
 
@@ -353,13 +353,69 @@ display: none;
 <h1 class="title toc-ignore">Figure 4. Interaction of loop 3 insertions
 in ompK36 porin with blaKPC copy number</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-06-26</h4>
+<h4 class="date">2026-06-29</h4>
 
 </div>
 
 
 <div id="environment" class="section level1">
 <h1>Environment</h1>
+<pre class="r"><code>#Packages
+packages &lt;- c(&quot;tidyverse&quot;,&quot;cowplot&quot;,&quot;ggtree&quot;,&quot;cowplot&quot;,&quot;ggtext&quot;)
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.2.1     ✔ readr     2.2.0
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+## ✔ purrr     1.2.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+## 
+## Attaching package: &#39;cowplot&#39;
+## 
+## 
+## The following object is masked from &#39;package:lubridate&#39;:
+## 
+##     stamp
+## 
+## 
+## ggtree v4.2.0 Learn more at https://yulab-smu.top/contribution-tree-data/
+## 
+## Please cite:
+## 
+## Guangchuang Yu, David Smith, Huachen Zhu, Yi Guan, Tommy Tsan-Yuk Lam.
+## ggtree: an R package for visualization and annotation of phylogenetic
+## trees with their covariates and other associated data. Methods in
+## Ecology and Evolution. 2017, 8(1):28-36. doi:10.1111/2041-210X.12628
+## 
+## 
+## Attaching package: &#39;ggtree&#39;
+## 
+## 
+## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     expand</code></pre>
+<pre class="r"><code>source(&quot;./lib/consistent_themes.R&quot;)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;
+## 
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine
+## 
+## 
+## Attaching package: &#39;kableExtra&#39;
+## 
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     group_rows</code></pre>
+<pre class="r"><code>source(&quot;./lib/common_functions.R&quot;)
+source(&quot;./scripts/figures/figure_4_functions.R&quot;)</code></pre>
 </div>
 <div id="load-in-data" class="section level1">
 <h1>Load in data</h1>

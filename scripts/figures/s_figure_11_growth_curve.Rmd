@@ -21,13 +21,13 @@ packages <- c("tidyverse","data.table",'lubridate','readxl','cowplot','scales')
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
+# Source themes
+source("./lib/consistent_themes.R")
+
 # Print environment
 set.seed(45) 
 Sys.info()
 sessionInfo()  
-
-# Source themes
-source("./lib/consistent_themes.R")
 ```
 
 # Load data

@@ -49,6 +49,6 @@ table(df$KPC_allele)
 convert_tableone_into_df(df,vars="KPC_allele")
 ```
 
-# See frequency data in table 1 for frequency and criterion
-# Frequency across clades found in supplemental table 1
-# Diagnostic statistics for genotypic panel found in supplemental figure 10
+## See frequency data in table 1 for frequency and criterion
+### Frequency across clades found in supplemental table 1
+### Diagnostic statistics for genotypic panel found in supplemental figure 10

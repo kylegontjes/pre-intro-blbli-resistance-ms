@@ -15,11 +15,19 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 # Environment
 
 ```{r}
-library(tidyverse)
-library(data.table)
-library(tableone)
-library(kableExtra)
-source("./lib/consistent_themes.R")
+#Packages
+packages <- c("tidyverse","data.table",'kableExtra',"tableone")
+
+#Load Packages
+invisible(lapply(packages,library,character.only=T,quietly=T))
+
+#Scripts
+source("./lib/consistent_themes.R") 
+source("./lib/common_functions.R")
+
+# Print
+Sys.info()
+sessionInfo() 
 ```
 
 # Load data
@@ -102,7 +110,7 @@ table_curation <- function(stats,ulogr,mlogr){
                               "zosyn_1d"  = "Piperacillin/tazobactam exposure") 
   # Recode NAs
   results$`OR (95% CI)` <- gsub(" NA","NA",results$`OR (95% CI)`)
-  results$`aOR (95% CI)` <- gsub(" NA","NA",results$`aOR (95% CI)`)
+  results$`aOR (95% CI)` <- gsub(" NA","NA",results$`aOR (95% CI)`) 
   return(results)
 }
 ```

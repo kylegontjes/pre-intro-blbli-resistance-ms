@@ -25,6 +25,10 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 
 # Set null device
 set_null_device("png")
+
+# Print
+Sys.info()
+sessionInfo() 
 ```
 
 # Isolate order
@@ -211,6 +215,8 @@ colnames(table_2) <- recode(colnames(table_2),
                             "kpc_plasmid_change" = "log2 fold change in blaKPC plasmid CN",
                             "kpc_plasmid_size_difference" = "Change in plasmid size (bp)")
 ```
+
+# Print the table
 
 ```{r}
 favorite_kable(table_2)

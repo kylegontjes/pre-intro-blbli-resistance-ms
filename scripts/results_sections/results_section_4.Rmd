@@ -25,6 +25,10 @@ invisible(lapply(packages,library,character.only=T,quietly=T))
 source("./lib/consistent_themes.R")
 source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 source("./lib/common_functions.R")
+
+# Print environment
+Sys.info()
+sessionInfo()
 ```
 
 # Load data

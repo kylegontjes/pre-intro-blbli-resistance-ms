@@ -25,6 +25,11 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 
 # Set null device
 set_null_device("png")
+
+# Print environment
+set.seed(45) 
+Sys.info()
+sessionInfo()  
 ```
 
 # Load data
@@ -133,7 +138,7 @@ phenotype = 'AA552_status_rev'
     cell_fun = function(j, i, x, y, width, height, fill) {
        val <- matrix_raw_ordered[i, j] 
     if (val != 0) {
-    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 14))
+    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 12))
     }
     },
     show_heatmap_legend = FALSE,
@@ -184,7 +189,7 @@ phenotype = 'blbli_asr_cluster_renamed_simple_rev'
     cell_fun = function(j, i, x, y, width, height, fill) {
        val <- matrix_raw_ordered[i, j] 
     if (val != 0) {
-    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 14))
+    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 12))
     }
     },
     show_heatmap_legend = FALSE,
@@ -216,21 +221,24 @@ G
 ```
 
 # Curate figure
-```{r,fig.height=17,fig.width=13.6}
+```{r,fig.height=16,fig.width=12.8}
 AB <- cowplot::plot_grid(A,B,labels = c("A",'B'),ncol=2)
 CD <- cowplot::plot_grid(C,D,labels = c("C",'D'),ncol=2)
+
 figure <- cowplot::plot_grid(AB,CD,E,f,G,labels = c("","","E","F","G"),ncol=1,rel_heights = c(.275,.275,.175,.325,1))
+
 figure
 ```
 
 # Save figure
 ```{r,fig.height=20,fig.width=10}
-ggsave("./figures/s_figure_13_spatiotemporal_distribution_BLBLI_AA552.png", plot = figure, units='in', height=17, width=13.6, dpi=900, bg='white')
+ggsave("./figures/s_figure_13_spatiotemporal_distribution_BLBLI_AA552.png", plot = figure, units='in', height=16, width=12.8, dpi=900, bg='white')
 ```
 
 # Patient summaries
 ## No evidence of within patient transfer
 ## Some susceptible + resistant strain pairs within patients!
+
 ```{r}
 KPC_plasmid_summaries <-  df %>% group_by(Patient_ID) %>% summarise(n=n(),blbli_dich_num=sum(blbli_dich_num),AA552_KPC= sum(AA552_KPC),AA018_KPC=sum(AA018_KPC),AA552_non_KPC=sum(AA552_non_KPC)) %>% mutate(blbli_sus = n - blbli_dich_num )
 
@@ -246,7 +254,8 @@ table(KPC_plasmid_summaries$AA552_non_KPC_AA018_KPC,KPC_plasmid_summaries$AA552_
 table(KPC_plasmid_summaries$blbli_both,dnn = c("Susceptible and resistant strain"))
 ```
 
-# LR data
+# Long read data
+
 ```{r}
 paste0("Compelling case, but not one before the other!")
 df %>% subset(isolate_no %in% c("PCMP_H173","PCMP_H276")) %>% select(isolate_no,LTACH_Recode,Cx_date,AA552,blbli_asr_cluster_renamed)
