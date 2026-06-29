@@ -34,9 +34,9 @@ mobcontigs_lr$contig_id_renamed <- gsub(" polypolish","",mobcontigs_lr$contig_id
 ## Script
 ```{r}
 get_copy_data <- function(parent,evolved,base_path,amrfinder_data,mobsuite_data){
-  parent_cov <- vroom::vroom(paste0(base_path,parent,"/gatk/",parent,"_summary"), num_threads=10)
+  parent_cov <- vroom::vroom(paste0(base_path,parent,"_summary"), num_threads=10)
   parent_cov$contig <- str_split(string = parent_cov$Locus,":",simplify = T) %>% .[,1] 
-  evolved_cov <- vroom::vroom(paste0(base_path,evolved,"/gatk/",evolved,"_summary"), num_threads=10)
+  evolved_cov <- vroom::vroom(paste0(base_path,evolved,"_summary"), num_threads=10)
   evolved_cov$contig <- str_split(string = evolved_cov$Locus,":",simplify = T) %>% .[,1] 
   
   isolate_kpc_gene <- amrfinder_data %>% subset(isolate_no == parent & grepl(pattern = "blaKPC",element_symbol))  
@@ -81,7 +81,9 @@ get_copy_data <- function(parent,evolved,base_path,amrfinder_data,mobsuite_data)
  
   # Comparisons
   kpc_copy_change <- evol_kpc_chr_norm / parent_kpc_chr_norm
+  log2_kpc_copy_change <- log2(kpc_copy_change)
   kpc_plasmid_change <- evol_kpc_plasmid_chr_norm / parent_kpc_plasmid_chr_norm
+  log2_kpc_plasmid_change <- log2(kpc_plasmid_change)
   
   cbind.data.frame(parent,kpc_gene = isolate_kpc_gene$element_symbol,kpc_contig=kpc_contig,kpc_plasmid ,
                    
@@ -89,7 +91,8 @@ get_copy_data <- function(parent,evolved,base_path,amrfinder_data,mobsuite_data)
              parent_kpc_chr_norm,  parent_kpc_plasmid_norm,parent_kpc_plasmid_chr_norm ,
              evol_cov_chromosome_median,evol_cov_kpc_plasmid_median,evol_cov_kpc_median,
              evol_kpc_chr_norm,evol_kpc_plasmid_norm,evol_kpc_plasmid_chr_norm,
-             kpc_copy_change,kpc_plasmid_change)
+             kpc_copy_change,log2_kpc_copy_change,
+             kpc_plasmid_change,log2_kpc_plasmid_change)
 }
 ```
 
@@ -97,39 +100,40 @@ get_copy_data <- function(parent,evolved,base_path,amrfinder_data,mobsuite_data)
 
 ### PCMP_H116
 ```{r}
-PCMP_H116_coverage_stats <- get_copy_data(parent = "PCMP_H116",evolved = "PCMP_H116_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H116/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+base_path <- '/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/results/'
+PCMP_H116_coverage_stats <- get_copy_data(parent = "PCMP_H116",evolved = "PCMP_H116_MVB_R",base_path = base_path ,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 PCMP_H116_coverage_stats$assembly <- "hybrid"
 ```
 
 ### PCMP_H19
 ```{r}
-PCMP_H19_coverage_stats <- get_copy_data(parent = "PCMP_H19",evolved = "PCMP_H019_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H19/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H19_coverage_stats <- get_copy_data(parent = "PCMP_H19",evolved = "PCMP_H019_MVB_R",base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 PCMP_H19_coverage_stats$assembly <- "hybrid"
 ```
 
 ### PCMP_H226
 ```{r}
-PCMP_H226_coverage_stats <- get_copy_data(parent = "PCMP_H226",evolved = "PCMP_H226_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H226/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H226_coverage_stats <- get_copy_data(parent = "PCMP_H226",evolved = "PCMP_H226_MVB_R",base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 PCMP_H226_coverage_stats$assembly <- "hybrid"
 ```
 
 ### PCMP_H323
 ```{r}
-PCMP_H323_coverage_stats <- get_copy_data(parent = "PCMP_H323",evolved = "PCMP_H323_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H323/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H323_coverage_stats <- get_copy_data(parent = "PCMP_H323",evolved = "PCMP_H323_MVB_R",base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 
 PCMP_H323_coverage_stats$assembly <- "hybrid"
 ```
 
 ### PCMP_H414
 ```{r}
-PCMP_H414_coverage_stats <- get_copy_data(parent = "PCMP_H414",evolved = "PCMP_H414_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H414/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H414_coverage_stats <- get_copy_data(parent = "PCMP_H414",evolved = "PCMP_H414_MVB_R",base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 
 PCMP_H414_coverage_stats$assembly <- "hybrid"
 ```
 
 ### PCMP_H464
 ```{r}
-PCMP_H464_coverage_stats <- get_copy_data(parent = "PCMP_H464",evolved = "PCMP_H464_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H464/',amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+PCMP_H464_coverage_stats <- get_copy_data(parent = "PCMP_H464",evolved = "PCMP_H464_MVB_R",base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 
 PCMP_H464_coverage_stats$assembly <- "hybrid"
 ```
@@ -146,9 +150,9 @@ mobsuite_contigs_sr$contig_id_renamed <- gsub(" polypolish","",mobsuite_contigs_
 ## Scripts
 ```{r}
 get_copy_data_sr <- function(parent,evolved,base_path,mobsuite_data){
-  parent_cov <- vroom::vroom(paste0(base_path,parent,"/gatk/",parent,"_summary"), num_threads=10)
+  parent_cov <- vroom::vroom(paste0(base_path,parent,"_summary"), num_threads=10)
   parent_cov$contig <- str_split(string = parent_cov$Locus,":",simplify = T) %>% .[,1] 
-  evolved_cov <- vroom::vroom(paste0(base_path,evolved,"/gatk/",evolved,"_summary"), num_threads=10)
+  evolved_cov <- vroom::vroom(paste0(base_path,evolved,"_summary"), num_threads=10)
   evolved_cov$contig <- str_split(string = evolved_cov$Locus,":",simplify = T) %>% .[,1] 
   
   # Amrfinder dat
@@ -197,26 +201,29 @@ get_copy_data_sr <- function(parent,evolved,base_path,mobsuite_data){
  
   # Comparisons
   kpc_copy_change <- evol_kpc_chr_norm / parent_kpc_chr_norm
+  log2_kpc_copy_change <- log2(kpc_copy_change)
   kpc_plasmid_change <- evol_kpc_plasmid_chr_norm / parent_kpc_plasmid_chr_norm
+  log2_kpc_plasmid_change <- log2(kpc_plasmid_change)
   
   cbind.data.frame(parent,kpc_gene = amrfinder_report_kpc$`Element symbol`,kpc_contig=kpc_contig,kpc_plasmid=mobsuite_contigs_kpc_plasmid,
                    parent_cov_chromosome_median,parent_cov_kpc_plasmid_median,parent_cov_kpc_median,
              parent_kpc_chr_norm,  parent_kpc_plasmid_norm,parent_kpc_plasmid_chr_norm ,
              evol_cov_chromosome_median,evol_cov_kpc_plasmid_median,evol_cov_kpc_median,
              evol_kpc_chr_norm,evol_kpc_plasmid_norm,evol_kpc_plasmid_chr_norm,
-             kpc_copy_change,kpc_plasmid_change)
+             kpc_copy_change,log2_kpc_copy_change,
+             kpc_plasmid_change,log2_kpc_plasmid_change)
 }
 ```
 
 ### PCMP_H261
 ```{r}
-PCMP_H261_coverage_stats <- get_copy_data_sr(parent = "PCMP_H261",evolved = "PCMP_H261_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H261/',mobsuite_data = mobsuite_contigs_sr)
+PCMP_H261_coverage_stats <- get_copy_data_sr(parent = "PCMP_H261",evolved = "PCMP_H261_MVB_R",base_path = base_path,mobsuite_data = mobsuite_contigs_sr)
 PCMP_H261_coverage_stats$assembly <- "short"
 ```
 
 ### PCMP_H318
 ```{r}
-PCMP_H318_coverage_stats <- get_copy_data_sr(parent = "PCMP_H318",evolved = "PCMP_H318_MVB_R",base_path = '/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H318/',mobsuite_data = mobsuite_contigs_sr)
+PCMP_H318_coverage_stats <- get_copy_data_sr(parent = "PCMP_H318",evolved = "PCMP_H318_MVB_R",base_path = base_path,mobsuite_data = mobsuite_contigs_sr)
 PCMP_H318_coverage_stats$assembly <- "short"
 ```
 
@@ -224,7 +231,8 @@ PCMP_H318_coverage_stats$assembly <- "short"
 
 ```{r}
 coverage_stats <- rbind(PCMP_H116_coverage_stats,PCMP_H19_coverage_stats) %>% rbind(.,PCMP_H226_coverage_stats) %>% rbind(.,PCMP_H323_coverage_stats) %>% rbind(.,PCMP_H414_coverage_stats) %>% rbind(.,PCMP_H464_coverage_stats) %>% rbind(.,PCMP_H261_coverage_stats) %>% rbind(.,PCMP_H318_coverage_stats)
-saveRDS(coverage_stats,"/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS")
 
-coverage_stats 
+coverage_stats
+
+saveRDS(coverage_stats,"/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS")
 ```

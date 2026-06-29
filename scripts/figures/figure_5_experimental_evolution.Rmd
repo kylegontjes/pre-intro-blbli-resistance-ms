@@ -169,14 +169,14 @@ table_2$evolved_blaKPC_plasmid <- ifelse(table_2$`Evolved blaKPC plasmid` %in% c
 table_2$parent_blaKPC_plasmid <- ifelse(table_2$`Parental blaKPC plasmid` %in% c("AA018","AA552"), table_2$`Parental blaKPC plasmid`,
                                          ifelse(table_2$Sequenced =="Yes", "Other plasmid",NA))
 melted_dataset <- reshape2::melt(table_2,id.vars = 'Parent') 
-melted_dataset <- subset(melted_dataset,variable %in% c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','Log2 fold change in blaKPC gene CN','Log2 fold change in blaKPC plasmid CN','OmpK36_mutation',"OmpK36_intergenic_mutation"))
-melted_dataset$variable <- factor(melted_dataset$variable,levels = c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','Log2 fold change in blaKPC gene CN','Log2 fold change in blaKPC plasmid CN','OmpK36_mutation',"OmpK36_intergenic_mutation")) 
+melted_dataset <- subset(melted_dataset,variable %in% c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','log2 fold change in blaKPC gene CN','log2 fold change in blaKPC plasmid CN','OmpK36_mutation',"OmpK36_intergenic_mutation"))
+melted_dataset$variable <- factor(melted_dataset$variable,levels = c('Sequenced','parent_blaKPC_plasmid','evolved_blaKPC_plasmid','log2 fold change in blaKPC gene CN','log2 fold change in blaKPC plasmid CN','OmpK36_mutation',"OmpK36_intergenic_mutation")) 
 
 melted_dataset$variable <- recode(melted_dataset$variable,
                                   "parent_blaKPC_plasmid" = "Parental <i>bla</i><sub>KPC</sub> plasmid", 
                                   "evolved_blaKPC_plasmid" = "Evolved <i>bla</i><sub>KPC</sub> plasmid",
-                                  "Log2 fold change in blaKPC gene CN" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
-                                  "Log2 fold change in blaKPC plasmid CN" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
+                                  "log2 fold change in blaKPC gene CN" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
+                                  "log2 fold change in blaKPC plasmid CN" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
                                   "OmpK36_mutation" = "Evolved mutation in <i>ompK36</i>",
                                   "OmpK36_intergenic_mutation" = "Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")
 

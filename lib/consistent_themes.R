@@ -146,10 +146,10 @@ log_10_experimental_evolution_scale <-  scale_x_log10(
 # KPC experimental evolution copy number scale
 KPC_copy_number_change_scale <- scale_fill_gradient2(low = "blue", mid = "white" ,high = "red",
                                                      name = expression(log[2]~"fold change"),
-                                                     midpoint=1,
+                                                     midpoint=0,
                                                      na.value = 'white',
                                                      guide = guide_colorbar(order=3),
-                                                     limits=c(0,8))
+                                                     limits=c(-1,3))
 
 # Mobility scale
 mobility_scale <- scale_fill_manual(

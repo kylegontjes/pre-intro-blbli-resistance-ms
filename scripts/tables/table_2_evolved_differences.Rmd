@@ -46,7 +46,7 @@ isolate_order
 coverage_stats <- readRDS("./data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS")
 coverage_stats <- coverage_stats %>% arrange(parent) %>% distinct
 
-plasmid_copy_numer_data <- coverage_stats %>% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)
+plasmid_copy_numer_data <- coverage_stats %>% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,log2_kpc_copy_change,kpc_plasmid_change,log2_kpc_plasmid_change)
 ```
 
 # Mobsuite data
@@ -85,7 +85,7 @@ kleb_diffs_hits_sub <- kleb_diffs_hits %>% select(parent,ompK36_parental)
 ```{r}
 is_finder_data_goi <- readRDS("./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS")
 
-KPNIH1_features <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS")
+KPNIH1_features <- readRDS("./data/references/KPNIH1/KPNIH1_features.RDS")
 
 is_finder_location_data <-   lapply(is_finder_data_goi$evolved_only_IS,FUN=function(x){
   hit <- x
@@ -136,7 +136,7 @@ is_finder_data_goi_data %>% favorite_kable()
 ## No unique SNPs
 
 ```{r}
-SNP_differences <- readRDS( "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS")
+SNP_differences <- readRDS( "./data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS")
 
 SNP_differences %>% favorite_kable()
 SNP_differences$SNP_canonical <- SNP_differences$evolved_unique_str
@@ -148,7 +148,7 @@ SNP_differences_hits <- SNP_differences %>% select(parent,SNP_canonical)
 ## Several INDELs found in ompK36
 
 ```{r}
-INDEL_differences <-  readRDS( "~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS") 
+INDEL_differences <-  readRDS( "./data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS") 
 
 INDEL_differences %>% favorite_kable()
 INDEL_differences$INDEL_canonical <- INDEL_differences$evolved_unique_str
@@ -158,7 +158,7 @@ INDEL_differences_hits <- INDEL_differences %>% select(parent,INDEL_canonical)
 # MIC data
 
 ```{r}
-MIC_data <- readRDS("~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS")
+MIC_data <- readRDS("./data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS")
 MIC_data$resistant_median_MIC_sign_aware <- ifelse(MIC_data$resistant_median_MIC == 256 & MIC_data$resistant_all_growth == 2, ">256",
                                                    ifelse(MIC_data$resistant_median_MIC==0.25 & MIC_data$resistant_all_no_growth==2,"<=0.25",MIC_data$resistant_median_MIC))
 ```
@@ -184,7 +184,7 @@ final_dataset$canonical_mutant <- lapply(final_dataset$parent,FUN=function(x){
 ```
 
 ```{r}
-final_dataset_sum <- final_dataset %>% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,change_median_log_2_MIC,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
+final_dataset_sum <- final_dataset %>% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,change_median_log_2_MIC,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,log2_kpc_copy_change,log2_kpc_plasmid_change,kpc_plasmid_size_difference)
 
 final_dataset_sum <- final_dataset_sum %>% mutate(across(where(is.numeric), ~ round(.,2)))
 
@@ -211,8 +211,8 @@ colnames(table_2) <- recode(colnames(table_2),
                             "evolved_kpc_plasmid" = "Evolved blaKPC plasmid",
                             "evol_kpc_chr_norm" = "Evolved blaKPC gene CN",
                             "evol_kpc_plasmid_chr_norm" = "Evolved blaKPC plasmid CN",
-                            "kpc_copy_change" = "Fold change in blaKPC gene CN",
-                            "kpc_plasmid_change" = "Fold change in blaKPC plasmid CN",
+                            "log2_kpc_copy_change" = "log2 fold change in blaKPC gene CN",
+                            "log2_kpc_plasmid_change" = "log2 fold change in blaKPC plasmid CN",
                             "kpc_plasmid_size_difference" = "Change in plasmid size (bp)")
 ```
 

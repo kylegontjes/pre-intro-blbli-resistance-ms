@@ -666,7 +666,7 @@ paste0(&quot;Isolate order: &quot;)</code></pre>
 <pre class="r"><code>coverage_stats &lt;- readRDS(&quot;./data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS&quot;)
 coverage_stats &lt;- coverage_stats %&gt;% arrange(parent) %&gt;% distinct
 
-plasmid_copy_numer_data &lt;- coverage_stats %&gt;% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_plasmid_change)</code></pre>
+plasmid_copy_numer_data &lt;- coverage_stats %&gt;% select(parent,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,log2_kpc_copy_change,kpc_plasmid_change,log2_kpc_plasmid_change)</code></pre>
 </div>
 <div id="mobsuite-data" class="section level1">
 <h1>Mobsuite data</h1>
@@ -698,7 +698,7 @@ kleb_diffs_hits_sub &lt;- kleb_diffs_hits %&gt;% select(parent,ompK36_parental)<
 <h2>A few IS elements detected</h2>
 <pre class="r"><code>is_finder_data_goi &lt;- readRDS(&quot;./data/evolution_experiment/panISa_evolved/panISa_differences_canonical_genes.RDS&quot;)
 
-KPNIH1_features &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/references/KPNIH1/KPNIH1_features.RDS&quot;)
+KPNIH1_features &lt;- readRDS(&quot;./data/references/KPNIH1/KPNIH1_features.RDS&quot;)
 
 is_finder_location_data &lt;-   lapply(is_finder_data_goi$evolved_only_IS,FUN=function(x){
   hit &lt;- x
@@ -821,7 +821,7 @@ PCMP_H464
 <h1>SNP/INDEL data</h1>
 <div id="no-unique-snps" class="section level2">
 <h2>No unique SNPs</h2>
-<pre class="r"><code>SNP_differences &lt;- readRDS( &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS&quot;)
+<pre class="r"><code>SNP_differences &lt;- readRDS( &quot;./data/evolution_experiment/SNPKIT/SNP_differences_canonical.RDS&quot;)
 
 SNP_differences %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
@@ -1121,7 +1121,7 @@ SNP_differences_hits &lt;- SNP_differences %&gt;% select(parent,SNP_canonical)</
 <h1>INDELs</h1>
 <div id="several-indels-found-in-ompk36" class="section level2">
 <h2>Several INDELs found in ompK36</h2>
-<pre class="r"><code>INDEL_differences &lt;-  readRDS( &quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS&quot;) 
+<pre class="r"><code>INDEL_differences &lt;-  readRDS( &quot;./data/evolution_experiment/SNPKIT/INDEL_differences_canonical.RDS&quot;) 
 
 INDEL_differences %&gt;% favorite_kable()</code></pre>
 <table style="width:100%; color: black; margin-left: auto; margin-right: auto;" class="table table-striped table-hover table-condensed table-responsive">
@@ -1351,7 +1351,7 @@ INDEL_differences_hits &lt;- INDEL_differences %&gt;% select(parent,INDEL_canoni
 </div>
 <div id="mic-data" class="section level1">
 <h1>MIC data</h1>
-<pre class="r"><code>MIC_data &lt;- readRDS(&quot;~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS&quot;)
+<pre class="r"><code>MIC_data &lt;- readRDS(&quot;./data/evolution_experiment/MIC_assay/MIC_data_curated_final.RDS&quot;)
 MIC_data$resistant_median_MIC_sign_aware &lt;- ifelse(MIC_data$resistant_median_MIC == 256 &amp; MIC_data$resistant_all_growth == 2, &quot;&gt;256&quot;,
                                                    ifelse(MIC_data$resistant_median_MIC==0.25 &amp; MIC_data$resistant_all_no_growth==2,&quot;&lt;=0.25&quot;,MIC_data$resistant_median_MIC))</code></pre>
 </div>
@@ -1372,7 +1372,7 @@ final_dataset$canonical_mutant &lt;- lapply(final_dataset$parent,FUN=function(x)
   
   paste0(variants, collapse = &quot; &amp; &quot;) 
 })  %&gt;% unlist</code></pre>
-<pre class="r"><code>final_dataset_sum &lt;- final_dataset %&gt;% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,change_median_log_2_MIC,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,kpc_copy_change,kpc_copy_change,kpc_plasmid_change,kpc_plasmid_size_difference)
+<pre class="r"><code>final_dataset_sum &lt;- final_dataset %&gt;% select(parent,clade_I,ompK36_parental,resistant_median_MIC_sign_aware,change_median_log_2_MIC,canonical_mutant,kpc_gene,kpc_plasmid,parent_kpc_chr_norm,parent_kpc_plasmid_chr_norm,evolved_kpc_plasmid,evol_kpc_chr_norm,evol_kpc_plasmid_chr_norm,log2_kpc_copy_change,log2_kpc_plasmid_change,kpc_plasmid_size_difference)
 
 final_dataset_sum &lt;- final_dataset_sum %&gt;% mutate(across(where(is.numeric), ~ round(.,2)))
 
@@ -1399,8 +1399,8 @@ colnames(table_2) &lt;- recode(colnames(table_2),
                             &quot;evolved_kpc_plasmid&quot; = &quot;Evolved blaKPC plasmid&quot;,
                             &quot;evol_kpc_chr_norm&quot; = &quot;Evolved blaKPC gene CN&quot;,
                             &quot;evol_kpc_plasmid_chr_norm&quot; = &quot;Evolved blaKPC plasmid CN&quot;,
-                            &quot;kpc_copy_change&quot; = &quot;Fold change in blaKPC gene CN&quot;,
-                            &quot;kpc_plasmid_change&quot; = &quot;Fold change in blaKPC plasmid CN&quot;,
+                            &quot;log2_kpc_copy_change&quot; = &quot;log2 fold change in blaKPC gene CN&quot;,
+                            &quot;log2_kpc_plasmid_change&quot; = &quot;log2 fold change in blaKPC plasmid CN&quot;,
                             &quot;kpc_plasmid_size_difference&quot; = &quot;Change in plasmid size (bp)&quot;)</code></pre>
 </div>
 <div id="print-the-table" class="section level1">
@@ -1450,10 +1450,10 @@ Evolved blaKPC gene CN
 Evolved blaKPC plasmid CN
 </th>
 <th style="text-align:right;">
-Fold change in blaKPC gene CN
+log2 fold change in blaKPC gene CN
 </th>
 <th style="text-align:right;">
-Fold change in blaKPC plasmid CN
+log2 fold change in blaKPC plasmid CN
 </th>
 <th style="text-align:left;">
 Change in plasmid size (bp)
@@ -1501,10 +1501,10 @@ AA018
 2.84
 </td>
 <td style="text-align:right;">
-2.34
+1.23
 </td>
 <td style="text-align:right;">
-2.96
+1.57
 </td>
 <td style="text-align:left;">
 -247
@@ -1550,10 +1550,10 @@ AA552
 3.49
 </td>
 <td style="text-align:right;">
-7.04
+2.82
 </td>
 <td style="text-align:right;">
-4.43
+2.15
 </td>
 <td style="text-align:left;">
 NA
@@ -1599,10 +1599,10 @@ AA018
 1.10
 </td>
 <td style="text-align:right;">
-2.58
+1.37
 </td>
 <td style="text-align:right;">
-2.08
+1.06
 </td>
 <td style="text-align:left;">
 -11368
@@ -1649,10 +1649,10 @@ AA018
 1.03
 </td>
 <td style="text-align:right;">
-1.29
+0.36
 </td>
 <td style="text-align:right;">
-1.83
+0.87
 </td>
 <td style="text-align:left;">
 728
@@ -1698,10 +1698,10 @@ AA275
 1.48
 </td>
 <td style="text-align:right;">
-1.47
+0.56
 </td>
 <td style="text-align:right;">
-2.01
+1.01
 </td>
 <td style="text-align:left;">
 -1418
@@ -1749,10 +1749,10 @@ AA018
 0.91
 </td>
 <td style="text-align:right;">
-1.39
+0.48
 </td>
 <td style="text-align:right;">
-2.15
+1.10
 </td>
 <td style="text-align:left;">
 0
@@ -1798,10 +1798,10 @@ AA357
 0.86
 </td>
 <td style="text-align:right;">
-1.29
+0.37
 </td>
 <td style="text-align:right;">
-1.25
+0.33
 </td>
 <td style="text-align:left;">
 0
@@ -1847,10 +1847,10 @@ AA274
 1.97
 </td>
 <td style="text-align:right;">
-1.13
+0.18
 </td>
 <td style="text-align:right;">
-2.03
+1.02
 </td>
 <td style="text-align:left;">
 -1132

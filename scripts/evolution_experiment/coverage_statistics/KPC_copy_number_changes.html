@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kyle Gontjes" />
 
-<meta name="date" content="2026-02-20" />
+<meta name="date" content="2026-06-29" />
 
 <title>Comparison of coverage across parent and evolved genomes</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Comparison of coverage across parent and
 evolved genomes</h1>
 <h4 class="author">Kyle Gontjes</h4>
-<h4 class="date">2026-02-20</h4>
+<h4 class="date">2026-06-29</h4>
 
 </div>
 
@@ -379,9 +379,9 @@ mobcontigs_lr$contig_id_renamed &lt;- gsub(&quot; polypolish&quot;,&quot;&quot;,
 <div id="script" class="section level2">
 <h2>Script</h2>
 <pre class="r"><code>get_copy_data &lt;- function(parent,evolved,base_path,amrfinder_data,mobsuite_data){
-  parent_cov &lt;- vroom::vroom(paste0(base_path,parent,&quot;/gatk/&quot;,parent,&quot;_summary&quot;), num_threads=10)
+  parent_cov &lt;- vroom::vroom(paste0(base_path,parent,&quot;_summary&quot;), num_threads=10)
   parent_cov$contig &lt;- str_split(string = parent_cov$Locus,&quot;:&quot;,simplify = T) %&gt;% .[,1] 
-  evolved_cov &lt;- vroom::vroom(paste0(base_path,evolved,&quot;/gatk/&quot;,evolved,&quot;_summary&quot;), num_threads=10)
+  evolved_cov &lt;- vroom::vroom(paste0(base_path,evolved,&quot;_summary&quot;), num_threads=10)
   evolved_cov$contig &lt;- str_split(string = evolved_cov$Locus,&quot;:&quot;,simplify = T) %&gt;% .[,1] 
   
   isolate_kpc_gene &lt;- amrfinder_data %&gt;% subset(isolate_no == parent &amp; grepl(pattern = &quot;blaKPC&quot;,element_symbol))  
@@ -426,7 +426,9 @@ mobcontigs_lr$contig_id_renamed &lt;- gsub(&quot; polypolish&quot;,&quot;&quot;,
  
   # Comparisons
   kpc_copy_change &lt;- evol_kpc_chr_norm / parent_kpc_chr_norm
+  log2_kpc_copy_change &lt;- log2(kpc_copy_change)
   kpc_plasmid_change &lt;- evol_kpc_plasmid_chr_norm / parent_kpc_plasmid_chr_norm
+  log2_kpc_plasmid_change &lt;- log2(kpc_plasmid_change)
   
   cbind.data.frame(parent,kpc_gene = isolate_kpc_gene$element_symbol,kpc_contig=kpc_contig,kpc_plasmid ,
                    
@@ -434,41 +436,43 @@ mobcontigs_lr$contig_id_renamed &lt;- gsub(&quot; polypolish&quot;,&quot;&quot;,
              parent_kpc_chr_norm,  parent_kpc_plasmid_norm,parent_kpc_plasmid_chr_norm ,
              evol_cov_chromosome_median,evol_cov_kpc_plasmid_median,evol_cov_kpc_median,
              evol_kpc_chr_norm,evol_kpc_plasmid_norm,evol_kpc_plasmid_chr_norm,
-             kpc_copy_change,kpc_plasmid_change)
+             kpc_copy_change,log2_kpc_copy_change,
+             kpc_plasmid_change,log2_kpc_plasmid_change)
 }</code></pre>
 </div>
 <div id="results-for-lr-parents" class="section level2">
 <h2>Results for LR Parents</h2>
 <div id="pcmp_h116" class="section level3">
 <h3>PCMP_H116</h3>
-<pre class="r"><code>PCMP_H116_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H116&quot;,evolved = &quot;PCMP_H116_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H116/&#39;,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+<pre class="r"><code>base_path &lt;- &#39;/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/results/&#39;
+PCMP_H116_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H116&quot;,evolved = &quot;PCMP_H116_MVB_R&quot;,base_path = base_path ,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 PCMP_H116_coverage_stats$assembly &lt;- &quot;hybrid&quot;</code></pre>
 </div>
 <div id="pcmp_h19" class="section level3">
 <h3>PCMP_H19</h3>
-<pre class="r"><code>PCMP_H19_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H19&quot;,evolved = &quot;PCMP_H019_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H19/&#39;,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+<pre class="r"><code>PCMP_H19_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H19&quot;,evolved = &quot;PCMP_H019_MVB_R&quot;,base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 PCMP_H19_coverage_stats$assembly &lt;- &quot;hybrid&quot;</code></pre>
 </div>
 <div id="pcmp_h226" class="section level3">
 <h3>PCMP_H226</h3>
-<pre class="r"><code>PCMP_H226_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H226&quot;,evolved = &quot;PCMP_H226_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H226/&#39;,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+<pre class="r"><code>PCMP_H226_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H226&quot;,evolved = &quot;PCMP_H226_MVB_R&quot;,base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 PCMP_H226_coverage_stats$assembly &lt;- &quot;hybrid&quot;</code></pre>
 </div>
 <div id="pcmp_h323" class="section level3">
 <h3>PCMP_H323</h3>
-<pre class="r"><code>PCMP_H323_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H323&quot;,evolved = &quot;PCMP_H323_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H323/&#39;,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+<pre class="r"><code>PCMP_H323_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H323&quot;,evolved = &quot;PCMP_H323_MVB_R&quot;,base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 
 PCMP_H323_coverage_stats$assembly &lt;- &quot;hybrid&quot;</code></pre>
 </div>
 <div id="pcmp_h414" class="section level3">
 <h3>PCMP_H414</h3>
-<pre class="r"><code>PCMP_H414_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H414&quot;,evolved = &quot;PCMP_H414_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H414/&#39;,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+<pre class="r"><code>PCMP_H414_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H414&quot;,evolved = &quot;PCMP_H414_MVB_R&quot;,base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 
 PCMP_H414_coverage_stats$assembly &lt;- &quot;hybrid&quot;</code></pre>
 </div>
 <div id="pcmp_h464" class="section level3">
 <h3>PCMP_H464</h3>
-<pre class="r"><code>PCMP_H464_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H464&quot;,evolved = &quot;PCMP_H464_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H464/&#39;,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
+<pre class="r"><code>PCMP_H464_coverage_stats &lt;- get_copy_data(parent = &quot;PCMP_H464&quot;,evolved = &quot;PCMP_H464_MVB_R&quot;,base_path = base_path,amrfinder_data = amrfinder_lr,mobsuite_data = mobcontigs_lr)
 
 PCMP_H464_coverage_stats$assembly &lt;- &quot;hybrid&quot;</code></pre>
 </div>
@@ -486,9 +490,9 @@ mobsuite_contigs_sr$contig_id_renamed &lt;- gsub(&quot; polypolish&quot;,&quot;&
 <div id="scripts" class="section level2">
 <h2>Scripts</h2>
 <pre class="r"><code>get_copy_data_sr &lt;- function(parent,evolved,base_path,mobsuite_data){
-  parent_cov &lt;- vroom::vroom(paste0(base_path,parent,&quot;/gatk/&quot;,parent,&quot;_summary&quot;), num_threads=10)
+  parent_cov &lt;- vroom::vroom(paste0(base_path,parent,&quot;_summary&quot;), num_threads=10)
   parent_cov$contig &lt;- str_split(string = parent_cov$Locus,&quot;:&quot;,simplify = T) %&gt;% .[,1] 
-  evolved_cov &lt;- vroom::vroom(paste0(base_path,evolved,&quot;/gatk/&quot;,evolved,&quot;_summary&quot;), num_threads=10)
+  evolved_cov &lt;- vroom::vroom(paste0(base_path,evolved,&quot;_summary&quot;), num_threads=10)
   evolved_cov$contig &lt;- str_split(string = evolved_cov$Locus,&quot;:&quot;,simplify = T) %&gt;% .[,1] 
   
   # Amrfinder dat
@@ -537,23 +541,26 @@ mobsuite_contigs_sr$contig_id_renamed &lt;- gsub(&quot; polypolish&quot;,&quot;&
  
   # Comparisons
   kpc_copy_change &lt;- evol_kpc_chr_norm / parent_kpc_chr_norm
+  log2_kpc_copy_change &lt;- log2(kpc_copy_change)
   kpc_plasmid_change &lt;- evol_kpc_plasmid_chr_norm / parent_kpc_plasmid_chr_norm
+  log2_kpc_plasmid_change &lt;- log2(kpc_plasmid_change)
   
   cbind.data.frame(parent,kpc_gene = amrfinder_report_kpc$`Element symbol`,kpc_contig=kpc_contig,kpc_plasmid=mobsuite_contigs_kpc_plasmid,
                    parent_cov_chromosome_median,parent_cov_kpc_plasmid_median,parent_cov_kpc_median,
              parent_kpc_chr_norm,  parent_kpc_plasmid_norm,parent_kpc_plasmid_chr_norm ,
              evol_cov_chromosome_median,evol_cov_kpc_plasmid_median,evol_cov_kpc_median,
              evol_kpc_chr_norm,evol_kpc_plasmid_norm,evol_kpc_plasmid_chr_norm,
-             kpc_copy_change,kpc_plasmid_change)
+             kpc_copy_change,log2_kpc_copy_change,
+             kpc_plasmid_change,log2_kpc_plasmid_change)
 }</code></pre>
 <div id="pcmp_h261" class="section level3">
 <h3>PCMP_H261</h3>
-<pre class="r"><code>PCMP_H261_coverage_stats &lt;- get_copy_data_sr(parent = &quot;PCMP_H261&quot;,evolved = &quot;PCMP_H261_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H261/&#39;,mobsuite_data = mobsuite_contigs_sr)
+<pre class="r"><code>PCMP_H261_coverage_stats &lt;- get_copy_data_sr(parent = &quot;PCMP_H261&quot;,evolved = &quot;PCMP_H261_MVB_R&quot;,base_path = base_path,mobsuite_data = mobsuite_contigs_sr)
 PCMP_H261_coverage_stats$assembly &lt;- &quot;short&quot;</code></pre>
 </div>
 <div id="pcmp_h318" class="section level3">
 <h3>PCMP_H318</h3>
-<pre class="r"><code>PCMP_H318_coverage_stats &lt;- get_copy_data_sr(parent = &quot;PCMP_H318&quot;,evolved = &quot;PCMP_H318_MVB_R&quot;,base_path = &#39;/scratch/esnitkin_root/esnitkin1/kgontjes/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance/coverage_statistics/CoverageStats/results/MVB_evolved_PCMP_H318/&#39;,mobsuite_data = mobsuite_contigs_sr)
+<pre class="r"><code>PCMP_H318_coverage_stats &lt;- get_copy_data_sr(parent = &quot;PCMP_H318&quot;,evolved = &quot;PCMP_H318_MVB_R&quot;,base_path = base_path,mobsuite_data = mobsuite_contigs_sr)
 PCMP_H318_coverage_stats$assembly &lt;- &quot;short&quot;</code></pre>
 </div>
 </div>
@@ -561,9 +568,8 @@ PCMP_H318_coverage_stats$assembly &lt;- &quot;short&quot;</code></pre>
 <div id="merged-data" class="section level1">
 <h1>Merged data</h1>
 <pre class="r"><code>coverage_stats &lt;- rbind(PCMP_H116_coverage_stats,PCMP_H19_coverage_stats) %&gt;% rbind(.,PCMP_H226_coverage_stats) %&gt;% rbind(.,PCMP_H323_coverage_stats) %&gt;% rbind(.,PCMP_H414_coverage_stats) %&gt;% rbind(.,PCMP_H464_coverage_stats) %&gt;% rbind(.,PCMP_H261_coverage_stats) %&gt;% rbind(.,PCMP_H318_coverage_stats)
-saveRDS(coverage_stats,&quot;/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS&quot;)
 
-coverage_stats </code></pre>
+coverage_stats</code></pre>
 <pre><code>     parent kpc_gene                              kpc_contig kpc_plasmid
 1 PCMP_H116 blaKPC-3 hybrid_PCMP_H116_contig_2;circular=true       AA357
 2  PCMP_H19 blaKPC-2  hybrid_PCMP_H19_contig_1;circular=true       AA275
@@ -624,16 +630,17 @@ coverage_stats </code></pre>
 7             0.9775281                 1.0987654        2.577778
 8             0.7654321                 1.0253165        1.287089
 9             1.3048780                 3.4893617        7.043218
-  kpc_plasmid_change assembly
-1           1.253147   hybrid
-2           2.009405   hybrid
-3           2.009405   hybrid
-4           2.026263   hybrid
-5           2.960244   hybrid
-6           2.150886   hybrid
-7           2.081871   hybrid
-8           1.827738    short
-9           4.428805    short</code></pre>
+  log2_kpc_copy_change kpc_plasmid_change log2_kpc_plasmid_change assembly
+1            0.3666745           1.253147               0.3255555   hybrid
+2            0.5556616           2.009405               1.0067684   hybrid
+3            0.5556616           2.009405               1.0067684   hybrid
+4            0.1805722           2.026263               1.0188212   hybrid
+5            1.2281006           2.960244               1.5657160   hybrid
+6            0.4757688           2.150886               1.1049311   hybrid
+7            1.3661279           2.081871               1.0578809   hybrid
+8            0.3641114           1.827738               0.8700593    short
+9            2.8162348           4.428805               2.1469176    short</code></pre>
+<pre class="r"><code>saveRDS(coverage_stats,&quot;/nfs/turbo/umms-esnitkin/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/data/evolution_experiment/coverage_statistics/KPC_coverage_stats.RDS&quot;)</code></pre>
 </div>
 
 

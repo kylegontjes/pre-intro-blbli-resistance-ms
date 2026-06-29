@@ -1,9 +1,9 @@
-Parent,Clade,Parental OmpK36 status,Evolved MVB MIC,Change in median log2 MIC,Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position),blaKPC gene,Parental blaKPC plasmid,Parental blaKPC gene copy number (CN),Parental blaKPC plasmid CN,Evolved blaKPC plasmid,Evolved blaKPC gene CN,Evolved blaKPC plasmid CN,Fold change in blaKPC gene CN,Fold change in blaKPC plasmid CN,Change in plasmid size (bp)
-PCMP_H323,I,25 C>T transition & GD insertion in loop 3,48,3,,blaKPC-2,AA018,0.93,0.96,AA018,2.18,2.84,2.34,2.96,-247
-PCMP_H318,I,25 C>T transition & GD insertion in loop 3,>256,5.5,,blaKPC-2,AA018,0.65,0.79,AA552,4.55,3.49,7.04,4.43,NA
-PCMP_H464,I,25 C>T transition & GD insertion in loop 3,32,6,,blaKPC-2,AA018,0.42,0.53,AA018,1.07,1.1,2.58,2.08,-11368
-PCMP_H261,I,25 C>T transition,48,7.5,ompK36 (c.190_196dupGAAACCC); 3713864,blaKPC-2,AA018,0.61,0.56,AA018,0.78,1.03,1.29,1.83,728
-PCMP_H19,I,,32,6.5,upstream ompK36 (ISKpn26); 3714091,blaKPC-2,AA275,0.74,0.74,AA275,1.08,1.48,1.47,2.01,-1418
-PCMP_H414,I,25 C>T transition,>256,8.5,ompK36 (p.Gly136_Asp137del); 3713649 & upstream ompK36 (ISKpn14); 3714068,blaKPC-2,AA018,0.49,0.42,AA018,0.68,0.91,1.39,2.15,0
-PCMP_H116,II,,>256,7.5,ompK36 (ISKpn26); 3714050,blaKPC-3,AA357,0.66,0.69,AA357,0.85,0.86,1.29,1.25,0
-PCMP_H226,II,,>256,6.5,ompK36 (p.Val323_Asp338del); 3713046,blaKPC-3,AA274,1.47,0.97,AA274,1.67,1.97,1.13,2.03,-1132
+Parent,Clade,Parental OmpK36 status,Evolved MVB MIC,Change in median log2 MIC,Evolved chromosomal carbapenem resistance mutation (gene [mutation]; position),blaKPC gene,Parental blaKPC plasmid,Parental blaKPC gene copy number (CN),Parental blaKPC plasmid CN,Evolved blaKPC plasmid,Evolved blaKPC gene CN,Evolved blaKPC plasmid CN,log2 fold change in blaKPC gene CN,log2 fold change in blaKPC plasmid CN,Change in plasmid size (bp)
+PCMP_H323,I,25 C>T transition & GD insertion in loop 3,48,3,,blaKPC-2,AA018,0.93,0.96,AA018,2.18,2.84,1.23,1.57,-247
+PCMP_H318,I,25 C>T transition & GD insertion in loop 3,>256,5.5,,blaKPC-2,AA018,0.65,0.79,AA552,4.55,3.49,2.82,2.15,NA
+PCMP_H464,I,25 C>T transition & GD insertion in loop 3,32,6,,blaKPC-2,AA018,0.42,0.53,AA018,1.07,1.1,1.37,1.06,-11368
+PCMP_H261,I,25 C>T transition,48,7.5,ompK36 (c.190_196dupGAAACCC); 3713864,blaKPC-2,AA018,0.61,0.56,AA018,0.78,1.03,0.36,0.87,728
+PCMP_H19,I,,32,6.5,upstream ompK36 (ISKpn26); 3714091,blaKPC-2,AA275,0.74,0.74,AA275,1.08,1.48,0.56,1.01,-1418
+PCMP_H414,I,25 C>T transition,>256,8.5,ompK36 (p.Gly136_Asp137del); 3713649 & upstream ompK36 (ISKpn14); 3714068,blaKPC-2,AA018,0.49,0.42,AA018,0.68,0.91,0.48,1.1,0
+PCMP_H116,II,,>256,7.5,ompK36 (ISKpn26); 3714050,blaKPC-3,AA357,0.66,0.69,AA357,0.85,0.86,0.37,0.33,0
+PCMP_H226,II,,>256,6.5,ompK36 (p.Val323_Asp338del); 3713046,blaKPC-3,AA274,1.47,0.97,AA274,1.67,1.97,0.18,1.02,-1132
