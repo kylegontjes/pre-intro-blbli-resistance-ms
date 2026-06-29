@@ -3396,8 +3396,11 @@ Pass
 </table>
 <pre class="r"><code>table_1 &lt;- left_join(table_1,diagnostic_stats %&gt;% select(Variable,`Discriminatory criterion`))</code></pre>
 </div>
-<div id="final-table" class="section level1">
-<h1>Final table</h1>
+<div id="table" class="section level1">
+<h1>Table</h1>
+<ol style="list-style-type: decimal">
+<li>Note: final table is formatted in MW to add row headers, etc</li>
+</ol>
 <pre class="r"><code>colnames(table_1) &lt;- recode(colnames(table_1),
                             &#39;Variable&#39; = &quot;Mechanism of interest&quot;) 
 

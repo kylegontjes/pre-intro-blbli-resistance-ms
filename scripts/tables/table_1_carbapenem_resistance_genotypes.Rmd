@@ -109,9 +109,10 @@ diagnostic_stats %>% favorite_kable()
 table_1 <- left_join(table_1,diagnostic_stats %>% select(Variable,`Discriminatory criterion`))
 ```
 
-# Final table
+# Table
 
-```{r}
+1. Note: final table is formatted in MW to add row headers, etc
+```{r} 
 colnames(table_1) <- recode(colnames(table_1),
                             'Variable' = "Mechanism of interest") 
 
