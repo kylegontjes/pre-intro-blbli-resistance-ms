@@ -429,12 +429,12 @@ s_figure_9_format_plasmid_x <- theme(legend.title = element_markdown(),
 
 ### 10. Supplemental Figure 10
 s_figure_10_format <-  theme(legend.position = "bottom",
-                             axis.text =   element_text(size=10,color="black"),
-                             axis.title = element_text(size = 10,color="black"),
+                             axis.text =   element_text(size=8.5,color="black"),
+                             axis.title = element_text(size = 8.5,color="black"),
                              plot.title = element_text(size = 16,color="black"),
                              legend.title = element_text(size = 14,color="black"),
                              legend.text = element_text(size = 12,color="black"),
-                             legend.margin = margin(t=0,unit="cm")
+                             legend.margin = margin(t=0,b=0,unit="cm")
                              )
 
 ### 11. Supplemental Figure 11
