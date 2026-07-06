@@ -63,7 +63,7 @@ df <- left_join(df,KPC_data %>% select(isolate_no,KPC_allele))
 df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele) 
 
 df$KPC_copy_number_log_2 <- log2(df$KPC_copy_number)
-df$KPC_plasmid_copy_number_log_2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
+df$KPC_plasmid_copy_number_log_2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized) 
 ```
 
 ## A. KPC copy number distribution
@@ -173,6 +173,7 @@ variant_stats$KPC_copy_number_change <- ifelse(variant_stats$KPC_copy_number_dif
 ## H. Change in copy number by plasmid type
 
 ```{r}
+# Order the plasmids
 variant_stats$isolate_comparison_value <- factor(variant_stats$isolate_comparison_value,levels = c(KPC_order,"No Plasmid"),labels = c(KPC_order,"No plasmid"))
 # Scale
 nearest_neighbor_scale <-  scale_color_manual(values = hues::iwanthue(length(unique(variant_stats$isolate_comparison_value))+1),name = "Nearest neighbor's <i>bla</i><sub>KPC</sub> plasmid",guide = guide_legend(nrow=3,title.position = "top", label.position = "right"))

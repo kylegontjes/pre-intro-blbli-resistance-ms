@@ -15,7 +15,7 @@ opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-i
 # Environment
 
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer")
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap")
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -41,6 +41,9 @@ tr <- read.tree("./data/tree/tree.treefile")
 ## KPC Plasmids 
 KPC_info_clusters <- readRDS("./data/KPC_plasmid/KPC_containing_clusters_mat.RDS") %>% as.data.frame 
 KPC_containing_clusters <- KPC_info_clusters %>% `colnames<-`(paste0(colnames(.),"_KPC")) %>% {ifelse(.=="KPC Plasmid",1,0)} %>% as.data.frame%>% select_if(colSums(.)>0)
+cluster_KPC_containing_clusters <- Heatmap(KPC_containing_clusters)
+plasmid_order <- colnames(KPC_containing_clusters[column_order(cluster_KPC_containing_clusters)])
+
 KPC_clusters <- colnames(KPC_containing_clusters) 
 df <- left_join(df,KPC_containing_clusters %>% mutate(isolate_no = rownames(.)))  
 
@@ -107,7 +110,7 @@ p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_num
 
 p4.1 <- p4 + ggnewscale::new_scale_fill()
   
-figure <- gheatmap(p4.1,data=KPC_containing_clusters %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.5,offset =.0000875) + plasmid_scale_v + ylim(NA,590)   + consistent_theme_s_figure_6_wo_md  
+figure <- gheatmap(p4.1,data=KPC_containing_clusters[,plasmid_order] %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.5,offset =.0000875) + plasmid_scale_v + ylim(NA,590)   + consistent_theme_s_figure_6_wo_md  
 
 figure
 ``` 

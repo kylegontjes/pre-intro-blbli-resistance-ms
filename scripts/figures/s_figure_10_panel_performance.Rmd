@@ -177,7 +177,7 @@ E <- ggplot(data=BLBLI_panel,aes(fill=panels,y=accuracy,x=population)) +  geom_b
 
 # Figure
 
-```{r,fig.height=9.5,fig.width=7.6}
+```{r,fig.height=8.25, fig.width=7.5}
 fig_legend <- cowplot::plot_grid(cowplot::get_legend(A))
 
 s_figure_10 <- cowplot::plot_grid(A + theme(legend.position = "none"),
@@ -187,7 +187,8 @@ s_figure_10 <- cowplot::plot_grid(A + theme(legend.position = "none"),
                                   E+ theme(legend.position = "none"),
                                   fig_legend,
                                   labels = c("A","B","C","D","E",""),
-                                  ncol=2,label_size = 16,
+                                  ncol=2,
+                                  label_size = 16,
                                   rel_widths = c(1,1,1,1,1,1),
                                   label_y = 1,label_x = 0)
  
@@ -197,5 +198,5 @@ s_figure_10
 ## Save figure
 
 ```{r}
-ggsave(plot = s_figure_10, filename = './figures/s_figure_10_panel_performance.png', height = 9.5, width = 7.6, limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = s_figure_10, filename = './figures/s_figure_10_panel_performance.png', height = 8.25, width = 7.5, limitsize=FALSE, bg='white', dpi=900)
 ```
