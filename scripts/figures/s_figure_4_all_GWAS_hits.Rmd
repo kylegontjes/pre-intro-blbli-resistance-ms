@@ -11,7 +11,7 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
@@ -50,13 +50,18 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 # S Figure 4A - Table
 
 ```{r}
-s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,nn_qc) 
+# Curate table
+s_figure_4.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,nn_qc)
+
+# Update locus tag and gene and product for informative data
 s_figure_4.A_tb$locus_tag <- recode_genotypes(s_figure_4.A_tb$locus_tag)
-s_figure_4.A_tb$locus_tag <- ifelse(s_figure_4.A_tb$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",s_figure_4.A_tb$locus_tag)
 s_figure_4.A_tb$gene <- ifelse(grepl(pattern = 'ompK36|OmpK36',s_figure_4.A_tb$locus_tag) | s_figure_4.A_tb$locus_tag =='KPNIH1_RS18665',"ompK36",s_figure_4.A_tb$gene) %>% {ifelse(is.na(.),"",.)}
-s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "KPNIH1_RS18100","MdtA/MuxA family multidrug efflux RND <br>transporter periplasmic adaptor subunit",s_figure_4.A_tb$product)
+s_figure_4.A_tb$product <- ifelse(grepl("KPNIH1_RS18100", s_figure_4.A_tb$locus_tag),
+                                  "MdtA/MuxA family multidrug efflux RND transporter periplasmic adaptor subunit",
+                                  s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$gene=='ompK36','porin OmpC',s_figure_4.A_tb$product)
 s_figure_4.A_tb$product <- ifelse(grepl(pattern = 'KPC',s_figure_4.A_tb$locus_tag),"blaKPC-associated plasmid cluster",s_figure_4.A_tb$product)
+s_figure_4.A_tb$product <- ifelse(grepl("SHV-11|TEM-1D", s_figure_4.A_tb$locus_tag),"Broad-spectrum β-lactamase",s_figure_4.A_tb$product)
 s_figure_4.A_tb$locus_tag <- gsub("blaKPC-","<i>bla</i><sub>KPC</sub>-",s_figure_4.A_tb$locus_tag)
 s_figure_4.A_tb$locus_tag <- gsub("ompK36","<i>ompK36</i>",s_figure_4.A_tb$locus_tag) 
 s_figure_4.A_tb$gene <- gsub("ompK36","<i>ompK36</i>",s_figure_4.A_tb$gene) 
@@ -64,35 +69,44 @@ s_figure_4.A_tb$product <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",s_figure_4.A
 s_figure_4.A_tb$locus_tag <-  gsub("associated","containing",s_figure_4.A_tb$locus_tag)
 s_figure_4.A_tb$product <-  gsub("associated","containing",s_figure_4.A_tb$product)
 s_figure_4.A_tb$sig_models_simple <- gsub("KPC-","<i>bla</i><sub>KPC</sub>-",s_figure_4.A_tb$sig_models_simple) %>% gsub("associated","containing",.)
-
-# Add PFAV call 
 s_figure_4.A_tb$sig_models_simple <- gsub("High-risk variants","PFAV",s_figure_4.A_tb$sig_models_simple)
 
 # Recode PFAV at first mention
 idx <- which(grepl("PFAV", s_figure_4.A_tb$sig_models_simple))[1]
 s_figure_4.A_tb$sig_models_simple[idx] <- gsub(
   "PFAV",
-  "Putative function-altering variants<br>(PFAVs)",
+  "Putative function-altering variants (PFAVs)",
   s_figure_4.A_tb$sig_models_simple[idx])
 
-# Recode product
-s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "SHV-11","Broad-spectrum β-lactamase",s_figure_4.A_tb$product)
-s_figure_4.A_tb$product <- ifelse(s_figure_4.A_tb$locus_tag == "TEM-1D.v1^","Broad-spectrum β-lactamase",s_figure_4.A_tb$product)
+# Select relevant columns
+s_figure_4.A_tbl <- s_figure_4.A_tb %>%
+  select(locus_tag, gene, product, sig_tests, sig_models_simple, sig_phenotypes, nn_qc) %>%
+  `colnames<-`(c('Significant hit', 'Gene', 'Product', 'Significant test(s)',
+                 'Significant model(s)', 'Phenotype(s)', 'Nearest neighbor criterion'))
 
-s_figure_4.A_tbl <- s_figure_4.A_tb %>% select(locus_tag,gene,product,sig_tests,sig_models_simple,sig_phenotypes,nn_qc) %>% `colnames<-`(c('Significant hit','Gene', 'Product', 'Significant test(s)','Significant model(s)', 'Phenotype(s)','Nearest neighbor criterion'))
-
-tbl_html <- s_figure_4.A_tbl  %>%
-  kable(format = "html", row.names = FALSE,escape = FALSE) %>%
-  kable_styling(
-    bootstrap_options = c("condensed", "responsive"),
-    full_width = TRUE,
-    fixed_thead  = TRUE,
-    font_size = 44
-  ) %>%  row_spec(0, background = "lightgray", color = "black", bold = TRUE)  %>% row_spec(1:8, background = "white") 
+# Table
+tbl_html <- s_figure_4.A_tbl %>%
+  kable(format = "html", row.names = FALSE, escape = FALSE,
+        align = c("l", "l", "l", "l", "l", "l", "l")) %>%
+  kable_styling(bootstrap_options = c("condensed", "responsive"),
+                full_width = TRUE, fixed_thead = TRUE,
+                font_size = 47, html_font = "Arial") %>%
+  column_spec(1:ncol(s_figure_4.A_tbl),                                 # all columns, header included
+              extra_css = "padding-left: 0.3em; padding-right: 0.3em;",
+              include_thead = TRUE) %>%
+  column_spec(1, extra_css = "white-space: nowrap;") %>%                # Significant hit: no wrapping
+  column_spec(3, width = "22%") %>%                                     # Product
+  column_spec(4, extra_css = "white-space: nowrap;") %>%                # Significant test(s)
+  column_spec(6, extra_css = "white-space: nowrap;") %>%                # Phenotype(s)
+  column_spec(7, extra_css = "white-space: nowrap;", include_thead = TRUE) %>%   # Nearest neighbor criterion
+  row_spec(0, background = "lightgray", color = "black", bold = TRUE) %>%
+  row_spec(1:nrow(s_figure_4.A_tbl), background = "white",
+           extra_css = "border-top: 3px solid #bdbdbd;")
 
 save_kable(x = tbl_html, file = "tab_kbl.html")
 
-webshot2::webshot("tab_kbl.html", "tab_kbl.png", vwidth = 3900, vheight = 700) 
+webshot2::webshot(url = "tab_kbl.html", file = "tab_kbl.png",
+                  vwidth = 4100, vheight = 2000, selector = "table")
 ```
 
 # S Figure 4B - Phylogeny 
@@ -100,10 +114,9 @@ webshot2::webshot("tab_kbl.html", "tab_kbl.png", vwidth = 3900, vheight = 700)
 ```{r ,fig.height=12.5,fig.width=12.5,echo=F,message=F,error=F,warning=F} 
 rownames(df) <- df$isolate_no
 s_figure_4.df_mat <- get_gwas_hit_matrix(gwas_table,df)  
-sig_hits_name <- recode_genotypes(colnames(s_figure_4.df_mat))
+sig_hits_name <- recode_genotypes(colnames(s_figure_4.df_mat) %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.))
  
-s_figure_4.phylo <- gwas_figures(df,tr,s_figure_4.df_mat,sig_hits_name = sig_hits_name %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.)) + ylim(NA,555)  
-s_figure_4.FB <- plot_grid(s_figure_4.phylo,labels = "B",label_size=24)  
+s_figure_4.phylo <- gwas_figures(df,tr,s_figure_4.df_mat,sig_hits_name = sig_hits_name,text_size=2.125,tree_linewidth = 0.2)  + ylim(NA,595)   
 ```
 
 # S Figure 4C - Resistance Frequency
@@ -115,7 +128,7 @@ gwas_nons_freq$`Significant Hit` <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",gwa
 gwas_nons_freq$`Significant Hit` <- gsub("ompK36","<i>ompK36</i>",gwas_nons_freq$`Significant Hit`)
 gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(gwas_nons_freq$`Significant Hit`)))  
 
-s_figure_4.C <- freq_plot(gwas_nons_freq)  + s_figure_4_descriptive_plot_theme
+s_figure_4.C <- freq_plot(gwas_nons_freq,fig_text_size=2)  + s_figure_4_descriptive_plot_theme
 ```
 
 # S Figure 4D - Nearest neighbor Data
@@ -127,26 +140,101 @@ nn_data_melt$locus_tag <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",nn_data_melt$
 nn_data_melt$locus_tag <- gsub("ompK36","<i>ompK36</i>",nn_data_melt$locus_tag)  
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(nn_data_melt$locus_tag)))  
 
-s_figure_4.D <- nn_plot(nn_data_melt) + s_figure_4_descriptive_plot_theme
+s_figure_4.D <- nn_plot(nn_data_melt,box_linewidth = 0.25,dashed_linewidth = 0.33,outlier_size=0.33) + s_figure_4_descriptive_plot_theme
 ```
 
-# Merge figure
+# Legend
+```{r} 
+# Legend from a real variable, using the same scale as the panel
+data_legend <- function(data, var, scale, glyph = "rect", key_border = TRUE) {
+  data <- as.data.frame(data)
+  data <- data[!is.na(data[[var]]), , drop = FALSE]
+  data[[var]] <- factor(data[[var]])
+  outline <- if (glyph == "boxplot") "black" else NA        # outline only the boxplot symbol
+  p <- ggplot(data, aes(x = .data[[var]], fill = .data[[var]])) +
+    geom_bar(key_glyph = glyph, colour = outline, linewidth = 0.2) +
+    scale + consistent_theme_GWAS
+  if (!key_border) p <- p + theme(legend.key = element_rect(colour = NA, fill = NA))
+  cowplot::get_legend(p)
+}
 
-```{r,fig.height=20,fig.width=25}
-s_figure_4.FCD <- plot_grid(s_figure_4.C,s_figure_4.D ,nrow = 2,labels = c("C","D"),label_size = 28,align = "hv",label_x = -0.02)
-s_figure_4.FCDB <- plot_grid(s_figure_4.FB,s_figure_4.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 
+# Genotype: all hit columns combined, so both Present and Absent appear
+genotype_long <- data.frame(genotype = as.vector(as.matrix(s_figure_4.df_mat)))
+
+leg_clade      <- data_legend(df, "clade_I", clade_colors_scale_v)
+leg_phylo      <- data_legend(df, "blbli_asr_cluster_renamed", cluster_scale_3_col_key)
+leg_resistance <- data_legend(df, "blbli_dich", resistance_scale_key)
+leg_mic        <- data_legend(df, "MVB_log_2", Log2_scale_gwas_figure)
+leg_genotype   <- data_legend(genotype_long, "genotype", genotype_scale_v)
+leg_antibiotic <- data_legend(nn_data_melt, "variable", MVB_IR_scale,
+                              glyph = "boxplot", key_border = FALSE)
+
+legs <- list(leg_clade, leg_phylo, leg_resistance, leg_mic, leg_genotype, leg_antibiotic)
+
+# Measure each legend's width and height (in inches)
+w <- sapply(legs, function(g) grid::convertWidth(sum(g$widths),  "in", valueOnly = TRUE))
+h <- sapply(legs, function(g) grid::convertHeight(sum(g$heights), "in", valueOnly = TRUE))
+
+# Pad the bottom of each legend to match the tallest, so all titles line up
+legs <- mapply(function(g, hi) gtable::gtable_add_rows(g, unit(max(h) - hi, "in"), pos = -1),
+               legs, h, SIMPLIFY = FALSE)
+
+# Spacing: equal gaps between legends, equal padding on both sides (7.05 = figure width)
+gap <- 0.12
+pad <- max((7.05 - sum(w) - gap * (length(legs) - 1)) / 2, 0)
+rel <- c(pad, as.vector(rbind(w, gap))[-2 * length(w)], pad)
+
+# Interleave legends with NULL spacers: NULL, leg1, NULL, leg2, ..., leg6, NULL
+cells <- c(list(NULL),
+           unlist(lapply(seq_along(legs), function(i)
+             if (i < length(legs)) list(legs[[i]], NULL) else list(legs[[i]])),
+             recursive = FALSE),
+           list(NULL))
+
+s_figure_4.legends <- do.call(plot_grid, c(cells, list(nrow = 1, rel_widths = rel)))
 ```
 
-```{r ,fig.height=18.5,fig.width=22}
-s_figure_4.A <- ggdraw() + draw_image("tab_kbl.png")
+```{r ,fig.height=6.5,fig.width=7.05}
+# ===== Panel A: table =====
+info  <- magick::image_info(magick::image_read("tab_kbl.png"))
+
+fig_h <- 6.5                                    # total figure height (in); max 10.24
+tbl_w <- 6.65                                   # table width (in), leaving ~0.15 in each side
+tbl_h <- tbl_w * info$height / info$width       # height the table needs at that width
+a     <- 1.155 * tbl_h / (fig_h - tbl_h)        # panel A's share (1 + 0.155 = panels + legend row)
+
+s_figure_4.A_img <- ggdraw() + cowplot::draw_image("tab_kbl.png")
 unlink(c("tab_kbl.html", "tab_kbl.png"))
-s_figure_4.FA <- plot_grid(s_figure_4.A, labels = "A", label_size = 28, align = "hv", rel_widths = c(1))  +
-  theme(plot.margin = unit(c(0.1, 0, 0, 0), "cm"))
-s_figure_4 <- plot_grid(s_figure_4.FA,s_figure_4.FCDB,labels = c("",""),nrow=2,label_size = 28, rel_heights = c(0.35,1))   
+
+s_figure_4.FA <- plot_grid(s_figure_4.A_img, labels = "A", label_size = 12) +
+  theme(plot.margin = unit(c(0.05, 0, 0, 0), "cm"))
+```
+
+```{r ,fig.height=6.5,fig.width=7.05}
+# ===== Panel B: tree, no legends =====
+s_figure_4.FB <- plot_grid(s_figure_4.phylo + theme(legend.position = "none"),
+                           labels = "B", label_size = 12)
+
+# ===== Panels C and D, no legends =====
+s_figure_4.FCD <- plot_grid(
+  s_figure_4.C + theme(legend.position = "none"),
+  s_figure_4.D + theme(legend.position = "none"),
+  nrow = 2, labels = c("C", "D"), label_size = 12, align = "hv", label_x = -0.02)
+
+# ===== Assemble: table / panels B-D / shared legend row =====
+s_figure_4.FBCD <- plot_grid(s_figure_4.FB, s_figure_4.FCD, ncol = 2, rel_widths = c(1, 0.7))
+
+leg_share <- 0.125
+a <- (1 + leg_share) * tbl_h / (fig_h - tbl_h)
+
+s_figure_4 <- plot_grid(s_figure_4.FA, s_figure_4.FBCD, s_figure_4.legends,
+                        nrow = 3, rel_heights = c(a, 1, leg_share))
 s_figure_4
 ```
 
+
 # Save figure 
 ```{r}
-ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png', width = 22, height = 18.5,limitsize=FALSE,bg='white',dpi=900)
+ggsave(plot = s_figure_4, filename = './figures/s_figure_4.png',
+       width = 7.05, height = fig_h, units = 'in', bg = 'white', dpi = 900, device = ragg::agg_png)
 ```

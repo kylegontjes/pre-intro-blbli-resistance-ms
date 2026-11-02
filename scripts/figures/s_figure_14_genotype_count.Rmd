@@ -10,7 +10,7 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
@@ -95,5 +95,5 @@ s_figure_14
 ## Save figure 
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=4.5,fig.height=3.6} 
-ggsave(plot = s_figure_14, filename = './figures/s_figure_14_genotype_count.png', width = 4.5, height = 3.6, limitsize=FALSE, bg='white', dpi=900)
+ggsave(plot = s_figure_14, filename = './figures/s_figure_14_genotype_count.png', width = 4.5, height = 3.6, units = "in", dpi = 900, bg = 'white', device = ragg::agg_png)
 ```

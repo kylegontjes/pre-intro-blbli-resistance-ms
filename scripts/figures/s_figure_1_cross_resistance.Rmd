@@ -9,13 +9,13 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
 rm(list = ls())
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ``` 
 
 # Environment
 ```{r}
 #Packages
-packages <- c("tidyverse","ComplexHeatmap","RColorBrewer",'circlize',"cowplot")
+packages <- c("tidyverse","ComplexHeatmap","RColorBrewer",'circlize',"cowplot","magick")
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -45,12 +45,9 @@ data_matrix <- as.matrix(last_line_res_numeric)
 co_occurrence <- t(data_matrix) %*% data_matrix %>% as.matrix
 co_occurrence_percent <- co_occurrence / total_occurrences * 100 
 
-
 # Get clustering
-mat <- co_occurrence_percent
-
 drug_dist <- as.dist(
-  1 - cor(t(co_occurrence_percent), use = "pairwise.complete.obs")
+    1 - cor(t(co_occurrence_percent), use = "pairwise.complete.obs")
 )
 
 drug_hc <- hclust(drug_dist, method = "average")
@@ -64,55 +61,79 @@ co_occurrence_percent <- co_occurrence_percent[order,order]
 # Finish
 co_occurrence_merged <- list()
 for(i in 1:ncol(co_occurrence)){
-co_occurrence_merged[[i]] <- paste0(co_occurrence[,i]," (",round(co_occurrence_percent[,i],1),"%)")
+    co_occurrence_merged[[i]] <- paste0(co_occurrence[,i],"\n(",round(co_occurrence_percent[,i],1),"%)")   # n over (%)
 }
 
 co_occurrence_merged <- do.call(cbind,co_occurrence_merged) %>% as.data.frame %>% `colnames<-`(gsub("_dich_num","",colnames(co_occurrence))
 ) 
+diag(co_occurrence_merged) <- ""                                                 # blank diagonal (always 100%)
 
 rownames(co_occurrence_merged) <- sapply(rownames(co_occurrence),FUN=function(x){
-  total_count <- subset(total_occurrences,names(total_occurrences)==x)
-  paste0(recode_resistance_variables(x)," resistant (n = ",total_count,")")
+    total_count <- subset(total_occurrences,names(total_occurrences)==x)
+    paste0(recode_resistance_variables(x)," resistant (n = ",total_count,")")
 }) 
- 
+
 # Names
 rownames(co_occurrence_percent) <- recode_resistance_variables(rownames(co_occurrence_percent)) 
 colnames(co_occurrence_percent) <- recode_resistance_variables(colnames(co_occurrence_percent))
 colnames(co_occurrence_merged) <- recode_resistance_variables(colnames(co_occurrence_merged))
-drugs <- gsub("_dich_num","",colnames(co_occurrence_merged))
+diag(co_occurrence_percent) <- NA                                                # gray diagonal cells
+
+## Cell size (pt)
+cell_w <- 33                                                                     # cell width
+cell_h <- 24                                                                     # cell height: two 7 pt lines
 
 ## Heatmap
-co_occurrence_heatmap <- pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-resistance", legend=F, fontsize = 9.5,
-    row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 14)),
-    column_names_max_height = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 14)),
-    legend_breaks = c(0, 25, 50, 75, 100),
-    legend_labels = c("0%", "25%", "50%", "75%", "100%"),
-    cluster_rows=F,cluster_cols = F,
-    display_numbers = as.matrix(co_occurrence_merged),labels_row = rownames(co_occurrence_merged), number_color = "black")
+co_occurrence_heatmap <- pheatmap(co_occurrence_percent %>% as.matrix,border_color = "black",name ="Cross-resistance", legend=F, fontsize = 7.75,
+                                  color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(100), breaks = seq(0, 100, length.out = 101),
+                                  na_col = "grey90",
+                                  row_names_max_width = max_text_width(rownames(co_occurrence_merged), gp = gpar(fontsize = 7.75)),
+                                  column_names_max_height = max_text_width(colnames(co_occurrence_merged), gp = gpar(fontsize = 7.75)),   # space for 45° labels
+                                  cluster_rows=F,cluster_cols = F, angle_col = "45",
+                                  treeheight_col = 0, treeheight_row = 0,                                      # no reserved dendrogram space
+                                  cellwidth = cell_w, cellheight = cell_h,
+                                  display_numbers = as.matrix(co_occurrence_merged),
+                                  labels_row = rownames(co_occurrence_merged), 
+                                  number_color = "black",
+                                  fontsize_number = 7.75)
 
-## Complex heatmap legend
-one_hundred_breaks <- c()
-for(i in 1:100){
-  one_hundred_breaks[i] <- 1*i
-}  
+## Complex heatmap legend (vertical, right of the row labels)
+one_hundred_breaks <- seq(0, 100, length.out = 100)
 
-fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Cross-resistance",direction = "horizontal",col_fun = colorRamp2(breaks = one_hundred_breaks,colors = colorRampPalette(rev(brewer.pal(n = 7, name =  "RdYlBu")))(100)), title_gp = gpar(fontsize = 16),labels_gp=gpar(fontsize=14), legend_width = unit(12.5, "cm"), title_position = 'topcenter')
+fig_legend <- Legend(at = c(0, 25, 50, 75, 100),labels = c("0%", "25%", "50%", "75%", "100%"),title = "Cross-resistance",direction = "vertical",col_fun = colorRamp2(breaks = one_hundred_breaks,colors = colorRampPalette(rev(brewer.pal(n = 7, name =  "RdYlBu")))(100)), title_gp = gpar(fontsize = 7.75),labels_gp=gpar(fontsize=6.75), legend_height = unit(3, "cm"))
+
+## Canvas: generous size so nothing is clipped; trimmed to content after saving
+s1_w <- 9
+s1_h <- 6
+pad  <- unit(c(2, 10, 2, 8), "mm")                                               # bottom, left, top, right
 
 # Print heatmap
-fig_heatmap_image <- grid.grabExpr(draw(co_occurrence_heatmap))
-fig_legend_image <- grid.grabExpr(draw(fig_legend))
-
-s_figure_1 <- cowplot::plot_grid(fig_heatmap_image, fig_legend_image,ncol=1,axis="l", align="hv",rel_heights = c(1,.175))  
-```
-
-# Figure 
-
-```{r,message=F,error=F,warning=F,fig.width=8.5,fig.height=4.25}
-s_figure_1
+s_figure_1 <- cowplot::ggdraw(grid.grabExpr(draw(co_occurrence_heatmap,
+                                                 heatmap_legend_list = list(fig_legend),
+                                                 heatmap_legend_side = "right", padding = pad),
+                                            width = s1_w, height = s1_h))
 ```
 
 ## Save
 
 ```{r}
-ggsave(plot = s_figure_1, filename = './figures/s_figure_1.png', width = 8.5, height = 4.25, bg = "white", dpi=900)
+out <- "./figures/s_figure_1.png"
+ggsave(plot = s_figure_1, filename = out,
+       width = s1_w, height = s1_h, units = "in", dpi = 900, bg = "white", device = ragg::agg_png)
+
+# Trim surrounding white space, then add an even ~0.05 in margin
+img <- image_read(out)
+img <- image_trim(img)
+img <- image_border(img, "white", "45x45")                                      # 45 px = 0.05 in at 900 dpi
+image_write(img, out, density = 900)
+
+# Final size (in)
+info <- image_info(img)
+c(width = info$width / 900, height = info$height / 900)
+```
+
+# Figure  
+
+```{r,message=F,error=F,warning=F,fig.width=info$width/900,fig.height=info$height/900}
+grid::grid.raster(img)
 ```

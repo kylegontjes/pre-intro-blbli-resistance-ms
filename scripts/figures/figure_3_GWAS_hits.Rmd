@@ -11,7 +11,8 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+knitr::opts_chunk$set(dev = "ragg_png", dpi = 900)
 ```
 
 # Environment
@@ -22,6 +23,9 @@ packages <- c("tidyverse","cowplot","ggtree","ggnewscale","ape","phytools","phyl
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
 
+# Measure text with the same engine that draws it (fixes ggtext word spacing)
+cowplot::set_null_device("agg")
+
 #Scripts
 source("./lib/consistent_themes.R")
 source("./lib/common_functions.R") 
@@ -29,10 +33,7 @@ source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R")
 
 # Print
 Sys.info()
-sessionInfo() 
-
-# Set null device
-set_null_device("png")
+sessionInfo()
 ```
  
 # Load data
@@ -58,15 +59,16 @@ df <- left_join(df,gwas_hits %>% mutate(isolate_no = rownames(.))) %>% left_join
 
 # Figure 3A - Table
 
-```{r ,fig.height=16,fig.width=22}
+```{r ,fig.height=5.13,fig.width=7.05}
 # Curate table
-figure_3.A_tb <- gwas_table %>% select(locus_tag,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc)
+figure_3.A_tb <- gwas_table %>% select(locus_tag,feature_count,gene,product,resistance_category,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc)
 
 # Update locus tag and gene and product for informative data
-figure_3.A_tb$locus_tag <- recode_genotypes(figure_3.A_tb$locus_tag)
-figure_3.A_tb$locus_tag <- ifelse(figure_3.A_tb$locus_tag =="KPNIH1_RS18665","ompK36 PFAV",figure_3.A_tb$locus_tag)
+figure_3.A_tb$locus_tag <- recode_genotypes(figure_3.A_tb$locus_tag) 
 figure_3.A_tb$gene <- ifelse(grepl(pattern = 'ompK36|OmpK36',figure_3.A_tb$locus_tag) | figure_3.A_tb$locus_tag =='KPNIH1_RS18665',"ompK36",figure_3.A_tb$gene) %>% {ifelse(is.na(.),"",.)}
-figure_3.A_tb$product <- ifelse(figure_3.A_tb$locus_tag == "KPNIH1_RS18100","MdtA/MuxA family multidrug efflux RND <br>transporter periplasmic adaptor subunit",figure_3.A_tb$product)
+figure_3.A_tb$product <- ifelse(grepl("KPNIH1_RS18100", figure_3.A_tb$locus_tag),
+                                "MdtA/MuxA family multidrug efflux RND transporter periplasmic adaptor subunit",
+                                figure_3.A_tb$product)
 figure_3.A_tb$product <- ifelse(figure_3.A_tb$gene=='ompK36','porin OmpC',figure_3.A_tb$product)
 figure_3.A_tb$product <- ifelse(grepl(pattern = 'KPC',figure_3.A_tb$locus_tag),"blaKPC-associated plasmid cluster",figure_3.A_tb$product)
 figure_3.A_tb$locus_tag <- gsub("blaKPC-","<i>bla</i><sub>KPC</sub>-",figure_3.A_tb$locus_tag)
@@ -86,38 +88,51 @@ figure_3.A_tb$sig_models_simple[idx] <- gsub(
   figure_3.A_tb$sig_models_simple[idx])
 
 # Select relevant columns
-figure_3.A_tbl <- figure_3.A_tb %>% select(locus_tag,gene,product,sig_tests,sig_models_simple,sig_phenotypes,explanatory_qc) %>% `colnames<-`(c('Significant hit','Gene', 'Product','Significant test(s)','Significant model(s)', 'Phenotype(s)',"Explanatory genotype")) 
+figure_3.A_tbl <- figure_3.A_tb %>%
+  select(locus_tag, feature_count, gene, product, sig_tests, sig_models_simple, sig_phenotypes, explanatory_qc) %>%
+  `colnames<-`(c('Significant hit', 'n', 'Gene', 'Product', 'Significant test(s)',
+                 'Significant model(s)', 'Phenotype(s)', 'Explanatory genotype'))
 
-tbl_html <- figure_3.A_tbl  %>%
-  kable(format = "html", row.names = FALSE,escape = FALSE) %>%
-  kable_styling(
-    bootstrap_options = c("condensed", "responsive"),
-    full_width = TRUE,
-    fixed_thead  = TRUE,
-    font_size = 44
-  ) %>%  row_spec(0, background = "lightgray", color = "black", bold = TRUE)  %>% row_spec(1:8, background = "white") 
+# Select relevant columns
+tbl_html <- figure_3.A_tbl %>%
+  kable(format = "html", row.names = FALSE, escape = FALSE,
+        align = c("l", "r", "l", "l", "l", "l", "l", "l")) %>%
+  kable_styling(bootstrap_options = c("condensed", "responsive"),
+                full_width = TRUE, fixed_thead = TRUE,
+                font_size = 47, html_font = "Arial") %>%
+  column_spec(1:ncol(figure_3.A_tbl),                                   # all columns, header included
+              extra_css = "padding-left: 0.3em; padding-right: 0.3em;",
+              include_thead = TRUE) %>%
+  column_spec(1, extra_css = "white-space: nowrap;") %>%                # Significant hit: no wrapping
+  column_spec(4, width = "22%") %>%                                     # Product   
+  column_spec(5, extra_css = "white-space: nowrap;") %>%   # Significant test(s): "PhyC & Synchronous"
+  column_spec(7, extra_css = "white-space: nowrap;") %>%   # Phenotype(s): "BL/BLI & IR & MVB"
+  column_spec(8, extra_css = "white-space: nowrap;", include_thead = TRUE) %>%   # Explanatory genotype
+  row_spec(0, background = "lightgray", color = "black", bold = TRUE) %>%
+  row_spec(1:nrow(figure_3.A_tbl), background = "white",
+         extra_css = "border-top: 3px solid #bdbdbd;")
 
-# Save the table
 save_kable(x = tbl_html, file = "tab_kbl.html")
 
-# Take a screenshot of the table for future work in cowplot
-webshot2::webshot(url = "tab_kbl.html", file = "tab_kbl.png", vwidth = 4100, vheight = 700) 
+webshot2::webshot(url = "tab_kbl.html", file = "tab_kbl.png",
+                  vwidth = 4100, vheight = 700, selector = "table")
 ```
 
 # Figure 3B - Phylogeny with hits
 
-```{r,fig.height=55,fig.width=40}
+```{r ,fig.height=5.13,fig.width=4.338462}
 rownames(df) <- df$isolate_no
 figure_3.df_mat <- get_gwas_hit_matrix(gwas_table,df) 
-sig_hits_name <- recode_genotypes(colnames(figure_3.df_mat))
+sig_hits_name <- recode_genotypes(colnames(figure_3.df_mat)%>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.))
 
-figure_3.phylo <- gwas_figures(df,tr,figure_3.df_mat,sig_hits_name = sig_hits_name %>% gsub("_1|_2|_1.2|_2.2|_3|_3.2","",.)) + ylim(NA,600)  
-figure_3.FB <- plot_grid(figure_3.phylo,labels = "B",label_size=28)  
+figure_3.phylo <- gwas_figures(df,tr,figure_3.df_mat,sig_hits_name = sig_hits_name,text_size=2.125,tree_linewidth = 0.2) + ylim(NA,595)  
+figure_3.FB <- plot_grid(figure_3.phylo,labels = "B",label_size=12)  
+figure_3.FB
 ``` 
   
 # Figure 3C - Frequency of hit in resistant isolates
 
-```{r,fig.height=15,fig.width=25}
+```{r ,fig.height=5.13,fig.width=7.05}
 # Curate results
 gwas_nons_freq <- variants_freq(gwas_table$genotype,df)  
 gwas_nons_freq$locus_tag <- recode_genotypes(gwas_nons_freq$locus_tag) 
@@ -127,41 +142,118 @@ gwas_nons_freq$`Significant Hit` <- gsub("ompK36","<i>ompK36</i>",gwas_nons_freq
 gwas_nons_freq$`Significant Hit` <- factor(gwas_nons_freq$`Significant Hit`, levels=rev(unique(figure_3.A_tb$locus_tag)))  
 
 # Figure 3C
-figure_3.C <- freq_plot(gwas_nons_freq)  + figure_3_descriptive_plot_theme
+figure_3.C <- freq_plot(gwas_nons_freq,fig_text_size=2)  + figure_3_descriptive_plot_theme
+figure_3.C
 ```
 
 # Figure 3D - Nearest neighbor algorithm analysis data
 
-```{r,fig.height=15,fig.width=25}
+```{r ,fig.height=5.13,fig.width=7.05}
 # D. Curate fold change data
 nn_data_melt <- lapply(gwas_table$genotype,generate_nn_melt_data,nn_data=nn) %>% do.call(rbind,.)
 nn_data_melt$locus_tag <- recode_genotypes(nn_data_melt$locus_tag)
 nn_data_melt$locus_tag <- gsub("blaKPC","<i>bla</i><sub>KPC</sub>",nn_data_melt$locus_tag)
 nn_data_melt$locus_tag <- gsub("ompK36","<i>ompK36</i>",nn_data_melt$locus_tag)  
 nn_data_melt$locus_tag <- factor(nn_data_melt$locus_tag, levels=rev(unique(figure_3.A_tb$locus_tag)))   
-figure_3.D <- nn_plot(nn_data_melt) + figure_3_descriptive_plot_theme
+figure_3.D <- nn_plot(nn_data_melt,box_linewidth = 0.25,dashed_linewidth = 0.33,outlier_size=0.33) + figure_3_descriptive_plot_theme
 
 # Figure 3D
 figure_3.D
 ```
+# Legend
+```{r}
+# Legend from a real variable, using the same scale as the panel
+data_legend <- function(data, var, scale, glyph = "rect", key_border = TRUE) {
+  data <- as.data.frame(data)
+  data <- data[!is.na(data[[var]]), , drop = FALSE]
+  data[[var]] <- factor(data[[var]])
+  outline <- if (glyph == "boxplot") "black" else NA        # outline only the boxplot symbol
+  p <- ggplot(data, aes(x = .data[[var]], fill = .data[[var]])) +
+    geom_bar(key_glyph = glyph, colour = outline, linewidth = 0.2) +
+    scale + consistent_theme_GWAS
+  if (!key_border) p <- p + theme(legend.key = element_rect(colour = NA, fill = NA))
+  cowplot::get_legend(p)
+}
 
-# Figure
+leg_clade      <- data_legend(df, "clade_I", clade_colors_scale_v)
+leg_phylo      <- data_legend(df, "blbli_asr_cluster_renamed", cluster_scale_3_col_key)
+leg_resistance <- data_legend(df, "blbli_dich", resistance_scale_key)
+leg_mic        <- data_legend(df, "MVB_log_2", Log2_scale_gwas_figure)
+leg_genotype   <- data_legend(figure_3.df_mat, colnames(figure_3.df_mat)[1], genotype_scale_v)
+leg_antibiotic <- data_legend(nn_data_melt, "variable", MVB_IR_scale,
+                              glyph = "boxplot", key_border = FALSE)
 
-```{r,fig.height=20,fig.width=25}
-figure_3.FCD <- plot_grid(figure_3.C,figure_3.D ,nrow = 2,labels = c("C","D"),label_size = 28,align = "hv",label_x = -0.02)
-figure_3.FCDB <- plot_grid(figure_3.FB,figure_3.FCD,ncol = 2,rel_heights = c(1,1),rel_widths = c(1,0.625)) 
+legs <- list(leg_clade, leg_phylo, leg_resistance, leg_mic, leg_genotype, leg_antibiotic)
+
+# Measure each legend's width and height (in inches)
+w <- sapply(legs, function(g) grid::convertWidth(sum(g$widths),  "in", valueOnly = TRUE))
+h <- sapply(legs, function(g) grid::convertHeight(sum(g$heights), "in", valueOnly = TRUE))
+
+# Pad the bottom of each legend to match the tallest, so all titles line up
+legs <- mapply(function(g, hi) gtable::gtable_add_rows(g, unit(max(h) - hi, "in"), pos = -1),
+               legs, h, SIMPLIFY = FALSE)
+
+# Spacing: equal gaps between legends, equal padding on both sides (7.05 = figure width)
+gap <- 0.12
+pad <- max((7.05 - sum(w) - gap * (length(legs) - 1)) / 2, 0)
+rel <- c(pad, as.vector(rbind(w, gap))[-2 * length(w)], pad)
+
+# Interleave legends with NULL spacers: NULL, leg1, NULL, leg2, ..., leg6, NULL
+cells <- c(list(NULL),
+           unlist(lapply(seq_along(legs), function(i)
+             if (i < length(legs)) list(legs[[i]], NULL) else list(legs[[i]])),
+             recursive = FALSE),
+           list(NULL))
+
+figure_3.legends <- do.call(plot_grid, c(cells, list(nrow = 1, rel_widths = rel)))
 ```
 
-```{r ,fig.height=16,fig.width=22}
+```{r ,fig.height=6,fig.width=7.05}
+# ===== Panel A: table =====
+info  <- magick::image_info(magick::image_read("tab_kbl.png"))
+tbl_h <- 7.05 * info$height / info$width             # height (in) needed at full width
+
+fig_h <- 6                                      # total figure height (in); max 10.24
+tbl_w <- 6.65                                   # table width (in), leaving ~0.15 in each side
+tbl_h <- tbl_w * info$height / info$width       # height needed at that width
+a     <- 1.155 * tbl_h / (fig_h - tbl_h)
+
 figure_3.A <- ggdraw() + cowplot::draw_image("tab_kbl.png")
 unlink(c("tab_kbl.html", "tab_kbl.png"))
-figure_3.FA <- plot_grid(figure_3.A, labels = "A", label_size = 28, align = "hv", rel_widths = c(1)) +
-  theme(plot.margin = unit(c(0.1, 0, 0, 0), "cm"))
-figure_3 <- plot_grid(figure_3.FA,figure_3.FCDB,labels = c("",""),nrow=2,label_size = 28, rel_heights = c(0.3,1))   
+
+figure_3.FA <- plot_grid(figure_3.A, labels = "A", label_size = 12) +
+  theme(plot.margin = unit(c(0.05, 0, 0, 0), "cm"))
+
+# ===== Panel B: tree, no legends =====
+figure_3.FB <- plot_grid(figure_3.phylo + theme(legend.position = "none"),
+                         labels = "B", label_size = 12)
+
+# ===== Panels C and D, no legends =====
+figure_3.FCD <- plot_grid(
+  figure_3.C + theme(legend.position = "none"),
+  figure_3.D + theme(legend.position = "none"),
+  nrow = 2, labels = c("C", "D"), label_size = 12, align = "hv", label_x = -0.02)
+
+# ===== Assemble: table / panels B-D / shared legend row =====
+figure_3.FCDB <- plot_grid(figure_3.FB, figure_3.FCD, ncol = 2, rel_widths = c(1, 0.7))
+
+# Figure size 
+leg_share <- 0.125                                   # was 0.155
+a <- (1 + leg_share) * tbl_h / (fig_h - tbl_h)
+
+figure_3 <- plot_grid(figure_3.FA, figure_3.FCDB, figure_3.legends,
+                      nrow = 3, rel_heights = c(a, 1, leg_share))
 figure_3
 ```
 
 ## Save figure
 ```{r} 
-ggsave(plot = figure_3, filename = './figures/figure_3.png', width = 22, height = 16, limitsize=FALSE, bg='white', dpi=900)
+# PDF (submission file): vector, editable text
+ggsave(plot = figure_3, filename = './figures/figure_3.pdf',
+       width = 7.05, height = fig_h, units = 'in', bg = 'white', device = cairo_pdf)
+
+# PNG (for Word / quick viewing): same text engine as the preview
+ggsave(plot = figure_3, filename = './figures/figure_3.png',
+       width = 7.05, height = fig_h, units = 'in', bg = 'white', dpi = 600,
+       device = ragg::agg_png)
 ```

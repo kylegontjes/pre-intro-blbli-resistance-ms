@@ -9,7 +9,7 @@ output: html_document
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
@@ -77,46 +77,107 @@ df$KPC_allele <- ifelse(is.na(df$KPC_allele),"No blaKPC",df$KPC_allele)
 
 # Plot on the tree
 
-```{r,fig.height=9.333,fig.width=10.5}
+```{r,fig.height=6.75,fig.width=7.5}
 df$KPC_copy_number_log2 <- log2(df$KPC_copy_number)
 df$KPC_plasmid_copy_number_log2 <- log2(df$KPC_plasmid_median_copy_chromosome_normalized)
 
 rownames(df) <- df$isolate_no
+font_size =  2.75
+font_family = "Arial"
 
-p0 <- gheatmap(ggtree(tr),data=df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05) + cluster_scale_1_order_2_col  + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
+p0 <- gheatmap(ggtree(tr),data=df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = font_size, width = 0.05,family = font_family) + cluster_scale_1_order_2_col  + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
 
 p0.1 <- p0+ggnewscale::new_scale_fill()
 
-p1 <- gheatmap(p0.1,data=df %>% select(blbli_dich) %>% mutate_all(as.factor) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.0000125) + resistance_scale_order_2 + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
+p1 <- gheatmap(p0.1,data=df %>% select(blbli_dich) %>% mutate_all(as.factor) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = font_size, width = 0.05,offset=.0000125,family = font_family) + resistance_scale_order_1 + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
 
 p1.1 <- p1+ggnewscale::new_scale_fill()
 
-p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.000025) + Log2_scale_3_order + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
+p2 <- gheatmap(p1.1,data=df %>% select(MVB_log_2,IR_log_2) %>% mutate_all(as.factor) %>% `colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = font_size, width = 0.1,offset=.000025,family = font_family) + Log2_scale_s6 + ylim(NA,550) + consistent_theme_s_figure_6_wo_md
   
 p2.1 <- p2+ggnewscale::new_scale_fill()
 
-p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC allele")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.05,offset=.00005) + kpc_scale + consistent_theme_s_figure_6_wo_md   + guides(
+p3 <- gheatmap(p2.1,data=df %>% select(KPC_allele) %>% `colnames<-`(c("blaKPC allele")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = font_size, width = 0.05,offset=.00005,family = font_family) + kpc_scale + consistent_theme_s_figure_6_wo_md   + guides(
     fill = guide_legend(
         title.position = "top",
         label.position = "right",
         order=4,
-        ncol = 1,theme = theme(legend.title=element_markdown(),legend.text=element_markdown())
+        ncol = 1,theme = theme(legend.title = element_markdown(size = 7, hjust = 0.5),
+                 legend.text  = element_markdown(size = 6))
     )
-)
+) 
 
 p3.1 <- p3+ggnewscale::new_scale_fill()
 
-p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("log2 blaKPC plasmid copy number","log2 blaKPC gene copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.1,offset=.00006125)    +consistent_theme_s_figure_6_wo_md   + log2_cont_scale + ylim(NA,550)  
+p4 <- gheatmap(p3.1,data=df %>% select(KPC_plasmid_copy_number_log2,KPC_copy_number_log2) %>% `colnames<-`(c("log2 blaKPC plasmid copy number","log2 blaKPC gene copy number")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = font_size, width = 0.1,offset=.00006125,family = font_family)    +consistent_theme_s_figure_6_wo_md   + log2_cont_scale_s6 + ylim(NA,550)   
 
 p4.1 <- p4 + ggnewscale::new_scale_fill()
   
-figure <- gheatmap(p4.1,data=KPC_containing_clusters[,plasmid_order] %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 4, width = 0.5,offset =.0000875) + plasmid_scale_v + ylim(NA,590)   + consistent_theme_s_figure_6_wo_md  
-
-figure
+figure <- gheatmap(p4.1,data=KPC_containing_clusters[,plasmid_order] %>% mutate_all(as.factor) %>% `colnames<-`(paste0(colnames(.) %>% gsub("_KPC","",.)," blaKPC-containing plasmid")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = font_size, width = 0.5,offset =.0000875,family = font_family) + plasmid_scale_v + ylim(NA,570)   + consistent_theme_s_figure_6_wo_md  
 ``` 
+
+```{r,fig.height=6.75,fig.width=6.75}
+# Legend from real data, using the same scale as the panel
+data_legend <- function(data, var, scale, continuous = FALSE, extra = NULL) {
+  data <- as.data.frame(data)
+  data <- data[!is.na(data[[var]]), , drop = FALSE]
+  if (!continuous) data[[var]] <- factor(data[[var]])
+  p <- ggplot(data, aes(x = 1, y = 1, fill = .data[[var]])) + geom_tile() +
+    scale + consistent_theme_s_figure_6_wo_md
+  if (!is.null(extra)) p <- p + extra                       # e.g. markdown guide for blaKPC
+  cowplot::get_legend(p)
+}
+
+# blaKPC allele: markdown title and labels (italic bla, subscript KPC)
+kpc_md_guide <- guides(fill = guide_legend(title.position = "top", label.position = "right", order = 4, ncol = 1,
+                                           theme = theme(legend.title = element_markdown(size = 7, hjust = 0.5),
+                                                         legend.text  = element_markdown(size = 6))))
+
+leg_phylo <- data_legend(df, "blbli_asr_cluster_renamed", cluster_scale_1_order_2_col)
+leg_res   <- data_legend(df, "blbli_dich", resistance_scale_order_2)
+leg_mic   <- data_legend(df, "MVB_log_2", Log2_scale_gwas_figure)
+leg_kpc   <- data_legend(df, "KPC_allele", kpc_scale, extra = kpc_md_guide)
+leg_cn    <- data_legend(df, "KPC_copy_number_log2", log2_cont_scale_s6, continuous = TRUE)
+leg_plas  <- data_legend(data.frame(p = as.vector(as.matrix(KPC_containing_clusters))), "p", plasmid_scale_v)
+
+# One row: all six legends (row_legends() from S Figure 3) 
+row_legends <- function(legs, fig_w = 7.5, gap = 0.12) {
+  w <- sapply(legs, function(g) grid::convertWidth(sum(g$widths),  "in", valueOnly = TRUE))
+  h <- sapply(legs, function(g) grid::convertHeight(sum(g$heights), "in", valueOnly = TRUE))
+  # Pad the bottom of each legend to match the tallest, so all titles line up
+  legs <- mapply(function(g, hi) gtable::gtable_add_rows(g, unit(max(h) - hi, "in"), pos = -1),
+                 legs, h, SIMPLIFY = FALSE)
+  pad <- max((fig_w - sum(w) - gap * (length(legs) - 1)) / 2, 0)
+  rel <- c(pad, as.vector(rbind(w, gap))[-2 * length(w)], pad)
+  # Interleave legends with NULL spacers: NULL, leg1, NULL, leg2, ..., NULL
+  cells <- c(list(NULL),
+             unlist(lapply(seq_along(legs), function(i)
+               if (i < length(legs)) list(legs[[i]], NULL) else list(legs[[i]])),
+               recursive = FALSE),
+             list(NULL))
+  out <- do.call(plot_grid, c(cells, list(nrow = 1, rel_widths = rel)))
+  attr(out, "height_in") <- max(h)                              # row height (in)
+  attr(out, "width_in")  <- sum(w) + gap * (length(legs) - 1)   # row width (in)
+  out
+}
+
+legends  <- row_legends(list(leg_phylo,leg_res ,leg_mic, leg_kpc, leg_cn, leg_plas),
+                        fig_w = 6.75, gap = 0.03)
+attr(legends, "width_in")                                   # must be <= 7.5
+legend_h <- attr(legends, "height_in")
+
+# Tree without its legends + legend row; total height 7.5 in
+fig_h  <- 6.75
+tree_h <- fig_h - legend_h
+s_figure_6 <- plot_grid(figure + theme(legend.position = "none"), legends,
+                        ncol = 1, rel_heights = c(tree_h, legend_h))
+
+s_figure_6
+```
 
 ## Save the figure
 
 ```{r}
-ggsave("./figures/s_figure_6_KPC_copy_number_across_phylogeny.png",plot = figure, units = 'in', height = 9.333, width = 10.5, dpi = 900, bg='white')
+ggsave("./figures/s_figure_6_KPC_copy_number_across_phylogeny.png", plot = s_figure_6,
+       width = 6.75, height = fig_h, units = 'in', dpi = 900, bg = 'white', device = ragg::agg_png)
 ```

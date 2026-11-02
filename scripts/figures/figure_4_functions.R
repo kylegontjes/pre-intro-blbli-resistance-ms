@@ -1,11 +1,21 @@
 
 MIC_ompk36_prop_hist <- function(dataset){
-  # Add padding
-  padding <- max(nchar(dataset[['phenotype_cat']] %>% as.character))
-  dataset$phenotype_cat <- factor(dataset$phenotype_cat,labels = str_pad(levels(dataset$phenotype_cat),width = padding , side='both')) 
+  # n per resistance category (summed across OmpK36 groups)
+  n_cat <- dataset %>%
+    dplyr::group_by(phenotype_cat) %>%
+    dplyr::summarise(n = sum(n), .groups = "drop")   # needs a per-row count column `n`
   
-  ## Color Scale 
-  histogram <-  ggplot(data=dataset,aes(x=phenotype_cat,fill=OmpK36_mutations,y=freq)) + geom_bar(position="stack",stat="identity", width = 0.55)  +ylab("Proportion of Isolates") +xlab("Resistance Profile") 
+  # Build x labels: padded category name + n on a second line
+  padding <- max(nchar(as.character(dataset[['phenotype_cat']])))
+  lab_df <- n_cat %>%
+    dplyr::mutate(lab = paste0(str_pad(as.character(phenotype_cat), width = padding, side = "both"),
+                               "\n(n = ", n, ")"))
+  lab_vec <- setNames(lab_df$lab, as.character(lab_df$phenotype_cat))
+  
+  histogram <- ggplot(data = dataset, aes(x = phenotype_cat, fill = OmpK36_mutations, y = freq)) +
+    geom_bar(position = "stack", stat = "identity", width = 0.55) +
+    scale_x_discrete(labels = lab_vec) +
+    ylab("Proportion of Isolates") + xlab("Resistance Profile")
   return(histogram)
 }
 

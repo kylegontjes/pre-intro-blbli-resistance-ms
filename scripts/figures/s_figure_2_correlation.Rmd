@@ -9,7 +9,7 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE) 
 rm(list = ls())
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ``` 
 
 # Environment
@@ -68,5 +68,5 @@ s_figure_2
 
 ## Save
 ```{r}
-ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 5.75, height = 5.75, bg='white', dpi=900)
+ggsave(plot = s_figure_2, filename = './figures/s_figure_2.png', width = 5.75, height = 5.75, bg='white', dpi=900, device = ragg::agg_png)
 ```

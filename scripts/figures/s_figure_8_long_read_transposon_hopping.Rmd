@@ -9,14 +9,14 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
 
 ```{r , echo=F, message=FALSE, include=F, results=F}
 #Packages
-packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree')
+packages <- c("tidyverse","gridExtra",'kableExtra',"ggnewscale","cowplot",'ape','ggtree','ggtext')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -184,10 +184,34 @@ make_plots <- function(filename,contig_data,blast_data){
   }) %>% do.call(rbind,.) 
   contig_data$map1_chr <- factor(contig_data$map1_chr,levels = c(isolate_1_contigs %>% arrange(-size) %>% .$contig_name)) 
   contig_data$map2_chr <- factor(contig_data$map2_chr,levels = c(isolate_2_contigs %>% arrange(-size) %>% .$contig_name)) 
-  
-    figure <- ggplot(data=coords, aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`)) + geom_segment() +  geom_segment(data=tn4401_merge,aes(x=`[S1]`, xend=`[E1]`, y=`[S2]`, yend=`[E2]`,color="red"))  + geom_segment(data=contig_data,aes(x=`X`,xend=`X`,y=`Y`,yend=`Y`),color="white") +
-    facet_grid(map2_chr~map1_chr,scales = 'free',drop = F)   + xlab(paste0(unique(coords$map1_name)," position (bp)")) + ylab(paste0(unique(coords$map2_name)," position (bp)")) +    geom_point(alpha=.5)  + xlim(0,NA) + ylim(0,NA)+ coord_cartesian(clip = "off") + ggplot2::theme_bw()  + scale_color_manual(values="red",labels="<i>bla</i><sub>KPC</sub>-containing <i>tn4401</i> transposon", name="", guide = guide_legend(nrow=1, title.position = "top", label.position = "right")) + s_figure_8_format
- 
+
+  # Axes end at the contig length; chromosome gets 0 / 2,500 / 5,000 kb, plasmids get round ticks inside the range
+  contig_breaks <- function(n) function(lims) {
+    if (lims[2] > 1e6) return(c(0, 2.5e6, 5e6))          # chromosome
+    b <- pretty(lims, n = n)
+    b[b >= 0 & b <= lims[2]]                             # no ticks past the contig end
+  }
+  kb_labels <- scales::label_number(scale = 1e-3, big.mark = ",")
+
+  figure <- ggplot(data = coords, aes(x = `[S1]`, xend = `[E1]`, y = `[S2]`, yend = `[E2]`)) +
+    geom_segment(linewidth = 0.3) +
+    geom_segment(data = tn4401_merge, aes(x = `[S1]`, xend = `[E1]`, y = `[S2]`, yend = `[E2]`, color = "red"),
+                 linewidth = 0.5) +
+    geom_segment(data = contig_data, aes(x = `X`, xend = `X`, y = `Y`, yend = `Y`), color = "white") +
+    facet_grid(map2_chr ~ map1_chr, scales = 'free', drop = F) +
+    geom_point(alpha = .5, size = 0.4) +
+    scale_x_continuous(limits = c(0, NA), breaks = contig_breaks(3), labels = kb_labels,
+                       expand = expansion(mult = c(0.02, 0.02))) +
+    scale_y_continuous(limits = c(0, NA), breaks = contig_breaks(5), labels = kb_labels,
+                       expand = expansion(mult = c(0, 0.02))) +
+    xlab(paste0(unique(coords$map1_name), " position (kb)")) +
+    ylab(paste0(unique(coords$map2_name), " position (kb)")) +
+    coord_cartesian(clip = "off") + ggplot2::theme_bw() +
+    scale_color_manual(values = "red", labels = "<i>bla</i><sub>KPC</sub>-containing <i>tn4401</i> transposon", name = "",
+                       guide = guide_legend(nrow = 1, title.position = "top", label.position = "right",
+                                            override.aes = list(linewidth = 1))) +
+    s_figure_8_format
+
   figure
 }
 ```
@@ -219,11 +243,12 @@ phyloAMR::nearest_neighbor_algorithm("PCMP_H148",phylogenetic_distance = phylo_d
 
 # Save data
 
-```{r,fig.width=13.75,fig.height=10.31276}
+```{r,fig.width=7.5,fig.height=5.639098}
 setwd("./data/mummer_hybrid/")
 tn4401_hopping <- make_plots(filename = 'PCMP_H276_PCMP_H173.coords',contig_data = contig_data,blast_data = tn4401_blast) 
 
 tn4401_hopping
 
-ggsave("../../figures/s_figure_8_transposon_hopping.png", plot=tn4401_hopping, width = 13.75, height = 10.31276, dpi=900)
+ggsave("../../figures/s_figure_8_transposon_hopping.png", plot = tn4401_hopping,
+       width = 7.5, height = 5.639098, units = "in", dpi = 900, bg = "white", device = ragg::agg_png)
 ```

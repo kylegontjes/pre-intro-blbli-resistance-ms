@@ -9,7 +9,7 @@ output: html_document
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA) 
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms')
 ```
 
 # Environment
@@ -20,6 +20,7 @@ packages <- c("tidyverse","data.table",'lubridate','readxl','cowplot','scales')
 
 #Load Packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
+cowplot::set_null_device("agg")
 
 # Source themes
 source("./lib/consistent_themes.R")
@@ -82,21 +83,22 @@ isolate_info <-  growth_curve_metadata_plate_average  %>% subset(isolate_type !=
 
 ## Figure
 ```{r}
+A_data <- subset(growth_curve_metadata_plate_average, isolate_type != "blank")
+A_lims <- c(floor(min(A_data$OD_average, na.rm = TRUE) * 10) / 10,
+            ceiling(max(A_data$OD_average, na.rm = TRUE) * 10) / 10)
+
 A <- ggplot(
-    data = subset(growth_curve_metadata_plate_average, isolate_type != "blank"),
-    aes(x = time, y = OD_average, color = identity, group = interaction(isolate_no, identity, Plate_ID)))  +
-  geom_rect(aes(fill = parent_category), data = isolate_info,
-            inherit.aes = FALSE,
-            xmin=-Inf, 
-            xmax=Inf, 
-            ymin = -Inf, 
-            ymax=Inf, 
-            alpha = 0.5) +
-    geom_line() +
-    facet_wrap(~isolate_no) +
-    theme_bw() +
-    xlab("Time (hours)") +
-    ylab("Optical density (OD)")  + theme_bw_me + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(growth_curve_metadata_plate_average$OD_average*10))/10))  + parent_colors + status_fill + s_figure_11_format_A
+    data = A_data,
+    aes(x = time, y = OD_average, color = identity, group = interaction(isolate_no, identity, Plate_ID))) +
+  geom_rect(aes(fill = parent_category), data = isolate_info, inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = 0.45) +
+  geom_line(aes(group = interaction(isolate_type, Plate_ID)), linewidth = 0.35, alpha = 1) +
+  facet_wrap(~isolate_no) +
+  theme_bw() +
+  xlab("Time (hours)") +
+  ylab("Optical density (OD)") + theme_bw_me +
+  scale_y_continuous(breaks = scales::pretty_breaks(6), limits = A_lims) +
+  parent_colors + status_fill + s_figure_11_format_A
 
 A  
 ```
@@ -104,17 +106,26 @@ A
 # B & C: AUC Data
 ## B. AUC plots
 ```{r}
-AUC_metadata_average$isolate_no <- factor(AUC_metadata_average$isolate_no,levels = c(isolate_ranking_frequency,'blank'))
+AUC_metadata_average$isolate_no <- factor(AUC_metadata_average$isolate_no, levels = c(isolate_ranking_frequency, 'blank'))
 
-B <- ggplot(data=AUC_metadata_average %>% subset(isolate_type!='blank'),aes(y=AUC_average,x=isolate_no,fill=isolate_type)) +
-  facet_grid( ~ parent_category, 
-              scales = "free_x", 
-              space  = "free_x" ) + 
+B_data <- AUC_metadata_average %>% subset(isolate_type != 'blank')
+wrap_width=17
+
+# Y limits from the plotted data, rounded outward to whole AUC units
+auc_lims <- c(floor(min(B_data$AUC_average, na.rm = TRUE)),
+              ceiling(max(B_data$AUC_average, na.rm = TRUE)))
+
+B <- ggplot(data = B_data, aes(y = AUC_average, x = isolate_no, fill = isolate_type)) +
+  facet_grid(~ parent_category, scales = "free_x", space = "free_x",
+             labeller = labeller(parent_category = label_wrap_gen(width = wrap_width))) +
   geom_boxplot(position = position_dodge(width = 0.8),
-               outlier.shape = NA) + 
-  geom_point(inherit.aes = T,
-             position = position_dodge(width = 0.8)) + 
-  theme_bw_me + xlab(NULL) + ylab("Area under the curve (AUC)") + labs(legend = "Isolate type") + s_figure_11_format_BCDE + scale_y_continuous(breaks = scales::pretty_breaks(6),limits = c(0,ceiling(max(AUC_metadata_average$AUC_average)))) + parent_color_group
+               outlier.shape = NA, linewidth = 0.25) +                       # CHANGED: wider boxes, thinner lines
+  geom_point(position = position_dodge(width = 0.8), size = 0.5,
+             show.legend = FALSE) +                                          # CHANGED: smaller points, kept out of legend
+  theme_bw_me + xlab(NULL) + ylab("Area under the curve (AUC)") + labs(fill = "Isolate type") +   # CHANGED: legend -> fill
+  s_figure_11_format_BCDE +
+  scale_y_continuous(limits = auc_lims, breaks = seq(auc_lims[1], auc_lims[2], by = 1)) +  # CHANGED: zoomed to the data
+  parent_color_group
 
 B
 ```
@@ -129,10 +140,12 @@ paired_AUC_data_by_plate <- AUC_metadata_average%>% subset(isolate_no != 'blank'
     ) %>%  mutate(AUC_difference = resistant - parent) 
 
 
-C <- ggplot(data = paired_AUC_data_by_plate,aes(x=isolate_no,y=AUC_difference,fill=parent_category))  +
-  facet_grid(   ~ parent_category,scales = "free_x",space  = "free_x") + 
-  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
-  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + 
+C <- ggplot(data = paired_AUC_data_by_plate,aes(x=isolate_no,y=AUC_difference,fill=parent_category))  + 
+ facet_grid(~ parent_category, scales = "free_x", space = "free_x",
+           labeller = labeller(parent_category = label_wrap_gen(width = wrap_width))) + 
+   geom_boxplot(position = position_dodge(width = 0.8),
+               outlier.shape = NA, linewidth = 0.25) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8),size=0.5,show.legend = F)  + 
   theme_bw_me + xlab(NULL) + ylab("Change in AUC") +   s_figure_11_format_BCDE  + status_fill + geom_hline(yintercept = 0,linetype = 2) +  scale_y_continuous(breaks = pretty_breaks(3)) 
 
 C
@@ -143,10 +156,15 @@ C
 ```{r} 
 max_od_plate$isolate_no <- factor(max_od_plate$isolate_no,levels = c(isolate_ranking_frequency,'blank'))
 
-D <-  ggplot(data = max_od_plate,aes(x=isolate_no,y=max_OD_plate,fill=isolate_type))  +
-  facet_grid(    ~ parent_category,    scales = "free_x", space  = "free_x"  ) + 
-  geom_boxplot( position = position_dodge(width = 0.8),   outlier.shape = NA) + 
-  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + theme_bw_me + xlab(NULL) + ylab("Maximum optical density (OD<sub>max</sub>)") + s_figure_11_format_BCDE  + parent_color_group + scale_y_continuous(breaks = pretty_breaks(9),limits = c(0,round(10*max(max_od_plate$max_OD_plate))/10))  
+od_lims <- c(floor(10 * min(max_od_plate$max_OD_plate, na.rm = TRUE)) / 10,
+             ceiling(10 * max(max_od_plate$max_OD_plate, na.rm = TRUE)) / 10)
+
+D <-  ggplot(data = max_od_plate,aes(x=isolate_no,y=max_OD_plate,fill=isolate_type))  + 
+ facet_grid(~ parent_category, scales = "free_x", space = "free_x",
+           labeller = labeller(parent_category = label_wrap_gen(width = wrap_width)))  + 
+  geom_boxplot(position = position_dodge(width = 0.8),
+               outlier.shape = NA, linewidth = 0.25) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8),size=0.5,show.legend = F)  + theme_bw_me + xlab(NULL) + ylab("Maximum optical density (OD<sub>max</sub>)") + s_figure_11_format_BCDE  + parent_color_group + scale_y_continuous(limits = od_lims, breaks = round(seq(od_lims[1], od_lims[2], by = 0.1), 1))
 
 D
 ```
@@ -160,10 +178,12 @@ paired_max_OD_data_by_plate <- max_od_plate%>% subset(isolate != 'blank')  %>%
         values_from = max_OD_plate
     ) %>%  mutate(max_OD_difference = resistant - parent) 
 
-E <- ggplot(data = paired_max_OD_data_by_plate,aes(x=isolate_no,y=max_OD_difference,fill=parent_category))  +
-  facet_grid(  ~ parent_category,     scales = "free_x",   space  = "free_x" ) + 
-  geom_boxplot( position = position_dodge(width = 0.8), outlier.shape = NA) + 
-  geom_point(inherit.aes = T,position = position_dodge(width = 0.8))  + 
+E <- ggplot(data = paired_max_OD_data_by_plate,aes(x=isolate_no,y=max_OD_difference,fill=parent_category))  +  
+ facet_grid(~ parent_category, scales = "free_x", space = "free_x",
+           labeller = labeller(parent_category = label_wrap_gen(width = wrap_width))) + 
+   geom_boxplot(position = position_dodge(width = 0.8),
+               outlier.shape = NA, linewidth = 0.25) + 
+  geom_point(inherit.aes = T,position = position_dodge(width = 0.8),size=0.5,show.legend = F)  + 
   theme_bw_me + xlab(NULL) + ylab("Change in OD<sub>max</sub>") +   s_figure_11_format_BCDE  + status_fill + geom_hline(yintercept = 0,linetype = 2) +  scale_y_continuous(breaks = pretty_breaks(3))
 
 E
@@ -171,18 +191,25 @@ E
  
 # Master figure
 
-```{r,fig.width=18.5,fig.height=10.57143}  
+```{r,fig.width=7.5,fig.height=9}  
 isolate_type_legend <- cowplot::get_legend(B)
-merged_summary_stat_plots <- cowplot::plot_grid(B+ theme(legend.position='none'),C+ theme(legend.position='none'),D + theme(legend.position='none') , E + theme(legend.position='none'),ncol=2,labels = c("B","C","D","E"),label_size = 18)
-merged_summary_stat_plots_w_legend <- cowplot::plot_grid(merged_summary_stat_plots,isolate_type_legend,ncol=1,rel_heights = c(1,0.15))
 
-figure <- cowplot::plot_grid(A,merged_summary_stat_plots_w_legend,ncol=2,rel_widths = c(0.65,1),labels = c("A",""),label_size = 18)
+BCDE <- cowplot::plot_grid(B + theme(legend.position = 'none',axis.title.y = element_markdown(size = 8.5)), C + theme(legend.position = 'none'),
+                           D + theme(legend.position = 'none',axis.title.y = element_markdown(size = 7)), E + theme(legend.position = 'none'),
+                           ncol = 2, labels = c("B", "C", "D", "E"), label_size = 12,
+                           align = "hv", axis = "tblr")
 
-figure 
+BCDE_w_legend <- cowplot::plot_grid(BCDE, isolate_type_legend, ncol = 1, rel_heights = c(1, 0.11))
+
+figure <- cowplot::plot_grid(A + theme(legend.position = "right"), BCDE_w_legend,
+                             ncol = 1, rel_heights = c(1, 1), labels = c("A", ""), label_size = 12)
+figure
 ```
 
 # Save figure
 
 ```{r}
-ggsave(plot = figure,filename = "./figures/s_figure_11_growth_curve_data.png",width = 18.5,height = 10.57143,units = 'in',dpi=900,bg='white')
+ggsave(plot = figure, filename = "./figures/s_figure_11_growth_curve_data.png",
+       width = 7.5, height = 9, units = "in", dpi = 900, bg = "white",
+       device = ragg::agg_png)
 ``` 

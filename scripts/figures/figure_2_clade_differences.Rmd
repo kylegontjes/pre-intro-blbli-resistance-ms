@@ -8,7 +8,8 @@ date: "`r Sys.Date()`"
 ```{r setup, include=FALSE}
 require(knitr)
 knitr::opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE)  
-knitr::opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+knitr::opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/') 
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo"), dpi = 900)
 ```
 
 # Environment
@@ -49,8 +50,8 @@ add_clade_median_values <- function(dataframe, variable, clade_variable,max_valu
   clade_I_median <- dataframe[dataframe[[clade_variable]] == "Clade I", variable] %>% median(na.rm = TRUE)
   clade_II_median <- dataframe[dataframe[[clade_variable]] != "Clade I", variable] %>% median(na.rm = TRUE)
   
-  list(clade_I = annotate('point',  x = clade_I_median, y = max_ylim_ceiling,  fill =  clade_colors[["Clade I"]], color = clade_colors[["Clade I"]], shape = 25,  size = 2.5), 
-       clade_II = annotate('point',  x = clade_II_median, y = max_ylim_ceiling,  fill =  clade_colors[["Clade II"]],color = clade_colors[["Clade II"]], shape = 25,  size = 2.5))
+  list(clade_I = annotate('point',  x = clade_I_median, y = max_ylim_ceiling,  fill =  clade_colors[["Clade I"]], color = clade_colors[["Clade I"]], shape = 25,  size = 2.25), 
+       clade_II = annotate('point',  x = clade_II_median, y = max_ylim_ceiling,  fill =  clade_colors[["Clade II"]],color = clade_colors[["Clade II"]], shape = 25,  size = 2.25))
 }
 
 IR_intercepts <-  add_clade_median_values(df, "IR_log_2", "clade_I")
@@ -101,36 +102,46 @@ fig2e <- MIC_prop_hist_count(blbli_clade_phylo_prop) + cluster_scale + figure_2_
 
 # Figure Compilation
 
-```{r,message=F,echo=F,error=F,warning=F,fig.width=20,fig.height=12.5}
-# Merge figures together
-fig2_data <- cowplot::plot_grid(fig2a + theme(legend.position = "none"),
-                                fig2b  + theme(legend.position = "none"),"",
-                                fig2c + theme(legend.position = "none"),
-                                fig2d + theme(legend.position = "none") , 
-                                fig2e + theme(legend.position = "none"),
-                                ncol=3,
-                                rel_widths = c(1,0.45,0.45,1,0.45,0.45),
-                                labels = c("A","B","","C","D","E"),label_size = 18)
+```{r,message=F,echo=F,error=F,warning=F,fig.width=9.75,fig.height=7.8}
+fig2_data <- cowplot::plot_grid(
+  fig2a + theme(legend.position = "none"),
+  fig2b + theme(legend.position = "none"), "",
+  fig2c + theme(legend.position = "none"),
+  fig2d + theme(legend.position = "none"),
+  fig2e + theme(legend.position = "none"),
+  ncol = 3,
+  rel_widths = c(1, 0.45, 0.45),   # length = ncol
+  align = "hv", axis = "tblr",
+  labels = c("A","B","","C","D","E"), label_size = 12)
 
 # Create legend
-clade_legend <- cowplot::get_legend(fig2a)
-resistance_legend <- cowplot::get_legend(fig2b)
-clade_phylo_legend <- cowplot::get_legend(fig2e)
+no_pad <- theme(legend.margin = margin(0, 0, 0, 0),
+                legend.box.margin = margin(0, 0, 0, 0))
 
-fig2.legends <- cowplot::plot_grid(clade_legend,"",resistance_legend,"",clade_phylo_legend,ncol=5,align = "hv",rel_widths = c(1,.0025,1,0.25,1)) + theme(plot.margin = unit(c(t=-2.5, 2, b=-1,0 ), "cm"))
- 
-# Add legend to figure
-figure_2 <-  cowplot::plot_grid(fig2_data,fig2.legends,ncol=1,rel_heights = c(1,0.18),align = "h")
+clade_legend       <- cowplot::get_legend(fig2a + no_pad)
+resistance_legend  <- cowplot::get_legend(fig2b + no_pad)
+clade_phylo_legend <- cowplot::get_legend(fig2e + no_pad)
+
+fig2.legends <- cowplot::plot_grid(
+  clade_legend, "", resistance_legend, "", clade_phylo_legend,
+  ncol = 5, align = "hv", rel_widths = c(0.8, 0, 1.1, 0.1, 2.6)) +
+  theme(plot.margin = margin(t = -0.3, unit = "cm"))
+
+figure_2 <- cowplot::plot_grid(
+  fig2_data, fig2.legends, ncol = 1,
+  rel_heights = c(1, 0.2))
 ```
 
 # Figure
 
-```{r,message=F,echo=F,error=F,warning=F,fig.width=9.5,fig.height=7.6}
+```{r,message=F,echo=F,error=F,warning=F,fig.width=7,fig.height=5.6}
 figure_2
 ```
 
 ## Save figure
 
 ```{r}
-ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 9.5, height = 7.6,bg = 'white', dpi=900)
+ggsave(plot = figure_2, filename = './figures/figure_2.png', width = 7, height = 5.6,bg = 'white', dpi=900)
+ggsave(plot = figure_2, filename = "./figures/figure_2.pdf",
+          width = 7, height = 5.6, bg = "white", device = cairo_pdf)
 ```

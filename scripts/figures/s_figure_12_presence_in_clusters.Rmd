@@ -8,13 +8,13 @@ date: "`r Sys.Date()`"
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
 
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','cowplot')
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','cowplot','ggtext')
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -23,7 +23,7 @@ source("./lib/consistent_themes.R")
 source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
 
 # Set null device
-set_null_device("png")
+set_null_device("agg")
 
 # Print
 Sys.info()
@@ -148,22 +148,25 @@ clade_labels <- columnAnnotation(Clade = column_names_nnotated,col=  list(Clade 
 
 # Heatmap
 A_heatmap <- ComplexHeatmap::Heatmap(prop_matrix,show_heatmap_legend = T,show_row_names = T,col = c("white","red"),cluster_columns = T,cluster_rows=T,name = "Percentage",column_labels = column_names,row_labels = gt_render(row_names), cell_fun = function(j, i, x, y, width, height, fill) {
-    grid.text(sprintf("%.3s", ct_matrix[i, j]), x, y, gp = gpar(fontsize = 11))
-},border_gp = gpar(col = "black", lty = 1), rect_gp = gpar(col = "white", lwd = 1),bottom_annotation = clade_labels,row_names_gp =  gpar(fontsize = 11),column_names_gp =  gpar(fontsize = 13),heatmap_legend_param = heatmap_legend_params, 
-width = unit(10, "cm"),
- row_names_max_width = unit(8.759, "cm"))
+    grid.text(sprintf("%.3s", ct_matrix[i, j]), x, y, gp = gpar(fontsize = 12))   # CHANGED: 11 -> 12
+},border_gp = gpar(col = "black", lty = 1), rect_gp = gpar(col = "white", lwd = 1),bottom_annotation = clade_labels,
+row_names_gp =  gpar(fontsize = 13),      # CHANGED: 11 -> 13
+column_names_gp =  gpar(fontsize = 13),
+heatmap_legend_param = heatmap_legend_params, 
+width = unit(8.5, "cm"),                  # CHANGED: 10 -> 8.5
+ row_names_max_width = unit(10, "cm"))    # CHANGED: room for the bigger labels
  
 # Save heatmap to a temporary PNG file
 tmpfile <- tempfile(fileext = ".png")
 ht <- draw(A_heatmap, heatmap_legend_side = "bottom") 
 dev.new()
-png(tmpfile,
-    width = 8 * 900,    # 9.9 inches * 300 dpi = 2970 pixels
-    height = 7 * 900,   # 7.5 inches * 300 dpi = 2250 pixels
-    res = 900)
+
+png(tmpfile, width = 9 * 900, height = 7 * 900, res = 900)   # was 8 * 900
 
 draw(ht,padding = unit(c(0, -20, 0, 0), "cm"))
 dev.off() 
+
+A_img <- magick::image_read(tmpfile) %>% magick::image_trim() %>% magick::image_border("white", "20x20")
 ```
 
 # B - Occurrence
@@ -212,7 +215,7 @@ tree_w_blbli <- st258 + geom_nodepoint(aes(subset=(node %in% gains$blbli_dich_nu
 
 ```{r}
 blbli_name = "BL/BLI resistance"
-AA552_name = "AA552 <i>bla<sub>KPC</sub></i>-containing plasmid"
+AA552_name = "AA552 <i>bla<sub>KPC</sub></i>-containing<br>plasmid"
 ompK36_name = "PFAV in <i>ompK36</i>"
 PBP_name = "PBP-2 mutant"
 RamA_name = "PFAV in <i>ramA</i>" 
@@ -230,29 +233,35 @@ B <- st258 +
     scale_shape_manual(name="Synchronous clustering",values=setNames(
     c(21,22,23,24,25),genotype_ordering
   ),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right")) + 
-  scale_size_manual(name="Synchronous clustering",values = setNames(
-    c(4,2.25,2.5,1.75,2.25),genotype_ordering),breaks=genotype_ordering,guide = guide_legend(ncol=1,title.position = "top", label.position = "right"))  + 
+ scale_size_manual(name="Synchronous clustering",values = setNames(
+    c(2.25,1.25,1.5,1.1,1.25),genotype_ordering),breaks=genotype_ordering,
+    guide = guide_legend(ncol=1,title.position = "top", label.position = "right",
+                         override.aes = list(size = c(2.75,2,2.25,2,2))))    +   # CHANGED: x0.68
   scale_alpha(guide = 'none') + theme(legend.position = 'bottom')
 rownames(df) <- df$isolate_no
 
 B_1 <- B + ggnewscale::new_scale_fill()
 
-B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0,font.size=3.75)  + ylim(NA, 535) + theme(legend.position = 'bottom', legend.text = element_markdown(),legend.box.margin = margin(t = -25)) + cluster_scale_2_col_key 
+B_w_tree <- gheatmap(B_1,df %>% select(blbli_asr_cluster_renamed) %>% `colnames<-`("BL/BLI clustering"),width=0.05,colnames_position = 'top',colnames_angle = 90, color=NULL ,colnames_offset_y = 0.25, hjust = 0,font.size=2.5)  +   # CHANGED: 3.75 -> 2.5  
+scale_y_continuous(limits = c(0, 546), expand = c(0, 0)) +  # was 0.5 + 
+  s_figure_12_format_B +                           
+  cluster_scale_2_col_key
 ```
 
 # Supplemental figure
 
-```{r, fig.height=6.285714, fig.width=11} 
-s_figure_12.A <- ggdraw() + draw_image(tmpfile)
-unlink(tmpfile) 
+```{r, fig.height=4.5, fig.width=7.5} 
+s_figure_12.A <- ggdraw() + draw_image(A_img)
 
-s_figure_12 <- cowplot::plot_grid(s_figure_12.A, B_w_tree, labels = "AUTO", ncol=2, label_size = 20, rel_widths = c(1,0.65))
+unlink(tmpfile)
 
-s_figure_12
+s_figure_12 <- cowplot::plot_grid(s_figure_12.A, B_w_tree, labels = "AUTO", ncol=2, label_size = 12, rel_widths = c(1,0.66))
+
+s_figure_12 
 ``` 
 
 ## Save figure
 
 ```{r,message=F,echo=F,error=F,warning=F,fig.width=11,fig.height=6.5} 
-ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_clustering.png', width = 11, height = 6.285714, limitsize=FALSE, bg='white', dpi=900)
+   ggsave(plot = s_figure_12, filename = './figures/s_figure_12_genotype_clustering.png', width = 7.5, height = 4.5, units = "in", dpi = 900, bg = 'white', device = ragg::agg_png)
 ```

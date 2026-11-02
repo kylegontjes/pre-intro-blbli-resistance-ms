@@ -383,10 +383,33 @@ variants_freq <- function(locus_tags,df){
   return(vars_freq_df)
 }
 
-freq_plot <- function(hits_data){
-  melted <- hits_data %>%  select(locus_tag,genotype,blbli_sus_prop,blbli_res_prop,`Significant Hit`) %>% reshape2::melt()
-  melted$frequency <- melted$value * 100
-  figure <- ggplot(data=melted,aes(fill=variable,y=`Significant Hit`,x = frequency)) + geom_bar(position="dodge", stat="identity") + xlim(0,100.1) + resistance_prop_scale + theme_bw() + xlab("Percentage with genotype")  +ylab("")
+freq_plot <- function(hits_data,fig_text_size){
+  # proportions -> bar positions
+  prop_long <- hits_data %>%
+    select(locus_tag, genotype, `Significant Hit`, blbli_sus_prop, blbli_res_prop) %>%
+    reshape2::melt(id.vars = c("locus_tag","genotype","Significant Hit"),
+                   variable.name = "variable", value.name = "prop") %>%
+    dplyr::mutate(pheno = ifelse(variable == "blbli_sus_prop", "sus", "res"),
+                  frequency = prop * 100)
+  
+  # counts -> labels
+  freq_long <- hits_data %>%
+    select(`Significant Hit`, blbli_sus_freq, blbli_res_freq) %>%
+    reshape2::melt(id.vars = "Significant Hit",
+                   variable.name = "fvar", value.name = "count") %>%
+    dplyr::mutate(pheno = ifelse(fvar == "blbli_sus_freq", "sus", "res")) %>%
+    select(`Significant Hit`, pheno, count)
+  
+  plot_df <- dplyr::left_join(prop_long, freq_long, by = c("Significant Hit","pheno"))
+  
+  figure <- ggplot(plot_df, aes(fill = variable, y = `Significant Hit`, x = frequency)) +
+    geom_bar(position = position_dodge(width = 0.9), stat = "identity", colour = "black", linewidth = 0.2) +
+    geom_text(aes(label = count),
+              position = position_dodge(width = 0.9),
+              hjust = -0.25, size = fig_text_size) +
+    scale_x_continuous(limits = c(0, 112), breaks = seq(0, 100, 25)) +
+    resistance_prop_scale + theme_bw() +
+    xlab("Percentage with genotype") + ylab("")
   return(figure)
 }
 
@@ -398,33 +421,48 @@ generate_nn_melt_data <- function(variable,nn_data){
   return(nn_data_melt)
 }
 
-nn_plot <- function(nn_data_melt){
-  nn_data_melt$variable <- factor(nn_data_melt$variable,levels = rev(unique(nn_data_melt$variable)))
-  figure <- ggplot(data=nn_data_melt,aes(fill=variable,y=locus_tag,x = value))  + geom_boxplot(outliers = T,color="black",linewidth = 0.5) +xlab("log<sub>2</sub> fold change in MIC") + ylab("") + xlim(min(nn_data_melt$value)-1,max(nn_data_melt$value)+1) + MVB_IR_scale + theme_bw() + geom_vline(xintercept = 0,colour = "black") + geom_vline(xintercept = 1, color='red',linetype = 2) + geom_vline(xintercept = -1, color='red',linetype = 2)  
+nn_plot <- function(nn_data_melt, box_linewidth, dashed_linewidth, outlier_size, step = 2) {
+  nn_data_melt$variable <- factor(nn_data_melt$variable, levels = rev(unique(nn_data_melt$variable)))
+  
+  # Limits = data range; ticks every `step` counted out from 0, plus the min and max
+  rng  <- range(nn_data_melt$value, na.rm = TRUE)
+  brks <- seq(ceiling(rng[1] / step) * step, floor(rng[2] / step) * step, by = step)
+  brks <- sort(unique(c(rng, brks)))
+  brks <- brks[!(brks %in% (rng + c(1, -1)))]   # drop ticks one unit inside the min and max
+  
+  figure <- ggplot(data = nn_data_melt, aes(fill = variable, y = locus_tag, x = value)) +
+    geom_boxplot(outliers = TRUE, color = "black", linewidth = box_linewidth, outlier.size = outlier_size) +
+    xlab("log<sub>2</sub> fold change in MIC") + ylab("") +
+    scale_x_continuous(limits = rng, breaks = brks,
+                       labels = scales::label_number(style_negative = "minus")) +
+    MVB_IR_scale + theme_bw() +
+    geom_vline(xintercept = 0,  colour = "black", linewidth = dashed_linewidth) +
+    geom_vline(xintercept = 1,  colour = "red", linetype = 2, linewidth = dashed_linewidth) +
+    geom_vline(xintercept = -1, colour = "red", linetype = 2, linewidth = dashed_linewidth)
   return(figure)
 }
 
 # Figures
-gwas_figures <- function(df,tr,gwas_mat,sig_hits_name){
+gwas_figures <- function(df,tr,gwas_mat,sig_hits_name,text_size,tree_linewidth){
   rownames(df) <- df$isolate_no
   #Step #1: Clades
-  p.1 <- gheatmap(ggtree(tr),df %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05)   + clade_colors_scale_v + consistent_theme_GWAS
+  p.1 <- gheatmap(ggtree(tr, linewidth = tree_linewidth),df %>% select(clade_I) %>% `colnames<-`("ST258 clade"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = text_size, width = 0.05)   + clade_colors_scale_v + consistent_theme_GWAS
 
   #Step #3: BL/BLI Cluster
   p.2 <- p.1 + new_scale_fill()
-  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.0000125) + cluster_scale_2_col + consistent_theme_GWAS
+  p.3 <-  gheatmap(p.2,df %>% select(blbli_asr_cluster_renamed) %>% mutate_all(as.factor) %>% `colnames<-`("BL/BLI clustering"), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = text_size, width = 0.05,offset =.0000125) + cluster_scale_2_col + consistent_theme_GWAS
 
   #Step #4: MVB Binary
   p.4 <- p.3 + new_scale_fill()
-  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05,offset =.000025) + resistance_scale + consistent_theme_GWAS
+  p.5 <-  gheatmap(p.4,df %>% select(blbli_dich) %>% `colnames<-`(c("BL/BLI resistance")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = text_size, width = 0.05,offset =.000025) + resistance_scale + consistent_theme_GWAS
 
   #Step #6: MVB MIC
   p.6 <- p.5 + new_scale_fill()
-  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = .1,offset =.0000375) + Log2_scale + consistent_theme_GWAS
+  p.7 <-  gheatmap(p.6,df %>% select(MVB_log_2,IR_log_2) %>%   mutate_all(as.factor)  %>%`colnames<-`(c("Meropenem-vaborbactam MIC","Imipenem-relebactam MIC")), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = text_size, width = .1,offset =.0000375) + Log2_scale_gwas_figure + consistent_theme_GWAS
 
   # Step #7: Add
   p.7.1 <- p.7 + new_scale_fill()
-  p.8 <-  gheatmap(p.7.1,gwas_mat %>% mutate_all(as.factor) %>% `colnames<-`(sig_hits_name), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = 5.5, width = 0.05*ncol(gwas_mat),offset =.0000625)  + genotype_scale_v + consistent_theme_GWAS
+  p.8 <-  gheatmap(p.7.1,gwas_mat %>% mutate_all(as.factor) %>% `colnames<-`(sig_hits_name), colnames_position = "top",colnames_angle=90, colnames_offset_y = 0.25, hjust = 0, color = NA, font.size = text_size, width = 0.05*ncol(gwas_mat),offset =.0000625)  + genotype_scale_v + consistent_theme_GWAS
   return(p.8)
 }
 

@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 require(knitr)
 opts_knit$set(echo = TRUE,warning = FALSE, message = FALSE,error=F,comment=NA)  
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
@@ -99,8 +99,12 @@ MVB_evolution_data$MVB_ratio_log_10 <- log10(MVB_evolution_data$MVB_ratio)
 # A. Frequency data
 
 ```{r}  
-A <- ggplot(data=MVB_evolution_data,aes(y=isolate_no,x=MVB_ratio,fill=category_simple),alpha=0.85) + geom_boxplot(aes(color=plasmid_type),outliers = F)   + plasmid_fill +  status_fill + ggnewscale::new_scale_color() + geom_jitter(aes(y=isolate_no,x=MVB_ratio,color=over_LoD),width=0,height = 0.25)  + theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
-  log_10_experimental_evolution_scale  + Limit_scale + figure_5_frequency_format
+A <- ggplot(data = MVB_evolution_data, aes(y = isolate_no, x = MVB_ratio, fill = category_simple), alpha = 0.85) +
+  geom_boxplot(aes(color = plasmid_type), outliers = F, linewidth = 0.3) +
+  plasmid_fill + status_fill + ggnewscale::new_scale_color() +
+  geom_jitter(aes(y = isolate_no, x = MVB_ratio, color = over_LoD), width = 0, height = 0.25, size = 0.75) +
+  theme_bw_me + ylab(NULL) + xlab("Frequency of resistance") +
+  log_10_experimental_evolution_scale + Limit_scale + figure_5_frequency_format
 
 A
 ``` 
@@ -178,7 +182,7 @@ melted_dataset$variable <- recode(melted_dataset$variable,
                                   "log2 fold change in blaKPC gene CN" = "<i>bla</i><sub>KPC</sub> gene <br>copy number change",
                                   "log2 fold change in blaKPC plasmid CN" = "<i>bla</i><sub>KPC</sub> plasmid <br>copy number change",
                                   "OmpK36_mutation" = "Evolved mutation in <i>ompK36</i>",
-                                  "OmpK36_intergenic_mutation" = "Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")
+                                  "OmpK36_intergenic_mutation" = "Evolved mutation in <br>5\u2032 intergenic region of <i>ompK36</i>")
 
 no_sequencing <- melted_dataset %>% subset(value=="No" & variable == "Sequenced" ) %>% .$Parent %>% unique() %>% as.character
 
@@ -190,7 +194,7 @@ B_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) +
   geom_tile(data = subset(melted_dataset, variable %in% c('<i>bla</i><sub>KPC</sub> gene <br>copy number change','<i>bla</i><sub>KPC</sub> plasmid <br>copy number change')),
             aes(fill = as.numeric(value)),colour = 'white',linewidth = 0.25) +  KPC_copy_number_change_scale + ggnewscale::new_scale_fill() + 
   # Mutation data
-  geom_tile(data = subset(melted_dataset, variable %in% c("Evolved mutation in <i>ompK36</i>","Evolved mutation in <br>5' intergenic region of <i>ompK36</i>")),
+  geom_tile(data = subset(melted_dataset, variable %in% c("Evolved mutation in <i>ompK36</i>","Evolved mutation in <br>5\u2032 intergenic region of <i>ompK36</i>")),
             aes(fill=value),colour = 'white',linewidth = 0.25) + mutation_scale +  
   # Remaining themes
   ylab(NULL) + xlab(NULL) +
@@ -203,7 +207,7 @@ B_initial<- ggplot(melted_dataset,aes(x=variable,y=Parent)) +
         ),
         aes(x = variable, y = Parent),
         label = "X",
-        size = 3
+        size = 2
     )  
 ```
 
@@ -225,10 +229,15 @@ identical(levels(melted_dataset$Parent), levels(MVB_evolution_data$isolate_no))
 
 # Combined figure
 
-```{r,fig.width=12.5,fig.height=7.5}
-A_fig <-  cowplot::plot_grid(NULL,A + theme(axis.ticks.y = element_blank(),axis.text.y = element_text(size=0)),NULL,ncol=1,rel_heights = c(0.03,1,0.055))
+```{r,fig.width=7.05,fig.height=4.229915}
+cowplot::set_null_device("cairo")
+A_fig <- cowplot::plot_grid(NULL,
+                            A + theme(axis.ticks.y = element_blank(),
+                                      axis.text.y = element_text(size = 0)),
+                            NULL, ncol = 1, rel_heights = c(0.035, 1, 0))
  
-B <- cowplot::plot_grid(NULL,B_initial  + theme(legend.position = 'none'),NULL,ncol=1,rel_heights = c(0.034,1,0.0375))
+B <- cowplot::plot_grid(NULL, B_initial + theme(legend.position = 'none'), NULL,
+                        ncol = 1, rel_heights = c(0.0375, 1, 0.0465))   # was c(0.034, 1, 0.0385)
 
 legend_B <- cowplot::get_legend(B_initial) 
 
@@ -237,17 +246,17 @@ legend_B_top_align <- cowplot::plot_grid(
   legend_B,
   NULL,
   ncol = 1,
-  rel_heights = c(0.27, 1, 1)   
+  rel_heights = c(0.4, 1, 1)   
 )
 
 figure <- cowplot::plot_grid(A_fig,
                              B,
                              legend_B_top_align,
-                             ncol=3,
-                             labels = c("A","B",""),
-                             rel_widths = c(1,0.55,0.19),
-                             rel_heights = c(1,1,1),
-                             label_size = 16)
+                             ncol = 3,
+                             labels = c("A", "B", ""),
+                             rel_widths = c(1.015, 0.55, 0.26),
+                             rel_heights = c(1, 1, 1),
+                             label_size = 12)
 
 figure 
 ```
@@ -255,5 +264,8 @@ figure
 # Save figure
 
 ```{r}
-ggsave("./figures/figure_5_experimental_evolution.png",figure,dpi=900,width=12.5,height=7.5,bg='white')
+ggsave("./figures/figure_5_experimental_evolution.png",figure,dpi=900,width=7.05,height=4.229915,bg='white')
+
+ggsave(plot = figure, filename = "./figures/figure_5_experimental_evolution.pdf",
+          width = 7.05, height = 4.229915, bg = "white", device = cairo_pdf)
 ```

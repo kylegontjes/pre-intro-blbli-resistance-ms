@@ -9,13 +9,13 @@ output: html_document
 require(knitr)
 opts_knit$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
 opts_chunk$set(echo = T,warning = FALSE, message = FALSE,error=F,comment=NA)
-opts_knit$set(root.dir='~/Desktop/gl_mount/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
+opts_knit$set(root.dir='~/Desktop/gl_nfs/Project_Penn_KPC/Analysis/Combination_resistance/pre-intro-blbli-resistance-ms/')
 ```
 
 # Environment
 
 ```{r}
-packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR')
+packages <- c("tidyverse","cowplot","ggtree","ape","phytools","gridExtra","kableExtra","colorRamp2","RColorBrewer","ComplexHeatmap",'phyloAMR','ggtext')
 
 # Load packages
 invisible(lapply(packages,library,character.only=T,quietly=T))
@@ -24,7 +24,7 @@ source("./lib/consistent_themes.R")
 source("./scripts/GWAS/analysis/GWAS_analysis_scripts.R") 
 
 # Set null device
-set_null_device("png")
+set_null_device("agg")
 
 # Print environment
 set.seed(45) 
@@ -75,18 +75,22 @@ df$blbli_asr_cluster_renamed_simple <- recode(df$blbli_asr_cluster_renamed,"No f
 df$date <- lubridate::as_date(df$Cx_date) 
 # Number of weeks using date data
 number_of_weeks <- as.numeric(round(difftime(max(df$Cx_date),min(df$Cx_date),units = 'weeks')) + 1)
+date_breaks_s13 <- c(as.Date("2014-08-01"), as.Date("2015-02-01"), as.Date("2015-07-24"))   # define once, near the top
 
-A <- ggplot(data=df,aes(x=Cx_date,fill=AA552_status_md)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + AA552_scale
+A <- ggplot(data=df,aes(x=Cx_date,fill=AA552_status_md)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + AA552_scale + s_figure_13_format +
+  scale_x_date(breaks = date_breaks_s13, date_labels = "%b %Y") 
 
 A
 ```
 
 # Temporal distribution
 
-```{r}
+```{r} 
 df$AA552_status_md_rev <- factor(df$AA552_status_md,levels = rev(levels(df$AA552_status_md)))
 
-B <-   ggplot(data=df,aes(x=Cx_date,fill=AA552_status_md_rev,y=AA552_status_md_rev)) + geom_boxplot(alpha=0.75,outliers=F) + geom_jitter(mapping = aes(color=as.factor(blbli_asr_cluster_renamed_simple)),alpha=1,width = 0,height = 0.25) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + cluster_scale_gray_color + theme(axis.text.y = element_markdown())
+B <-   ggplot(data=df,aes(x=Cx_date,fill=AA552_status_md_rev,y=AA552_status_md_rev)) + geom_boxplot(alpha=0.75,outliers=F) + geom_jitter(mapping = aes(color=as.factor(blbli_asr_cluster_renamed_simple)),alpha=1,width = 0,height = 0.25,size=0.5) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + cluster_scale_gray_color + theme(axis.text.y = element_markdown()) + s_figure_13_format +
+ scale_x_date(breaks = date_breaks_s13, date_labels = "%b %Y", expand = expansion(mult = c(0.02, 0.1)))  +
+  scale_y_discrete(labels = function(x) gsub(" plasmid", "<br>plasmid", x))
 
 B
 ```
@@ -97,19 +101,22 @@ B
 df$blbli_asr_cluster_renamed_simple <- factor(df$blbli_asr_cluster_renamed_simple,levels = sort(unique(df$blbli_asr_cluster_renamed_simple)))
 df$blbli_asr_cluster_renamed_simple_rev <- factor(df$blbli_asr_cluster_renamed_simple,levels = rev(levels(df$blbli_asr_cluster_renamed_simple)))
 
-C <-   ggplot(data=df,aes(x=Cx_date,fill=blbli_asr_cluster_renamed_simple)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + cluster_scale_gray 
+C <-   ggplot(data=df,aes(x=Cx_date,fill=blbli_asr_cluster_renamed_simple)) + geom_histogram(bins = number_of_weeks) + theme_bw_me + xlab("Collection date") + ylab ("Isolates") + scale_y_continuous(limits = c(0, 20))  + theme_bw_me + theme(legend.position='none') + cluster_scale_gray  + s_figure_13_format  +
+  scale_x_date(breaks = date_breaks_s13, date_labels = "%b %Y") 
 
-D <-   ggplot(data=df,aes(x=Cx_date,y=blbli_asr_cluster_renamed_simple_rev,fill=blbli_asr_cluster_renamed_simple_rev)) + geom_boxplot(alpha=.75,outliers=F) + geom_jitter(mapping = aes(color=(AA552_status_md)),alpha=1,width = 0,height = 0.25) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  cluster_scale_gray + AA552_scale_color 
+D <-   ggplot(data=df,aes(x=Cx_date,y=blbli_asr_cluster_renamed_simple_rev,fill=blbli_asr_cluster_renamed_simple_rev)) + geom_boxplot(alpha=.75,outliers=F) + geom_jitter(mapping = aes(color=(AA552_status_md)),alpha=1,width = 0,height = 0.25,size=0.5) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  cluster_scale_gray + AA552_scale_color + s_figure_13_format +
+  scale_x_date(breaks = date_breaks_s13, date_labels = "%b %Y", expand = expansion(mult = c(0.02, 0.1)))
 
 C
 
 D
 ```
 
-# Heatmap
+# Heatmaps
 
-# Facility plot
+# E. Facility plot
 ```{r}
+agg_grab_dev <- function(width, height) ragg::agg_capture(width = width, height = height, units = "in")
 df$AA552_status_rev <- factor(df$AA552_status,levels = rev(levels(factor(df$AA552_status))))
 phenotype = 'AA552_status_rev'
   dataframe <- df
@@ -126,41 +133,48 @@ phenotype = 'AA552_status_rev'
 
   matrix_raw_ordered <- matrix_raw[match(rev(levels(dataframe$clustering)),rownames(matrix_raw),incomparables = F) %>% subset(is.na(.)==F),]
 
-  rownames(matrix_raw_ordered) <- paste0(rownames(matrix_raw_ordered)," (n = ",rowSums(matrix_raw_ordered),")") 
+ 
+   rownames(matrix_raw_ordered) <- paste0(rownames(matrix_raw_ordered)," (n = ",rowSums(matrix_raw_ordered),")") 
   mat_prop <- sweep(matrix_raw_ordered, 1, rowSums(matrix_raw_ordered), FUN = "/")   
+  E_row_labels <- gsub("blaKPC", "<i>bla</i><sub>KPC</sub>", rownames(mat_prop))      # ADDED
+
   max(rownames(mat_prop) %>% nchar()) 
-  shared_rn_width <- unit(5, "in")
+  shared_rn_width <- unit(3, "in")
   
-  fig <- ComplexHeatmap::Heatmap(matrix = mat_prop,
+ fig <- ComplexHeatmap::Heatmap(matrix = mat_prop,
     col = c("white", "red"),
     cluster_rows = FALSE,
     cluster_columns = FALSE,
     cell_fun = function(j, i, x, y, width, height, fill) {
        val <- matrix_raw_ordered[i, j] 
     if (val != 0) {
-    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 12))
+    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 6))          # was 12
     }
     },
     show_heatmap_legend = FALSE,
     column_names_rot = 0,
-    column_title = "Facility",
+    column_title = NULL,
     column_title_side = "bottom",
-    width = ncol(mat_prop) * unit(.4, "in"),
-    height = nrow(mat_prop) * unit(.2, "in"),
+    column_title_gp = gpar(fontsize = 7.5),                                  # ADDED
+    column_names_gp = gpar(fontsize = 6.5),                                  # ADDED
+    width = ncol(mat_prop) * unit(.25, "in"),                                # was .4
+    height = nrow(mat_prop) * unit(.13, "in"),                               # was .2
     column_names_centered = TRUE,
     row_names_centered = FALSE,
     row_names_max_width = shared_rn_width,
-    row_names_gp = gpar(fontsize = 14))
+    row_names_gp = gpar(fontsize = 6.5),
+    row_labels = gt_render(E_row_labels))       
      
 heatmap_for_cowplot  <-    grid.grabExpr(draw(fig)) 
 
+fig_E <- fig
 # Add margin to this
 E <- cowplot::plot_grid(heatmap_for_cowplot)
 
 E
 ```
 
-# Spatiotemporal overall
+# F. Spatiotemporal overall
 
 ```{r}
 phenotype = 'blbli_asr_cluster_renamed_simple_rev'
@@ -189,20 +203,21 @@ phenotype = 'blbli_asr_cluster_renamed_simple_rev'
     cell_fun = function(j, i, x, y, width, height, fill) {
        val <- matrix_raw_ordered[i, j] 
     if (val != 0) {
-    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 12))
+    grid.text(sprintf("%.2s", val), x, y, gp = gpar(fontsize = 6))          # was 12
     }
     },
     show_heatmap_legend = FALSE,
     column_names_rot = 0,
     column_title = "Facility",
     column_title_side = "bottom",
-    width = ncol(mat_prop) * unit(.4, "in"),
-    height = nrow(mat_prop) * unit(.2, "in"),
+    column_title_gp = gpar(fontsize = 7.5),                                  # ADDED
+    column_names_gp = gpar(fontsize = 6.5),                                  # ADDED
+    width = ncol(mat_prop) * unit(.25, "in"),                                # was .4
+    height = nrow(mat_prop) * unit(.13, "in"),                               # was .2
     column_names_centered = TRUE,
     row_names_centered = FALSE,
     row_names_max_width = shared_rn_width,
-  row_names_gp = gpar(fontsize = 14)) 
-    
+    row_names_gp = gpar(fontsize = 6.5))       
 
 heatmap_for_cowplot  <-    grid.grabExpr(draw(fig)) 
 
@@ -214,51 +229,47 @@ f
 
 # Temporal distribution facilities
 
-```{r}
-G <- ggplot(data=df,aes(x=Cx_date,y=blbli_asr_cluster_renamed_simple_rev)) + geom_boxplot(alpha=0.5,outliers=F) + geom_jitter(mapping = aes(color=AA552_status_md),alpha=1,width = 0,height = .25,size=1.2) + theme_bw_me + xlab("Collection date") + ylab("")   + theme(legend.position = 'none')  + theme_bw_me + theme(legend.position='none') +  AA552_scale + AA552_scale_color + facet_wrap(~LTACH_Recode,ncol=4)
+```{r} 
+date_breaks_s13 <- c(as.Date("2014-08-01"), as.Date("2015-02-01"), as.Date("2015-07-24"))
 
+G <- ggplot(data=df,aes(x=date,y=blbli_asr_cluster_renamed_simple_rev)) + geom_boxplot(alpha=0.5,outliers=F,linewidth=0.25) + geom_jitter(mapping = aes(color=AA552_status_md),alpha=1,width = 0,height = .25,size=0.5) + theme_bw_me + xlab("Collection date") + ylab(NULL) + AA552_scale + AA552_scale_color + facet_wrap(~LTACH_Recode,ncol=7) +
+  scale_x_date(breaks = as.Date(c("2014-10-01", "2015-02-01", "2015-06-01")),
+             date_labels = "%b\n%Y")+  # Aug 2014, Feb 2015, Jul 2015   +
+  s_figure_13_format +
+  theme(panel.spacing.x = unit(0.15, "lines"))  
 G
 ```
 
+# Heatmap fixes
+```{r}
+# Widths of each heatmap's row labels
+rn_w_E <- ComplexHeatmap::max_text_width(rownames(fig_E@matrix), gp = gpar(fontsize = 6.5))
+rn_w_F <- ComplexHeatmap::max_text_width(rownames(mat_prop),     gp = gpar(fontsize = 6.5))
+
+# Padding order: bottom, left, top, right; extra right padding on the narrower one
+pad <- function(extra) unit.c(unit(2, "mm"), unit(2, "mm"), unit(2, "mm"), unit(2, "mm") + extra)
+
+E <- cowplot::plot_grid(grid.grabExpr(draw(fig_E, padding = pad(unit.pmax(rn_w_F - rn_w_E, unit(0, "mm")))),
+                                      device = agg_grab_dev))
+f <- cowplot::plot_grid(grid.grabExpr(draw(fig,   padding = pad(unit.pmax(rn_w_E - rn_w_F, unit(0, "mm")))),
+                                      device = agg_grab_dev))
+```
+
+
 # Curate figure
-```{r,fig.height=16,fig.width=12.8}
-AB <- cowplot::plot_grid(A,B,labels = c("A",'B'),ncol=2)
-CD <- cowplot::plot_grid(C,D,labels = c("C",'D'),ncol=2)
+```{r,fig.height=9.5,fig.width=7.5}
+AC <- cowplot::plot_grid(A, C, ncol = 1, labels = c("A","C"), label_size = 12,
+                         align = "v", axis = "lr")
+BD <- cowplot::plot_grid(B, D, ncol = 1, labels = c("B","D"), label_size = 12,
+                         align = "v", axis = "lr")
+ABCD <- cowplot::plot_grid(AC, BD, ncol = 2)
 
-figure <- cowplot::plot_grid(AB,CD,E,f,G,labels = c("","","E","F","G"),ncol=1,rel_heights = c(.275,.275,.175,.325,1))
-
+figure <- cowplot::plot_grid(ABCD, E, f, G, labels = c("","E","F","G"), ncol = 1, label_size = 12,
+                             rel_heights = c(0.7, 0.2, 0.38, 1))   # F: 0.35 -> 0.38
 figure
 ```
 
 # Save figure
 ```{r,fig.height=20,fig.width=10}
-ggsave("./figures/s_figure_13_spatiotemporal_distribution_BLBLI_AA552.png", plot = figure, units='in', height=16, width=12.8, dpi=900, bg='white')
-```
-
-# Patient summaries
-## No evidence of within patient transfer
-## Some susceptible + resistant strain pairs within patients!
-
-```{r}
-KPC_plasmid_summaries <-  df %>% group_by(Patient_ID) %>% summarise(n=n(),blbli_dich_num=sum(blbli_dich_num),AA552_KPC= sum(AA552_KPC),AA018_KPC=sum(AA018_KPC),AA552_non_KPC=sum(AA552_non_KPC)) %>% mutate(blbli_sus = n - blbli_dich_num )
-
-KPC_plasmid_summaries$blbli_both <- KPC_plasmid_summaries$blbli_dich_num>0 & KPC_plasmid_summaries$blbli_sus >0
-
-KPC_plasmid_summaries$AA552_KPC_AA018_KPC <- ifelse(KPC_plasmid_summaries$AA552_KPC>0 & KPC_plasmid_summaries$AA018_KPC>0,T,F)
-KPC_plasmid_summaries$AA552_non_KPC_AA018_KPC <- ifelse(KPC_plasmid_summaries$AA552_non_KPC>0 & KPC_plasmid_summaries$AA018_KPC>0,T,F)
-
-paste0("No evidence of within patient transfer: ")
-
-table(KPC_plasmid_summaries$AA552_non_KPC_AA018_KPC,KPC_plasmid_summaries$AA552_KPC_AA018_KPC,dnn = c("AA552 non KPC & AA018 KPC isolate(s)","Have KPC on a AA552 plasmid and a KPC on AA018 plasmid across isolates"))
-
-table(KPC_plasmid_summaries$blbli_both,dnn = c("Susceptible and resistant strain"))
-```
-
-# Long read data
-
-```{r}
-paste0("Compelling case, but not one before the other!")
-df %>% subset(isolate_no %in% c("PCMP_H173","PCMP_H276")) %>% select(isolate_no,LTACH_Recode,Cx_date,AA552,blbli_asr_cluster_renamed)
-
-df %>% subset(isolate_no %in% c("PCMP_H148","PCMP_H307")) %>% select(isolate_no,LTACH_Recode,Cx_date,AA552,blbli_asr_cluster_renamed)
-```
+ggsave("./figures/s_figure_13_spatiotemporal_distribution_BLBLI_AA552.png", plot = figure, width = 7.5, height = 9.5, units = 'in', dpi = 900, bg = 'white', device = ragg::agg_png)
+``` 
